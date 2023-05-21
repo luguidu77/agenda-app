@@ -11,7 +11,6 @@ import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
 
 import '../models/personaliza_model.dart';
-import '../providers/personaliza_provider.dart';
 import '../providers/providers.dart';
 
 class FichaClienteScreen extends StatefulWidget {

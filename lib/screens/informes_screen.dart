@@ -1,18 +1,12 @@
-import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
-import 'package:agendacitas/providers/cita_list_provider.dart';
-import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
-
 import 'package:agendacitas/widgets/change_theme_button.dart';
 import 'package:agendacitas/widgets/line_chart.dart';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/personaliza_model.dart';
-import '../providers/personaliza_provider.dart';
+import '../providers/providers.dart';
 
 class InformesScreen extends StatefulWidget {
   const InformesScreen({Key? key}) : super(key: key);
@@ -291,9 +285,9 @@ class _InformesScreenState extends State<InformesScreen> {
 
   _fecha() {
     // List<ClienteModel> nombreCliente = clientes();
-    DateTime initialDate = DateTime.now();
-    DateTime firstDate = initialDate.subtract(const Duration(days: 365));
-    DateTime lastDate = initialDate.add(const Duration(days: 365));
+    // DateTime initialDate = DateTime.now();
+    // DateTime firstDate = initialDate.subtract(const Duration(days: 365));
+    // DateTime lastDate = initialDate.add(const Duration(days: 365));
     return Expanded(
       flex: 1,
       child: Row(

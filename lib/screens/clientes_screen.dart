@@ -75,14 +75,14 @@ class _ClientesScreenState extends State<ClientesScreen> {
       listaClientes = listaAux;
 
       for (var element in listaClientes) {
-          traeCitaPorCliente(element.id).then((value) {
-            print('trae las citas $value');
+        traeCitaPorCliente(element.id).then((value) {
+          print('trae las citas $value');
 
-            numCitas.add(value);
+          numCitas.add(value);
 
-            print('lista de las citas $numCitas');
-          });
-        }
+          print('lista de las citas $numCitas');
+        });
+      }
 
       print('----------------lista clientes : $listaClientes');
     }
@@ -424,7 +424,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
     //? TRAIGO _citas POR idCliente
     try {
       if (iniciadaSesionUsuario) {
-        final citas0 = await FirebaseProvider()
+        await FirebaseProvider()
             .cargarCitasPorCliente(emailSesionUsuario, idCliente);
 
         debugPrint('citas firebase $citas');

@@ -1,14 +1,12 @@
-import 'package:agendacitas/screens/bienvenida.dart';
-
-import 'package:agendacitas/screens/home.dart';
 import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'package:flutter/material.dart';
 
+import '../screens/screens.dart';
+
 class InicioConfigApp extends StatefulWidget {
-  String usuarioAPP;
-  InicioConfigApp({Key? key, required this.usuarioAPP}) : super(key: key);
+  final String usuarioAPP;
+  const InicioConfigApp({Key? key, required this.usuarioAPP}) : super(key: key);
 
   @override
   State<InicioConfigApp> createState() => _InicioConfigAppState();

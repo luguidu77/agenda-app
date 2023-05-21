@@ -1,4 +1,5 @@
 import 'package:agendacitas/firebase_options.dart';
+import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -94,6 +95,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
   }
 
   inicializacion() async {
+    EstadoPagoApp p = EstadoPagoApp();
     //?comprueba pago en dispositivo
     final pago = await CompruebaPago().compruebaPago();
     debugPrint('datos gardados en tabla Pago (calendarioScreen.dart) $pago');
@@ -103,13 +105,24 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
     usuarioAPP =
         emailusuario; // usuarioAPP se usa en eliminar cita de Firebase //todo Quitar cuando sea online todas las gestiones
 
+    // 1- COMPRUEBO EN FIREBASE LA VARIABLE PAGO DEL USUARIO ##############################################
+    bool? pagadoFB = await FirebaseProvider().compruebaPagoFB(emailusuario);
+    // 2- LA PASO POR perfilPorPago QUE ME DEVUELVE GRATUITA/PRUEBA_ACTIVA/COMPRADA########################
+    final estadoPagoApp =
+        await EstadoPagoApp().perfilPorPago(pagadoFB, usuarioAPP);
+    debugPrint(
+        'estadopagoapp en fb ----------------${estadoPagoApp.toString()}');
+
+    // 3-ASIGNO AL PROVIDER EstadoPagoApp EL ESTADO DE PAGO PARA VISUALIZARLO EN TODA LA APLICACION #######
+    p.perfil = estadoPagoApp;
+
     //? SI LA APP NO HA SIDO COMPRADA => VERIFICA LA FECHA DE REGISTRO DEL USUARIO PARA SABER SI HA CADUCADO EL PERIODO DE PRUEBA
-   
-   
+
     if (!pago['pago']) {
       bool? pagadoFB = await FirebaseProvider().compruebaPagoFB(emailusuario);
 
-      print('compruba pago en firebase ----------------$pagadoFB');
+      debugPrint(
+          'compruba pago en firebase ----------------${pagadoFB.toString()}');
       if (!pagadoFB) {
         FirebaseAuth.instance.authStateChanges().listen((User? user) {
           if (user != null) {

@@ -688,7 +688,7 @@ class FirebaseProvider extends ChangeNotifier {
   }
 
   Future<bool> compruebaPagoFB(usuarioAPP) async {
-    PagoModel pago = PagoModel();
+    late bool pago;
     await _iniFirebase();
     try {
       final collecRef = await _referenciaDocumento(usuarioAPP, 'pago');
@@ -696,9 +696,11 @@ class FirebaseProvider extends ChangeNotifier {
       await collecRef.doc('0').get().then((res) {
         var data = res.data();
 
-        pago.pago = data['pago'];
+        pago = data['pago'];
       });
-    } catch (e) {}
-    return pago.pago == 'true' ? true : false;
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    return pago;
   }
 }

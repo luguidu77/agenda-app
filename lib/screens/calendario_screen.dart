@@ -104,30 +104,36 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
         emailusuario; // usuarioAPP se usa en eliminar cita de Firebase //todo Quitar cuando sea online todas las gestiones
 
     //? SI LA APP NO HA SIDO COMPRADA => VERIFICA LA FECHA DE REGISTRO DEL USUARIO PARA SABER SI HA CADUCADO EL PERIODO DE PRUEBA
+   
+   
     if (!pago['pago']) {
-      FirebaseAuth.instance.authStateChanges().listen((User? user) {
-        if (user != null) {
-          DateTime now = DateTime.now();
-          DateTime fecha =
-              DateTime.parse(user.metadata.creationTime.toString());
-          debugPrint(
-              '################   LOS DIAS DE PRUEBA LOS CONFIGURO AQUI EN .configuracions.dart ###########');
-          Duration diasDePrueba = perido_de_prueba;
+      bool? pagadoFB = await FirebaseProvider().compruebaPagoFB(emailusuario);
 
-          if (now.subtract(diasDePrueba).isAfter(fecha)) {
-            debugPrint('fecha cumplida prueba caducada');
+      print('compruba pago en firebase ----------------$pagadoFB');
+      if (!pagadoFB) {
+        FirebaseAuth.instance.authStateChanges().listen((User? user) {
+          if (user != null) {
+            DateTime now = DateTime.now();
+            DateTime fecha =
+                DateTime.parse(user.metadata.creationTime.toString());
+            debugPrint(
+                '################   LOS DIAS DE PRUEBA LOS CONFIGURO AQUI EN .configuracions.dart ###########');
+            Duration diasDePrueba = perido_de_prueba;
 
-            Navigator.pushReplacementNamed(context, 'finalizacionPruebaScreen',
-                arguments: {
-                  'usuarioAPP': user.email.toString(),
-                });
+            if (now.subtract(diasDePrueba).isAfter(fecha)) {
+              debugPrint('fecha cumplida prueba caducada');
 
-            
-          } else {
-            debugPrint('en tiempo prueba gratuita');
+              Navigator.pushReplacementNamed(
+                  context, 'finalizacionPruebaScreen',
+                  arguments: {
+                    'usuarioAPP': user.email.toString(),
+                  });
+            } else {
+              debugPrint('en tiempo prueba gratuita');
+            }
           }
-        }
-      });
+        });
+      }
     }
 
     //? compruebo si hay email para saber si hay sesion iniciada

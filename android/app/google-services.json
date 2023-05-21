@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "669231682418",
+    "firebase_url": "https://flutter-varios-576e6-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "flutter-varios-576e6",
+    "storage_bucket": "flutter-varios-576e6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:669231682418:android:4d53e97fb4fc8f6bd7c3eb",
+        "android_client_info": {
+          "package_name": "agendadecitas.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "669231682418-1adh4lhuprmqt8teqtil7lplml933545.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbR2Fm8mMy9be3VGyZ0_rI7C715uBMos0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "669231682418-1adh4lhuprmqt8teqtil7lplml933545.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "669231682418-hu1rs884ve5po6ioogdiscdpq3u5d93b.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "agendadecitas.app.agendadecitas"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

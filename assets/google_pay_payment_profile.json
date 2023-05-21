@@ -1,0 +1,38 @@
+{
+  "provider": "google_pay",
+  "data": {
+    "environment": "PRODUCTION",
+    "apiVersion": 2,
+    "apiVersionMinor": 0,
+    "allowedPaymentMethods": [
+      {
+        "type": "CARD",
+        "tokenizationSpecification": {
+          "type": "PAYMENT_GATEWAY",
+          "parameters": {
+            "gateway": "stripe",
+            "stripe:version": "2020-08-27",
+            "stripe:publishableKey": "pk_live_51JpFagEaW0pHhZCIR7pWGHaR6b3tl58FiZh1PD06OYQmx3yOQ8PHwSJeHNUoBjDDgcFvsg3i3iCCDanKR9nLbRy100oohpdDpV"
+          }
+        },
+        "parameters": {
+          "allowedCardNetworks": ["VISA", "MASTERCARD"],
+          "allowedAuthMethods": ["PAN_ONLY", "CRYPTOGRAM_3DS"],
+          "billingAddressRequired": false,
+          "billingAddressParameters": {
+            "format": "FULL",
+            "phoneNumberRequired": false
+          }
+        }
+      }
+    ],
+    "merchantInfo": {
+      "merchantId": "agenda de citas",
+      "merchantName": "agenda de citas"
+    },
+    "transactionInfo": {
+      "countryCode": "ES",
+      "currencyCode": "EUR"
+    }
+  }
+}

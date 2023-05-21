@@ -57,10 +57,8 @@ class _MyAppState extends State<MyApp> {
 
   reseteoprueba() async {
     //todo quitar , es solo pruebas para guadado en dispositivo de pago
-   //  await PagoProvider().guardaPagado(false, '');
+    //await PagoProvider().guardaPagado(false, '');
     //FirebaseAuth.instance.signOut();
-
-   
 
     /* 
       ?LOGICA DE INICIO:

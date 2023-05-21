@@ -1,5 +1,6 @@
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/models/pago_model.dart';
 import 'package:agendacitas/models/perfil_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -110,7 +111,7 @@ class FirebaseProvider extends ChangeNotifier {
     // Obtener el ID del documento
 
     // retorna el id de la cita para utilizarlo en id recordatorio
-    return  convertirIdEnEntero(docRef.id);
+    return convertirIdEnEntero(docRef.id);
   }
 
   nuevoServicio(String emailUsuarioAPP, String servicio, String tiempo,
@@ -684,5 +685,20 @@ class FirebaseProvider extends ChangeNotifier {
     }
 
     return gananciaDiaria.toString();
+  }
+
+  Future<bool> compruebaPagoFB(usuarioAPP) async {
+    PagoModel pago = PagoModel();
+    await _iniFirebase();
+    try {
+      final collecRef = await _referenciaDocumento(usuarioAPP, 'pago');
+
+      await collecRef.doc('0').get().then((res) {
+        var data = res.data();
+
+        pago.pago = data['pago'];
+      });
+    } catch (e) {}
+    return pago.pago == 'true' ? true : false;
   }
 }

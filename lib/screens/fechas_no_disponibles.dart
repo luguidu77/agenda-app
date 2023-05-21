@@ -3,16 +3,15 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/cita_list_provider.dart';
-import 'package:agendacitas/providers/my_logic_cita.dart';
-import 'package:agendacitas/providers/pago_provider.dart';
-
+import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:agendacitas/widgets/botones/floating_action_buton_widget.dart';
 import 'package:flutter/material.dart';
-
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
+
+import '../mylogic_formularios/mylogic.dart';
 
 class FechasNoDisponibles extends StatefulWidget {
   const FechasNoDisponibles({Key? key}) : super(key: key);

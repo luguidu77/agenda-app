@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../providers/pago_provider.dart';
+import '../../providers/pago_dispositivo_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:agendacitas/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

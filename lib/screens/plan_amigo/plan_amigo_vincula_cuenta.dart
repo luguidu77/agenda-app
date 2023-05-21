@@ -1,6 +1,7 @@
+import 'package:agendacitas/mylogic_formularios/my_logic_planAmigo.dart';
 import 'package:agendacitas/providers/Firebase/firebase_plan_amigo.dart';
-import 'package:agendacitas/providers/comprueba_pago.dart';
-import 'package:agendacitas/providers/my_logic_planAmigo.dart';
+import 'package:agendacitas/utils/comprueba_pago.dart';
+
 import 'package:agendacitas/screens/plan_amigo/plan_amigo.dart';
 import 'package:agendacitas/widgets/botones/floating_action_buton_widget.dart';
 import 'package:email_validator/email_validator.dart';

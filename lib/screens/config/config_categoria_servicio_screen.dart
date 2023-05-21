@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../models/cita_model.dart';
+import '../../mylogic_formularios/mylogic.dart';
 import '../../providers/Firebase/firebase_provider.dart';
-import '../../providers/my_logic_cita.dart';
-import '../../providers/pago_provider.dart';
+
+import '../../providers/pago_dispositivo_provider.dart';
 
 class ConfigCategoriaServiciosScreen extends StatefulWidget {
   const ConfigCategoriaServiciosScreen({Key? key}) : super(key: key);

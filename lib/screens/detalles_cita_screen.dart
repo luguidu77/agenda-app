@@ -4,7 +4,8 @@ import 'package:intl/intl.dart';
 
 import '../models/cita_model.dart';
 import '../models/personaliza_model.dart';
-import '../providers/my_logic_cita.dart';
+
+import '../mylogic_formularios/mylogic.dart';
 import '../widgets/botones/form_reprogramar_reserva.dart';
 import '../widgets/compartirCliente/compartir_cita_a_cliente.dart';
 

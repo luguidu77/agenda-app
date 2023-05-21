@@ -1,7 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
-import 'package:agendacitas/providers/pago_provider.dart';
+import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';
 import 'package:agendacitas/providers/cita_list_provider.dart';

@@ -1,12 +1,14 @@
+export 'package:agendacitas/mylogic_formularios/my_logic_planAmigo.dart';
+export 'package:agendacitas/providers/Firebase/firebase_plan_amigo.dart';
+export 'package:agendacitas/providers/Firebase/sincronizar_firebase.dart';
 export 'package:agendacitas/providers/calendario_provider.dart';
 export 'package:agendacitas/providers/cita_list_provider.dart';
-export 'package:agendacitas/providers/comprueba_pago.dart';
 export 'package:agendacitas/providers/detec_change_activate_service.dart';
 export 'package:agendacitas/providers/dispo_semanal_provider.dart';
-export 'package:agendacitas/providers/pago_provider.dart';
+export 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 export 'package:agendacitas/providers/recordatorios_provider.dart';
 export 'package:agendacitas/providers/theme_provider.dart';
+export 'package:agendacitas/utils/comprueba_pago.dart';
+
 export '../../providers/Firebase/firebase_provider.dart';
-export 'package:agendacitas/providers/Firebase/sincronizar_firebase.dart';
-export 'package:agendacitas/providers/my_logic_cita.dart';
 export '../../providers/personaliza_provider.dart';

@@ -15,9 +15,9 @@ import '../../widgets/filtros/backdrop_citas.dart';
 import '../../widgets/filtros/items_filter_citas.dart';
 import '../widgets/lista_de_citas.dart';
 import '../providers/Firebase/firebase_provider.dart';
-import '../providers/comprueba_pago.dart';
+import '../utils/comprueba_pago.dart';
 import '../providers/dispo_semanal_provider.dart';
-import '../providers/pago_provider.dart';
+import '../providers/pago_dispositivo_provider.dart';
 import '../utils/disponibilidadSemanal.dart';
 import '../widgets/botones/boton_speed_dial.dart';
 
@@ -116,11 +116,13 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
 
           if (now.subtract(diasDePrueba).isAfter(fecha)) {
             debugPrint('fecha cumplida prueba caducada');
-            //
+
             Navigator.pushReplacementNamed(context, 'finalizacionPruebaScreen',
                 arguments: {
                   'usuarioAPP': user.email.toString(),
                 });
+
+            
           } else {
             debugPrint('en tiempo prueba gratuita');
           }

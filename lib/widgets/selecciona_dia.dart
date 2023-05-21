@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/models.dart';
+import '../mylogic_formularios/mylogic.dart';
 import '../providers/providers.dart';
 import '../utils/publicidad.dart';
 import '../utils/utils.dart';

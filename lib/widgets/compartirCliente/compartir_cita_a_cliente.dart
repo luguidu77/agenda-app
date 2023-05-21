@@ -2,7 +2,7 @@
 import 'package:agendacitas/models/perfil_model.dart';
 import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
-import 'package:agendacitas/providers/pago_provider.dart';
+import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:agendacitas/providers/personaliza_provider.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';

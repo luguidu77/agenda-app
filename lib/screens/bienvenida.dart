@@ -1,4 +1,4 @@
-import 'package:agendacitas/providers/pago_provider.dart';
+import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:agendacitas/screens/config/config_personalizar_screen.dart';
 import 'package:agendacitas/screens/home.dart';
 import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
@@ -114,7 +114,7 @@ class _BienvenidaState extends State<Bienvenida> {
                       height: 60,
                       color: Colors.deepPurple[200],
                       child: Center(
-                        child: Text('CREAR CUENTA',
+                        child: Text('PRUEBA GRATUITA',
                             style: GoogleFonts.bebasNeue(
                                 fontSize: 18, color: Colors.white)),
                       ),
@@ -131,7 +131,7 @@ class _BienvenidaState extends State<Bienvenida> {
             width: double.infinity,
             height: 60,
             child: ElevatedButton(
-              child: Text('Prefiero continuar con la versión gratuita',
+              child: Text('Prefiero continuar sin cuenta online',
                   style: GoogleFonts.bebasNeue(fontSize: 18)),
               onPressed: () {
                 //al por primera vez al Home, guada las variables pertinenes para que la proxima vaya al Home sin pasar por la bienvenida

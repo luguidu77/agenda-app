@@ -4,19 +4,16 @@ import 'dart:io';
 
 import 'package:agendacitas/main.dart';
 import 'package:agendacitas/models/cita_model.dart';
-import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
-import 'package:agendacitas/providers/Firebase/sincronizar_firebase.dart';
-import 'package:agendacitas/providers/cita_list_provider.dart';
-import 'package:agendacitas/providers/my_logic_cita.dart';
-import 'package:agendacitas/providers/pago_provider.dart';
 import 'package:agendacitas/screens/ficha_cliente_screen.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
-
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_core/firebase_core.dart';
+
+import '../mylogic_formularios/mylogic.dart';
+import '../providers/providers.dart';
 
 class NuevoActualizacionCliente extends StatefulWidget {
   /*  ClienteModel clienteParametro;

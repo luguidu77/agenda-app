@@ -3,8 +3,7 @@ import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/cita_list_provider.dart';
 import 'package:agendacitas/providers/db_provider.dart';
-import 'package:agendacitas/providers/my_logic_cita.dart';
-import 'package:agendacitas/providers/pago_provider.dart';
+import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:agendacitas/providers/theme_provider.dart';
 
 import 'package:agendacitas/screens/contacs_dialog.dart';
@@ -19,6 +18,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
+
+import '../../mylogic_formularios/mylogic.dart';
 
 class ClientaStep extends StatefulWidget {
   ClienteModel clienteParametro;

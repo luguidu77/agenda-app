@@ -9,7 +9,6 @@ class FinalizacionPrueba extends StatefulWidget {
 }
 
 class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
-  String email = 'fdfd';
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic> parametros =
@@ -25,7 +24,7 @@ class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
               Text(parametros['usuarioAPP'].toString()),
               const Text('El periodo de prueba a finalizado'),
               ElevatedButton(
-                  onPressed: () => FirebaseAuth.instance.signOut(),
+                  onPressed: () => {FirebaseAuth.instance.signOut()},
                   child: const Text('ok'))
             ],
           ),

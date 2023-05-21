@@ -1,6 +1,6 @@
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/cita_list_provider.dart';
-import 'package:agendacitas/providers/pago_provider.dart';
+import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 
 import 'package:agendacitas/widgets/change_theme_button.dart';
 import 'package:agendacitas/widgets/line_chart.dart';

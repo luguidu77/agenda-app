@@ -1,10 +1,10 @@
-
+import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/screens/inicio_config_app.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:agendacitas/widgets/formulariosSessionApp/olvido_password.dart';
 import 'package:flutter/material.dart';
 import 'package:agendacitas/providers/Firebase/sincronizar_firebase.dart';
-import 'package:agendacitas/providers/pago_provider.dart';
+import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 
 import 'package:agendacitas/widgets/formulariosSessionApp/validaciones_form_inicio_session_registro.dart';
 import 'package:email_validator/email_validator.dart';
@@ -214,8 +214,12 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                           debugPrint('SESION INICIADA');
                           /* await Future.delayed(
                                       const Duration(seconds: 3)); */
+
+                          final pagado =
+                              await FirebaseProvider().compruebaPagoFB(email);
+
                           await PagoProvider()
-                              .guardaPagado(true, email.toString());
+                              .guardaPagado(pagado, email.toString());
 
                           _irPaginaInicio();
                           //Restart.restartApp();
@@ -326,7 +330,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
         const Padding(
           padding: EdgeInsets.all(8.0),
           child: Text(
-            'Necesitamos un email y una contraseña',
+            'Prueba todas las opciones y funcionalidades sin compromiso, sólo necesitas un email y una contraseña, puedes cancelar o suscribirte en cualquier momento. ',
             style: TextStyle(fontSize: 14),
           ),
         ),

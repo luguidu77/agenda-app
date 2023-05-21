@@ -1,4 +1,4 @@
-import 'package:agendacitas/providers/pago_provider.dart';
+import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:flutter/foundation.dart';
 
 class CompruebaPago {

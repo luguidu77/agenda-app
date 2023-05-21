@@ -1,13 +1,14 @@
 import 'dart:io';
 
-import 'package:agendacitas/models/perfil_model.dart';
-import 'package:agendacitas/providers/Firebase/sincronizar_firebase.dart';
-import 'package:agendacitas/providers/my_logic_cita.dart';
 import 'package:agendacitas/screens/config/config_usuario_app.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../models/models.dart';
+import '../mylogic_formularios/mylogic.dart';
+import '../providers/providers.dart';
 
 class NuevoAcutalizacionUsuarioApp extends StatefulWidget {
   PerfilModel? perfilUsuarioApp;

@@ -1,11 +1,14 @@
-import 'package:agendacitas/providers/Firebase/firebase_plan_amigo.dart';
-import 'package:agendacitas/providers/my_logic_planAmigo.dart';
+
+
+
 import 'package:agendacitas/providers/plan_amigo_provider.dart';
-import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
 import 'package:agendacitas/utils/publicidad.dart';
 import 'package:agendacitas/widgets/botones/floating_action_buton_widget.dart';
+import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+
+import '../../providers/providers.dart';
 
 class PlanAmigo extends StatefulWidget {
   const PlanAmigo({Key? key}) : super(key: key);

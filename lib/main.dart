@@ -1,5 +1,6 @@
 import 'package:agendacitas/.env.dart';
 import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -57,8 +58,8 @@ class _MyAppState extends State<MyApp> {
 
   reseteoprueba() async {
     //todo quitar , es solo pruebas para guadado en dispositivo de pago
-    //await PagoProvider().guardaPagado(false, '');
-    //FirebaseAuth.instance.signOut();
+    // await PagoProvider().guardaPagado(false, '');
+    // FirebaseAuth.instance.signOut();
 
     /* 
       ?LOGICA DE INICIO:
@@ -88,9 +89,10 @@ class _MyAppState extends State<MyApp> {
   }
 
   inicializacion() async {
-    final pago = await CompruebaPago().compruebaPago();
-    debugPrint('datos gardados en tabla Pago (inicioConfigApp.dart) $pago');
-
+    //?comprueba pago en dispositivo
+    final pago = await CompruebaPago.getPagoEmailDispositivo();
+    debugPrint('datos gardados en tabla Pago (main.dart) $pago');
+   
     if (mounted) {
       setState(() {
         //? guardo en variables los datos de pago->  email
@@ -128,6 +130,8 @@ class _MyAppState extends State<MyApp> {
             create: (BuildContext context) => DispoSemanalProvider()),
         ChangeNotifierProvider(
             create: (BuildContext context) => CalendarioProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => EstadoPagoAppProvider()),
       ],
       builder: (context, _) {
         return MaterialApp(

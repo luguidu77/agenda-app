@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class DisponibilidadSemanal {
-  static Future<List<int>> disponibilidadSemanal(context, usuarioAP) async {
+  static Future<List<int>> disponibilidadSemanal(BuildContext? context, usuarioAP) async {
     List<int> diasNoDisponibles =
         []; //Lunes = 1, Martes = 2,Miercoles =3....Domingo = 7
     var data;
@@ -17,7 +17,7 @@ class DisponibilidadSemanal {
 
     //invoca DispoSemanalProvider
     final dDispoSemanal =
-        Provider.of<DispoSemanalProvider>(context, listen: false);
+        Provider.of<DispoSemanalProvider>(context!, listen: false);
 
     // SETEAR DISPONIBILIDAD SEMANAL EN CONTEXTO
     dDispoSemanal.setDiasDispibles(data);

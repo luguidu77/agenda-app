@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../models/personaliza_model.dart';
-import '../../providers/personaliza_provider.dart';
-import '../../utils/alertasSnackBar.dart';
-import '../../widgets/configRecordatorios.dart';
-import '../../widgets/tarjeta_cod_moneda.dart';
+import '../models/personaliza_model.dart';
+import '../providers/personaliza_provider.dart';
+import '../utils/alertasSnackBar.dart';
+import '../widgets/configRecordatorios.dart';
+import '../widgets/tarjeta_cod_moneda.dart';
 
 class ConfigPersonalizar extends StatefulWidget {
   const ConfigPersonalizar({Key? key}) : super(key: key);

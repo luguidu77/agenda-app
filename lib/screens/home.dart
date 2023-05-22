@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cita_model.dart';
+import '../providers/estado_pago_app_provider.dart';
+import '../providers/providers.dart';
 import '../providers/theme_provider.dart';
 import '../widgets/widgets.dart';
 import 'screens.dart';
@@ -26,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ThemeProvider temaDefault = ThemeProvider();
 
   cargarTema() async {
+    
     // comprobamos si hay un color de tema guardado en sqlite, si lo hay cambia el tema con el color guardado
     final colorTema = await ThemeProvider().cargarTema();
 
@@ -49,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     cargarTema();
+
     super.initState();
   }
 
@@ -59,7 +63,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     return MaterialApp(
-      
         debugShowCheckedModeBanner: false,
         title: 'Agenda de citas',
         themeMode: temaDefault.themeMode,
@@ -111,7 +114,8 @@ class _HomeScreenState extends State<HomeScreen> {
           'Tema': (BuildContext context) => const TemaScreen(),
           'Servicios': (_) => const ServiciosScreen(),
           'Recordatorios': (_) => const ConfigRecordatorios(),
-          'configServicios': (BuildContext context) => const ConfigServiciosScreen(),
+          'configServicios': (BuildContext context) =>
+              const ConfigServiciosScreen(),
           'ConfigCategoriaServiciosScreen': (context) =>
               const ConfigCategoriaServiciosScreen(),
           /* 'clientaStep': (BuildContext context) => ClientaStep(
@@ -129,7 +133,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 registroLogin: 'Registro',
               ), */
           'ConfigUsuarioApp': (context) => const ConfigUsuarioApp(),
-          'NuevoActualizacionCliente': (context) => const NuevoActualizacionCliente(
+          'NuevoActualizacionCliente': (context) =>
+              const NuevoActualizacionCliente(
                 cliente: null,
                 pagado: false,
                 usuarioAPP: '',

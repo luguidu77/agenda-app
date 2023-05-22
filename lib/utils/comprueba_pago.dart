@@ -1,15 +1,12 @@
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
-import 'package:flutter/foundation.dart';
 
 class CompruebaPago {
-  compruebaPago() async {
+  // devuelve los datos guardados en dispositivos  {pago: false, email: loli@gmail.com}
+  static Future<Map<String, dynamic>> getPagoEmailDispositivo() async {
     Map<String, dynamic> pago;
-  
-      // comprueba pago en dispositivo
-      final p = await PagoProvider().cargarPago();
-      debugPrint('datos gardados en tabla Pago (home.dart) $p');
 
-      pago = p;    
+    final p = await PagoProvider().cargarPago();
+    pago = p;
 
     return pago;
   }

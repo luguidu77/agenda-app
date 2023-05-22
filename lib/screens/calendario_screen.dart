@@ -22,7 +22,7 @@ import '../providers/pago_dispositivo_provider.dart';
 import '../utils/disponibilidadSemanal.dart';
 import '../widgets/botones/boton_speed_dial.dart';
 
-import 'config/config.dart';
+import '../config/config.dart';
 
 class CalendarioCitasScreen extends StatefulWidget {
   const CalendarioCitasScreen({Key? key}) : super(key: key);
@@ -95,85 +95,17 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
   }
 
   inicializacion() async {
-    EstadoPagoApp p = EstadoPagoApp();
-    //?comprueba pago en dispositivo
-    final pago = await CompruebaPago().compruebaPago();
-    debugPrint('datos gardados en tabla Pago (calendarioScreen.dart) $pago');
-
-    //? guardo en variables los datos de pago-> pago y email
-    String emailusuario = pago['email'];
-    usuarioAPP =
-        emailusuario; // usuarioAPP se usa en eliminar cita de Firebase //todo Quitar cuando sea online todas las gestiones
-
-    // 1- COMPRUEBO EN FIREBASE LA VARIABLE PAGO DEL USUARIO ##############################################
-    bool? pagadoFB = await FirebaseProvider().compruebaPagoFB(emailusuario);
-    // 2- LA PASO POR perfilPorPago QUE ME DEVUELVE GRATUITA/PRUEBA_ACTIVA/COMPRADA########################
-    final estadoPagoApp =
-        await EstadoPagoApp().perfilPorPago(pagadoFB, usuarioAPP);
-    debugPrint(
-        'estadopagoapp en fb ----------------${estadoPagoApp.toString()}');
-
-    // 3-ASIGNO AL PROVIDER EstadoPagoApp EL ESTADO DE PAGO PARA VISUALIZARLO EN TODA LA APLICACION #######
-    p.perfil = estadoPagoApp;
-
-    //? SI LA APP NO HA SIDO COMPRADA => VERIFICA LA FECHA DE REGISTRO DEL USUARIO PARA SABER SI HA CADUCADO EL PERIODO DE PRUEBA
-
-    if (!pago['pago']) {
-      bool? pagadoFB = await FirebaseProvider().compruebaPagoFB(emailusuario);
-
-      debugPrint(
-          'compruba pago en firebase ----------------${pagadoFB.toString()}');
-      if (!pagadoFB) {
-        FirebaseAuth.instance.authStateChanges().listen((User? user) {
-          if (user != null) {
-            DateTime now = DateTime.now();
-            DateTime fecha =
-                DateTime.parse(user.metadata.creationTime.toString());
-            debugPrint(
-                '################   LOS DIAS DE PRUEBA LOS CONFIGURO AQUI EN .configuracions.dart ###########');
-            Duration diasDePrueba = perido_de_prueba;
-
-            if (now.subtract(diasDePrueba).isAfter(fecha)) {
-              debugPrint('fecha cumplida prueba caducada');
-
-              Navigator.pushReplacementNamed(
-                  context, 'finalizacionPruebaScreen',
-                  arguments: {
-                    'usuarioAPP': user.email.toString(),
-                  });
-            } else {
-              debugPrint('en tiempo prueba gratuita');
-            }
-          }
-        });
-      }
-    }
-
-    //? compruebo si hay email para saber si hay sesion iniciada
-    iniciadaSesionUsuario = emailusuario != '' ? true : false;
-    //todo: hasta aqui se ejecuta por duplicado en el main traer provider
-
-    //? seteo el Provider para tener pago e emailusuario en toda la aplicacion
-    final providerPagoUsuarioAPP = await pagoProvider();
-    providerPagoUsuarioAPP.pagado = pago;
-
-    //?  si hay usuario disponible, seteo en provider la disponibilidad semanal para el servicio
-    iniciadaSesionUsuario
-        // ignore: use_build_context_synchronously
-        ? diasNoDisponibles = await DisponibilidadSemanal.disponibilidadSemanal(
-            context,
-            emailusuario) // diasNoDisponibles desde la carpeta utils    //Lunes = 1, Martes = 2,Miercoles =3....Domingo = 7
-        : debugPrint('NO HAY USURIO LOGEADO!!!!');
-    if (mounted) {
-      setState(() => {});
-    }
-
-    //?I ES APP DE PAGO SINCRONIZA CON FIREBASE ----------------------------------------------------------
-    //if (pagado) SincronizarFirebase().sincronizaSubeFB(emailusuario);
+   
   }
 
   @override
   Widget build(BuildContext context) {
+    final estadoProvider =
+        Provider.of<EstadoPagoAppProvider>(context, listen: true);
+    usuarioAPP = estadoProvider.emailUsuarioApp;
+    iniciadaSesionUsuario = usuarioAPP != '' ? true : false;
+    print('------------------------usuarioapp $usuarioAPP');
+
     var calendarioProvider =
         Provider.of<CalendarioProvider>(context, listen: true);
     fechaElegida = calendarioProvider.fechaSeleccionada;

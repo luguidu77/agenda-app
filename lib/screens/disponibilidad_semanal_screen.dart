@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'config/config_disponibilidad.dart';
+import '../config/config_disponibilidad.dart';
 
 class DisponibilidadSemanalScreen extends StatefulWidget {
   const DisponibilidadSemanalScreen({

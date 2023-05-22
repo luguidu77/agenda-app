@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
-import '../../models/models.dart';
-import '../../providers/providers.dart';
-import '../../utils/utils.dart';
-import '../screens.dart';
+import '../models/models.dart';
+import '../providers/providers.dart';
+import '../utils/utils.dart';
+import '../screens/screens.dart';
 
 class ConfigUsuarioApp extends StatefulWidget {
   const ConfigUsuarioApp({Key? key}) : super(key: key);

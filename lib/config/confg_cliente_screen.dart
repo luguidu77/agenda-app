@@ -2,7 +2,7 @@ import 'package:agendacitas/models/cita_model.dart';
 
 import 'package:flutter/material.dart';
 
-import '../../mylogic_formularios/mylogic.dart';
+import '../mylogic_formularios/mylogic.dart';
 
 class ConfigClienteScreen extends StatefulWidget {
   final cliente;

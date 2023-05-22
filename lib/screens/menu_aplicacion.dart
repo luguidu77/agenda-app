@@ -1,12 +1,13 @@
 import 'package:agendacitas/models/perfil_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
-import 'package:agendacitas/screens/config/config_personalizar_screen.dart';
+import 'package:agendacitas/config/config_personalizar_screen.dart';
 import 'package:agendacitas/screens/disponibilidad_semanal_screen.dart';
 import 'package:agendacitas/screens/servicios_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../providers/estado_pago_app_provider.dart';
 import '../providers/pago_dispositivo_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:agendacitas/firebase_options.dart';
@@ -21,7 +22,8 @@ class MenuAplicacion extends StatefulWidget {
 }
 
 class _MenuAplicacionState extends State<MenuAplicacion> {
-  String usuarioAPP = '';
+  String _usuarioAPP = '';
+  String _estadopago = '';
   TextStyle estilo = const TextStyle(color: Colors.blueGrey);
   bool _haySesionIniciada = false;
   String versionApp = '';
@@ -71,10 +73,12 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
 
   emailUsuario() async {
     //traigo email del usuario, del PagoProvider
+    final estadoProvider =
+        Provider.of<EstadoPagoAppProvider>(context, listen: false);
+    _estadopago = estadoProvider.estadoPagoApp;
+    _usuarioAPP = estadoProvider.emailUsuarioApp;
 
-    final providerPagoUsuarioAPP =
-        Provider.of<PagoProvider>(context, listen: false);
-    usuarioAPP = providerPagoUsuarioAPP.pagado['email'];
+    _haySesionIniciada = _usuarioAPP != '' ? true : false;
   }
 
   @override
@@ -89,7 +93,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
   _fotoPerfil() {
     try {
       return StreamBuilder(
-          stream: FirebaseProvider().cargarPerfilFB(usuarioAPP).asStream(),
+          stream: FirebaseProvider().cargarPerfilFB(_usuarioAPP).asStream(),
           builder: ((context, AsyncSnapshot<PerfilModel> snapshot) {
             if (snapshot.hasData) {
               final data = snapshot.data;
@@ -121,11 +125,6 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
 
   @override
   Widget build(BuildContext context) {
-    //comprueba pago de la app
-    final estadopago = Provider.of<PagoProvider>(context);
-    bool iniSesion = estadopago.pagado['email'] != '' ? true : false;
-    _haySesionIniciada = iniSesion; // estadopago.pagado['pago'];
-    setState(() {});
     return ListView(
       // Important: Remove any padding from the ListView.
       padding: EdgeInsets.zero,
@@ -143,7 +142,15 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
                         icon: const Icon(Icons.settings),
                         onPressed: () =>
                             {Navigator.pushNamed(context, 'ConfigUsuarioApp')}),
-                    Text(usuarioAPP),
+                    Text(_usuarioAPP),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      _estadopago == 'PRUEBA_ACTIVA' ? ' * prueba activa' : '',
+                      style: const TextStyle(
+                          color: Color.fromARGB(255, 99, 11, 23)),
+                    )
                   ],
                 ),
                 accountName: const Text(''))

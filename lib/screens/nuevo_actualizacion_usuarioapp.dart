@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:agendacitas/screens/config/config_usuario_app.dart';
+import 'package:agendacitas/config/config_usuario_app.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';

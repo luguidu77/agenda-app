@@ -4,8 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../providers/Firebase/sincronizar_firebase.dart';
-import '../../providers/pago_dispositivo_provider.dart';
+import '../providers/Firebase/sincronizar_firebase.dart';
+import '../providers/pago_dispositivo_provider.dart';
 
 class ConfigDisponibilidad extends StatefulWidget {
   const ConfigDisponibilidad({Key? key}) : super(key: key);

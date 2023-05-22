@@ -1,5 +1,5 @@
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
-import 'package:agendacitas/screens/config/config_personalizar_screen.dart';
+import 'package:agendacitas/config/config_personalizar_screen.dart';
 import 'package:agendacitas/screens/home.dart';
 import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +15,7 @@ class Bienvenida extends StatefulWidget {
 
 class _BienvenidaState extends State<Bienvenida> {
   final introKey = GlobalKey<IntroductionScreenState>();
+  
 
   void _irInicioSesion(context, String inicioCrear) {
     Navigator.of(context).push(
@@ -70,7 +71,8 @@ class _BienvenidaState extends State<Bienvenida> {
       key: introKey,
       globalBackgroundColor: Colors.grey[300],
       allowImplicitScrolling: true,
-      autoScrollDuration: 0,
+      autoScrollDuration: 1,
+      
 
       /*  globalHeader: Align(
         alignment: Alignment.center,
@@ -191,7 +193,7 @@ class _BienvenidaState extends State<Bienvenida> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  //introKey.currentState?.animateScroll(0);
+                  introKey.currentState?.animateScroll(0);
                   Navigator.push(
                       context,
                       MaterialPageRoute(

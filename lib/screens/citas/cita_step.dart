@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +46,7 @@ class _CitaStepState extends State<CitaStep> {
 
   emailUsuarioApp() async {
     //?comprueba pago en dispositivo
-    final pago = await CompruebaPago().compruebaPago();
+    final pago = await CompruebaPago.getPagoEmailDispositivo();
     debugPrint('datos gardados en tabla Pago (home.dart) $pago');
 
     //? guardo en variables los datos de pago-> pago y email

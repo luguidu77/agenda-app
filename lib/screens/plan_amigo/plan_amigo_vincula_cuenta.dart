@@ -35,7 +35,7 @@ class _PlanAmigoVinculaCuentaState extends State<PlanAmigoVinculaCuenta> {
   }
 
   traeTuEmail() async {
-    final pago = await CompruebaPago().compruebaPago();
+    final pago = await CompruebaPago.getPagoEmailDispositivo();
 
     setState(() {
       tuEmail = pago['email'];

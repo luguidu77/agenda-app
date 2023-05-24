@@ -1,4 +1,3 @@
-
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -59,7 +58,7 @@ class _BotonAgregarServiciosState extends State<BotonAgregarServicios> {
     var switchLabelPosition = false;
     var extend = floatExtended;
     var mini = false;
-   // var rmicons = false;
+    // var rmicons = false;
     var customDialRoot = false;
     var closeManually = false;
     var useRAnimation = true;
@@ -67,7 +66,7 @@ class _BotonAgregarServiciosState extends State<BotonAgregarServicios> {
     var speedDialDirection = SpeedDialDirection.up;
     var buttonSize = const Size(56.0, 56.0);
     var childrenButtonSize = const Size(56.0, 56.0);
-   // var selectedfABLocation = FloatingActionButtonLocation.endDocked;
+    // var selectedfABLocation = FloatingActionButtonLocation.endDocked;
     return SpeedDial(
       icon: Icons.add,
       activeIcon: Icons.close,
@@ -143,7 +142,7 @@ class _BotonAgregarServiciosState extends State<BotonAgregarServicios> {
                   Navigator.pushNamed(context, 'ConfigCategoriaServiciosScreen',
                       arguments: CategoriaServicioModel());
                 },
-              ) 
+              )
             : SpeedDialChild(
                 child: const Icon(Icons.no_encryption_outlined),
                 label: 'Categorias no disponible',

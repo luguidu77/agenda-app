@@ -135,19 +135,23 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
                     color: Theme.of(context)
                         .primaryColor), // Color.fromARGB(255, 122, 121, 197)),
                 currentAccountPicture: _fotoPerfil(),
+                otherAccountsPictures: [
+                  IconButton(
+                      color: Colors.white,
+                      icon: const Icon(Icons.settings),
+                      onPressed: () =>
+                          {Navigator.pushNamed(context, 'ConfigUsuarioApp')}),
+                ],
                 accountEmail: Row(
                   children: [
-                    IconButton(
-                        color: Colors.white,
-                        icon: const Icon(Icons.settings),
-                        onPressed: () =>
-                            {Navigator.pushNamed(context, 'ConfigUsuarioApp')}),
                     Text(_usuarioAPP),
                     const SizedBox(
                       width: 10,
                     ),
                     Text(
-                      _estadopago == 'PRUEBA_ACTIVA' ? ' * prueba activa' : '',
+                      _estadopago == 'PRUEBA_ACTIVA'
+                          ? '    versión de prueba'
+                          : '',
                       style: const TextStyle(
                           color: Color.fromARGB(255, 99, 11, 23)),
                     )
@@ -158,7 +162,6 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
                 decoration: const BoxDecoration(
                   color: Colors.white,
                 ),
-                //  image: DecorationImage(image: AssetImage('assets/icon/icon.png'))),
                 child: Center(
                     child: SingleChildScrollView(
                   child: Column(children: [

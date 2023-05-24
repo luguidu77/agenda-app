@@ -1,3 +1,4 @@
+import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';
 
 import '../models/cita_model.dart';
@@ -70,7 +71,6 @@ class _ConfigCategoriaServiciosScreenState
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               if (_formKey.currentState!.validate()) {
-                // todo Categorias no servicios
                 (agregaModificaFB)
                     ? agregaCategoria(usuarioAPP!)
                     : modificarCategoria(
@@ -91,6 +91,7 @@ class _ConfigCategoriaServiciosScreenState
         child: Column(
           children: [
             _botonCerrar(),
+            const SizedBox(height: 10),
             Form(
                 key: _formKey,
                 child: Column(
@@ -102,7 +103,7 @@ class _ConfigCategoriaServiciosScreenState
                       style: const TextStyle(fontSize: 28),
                     ),
                     const SizedBox(
-                      height: 10,
+                      height: 50,
                     ),
                     TextFormField(
                       validator: (value) => _validacion(value),
@@ -123,13 +124,17 @@ class _ConfigCategoriaServiciosScreenState
     );
   }
 
-  agregaCategoria(String usuarioAPP) {
+  agregaCategoria(String usuarioAPP) async {
     final categoria = myLogic.textControllerNombreCategoria.text;
     final detalle = myLogic.textControllerDetalle.text;
 
-    FirebaseProvider().nuevaCategoriaServicio(usuarioAPP, categoria, detalle);
+    await FirebaseProvider()
+        .nuevaCategoriaServicio(usuarioAPP, categoria, detalle);
+    mensajeSuccess(context, 'Categoria agregada');
+    myLogic.textControllerNombreCategoria.clear();
+    myLogic.textControllerDetalle.clear();
 
-    Navigator.pushReplacementNamed(context, 'Servicios');
+    // Navigator.pushReplacementNamed(context, 'Servicios');
   }
 
   modificarCategoria(String usuarioAPP, CategoriaServicioModel categoria) {
@@ -140,7 +145,7 @@ class _ConfigCategoriaServiciosScreenState
 
     FirebaseProvider().actualizarCategoriaServicioFB(usuarioAPP, auxCategoria);
 
-    Navigator.pushReplacementNamed(context, 'Servicios');
+    //Navigator.pushReplacementNamed(context, 'Servicios');
   }
 
   _botonCerrar() {
@@ -154,7 +159,7 @@ class _ConfigCategoriaServiciosScreenState
           ),
           IconButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pop(context, true);
               },
               icon: const Icon(
                 Icons.close,

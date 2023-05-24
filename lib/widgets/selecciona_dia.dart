@@ -161,6 +161,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
     Intl.defaultLocale = 'es';
 
     Picker(
+      title: const Text("Selecciona una fecha"),
         confirmText: 'Aceptar',
         cancelText: 'Cancelar',
         hideHeader: true,
@@ -168,7 +169,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
           type: PickerDateTimeType.kYMD,
           isNumberMonth: true,
         ),
-        title: const Text("Selecciona una fecha"),
+        
         onConfirm: (Picker picker, List<int> selectedValues) {
           DateTime selectedDate =
               (picker.adapter as DateTimePickerAdapter).value!;

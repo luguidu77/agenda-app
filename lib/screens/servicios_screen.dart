@@ -61,17 +61,9 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
     } */
   }
 
-  cargarDatosServicios(usuarioAPP) async {
-    // TRAE LOS DATOS DE FIREBASE O DE DISPOSITIVO
-    if (iniciadaSesionUsuario) {
-      debugPrint('TRAYENDO SERVICIOS DE FIREBASE');
-
-      return listaAuxFB = await cargaServiciosFB(
-          usuarioAPP); //await cargaServiciosFirebase(usuarioAPP);
-    } else {
-      debugPrint('TRAYENDO SERVICIOS DE DISPOSITIVO');
-      return listaAux = await CitaListProvider().cargarServicios();
-    }
+  cargarDatosServiciosDispositivo() async {
+    debugPrint('TRAYENDO SERVICIOS DE DISPOSITIVO');
+    return listaAux = await CitaListProvider().cargarServicios();
   }
 
   @override
@@ -82,6 +74,14 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
     super.initState();
   }
 
+  retornoDeEdicionServicio() {
+    // Realizar acciones o actualizar datos aquí
+
+    emailUsuario();
+    debugPrint(
+        '##############- esta retornando de la pagina de config__servicios_screen.dart');
+  }
+
   bool d = false;
   bool floatExtended = false;
   @override
@@ -89,22 +89,10 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
     return SafeArea(
       child: Scaffold(
           floatingActionButton: const BotonAgregarServicios(),
-
-          /*   FloatingActionButonWidget(
-            icono: const Icon(Icons.add),
-            texto: 'Servicio',
-            funcion: () {
-              Navigator.pushNamed(context, 'configServicios',
-                  arguments: iniciadaSesionUsuario
-                      ? ServicioModelFB()
-                      : ServicioModel());
-            },
-          ), */
           body: Column(
             children: [
               _botonCerrar(),
               const Text(
-                //todo: HACER CATEGORIAS DE SERVICIOS
                 'Servicios',
                 style: TextStyle(fontSize: 28),
               ),
@@ -120,7 +108,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
       child: FutureBuilder(
         future: iniciadaSesionUsuario
             ? cargaServiciosFB(usuarioAPP!)
-            : cargarDatosServicios(usuarioAPP),
+            : cargarDatosServiciosDispositivo(),
         builder: (
           BuildContext context,
           AsyncSnapshot<dynamic> snapshot,
@@ -517,7 +505,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
       data.add(newSerCat);
     }
 
-    print(data);
+    // print(data);
     return data;
   }
 }

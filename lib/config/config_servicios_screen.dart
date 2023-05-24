@@ -34,6 +34,7 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
   List<String> idCategoria = [];
   String idCategoriaElegida = '';
   String dropdownValue = '';
+
   emailUsuario() async {
     //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
     final pago = await PagoProvider().cargarPago();
@@ -41,7 +42,6 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
     usuarioAPP = emailUsuario;
     iniciadaSesionUsuario = usuarioAPP != '' ? true : false;
     setState(() {});
-
     await cargarDatosCategorias();
 
     //DATA TRAIDA POR NAVIGATOR PUSHNAMED (ARGUMENTS)
@@ -62,6 +62,7 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
         myLogic.init();
       }
     }
+    setState(() {});
   }
 
   @override
@@ -81,6 +82,15 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
   bool agregaModifica = false;
   var dataFB;
   var data;
+
+  void retornoDeAgregarCategoria() {
+    // Realizar acciones o actualizar datos aquí
+
+    emailUsuario();
+    debugPrint(
+        '##############- esta retornando de la pagina de config_categoria_servicio_screen.dart');
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -187,9 +197,28 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
                       style: const TextStyle(fontSize: 28),
                     ),
                     const SizedBox(
-                      height: 10,
+                      height: 50,
                     ),
                     categoriaServicios(context),
+                    Container(
+                      alignment: Alignment.bottomRight,
+                      child: ElevatedButton.icon(
+                          onPressed: () async {
+                            // formulario categorias de servicios
+                            bool retorno = await Navigator.pushNamed(
+                                context, 'ConfigCategoriaServiciosScreen',
+                                arguments: CategoriaServicioModel()) as bool;
+                            if (retorno) {
+                              print(
+                                  ' -$retorno -----------------------------------------');
+                              listNombreCategoriaServicios.clear();
+                              listIdCategoriaServicios.clear();
+                              retornoDeAgregarCategoria();
+                            }
+                          },
+                          icon: const Icon(Icons.add),
+                          label: const Text('nueva categoría')),
+                    ),
                     TextFormField(
                       validator: (value) => _validacion(value),
                       controller: myLogicFB.textControllerServicio,
@@ -317,7 +346,7 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
           ),
           IconButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pop(context, true);
               },
               icon: const Icon(
                 Icons.close,
@@ -357,9 +386,8 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
       print(listNombreCategoriaServicios);
 
       dropdownValue = listNombreCategoriaServicios[0];
-
-      setState(() {});
     }
+    setState(() {});
   }
 
   var categoria = '';

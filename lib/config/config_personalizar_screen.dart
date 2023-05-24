@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_picker/picker.dart';
 
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import '../models/personaliza_model.dart';
 import '../providers/personaliza_provider.dart';
+import '../providers/providers.dart';
 import '../utils/alertasSnackBar.dart';
 import '../widgets/configRecordatorios.dart';
 import '../widgets/tarjeta_cod_moneda.dart';
@@ -16,6 +19,15 @@ class ConfigPersonalizar extends StatefulWidget {
 }
 
 class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
+  List<Color> colorsList = [
+    Colors.red,
+    Colors.green,
+    Colors.blue,
+    Colors.yellow,
+    Colors.orange,
+    Colors.purple,
+  ];
+
   PersonalizaModel personaliza = PersonalizaModel();
 
   String cerrado = '';
@@ -103,6 +115,51 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
             ),
             onPressed: () async {
               // todo picker color
+
+              Picker(
+                title: const Text('Selecciona color tema'),
+                hideHeader: true,
+                itemExtent: 50,
+                confirmText: 'Aceptar',
+                cancelText: 'Cancelar',
+                adapter: PickerDataAdapter<Color>(
+                  data: colorsList
+                      .map((color) => PickerItem<Color>(
+                          value: color,
+                          text: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: CircleAvatar(
+                              backgroundColor: color,
+                            ),
+                          )))
+                      .toList(),
+                ),
+                selectedTextStyle: TextStyle(color: Colors.blue),
+                onConfirm: (Picker picker, List<int> selectedValues) async {
+                  int selectedIndex = selectedValues[0];
+                  Color selectedColor = colorsList[selectedIndex];
+                  // Realiza las acciones necesarias con el color seleccionado
+                  print(selectedColor);
+                  final provider =
+                      Provider.of<ThemeProvider>(context, listen: false);
+                  provider.cambiaColor(selectedColor.value);
+                  //  graba en sqlite el tema elegido
+
+                  final colorTema = await ThemeProvider().cargarTema();
+
+                  final color = colorTema.map((e) => e.color);
+                  if (color.isEmpty) {
+                    await ThemeProvider().nuevoTema(selectedColor.value);
+                  } else {
+                    await ThemeProvider().acutalizarTema(selectedColor.value);
+                    mensajeModificado('Tema modificado');
+                  }
+                  setState(() {});
+                },
+              ).showDialog(context);
+            },
+            child: const Icon(Icons.palette))
+
         /*       await showMaterialColorPicker(
                 title: 'Elige color',
                 context: context,
@@ -126,8 +183,6 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
                   }
                 },
               ); */
-            },
-            child: const Icon(Icons.palette)),
       ],
     );
   }

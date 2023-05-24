@@ -143,18 +143,22 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
                           {Navigator.pushNamed(context, 'ConfigUsuarioApp')}),
                 ],
                 accountEmail: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(_usuarioAPP),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      _estadopago == 'PRUEBA_ACTIVA'
-                          ? '    versión de prueba'
-                          : '',
-                      style: const TextStyle(
-                          color: Color.fromARGB(255, 99, 11, 23)),
-                    )
+                    _estadopago == 'PRUEBA_ACTIVA'
+                        ? const Card(
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                'versión de prueba',
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 99, 11, 23),
+                                    fontSize: 12 ),
+                              ),
+                            ),
+                          )
+                        : Container()
                   ],
                 ),
                 accountName: const Text(''))

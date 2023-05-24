@@ -47,10 +47,12 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
     //DATA TRAIDA POR NAVIGATOR PUSHNAMED (ARGUMENTS)
     if (iniciadaSesionUsuario) {
       dataFB = ModalRoute.of(context)!.settings.arguments as ServicioModelFB;
+
       agregaModificaFB = (dataFB.servicio == null) ? true : false;
       if (!agregaModificaFB) {
         myLogicFB = MyLogicServicioFB(dataFB);
         myLogicFB.init();
+
         getcategoria(myLogicFB.servicioFB.idCategoria);
       }
     } else {
@@ -84,11 +86,15 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
   var data;
 
   void retornoDeAgregarCategoria() {
-    // Realizar acciones o actualizar datos aquí
+    // SE LLAMA ESTA FUNCION CUANDO RETORNA DE LA PAGINA config_categoria_servicio_screen.dart
 
+    // LIMPIA LAS LISTAS
+    listNombreCategoriaServicios.clear();
+    listIdCategoriaServicios.clear();
+    idCategoria.clear();
+
+    // REINICIA LOS DATOS
     emailUsuario();
-    debugPrint(
-        '##############- esta retornando de la pagina de config_categoria_servicio_screen.dart');
   }
 
   @override
@@ -99,10 +105,13 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               if (iniciadaSesionUsuario) {
+                debugPrint('iniciada sesion');
+                debugPrint('agregaModificaFB $agregaModificaFB');
+                print(idCategoriaElegida);
                 (agregaModificaFB)
                     ? agregaServicioFB(usuarioAPP)
-                    : modificarServicioFB(
-                        usuarioAPP, dataFB); // METODO MODIFICAR SERVICIO
+                    : modificarServicioFB(usuarioAPP, dataFB,
+                        idCategoriaElegida); // METODO MODIFICAR SERVICIO
               } else {
                 (agregaModifica)
                     ? agregaServicio()
@@ -204,15 +213,11 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
                       alignment: Alignment.bottomRight,
                       child: ElevatedButton.icon(
                           onPressed: () async {
-                            // formulario categorias de servicios
+                            // NAVEGA A FORMULARIO CATEGORIAS Y ESPERA RETORNO(bool) PARA 'REINICIAR LA PAGINA'
                             bool retorno = await Navigator.pushNamed(
                                 context, 'ConfigCategoriaServiciosScreen',
                                 arguments: CategoriaServicioModel()) as bool;
                             if (retorno) {
-                              print(
-                                  ' -$retorno -----------------------------------------');
-                              listNombreCategoriaServicios.clear();
-                              listIdCategoriaServicios.clear();
                               retornoDeAgregarCategoria();
                             }
                           },
@@ -320,7 +325,7 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
     Navigator.pushReplacementNamed(context, 'Servicios');
   }
 
-  modificarServicioFB(usuarioApp, ServicioModelFB servicio) {
+  modificarServicioFB(usuarioApp, ServicioModelFB servicio, idCatElegida) {
     ServicioModelFB auxservicio = ServicioModelFB();
     auxservicio.id = servicio.id;
     auxservicio.servicio = myLogicFB.textControllerServicio.text;
@@ -329,6 +334,8 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
     auxservicio.detalle = myLogicFB.textControllerDetalle.text;
     auxservicio.activo = 'true';
     auxservicio.idCategoria = idCategoriaElegida;
+    print(
+        '----------------------------que idcategoria guarda   $idCategoriaElegida');
 
     FirebaseProvider().actualizarServicioFB(usuarioApp, auxservicio);
 
@@ -416,11 +423,9 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
 
           int index = listNombreCategoriaServicios.indexOf(dropdownValue);
           idCategoriaElegida = idCategoria[index];
-          /*   iniciadaSesionUsuario
-                      ? seleccionaServicioFB(context, usuarioAPP,
-                          listNombreCategoriaServicios, listaCategoriaServicios, index)
-                      : seleccionaServicio(context, index);
-                  indexServicio = index; */
+
+          print(idCategoriaElegida);
+          print(idCategoria);
         });
       },
     );

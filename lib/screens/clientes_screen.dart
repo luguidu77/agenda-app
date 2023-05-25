@@ -2,6 +2,7 @@ import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/Firebase/sincronizar_firebase.dart';
 import 'package:agendacitas/providers/cita_list_provider.dart';
+import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:agendacitas/screens/citas/clienta_step.dart';
 import 'package:agendacitas/screens/ficha_cliente_screen.dart';
@@ -46,16 +47,12 @@ class _ClientesScreenState extends State<ClientesScreen> {
 
   emailUsuario() async {
     //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-
-    final provider = Provider.of<PagoProvider>(context, listen: false);
-
-    //? compruebo si hay email para saber si hay sesion iniciada
-    iniciadaSesionUsuario = provider.pagado['email'] != '' ? true : false;
-    print('iniciado sesion: $iniciadaSesionUsuario');
-    //? compruebo si pago de la app
-    pagado = provider.pagado['pago'];
+    emailSesionUsuario = context.read<EstadoPagoAppProvider>().emailUsuarioApp;
+    iniciadaSesionUsuario = emailSesionUsuario != '' ? true : false;
+    pagado = context.read<EstadoPagoAppProvider>().estadoPagoApp != 'GRATUITA'
+        ? true
+        : false;
     setState(() {});
-    emailSesionUsuario = provider.pagado['email'];
     datosClientes(emailSesionUsuario);
   }
 
@@ -306,7 +303,8 @@ class _ClientesScreenState extends State<ClientesScreen> {
                                                 secondaryAnimation) =>
                                         FichaClienteScreen(
                                           clienteParametro: ClienteModel(
-                                              id: listaClientes[index].id,
+                                              id: int.parse(
+                                                  listaClientes[index].id),
                                               nombre:
                                                   listaClientes[index].nombre,
                                               telefono:

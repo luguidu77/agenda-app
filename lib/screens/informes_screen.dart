@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/personaliza_model.dart';
+import '../providers/estado_pago_app_provider.dart';
 import '../providers/providers.dart';
 
 class InformesScreen extends StatefulWidget {
@@ -39,7 +40,7 @@ class _InformesScreenState extends State<InformesScreen> {
   ];
 
   DateFormat dateFormat = DateFormat("yyyy");
-  int preciototal = 0;
+  double preciototal = 0.0;
   bool ocultarPrecios = true;
 
   getPersonaliza() async {
@@ -55,61 +56,42 @@ class _InformesScreenState extends State<InformesScreen> {
   }
 
   leerBasedatos() async {
-    getPersonaliza();
+    await getPersonaliza();
 
     var fecha = dateFormat.format(fechaElegida);
 
-    if (kIsWeb) {
-      // La aplicación se está ejecutando en un navegador web (escritorio)
+    // La aplicación se está ejecutando en un dispositivo móvil
 
-      // La aplicación se está ejecutando en una plataforma de escritorio
-      iniciadaSesionUsuario = true;
-      emailSesionUsuario = 'luguidu77@gmail.com';
-
+    if (iniciadaSesionUsuario) {
       citas =
           await FirebaseProvider().cargarCitasAnual(emailSesionUsuario, fecha);
       debugPrint('TRAE LAS CITAS ANUALES GUARDADAS EN FIREBASE');
-
-      List faux = citas.map((e) => e['fecha']).toList();
-      List paux = citas.map((e) => e['precio']).toList();
-
-      await cantidadPorMes(faux, paux);
-      setState(() {});
-      // await precioTotal(citas);
     } else {
-      // La aplicación se está ejecutando en un dispositivo móvil
-
-      if (iniciadaSesionUsuario) {
-        citas = await FirebaseProvider()
-            .cargarCitasAnual(emailSesionUsuario, fecha);
-        debugPrint('TRAE LAS CITAS ANUALES GUARDADAS EN FIREBASE');
-      } else {
-        citas = await CitaListProvider().cargarCitasAnual(fecha);
-        debugPrint('TRAE LAS CITAS ANUALES GUARDADAS EN DISPOSITIVO');
-      }
-
-      List faux = citas.map((e) => e['fecha']).toList();
-      List paux = citas.map((e) => e['precio']).toList();
-
-      await cantidadPorMes(faux, paux);
-      setState(() {});
-      // await precioTotal(citas);
+      citas = await CitaListProvider().cargarCitasAnual(fecha);
+      debugPrint('TRAE LAS CITAS ANUALES GUARDADAS EN DISPOSITIVO');
     }
+
+    List faux = citas.map((e) => e['fecha']).toList();
+    List paux = citas.map((e) => e['precio']).toList();
+
+    await cantidadPorMes(faux, paux);
+    setState(() {});
+    // await precioTotal(citas);
   }
 
   cantidadPorMes(List fecha, List precio) {
-    int ene = 0;
-    int feb = 0;
-    int mar = 0;
-    int abr = 0;
-    int may = 0;
-    int jun = 0;
-    int jul = 0;
-    int ago = 0;
-    int sep = 0;
-    int oct = 0;
-    int nov = 0;
-    int dic = 0;
+    double ene = 0;
+    double feb = 0;
+    double mar = 0;
+    double abr = 0;
+    double may = 0;
+    double jun = 0;
+    double jul = 0;
+    double ago = 0;
+    double sep = 0;
+    double oct = 0;
+    double nov = 0;
+    double dic = 0;
 
     fecha.map((e) {
       String mes = e.split('-')[1];
@@ -119,7 +101,7 @@ class _InformesScreenState extends State<InformesScreen> {
           print('mes de enero');
           int indice = fecha.indexOf(e);
           var paux = precio[indice].toString();
-          ene += int.parse(paux);
+          ene += double.parse(paux);
 
           datosInforme[0] = ene;
           facturaMes[0] = ene / 100;
@@ -129,7 +111,7 @@ class _InformesScreenState extends State<InformesScreen> {
         case '02':
           int indice = fecha.indexOf(e);
           var paux = precio[indice].toString();
-          feb += int.parse(paux);
+          feb += double.parse(paux);
 
           datosInforme[1] = feb;
           facturaMes[1] = feb / 100;
@@ -138,7 +120,7 @@ class _InformesScreenState extends State<InformesScreen> {
         case '03':
           int indice = fecha.indexOf(e);
           var paux = precio[indice].toString();
-          mar += int.parse(paux);
+          mar += double.parse(paux);
 
           datosInforme[2] = mar;
           facturaMes[2] = mar / 100;
@@ -147,7 +129,7 @@ class _InformesScreenState extends State<InformesScreen> {
         case '04':
           int indice = fecha.indexOf(e);
           var paux = precio[indice].toString();
-          abr += int.parse(paux);
+          abr += double.parse(paux);
 
           datosInforme[3] = abr;
           facturaMes[3] = abr / 100;
@@ -156,7 +138,7 @@ class _InformesScreenState extends State<InformesScreen> {
         case '05':
           int indice = fecha.indexOf(e);
           var paux = precio[indice].toString();
-          may += int.parse(paux);
+          may += double.parse(paux);
 
           datosInforme[4] = may;
           facturaMes[4] = may / 100;
@@ -165,7 +147,7 @@ class _InformesScreenState extends State<InformesScreen> {
         case '06':
           int indice = fecha.indexOf(e);
           var paux = precio[indice].toString();
-          jun += int.parse(paux);
+          jun += double.parse(paux);
 
           datosInforme[5] = jun;
           facturaMes[4] = jun / 100;
@@ -174,7 +156,7 @@ class _InformesScreenState extends State<InformesScreen> {
         case '07':
           int indice = fecha.indexOf(e);
           var paux = precio[indice].toString();
-          jul += int.parse(paux);
+          jul += double.parse(paux);
 
           datosInforme[6] = jul;
           facturaMes[4] = jul / 100;
@@ -183,7 +165,7 @@ class _InformesScreenState extends State<InformesScreen> {
         case '08':
           int indice = fecha.indexOf(e);
           var paux = precio[indice].toString();
-          ago += int.parse(paux);
+          ago += double.parse(paux);
 
           datosInforme[7] = ago;
           facturaMes[7] = ago / 100;
@@ -192,7 +174,7 @@ class _InformesScreenState extends State<InformesScreen> {
         case '09':
           int indice = fecha.indexOf(e);
           var paux = precio[indice].toString();
-          sep += int.parse(paux);
+          sep += double.parse(paux);
 
           datosInforme[8] = sep;
           facturaMes[8] = sep / 100;
@@ -201,7 +183,7 @@ class _InformesScreenState extends State<InformesScreen> {
         case '10':
           int indice = fecha.indexOf(e);
           var paux = precio[indice].toString();
-          oct += int.parse(paux);
+          oct += double.parse(paux);
 
           datosInforme[9] = oct;
           facturaMes[9] = oct / 100;
@@ -210,7 +192,7 @@ class _InformesScreenState extends State<InformesScreen> {
         case '11':
           int indice = fecha.indexOf(e);
           var paux = precio[indice].toString();
-          nov += int.parse(paux);
+          nov += double.parse(paux);
 
           datosInforme[10] = nov;
           facturaMes[10] = nov / 100;
@@ -219,7 +201,7 @@ class _InformesScreenState extends State<InformesScreen> {
         case '12':
           int indice = fecha.indexOf(e);
           var paux = precio[indice].toString();
-          dic += int.parse(paux);
+          dic += double.parse(paux);
 
           datosInforme[11] = dic;
           facturaMes[11] = dic / 100;
@@ -238,15 +220,12 @@ class _InformesScreenState extends State<InformesScreen> {
 
   emailUsuario() async {
     //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-
-    final provider = Provider.of<PagoProvider>(context, listen: false);
-
-    //? compruebo si hay email para saber si hay sesion iniciada
-    emailSesionUsuario = provider.pagado['email'];
+   
+    emailSesionUsuario = context.read<EstadoPagoAppProvider>().emailUsuarioApp;
     iniciadaSesionUsuario = emailSesionUsuario != '' ? true : false;
-    print('iniciado sesion: $iniciadaSesionUsuario');
-    //? compruebo si pago de la app
-    pagado = provider.pagado['pago'];
+    pagado = context.read<EstadoPagoAppProvider>().estadoPagoApp != 'GRATUITA'
+        ? true
+        : false;
   }
 
   @override

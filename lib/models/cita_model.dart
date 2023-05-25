@@ -83,7 +83,7 @@ class CitaModelFirebase {
   String? idcliente;
   String? idservicio;
   String? idEmpleado;
-  String? precio;
+  double? precio;
 
   CitaModelFirebase(
       {this.id,
@@ -126,7 +126,7 @@ class ServicioModel {
   var id;
   String? servicio;
   String? tiempo;
-  int? precio;
+  double? precio;
   String? detalle;
   String? activo;
 
@@ -162,7 +162,7 @@ class ServicioModelFB {
   var id;
   String? servicio;
   String? tiempo;
-  int? precio;
+  double? precio;
   String? detalle;
   String? activo;
   String? idCategoria;

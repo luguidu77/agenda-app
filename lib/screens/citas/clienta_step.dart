@@ -1,3 +1,4 @@
+import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -42,16 +43,11 @@ class _ClientaStepState extends State<ClientaStep> {
 
   emailUsuario() async {
     //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-
-    final provider = Provider.of<PagoProvider>(context, listen: false);
-
-    //? compruebo si hay email para saber si hay sesion iniciada
-    iniciadaSesionUsuario = provider.pagado['email'] != '' ? true : false;
-    print('iniciado sesion: $iniciadaSesionUsuario');
-    //? compruebo si pago de la app
-    pagado = provider.pagado['pago'];
-    setState(() {});
-    emailSesionUsuario = provider.pagado['email'];
+    emailSesionUsuario = context.read<EstadoPagoAppProvider>().emailUsuarioApp;
+    iniciadaSesionUsuario = emailSesionUsuario != '' ? true : false;
+    pagado = context.read<EstadoPagoAppProvider>().estadoPagoApp != 'GRATUITA'
+        ? true
+        : false;
   }
 
   traeColorPrimarioTema() async {
@@ -77,7 +73,7 @@ class _ClientaStepState extends State<ClientaStep> {
   @override
   Widget build(BuildContext context) {
     var clientaElegida = Provider.of<CitaListProvider>(context);
-    var clienta = clientaElegida.getClientaElegida;
+    clientaElegida.getClientaElegida;
 
     return Scaffold(
       floatingActionButton: FloatingActionButonWidget(

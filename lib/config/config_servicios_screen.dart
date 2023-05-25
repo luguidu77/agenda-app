@@ -6,6 +6,7 @@ import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:flutter/material.dart';
 
 import '../mylogic_formularios/mylogic.dart';
+import '../screens/screens.dart';
 
 class ConfigServiciosScreen extends StatefulWidget {
   const ConfigServiciosScreen({Key? key}) : super(key: key);
@@ -107,7 +108,7 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
               if (iniciadaSesionUsuario) {
                 debugPrint('iniciada sesion');
                 debugPrint('agregaModificaFB $agregaModificaFB');
-                print(idCategoriaElegida);
+
                 (agregaModificaFB)
                     ? agregaServicioFB(usuarioAPP)
                     : modificarServicioFB(usuarioAPP, dataFB,
@@ -213,6 +214,14 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
                       alignment: Alignment.bottomRight,
                       child: ElevatedButton.icon(
                           onPressed: () async {
+                            // todo hacerlo modal desde abajo de pantalla.
+                            /*  bool retorno = showModalBottomSheet(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return ConfigCategoriaServiciosScreen();
+                              },
+                            ) as bool; */
+
                             // NAVEGA A FORMULARIO CATEGORIAS Y ESPERA RETORNO(bool) PARA 'REINICIAR LA PAGINA'
                             bool retorno = await Navigator.pushNamed(
                                 context, 'ConfigCategoriaServiciosScreen',
@@ -288,7 +297,7 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
   agregaServicio() {
     final servicio = myLogic.textControllerServicio.text;
     final tiempo = myLogic.textControllerTiempo.text;
-    final precio = int.parse(myLogic.textControllerPrecio.text);
+    final precio = double.parse(myLogic.textControllerPrecio.text);
     final detalle = myLogic.textControllerDetalle.text;
 
     CitaListProvider().nuevoServicio(servicio, tiempo, precio, detalle, 'true');
@@ -301,7 +310,7 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
     auxservicio.id = servicio.id;
     auxservicio.servicio = myLogic.textControllerServicio.text;
     auxservicio.tiempo = myLogic.textControllerTiempo.text;
-    auxservicio.precio = int.parse(myLogic.textControllerPrecio.text);
+    auxservicio.precio = double.parse(myLogic.textControllerPrecio.text);
     auxservicio.detalle = myLogic.textControllerDetalle.text;
     auxservicio.activo = 'true';
 
@@ -315,7 +324,7 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
   agregaServicioFB(usuarioApp) {
     final servicio = myLogicFB.textControllerServicio.text;
     final tiempo = myLogicFB.textControllerTiempo.text;
-    final precio = int.parse(myLogicFB.textControllerPrecio.text);
+    final precio = double.parse(myLogicFB.textControllerPrecio.text);
     final detalle = myLogicFB.textControllerDetalle.text;
     final categoria = myLogicFB.textControllerCategoria.text;
 
@@ -330,7 +339,7 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
     auxservicio.id = servicio.id;
     auxservicio.servicio = myLogicFB.textControllerServicio.text;
     auxservicio.tiempo = myLogicFB.textControllerTiempo.text;
-    auxservicio.precio = int.parse(myLogicFB.textControllerPrecio.text);
+    auxservicio.precio = double.parse(myLogicFB.textControllerPrecio.text);
     auxservicio.detalle = myLogicFB.textControllerDetalle.text;
     auxservicio.activo = 'true';
     auxservicio.idCategoria = idCategoriaElegida;

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/screens/nuevo_actualizacion_cliente.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -26,8 +27,8 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
   final ImagePicker _picker = ImagePicker();
   final List<Map<String, dynamic>> _citas = [];
   PagoProvider? data;
-  bool? pagado;
-  String? usuarioAPP;
+  bool pagado = false;
+  String emailSesionUsuario = '';
   bool iniciadaSesionUsuario = false;
   XFile? _image;
   PersonalizaModel personaliza = PersonalizaModel();
@@ -42,22 +43,20 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
 
       setState(() {});
     }
-  } 
+  }
 
   compruebaPago() async {
     //   PagoProvider para obtener pago y el email del usuarioAPP
-    final providerPagoUsuarioAPP =
-        Provider.of<PagoProvider>(context, listen: false);
+    //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
 
-    setState(() {
-      pagado = providerPagoUsuarioAPP.pagado['pago'];
-      usuarioAPP = providerPagoUsuarioAPP.pagado['email'];
-      usuarioAPP != ''
-          ? iniciadaSesionUsuario = true
-          : iniciadaSesionUsuario = false;
-    });
+    emailSesionUsuario = context.read<EstadoPagoAppProvider>().emailUsuarioApp;
+    iniciadaSesionUsuario = emailSesionUsuario != '' ? true : false;
+    pagado = context.read<EstadoPagoAppProvider>().estadoPagoApp != 'GRATUITA'
+        ? true
+        : false;
+    setState(() {});
     debugPrint(
-        'datos gardados en tabla Pago (fichaClienteScreen.dart) PAGO: $pagado // EMAIL:$usuarioAPP ');
+        'datos gardados en tabla Pago (fichaClienteScreen.dart) PAGO: $pagado // EMAIL:$emailSesionUsuario ');
   }
 
   @override
@@ -143,7 +142,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
                   child: TabBarView(
                       // physics: ScrollPhysics(),
                       children: [
-                        _datos(widget.clienteParametro, pagado!,
+                        _datos(widget.clienteParametro, pagado,
                             widget.clienteParametro.id),
                         _historial(context, _citas, widget.clienteParametro.id),
                       ]),
@@ -190,7 +189,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
       //TaskSnapshot taskSnapshot =
       await storage
           // GUARDO LAS FOTO DE FICHA CLIENTE EN LA SIGUIENTE DIRECCION DEL STORAGE FIREBASE
-          .ref('agendadecitas/clientes/$usuarioAPP/foto')
+          .ref('agendadecitas/clientes/$emailSesionUsuario/foto')
           .putFile(file);
       // CONSULTA DE LA URL EN STORAGE
       // final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
@@ -209,7 +208,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
             builder: (context) => NuevoActualizacionCliente(
               cliente: widget.clienteParametro,
               pagado: pagado,
-              usuarioAPP: usuarioAPP,
+              usuarioAPP: emailSesionUsuario,
             ),
           ),
         );
@@ -299,7 +298,8 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
   _historial(context, List<Map<String, dynamic>> citas, idCliente) {
     return FutureBuilder<dynamic>(
         future: iniciadaSesionUsuario
-            ? FirebaseProvider().cargarCitasPorCliente(usuarioAPP!, idCliente)
+            ? FirebaseProvider()
+                .cargarCitasPorCliente(emailSesionUsuario, idCliente)
             : CitaListProvider().cargarCitasPorCliente(idCliente),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

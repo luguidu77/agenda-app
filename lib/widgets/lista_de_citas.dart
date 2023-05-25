@@ -116,10 +116,10 @@ class _ListaCitasState extends State<ListaCitas> {
                         return const Text('');
                       } else if (snapshot.hasData) {
                         final data = snapshot.data;
-                        print(data);
+
                         // SI TENGO DATOS LOS VISUALIZO EN PANTALLA
                         return Text(
-                          'Ganancias $data ${personaliza.moneda}',
+                          'GANANCIAS HOY $data ${personaliza.moneda}',
                           style: const TextStyle(fontSize: 12),
                         );
                       } else {
@@ -233,6 +233,7 @@ class _ListaCitasState extends State<ListaCitas> {
 
   Card _tarjetasCitas(bool compruebafechaDisponible, citas, int index,
       String horaInicio, Color estiloHorario, String horaFinal) {
+    print('todas las citas $citas <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
     return Card(
         elevation: 2,
         color: compruebafechaDisponible
@@ -300,7 +301,8 @@ class _ListaCitasState extends State<ListaCitas> {
                               ),
                               Text(
                                 compruebafechaDisponible
-                                    ? ' ${citas[index]['detalle']}'.toString()
+                                    ? ' ${citas[index]['comentario']}'
+                                        .toString()
                                     : '',
                                 style: const TextStyle(fontSize: 12),
                               ),

@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
+import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +51,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
   String horaFinalTexto = '';
 
   bool? pagado;
-  String usuarioAPP = '';
+  String emailSesionUsuario = '';
   bool iniciadaSesionUsuario = false;
 
   tiempo() async {
@@ -165,16 +166,11 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
   emailUsuario() async {
     //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-
-    final provider = Provider.of<PagoProvider>(context, listen: false);
-
-    //? compruebo si hay email para saber si hay sesion iniciada
-    usuarioAPP = provider.pagado['email'];
-    iniciadaSesionUsuario = usuarioAPP != '' ? true : false;
-
-    /// print('iniciado sesion: $iniciadaSesionUsuario');
-    //? compruebo si pago de la app
-    pagado = provider.pagado['pago'];
+    emailSesionUsuario = context.read<EstadoPagoAppProvider>().emailUsuarioApp;
+    iniciadaSesionUsuario = emailSesionUsuario != '' ? true : false;
+    pagado = context.read<EstadoPagoAppProvider>().estadoPagoApp != 'GRATUITA'
+        ? true
+        : false;
 
     setState(() {});
   }
@@ -300,8 +296,16 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
           .toString(); //id los paso a String porque los id de Firebase son caracteres
       String idEmpleado = '55';
       //###### CREA CITA Y TRAE ID CITA CREADA EN FIREBASE PARA ID DEL RECORDATORIO
-      idCita = await FirebaseProvider().nuevaCita(usuarioAPP, fecha, horaInicio,
-          horaFinal, precio, comentario, idCliente, idServicioAux, idEmpleado);
+      idCita = await FirebaseProvider().nuevaCita(
+          emailSesionUsuario,
+          fecha,
+          horaInicio,
+          horaFinal,
+          precio,
+          comentario,
+          idCliente,
+          idServicioAux,
+          idEmpleado);
     } else {
       //###### CREA CITA Y TRAE ID CITA CREADA EN DISPOSITIVO PARA ID DEL RECORDATORIO
       idCita = await citaElegida.nuevaCita(
@@ -314,7 +318,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
       );
     }
 
-   //  RECORDATORIO CON ID PARA EN EL CASO DE QUE SE ELIMINE LA CITA, PODER BORRARLO
+    //  RECORDATORIO CON ID PARA EN EL CASO DE QUE SE ELIMINE LA CITA, PODER BORRARLO
     DateTime diaRecord = DateTime.parse(horaRecordatorio);
     // int horaRecord = DateTime.parse(horaRecordatorio).hour;
     // int minutoRecord = DateTime.parse(horaRecordatorio).minute;
@@ -322,8 +326,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     DateTime ahora = DateTime.now().subtract(const Duration(
         minutes:
             1)); // ? incremento 5 minuto porque la fecha notificacion debe ser mayor a la de AHORA
-   
-   // GUARDA RECORDATORIO SI LA FECHA ES POSTERIOR A LA ACTUAL
+
+    // GUARDA RECORDATORIO SI LA FECHA ES POSTERIOR A LA ACTUAL
     if (diaRecord.isAfter(ahora)) {
       // if (horaRecord >= ahora.hour) {
       debugPrint('---------GUARDA RECORDATORIO-------');

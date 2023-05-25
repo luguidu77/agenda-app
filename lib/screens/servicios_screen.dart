@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:skeletons/skeletons.dart';
 
 import '../models/models.dart';
-import '../models/personaliza_model.dart';
-import '../providers/personaliza_provider.dart';
 import '../providers/providers.dart';
 import '../widgets/widgets.dart';
 
@@ -23,7 +21,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
   List<ServicioModelFB> listaserviciosFB = [];
   List<String> listNombreServicios = [];
   List<int> listIdServicios = [];
-  List<String> listPrecioServicios = [];
+
   List<String> listTiempoServicios = [];
   List<String> listDetalleServicios = [];
 
@@ -136,7 +134,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
               // SI TENGO DATOS LOS VISUALIZO EN PANTALLA
               return iniciadaSesionUsuario
                   ? verserviciosFB(context, data)
-                  : verservicios(context, data);
+                  : verServiciosDispositivo(context, data);
             } else {
               return //NO HAY SERVICIOS
                   Column(
@@ -240,7 +238,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
               children: aux.map((ser) {
             Map<String, dynamic> servicio = ser.values.first;
             return (ser.keys.first == cat['nombreCat'])
-                ? targetasServicios(
+                ? targetasServiciosFb(
                     servicio) // Card(child: ListTile(title: Text(servicio['servicio'])))
                 : Container(); // necesario para que funciones
           }).toList())
@@ -250,7 +248,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
   }
 
 // SERVICIOS DE FIREBASE
-  Widget targetasServicios(Map<String, dynamic> servicio) {
+  Widget targetasServiciosFb(Map<String, dynamic> servicio) {
     // PRIMERO ADAPTO EL MAP a ServicioModelFB
     ServicioModelFB servicioFB = ServicioModelFB(
         id: servicio['id'],
@@ -320,7 +318,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
   }
 
 //  SERVICIOS DE DISPOSITIVO
-  verservicios(context, dataServicios) {
+  verServiciosDispositivo(context, dataServicios) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListView.builder(
@@ -358,7 +356,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
                                 children: [
                                   Text('${dataServicios[index].tiempo} '),
                                   Text(
-                                    '${dataServicios[index].precio} ${personaliza.moneda}',
+                                    '${dataServicios[index].precio.toString()} ${personaliza.moneda}',
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold),
                                   ),
@@ -489,7 +487,8 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
           .cargarCategoriaServiciosID(usuarioAPP, e.idCategoria!);
 
       print(categoria);
-
+      print(
+          'todas los servicios $listaServiciosAux <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
       Map<String, dynamic> newSerCat = {
         'id': e.id,
         'servicio': e.servicio,

@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,17 +34,12 @@ class _CalendarioState extends State<Calendario> {
 
   emailUsuario() async {
     //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-
-    final provider = Provider.of<PagoProvider>(context, listen: false);
-
-    //? compruebo si hay email para saber si hay sesion iniciada
-    iniciadaSesionUsuario = provider.pagado['email'] != '' ? true : false;
-    debugPrint('iniciado sesion: ${iniciadaSesionUsuario.toString()}');
-    //? compruebo si pago de la app
-    pagado = provider.pagado['pago'];
-
-    emailSesionUsuario = provider.pagado['email'];
-
+    emailSesionUsuario = context.read<EstadoPagoAppProvider>().emailUsuarioApp;
+    iniciadaSesionUsuario = emailSesionUsuario != '' ? true : false;
+    pagado = context.read<EstadoPagoAppProvider>().estadoPagoApp != 'GRATUITA'
+        ? true
+        : false;
+    setState(() {});
     await cargaCitas(emailSesionUsuario);
   }
 

@@ -36,7 +36,7 @@ class CitaListProvider extends ChangeNotifier {
 
     return nuevoCliente;
   }
-  
+
 //###### CREA CITA Y TRAE ID CITA CREADA EN DISPOSITIVO PARA ID DEL RECORDATORIO
   Future<int> nuevaCita(String dia, String horaInicio, String horaFinal,
       String comentario, idCliente, idServicio) async {
@@ -60,12 +60,12 @@ class CitaListProvider extends ChangeNotifier {
 
     citas.add(nuevaCita);
     notifyListeners();
-   
+
     return id;
   }
 
   Future<ServicioModel> nuevoServicio(String servicio, String tiempo,
-      int precio, String detalle, String activo) async {
+      double precio, String detalle, String activo) async {
     final nuevoServicio = new ServicioModel(
         servicio: servicio,
         tiempo: tiempo,
@@ -171,23 +171,18 @@ class CitaListProvider extends ChangeNotifier {
       List<Map<String, dynamic>> citas) async {
     await Future.delayed(const Duration(seconds: 1));
 
-    /* var fecha = dateFormat.format(fechaElegida);
-    //?TRAE LAS CITAS POR FECHA ELEGIDA ///////////////////////////////////////
-    List<Map<String, dynamic>> citas = await cargarCitasPorFecha(fechaElegida)
-        .getCitasHoraOrdenadaPorFecha(fecha);
- */
     //precio total diario
-    int gananciaDiaria = 0;
+    double gananciaDiaria = 0;
     List<Map<String, dynamic>> aux = citas;
 
     List precios = aux.map((value) {
       return value['precio'];
     }).toList();
-    print(precios);
-    for (int element in precios) {
+
+    for (double element in precios) {
       gananciaDiaria = gananciaDiaria + element;
     }
-    print(gananciaDiaria);
+
     return gananciaDiaria.toString();
   }
 

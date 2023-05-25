@@ -334,7 +334,7 @@ class SincronizarFirebase {
       for (var y = 0; y < data.length; y++) {
         // print(x.toString());
         String servicio = data[y]['servicio'];
-        int precio = data[y]['precio'];
+        double precio = data[y]['precio'];
         String detalle = data[y]['detalle'];
         String tiempo = data[y]['tiempo'];
         String activo = data[y]['activo'];

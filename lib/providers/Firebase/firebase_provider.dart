@@ -115,7 +115,7 @@ class FirebaseProvider extends ChangeNotifier {
   }
 
   nuevoServicio(String emailUsuarioAPP, String servicio, String tiempo,
-      int precio, String detalle, String categoria) async {
+      double precio, String detalle, String categoria) async {
     final Map<String, dynamic> newServicio = ({
       'activo': 'true',
       'servicio': servicio,
@@ -256,7 +256,8 @@ class FirebaseProvider extends ChangeNotifier {
       if (fecha.split('-')[0] == anual) {
         //    _servicio = await DBProvider.db.getServicioPorId(item.idservicio! + 1);
 
-        int precio = (cita['precio'] != '') ? int.parse(cita['precio']) : 0;
+        double precio =
+            (cita['precio'] != '') ? double.parse(cita['precio']) : 0;
         data.add({
           'id': cita['id'],
           'fecha': fecha,
@@ -673,14 +674,14 @@ class FirebaseProvider extends ChangeNotifier {
 
   Future<String> calculaGananciaDiariasFB(citas) async {
     await Future.delayed(const Duration(seconds: 1));
-//precio total diario
-    int gananciaDiaria = 0;
+    //precio total diario
+    double gananciaDiaria = 0;
     List<Map<String, dynamic>> aux = citas;
     List precios = aux.map((value) {
-      return (value['precio'] != '') ? int.parse(value['precio']) : 0;
+      return (value['precio'] != '') ? double.parse(value['precio']) : 0;
     }).toList(); //todo: este campo está pendiende de añadir a tabla cita de firebase
 
-    for (int element in precios) {
+    for (double element in precios) {
       gananciaDiaria = gananciaDiaria + element;
     }
 

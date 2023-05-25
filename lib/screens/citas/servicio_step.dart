@@ -1,3 +1,4 @@
+import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -32,7 +33,7 @@ class _ServicioStepState extends State<ServicioStep> {
       false; //si no hay servicios, visible boton para ir a sercicios
   late MyLogicServicio myLogic;
 
-  String usuarioAPP = '';
+  String emailSesionUsuario = '';
   bool iniciadaSesionUsuario = false;
   PersonalizaModel personaliza = PersonalizaModel();
 
@@ -50,19 +51,12 @@ class _ServicioStepState extends State<ServicioStep> {
 
   emailUsuario() async {
     //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-
-    final provider = Provider.of<PagoProvider>(context, listen: false);
-
-    //? compruebo si hay email para saber si hay sesion iniciada
-    usuarioAPP = provider.pagado['email'];
-    iniciadaSesionUsuario = usuarioAPP != '' ? true : false;
-    print('iniciado sesion: $iniciadaSesionUsuario');
-    //? compruebo si pago de la app
-    // pagado = provider.pagado['pago'];
+    emailSesionUsuario = context.read<EstadoPagoAppProvider>().emailUsuarioApp;
+    iniciadaSesionUsuario = emailSesionUsuario != '' ? true : false;
 
     setState(() {});
 
-    cargarDatosServicios();
+    await cargarDatosServicios();
   }
 
   pagoProvider() async {
@@ -73,13 +67,15 @@ class _ServicioStepState extends State<ServicioStep> {
     if (iniciadaSesionUsuario) {
       debugPrint('TRAE SERVICIOS DE FIREBASE');
       //-----------------------------------------------------------------------------------------------------
-      listaAuxFB = await FirebaseProvider().cargarServiciosActivos(usuarioAPP);
+      listaAuxFB =
+          await FirebaseProvider().cargarServiciosActivos(emailSesionUsuario);
       listaserviciosFB = listaAuxFB;
 
       if (listaserviciosFB.isNotEmpty) {
         for (var item in listaserviciosFB) {
           var nombreCategoria = await FirebaseProvider()
-              .cargarCategoriaServiciosID(usuarioAPP, item.idCategoria!);
+              .cargarCategoriaServiciosID(
+                  emailSesionUsuario, item.idCategoria!);
           if (item.activo == 'true') {
             listNombreServicios.add(
                 '${item.servicio}-${nombreCategoria['nombreCategoria'].toString()}');
@@ -241,7 +237,7 @@ class _ServicioStepState extends State<ServicioStep> {
     return Column(children: [
       Container(
         width: 300,
-        height: 90,
+        height: 110,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5.0),
             border: Border.all(color: Colors.blue)),
@@ -250,15 +246,17 @@ class _ServicioStepState extends State<ServicioStep> {
             padding: const EdgeInsets.all(8.0),
             child: DropdownButtonFormField(
               isDense: false,
-              itemHeight: 80,
+              itemHeight: 85,
               // menuMaxHeight: 100, maximo altura del menu
 
               decoration: const InputDecoration(
                   border: UnderlineInputBorder(borderSide: BorderSide.none)),
               //opcion color para cambio tema: iconEnabledColor: Colors.amber,
-              hint: const Text(
-                'Elige un servicio',
-                style: TextStyle(fontSize: 18),
+              hint: Text(
+                listNombreServicios.isEmpty
+                    ? 'cargando servicios...'
+                    : 'Elige un servicio',
+                style: const TextStyle(fontSize: 18),
               ),
 
               validator: (value) =>
@@ -287,7 +285,7 @@ class _ServicioStepState extends State<ServicioStep> {
                   dropdownValue = newValue!;
                   int index = listNombreServicios.indexOf(dropdownValue);
                   iniciadaSesionUsuario
-                      ? seleccionaServicioFB(context, usuarioAPP,
+                      ? seleccionaServicioFB(context, emailSesionUsuario,
                           listNombreServicios, listaserviciosFB, index)
                       : seleccionaServicio(context, index);
                   indexServicio = index;
@@ -372,7 +370,7 @@ class _ServicioStepState extends State<ServicioStep> {
   seleccionaServicioFB(context, usuarioApp, List listNombreServcios,
       List<ServicioModelFB> listServicios, index) {
     print(
-        'usuarioapp: $usuarioAPP,lista nombres servicios: $listServicios lista servicios: $listServicios');
+        'usuarioapp: $emailSesionUsuario,lista nombres servicios: $listServicios lista servicios: $listServicios');
     print(listServicios.map((e) => e.servicio));
 
     var servicioElegido = Provider.of<CitaListProvider>(context, listen: false);

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 import '../../models/models.dart';
+import '../../screens/screens.dart';
 
 class BotonAgregarServicios extends StatefulWidget {
   const BotonAgregarServicios({Key? key}) : super(key: key);
@@ -138,6 +139,13 @@ class _BotonAgregarServiciosState extends State<BotonAgregarServicios> {
                 // foregroundColor: Colors.white,
                 label: 'Categorias',
                 onTap: () {
+                  //todo hacer modal desde abajo de pantalla
+                  /*  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return ConfigCategoriaServiciosScreen();
+                    },
+                  ); */
                   // formulario categorias de servicios
                   Navigator.pushNamed(context, 'ConfigCategoriaServiciosScreen',
                       arguments: CategoriaServicioModel());

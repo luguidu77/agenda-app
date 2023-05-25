@@ -161,7 +161,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
     Intl.defaultLocale = 'es';
 
     Picker(
-      title: const Text("Selecciona una fecha"),
+        title: const Text("Selecciona una fecha"),
         confirmText: 'Aceptar',
         cancelText: 'Cancelar',
         hideHeader: true,
@@ -169,7 +169,6 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
           type: PickerDateTimeType.kYMD,
           isNumberMonth: true,
         ),
-        
         onConfirm: (Picker picker, List<int> selectedValues) {
           DateTime selectedDate =
               (picker.adapter as DateTimePickerAdapter).value!;
@@ -246,7 +245,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
   }
 
 // traer horas y minutos de trabajo para sumarlas
-  seleccionaCita(BuildContext context, idServicio, usuarioAPP,
+  seleccionaCita(BuildContext context, int idServicio, usuarioAPP,
       iniciadaSesionUsuario) async {
     print('idservicio  = $idServicio');
     //COMPRUEBO EL TIEMPO DEL SERVICIO A PRESTAR
@@ -392,8 +391,8 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
     return ElevatedButton(
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            _disponible = await seleccionaCita(
-                context, widget.idServicio, usuarioAP, iniciadaSesionUsuario);
+            _disponible = await seleccionaCita(context,
+                int.parse(widget.idServicio), usuarioAP, iniciadaSesionUsuario);
             setState(() {});
             if (_disponible) {
               _pagado ? null : Publicidad().publicidad();
@@ -408,9 +407,9 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
               if (iniciadaSesionUsuario) {
                 CitaModelFirebase newCita = CitaModelFirebase();
                 newCita.id = idCitaOld;
-                newCita.dia = fecha; //todo: actualizar
-                newCita.horaInicio = textoFechaHora; //todo: actualizar
-                newCita.horaFinal = textoHoraF; //todo: actualizar
+                newCita.dia = fecha;
+                newCita.horaInicio = textoFechaHora;
+                newCita.horaFinal = textoHoraF;
                 newCita.comentario = oldCita['comentario'];
                 newCita.idcliente = oldCita['idCliente'];
                 newCita.idservicio = oldCita['idServicio'];
@@ -425,9 +424,9 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
                 //reprogramacion de fecha y hora de la cita
                 CitaModel newCita = CitaModel();
                 newCita.id = oldCita['id'];
-                newCita.dia = fecha; //todo: actualizar
-                newCita.horaInicio = textoFechaHora; //todo: actualizar
-                newCita.horaFinal = textoHoraF; //todo: actualizar
+                newCita.dia = fecha;
+                newCita.horaInicio = textoFechaHora;
+                newCita.horaFinal = textoHoraF;
                 newCita.comentario = oldCita['comentario'];
                 newCita.idcliente = oldCita['idCliente'];
                 newCita.idservicio = oldCita['idServicio'];
@@ -470,5 +469,6 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
 
   void snackbar() {
     mensajeSuccess(context, 'CITA REPROGRAMADA');
+    Navigator.pushNamed(context, 'home');
   }
 }

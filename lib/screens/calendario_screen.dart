@@ -39,7 +39,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
   String usuarioAPP = '';
 
   DateFormat dateFormat = DateFormat("yyyy-MM-dd");
-  int preciototal = 0;
+  double preciototal = 0;
   bool ocultarPrecios = true;
   Image? reloj;
 

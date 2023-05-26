@@ -39,25 +39,20 @@ class _ClientesScreenState extends State<ClientesScreen> {
   List<ClienteModel> listaAux = [];
   List<ClienteModel> aux = [];
   bool? pagado;
-  bool iniciadaSesionUsuario = false;
-  String emailSesionUsuario = '';
+  bool _iniciadaSesionUsuario = false;
+  String _emailSesionUsuario = '';
   pagoProvider() async {
     return Provider.of<PagoProvider>(context, listen: false);
   }
 
   emailUsuario() async {
-    //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-    emailSesionUsuario = context.read<EstadoPagoAppProvider>().emailUsuarioApp;
-    iniciadaSesionUsuario = emailSesionUsuario != '' ? true : false;
-    pagado = context.read<EstadoPagoAppProvider>().estadoPagoApp != 'GRATUITA'
-        ? true
-        : false;
-    setState(() {});
-    datosClientes(emailSesionUsuario);
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
   }
 
   datosClientes(String emailSesionUsuario) async {
-    iniciadaSesionUsuario
+    _iniciadaSesionUsuario
         ? listaAux = await cargaClientesFirebase(emailSesionUsuario)
         : listaAux = await CitaListProvider().cargarClientes();
 
@@ -73,15 +68,11 @@ class _ClientesScreenState extends State<ClientesScreen> {
 
       for (var element in listaClientes) {
         traeCitaPorCliente(element.id).then((value) {
-          print('trae las citas $value');
-
           numCitas.add(value);
-
-          print('lista de las citas $numCitas');
+          // print('lista de las citas $numCitas');
         });
       }
-
-      print('----------------lista clientes : $listaClientes');
+      // print('----------------lista clientes : $listaClientes');
     }
     // setState(() {}); actualizando no termina de cargar!!!
 
@@ -107,7 +98,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //  PagoProvider().guardaPagado(true, 'luguidu77@gmail.com'); //todo quitar , es solo pruebas
+    datosClientes(_emailSesionUsuario);
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButonWidget(
@@ -120,7 +111,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
               builder: (context) => NuevoActualizacionCliente(
                 cliente: ClienteModel(),
                 pagado: pagado,
-                usuarioAPP: emailSesionUsuario,
+                usuarioAPP: _emailSesionUsuario,
               ),
             ),
           );
@@ -183,7 +174,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
     return Expanded(
         flex: 8,
         child: FutureBuilder<dynamic>(
-          future: datosClientes(emailSesionUsuario),
+          future: datosClientes(_emailSesionUsuario),
           builder: (
             BuildContext context,
             AsyncSnapshot<dynamic> snapshot,
@@ -232,7 +223,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
                 child: Column(
                   children: [
                     ListTile(
-                      leading: iniciadaSesionUsuario &&
+                      leading: _iniciadaSesionUsuario &&
                               listaClientes[index].foto! != ''
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(150.0),
@@ -292,7 +283,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
                         TextButton.icon(
                             onPressed: () {
                               //1ºrefresco los datos cliente por si han sido editados
-                              datosClientes(emailSesionUsuario);
+                              datosClientes(_emailSesionUsuario);
                               //2ºn navega a Ficha Cliente con sus datos
                               Navigator.push(
                                 context,
@@ -303,8 +294,9 @@ class _ClientesScreenState extends State<ClientesScreen> {
                                                 secondaryAnimation) =>
                                         FichaClienteScreen(
                                           clienteParametro: ClienteModel(
-                                              id: int.parse(
-                                                  listaClientes[index].id),
+                                              id: listaClientes[index]
+                                                  .id
+                                                  .toString(),
                                               nombre:
                                                   listaClientes[index].nombre,
                                               telefono:
@@ -393,7 +385,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
                           setState(() {});
                           // ACTUALIZA CLIENTE DE FIREBASE
                           await _actualizarClienteFB(
-                              emailSesionUsuario, cliente);
+                              _emailSesionUsuario, cliente);
                           Navigator.pop(context);
                         },
                         child: const Text(
@@ -421,9 +413,9 @@ class _ClientesScreenState extends State<ClientesScreen> {
     int citas = 0;
     //? TRAIGO _citas POR idCliente
     try {
-      if (iniciadaSesionUsuario) {
+      if (_iniciadaSesionUsuario) {
         await FirebaseProvider()
-            .cargarCitasPorCliente(emailSesionUsuario, idCliente);
+            .cargarCitasPorCliente(_emailSesionUsuario, idCliente);
 
         debugPrint('citas firebase $citas');
       } else {

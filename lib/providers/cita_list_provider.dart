@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:agendacitas/providers/db_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CitaListProvider extends ChangeNotifier {
   List<ClienteModel> clientes = [];
@@ -182,8 +183,9 @@ class CitaListProvider extends ChangeNotifier {
     for (double element in precios) {
       gananciaDiaria = gananciaDiaria + element;
     }
-
-    return gananciaDiaria.toString();
+    // Formatear el número con dos decimales
+    String gananciaD = NumberFormat("#.00").format(gananciaDiaria);
+    return gananciaD.toString();
   }
 
   cargarCitasPorCliente(int cliente) async {

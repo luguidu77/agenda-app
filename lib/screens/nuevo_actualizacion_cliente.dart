@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:agendacitas/main.dart';
 import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/screens/ficha_cliente_screen.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -36,8 +37,8 @@ class NuevoActualizacionCliente extends StatefulWidget {
 
 class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
   final ImagePicker _picker = ImagePicker();
-  bool iniciadaSesionUsuario = false;
-  String usuarioAPP = '';
+  bool _iniciadaSesionUsuario = false;
+  String _emailSesionUsuario = '';
   bool pagado = false;
   PagoProvider? data;
   bool cargandoImagen = false;
@@ -45,25 +46,15 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
 
   // ignore: prefer_typing_uninitialized_variables
   var myLogic;
-  compruebaPago() async {
-    //   PagoProvider para obtener pago y el email del usuarioAPP
-    final providerPagoUsuarioAPP =
-        Provider.of<PagoProvider>(context, listen: false);
-
-    setState(() {
-      pagado = providerPagoUsuarioAPP.pagado['pago'];
-      usuarioAPP = providerPagoUsuarioAPP.pagado['email'];
-      usuarioAPP != ''
-          ? iniciadaSesionUsuario = true
-          : iniciadaSesionUsuario = false;
-    });
-    print(
-        'datos gardados en tabla Pago (nuevo_actualizacion_cliente.dart) PAGO: $pagado // EMAIL:$usuarioAPP ');
+  estadoPagoEmailApp() async {
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
   }
 
   @override
   void initState() {
-    compruebaPago();
+    estadoPagoEmailApp();
 
     myLogic = MyLogicCliente(widget.cliente!);
     myLogic.init();
@@ -81,11 +72,11 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
 
   @override
   Widget build(BuildContext context) {
-    print('hay sesion iniciada $iniciadaSesionUsuario');
+    // print('hay sesion iniciada $iniciadaSesionUsuario');
     myLogic.textControllerFoto.text;
     //setState(() {});
     ClienteModel cliente = widget.cliente!;
-    pagado = iniciadaSesionUsuario;
+    pagado = _iniciadaSesionUsuario;
 
     /*  bool pagado = widget.pagado!;
     String usuarioAPP = widget.usuarioAPP!;
@@ -99,7 +90,7 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
     (cliente.telefono == null) ? nuevoCliente = true : nuevoCliente = false;
 
     debugPrint(
-        'email cliente:${cliente.email} telefono cliente ${cliente.telefono}// pagado : $pagado // usuarioAPP: $usuarioAPP ');
+        'email cliente:${cliente.email} telefono cliente ${cliente.telefono}// pagado : $pagado // usuarioAPP: $_emailSesionUsuario ');
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
@@ -115,8 +106,8 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
             cliente = await clienteDatos();
             setState(() {});
             nuevoCliente
-                ? _nuevoCliente(usuarioAPP, cliente, pagado, myLogic)
-                : _refrescaFicha(usuarioAPP, cliente, pagado, myLogic);
+                ? _nuevoCliente(_emailSesionUsuario, cliente, pagado, myLogic)
+                : _refrescaFicha(_emailSesionUsuario, cliente, pagado, myLogic);
           } else {
             mensajeError(context, 'NO ACTUALIZADO, CARGANDO FOTO');
           }
@@ -169,7 +160,7 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
                         borderRadius: BorderRadius.circular(150.0),
                         child:
                             // ##### si hay sesion y foto guadada la carga de firebase con al ruta de textControllerFoto.text(no visible al usuario) #####
-                            iniciadaSesionUsuario &&
+                            _iniciadaSesionUsuario &&
                                     myLogic.textControllerFoto.text != ''
                                 ? Image.network(
                                     myLogic.textControllerFoto.text,
@@ -193,13 +184,13 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
                   children: [
                     IconButton(
                         onPressed: () async {
-                          if (iniciadaSesionUsuario) {
+                          if (_iniciadaSesionUsuario) {
                             setState(() {
                               cargandoImagen = true;
                             });
 
                             final image = await getImageGaleria(
-                                usuarioAPP,
+                                _emailSesionUsuario,
                                 cliente.telefono != null
                                     ? cliente.telefono!
                                     : '',
@@ -219,13 +210,13 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
                         icon: const Icon(Icons.image)),
                     IconButton(
                         onPressed: () async {
-                          if (iniciadaSesionUsuario) {
+                          if (_iniciadaSesionUsuario) {
                             setState(() {
                               cargandoImagen = true;
                             });
 
                             final image = await getImageFoto(
-                                usuarioAPP,
+                                _emailSesionUsuario,
                                 cliente.telefono != null
                                     ? cliente.telefono!
                                     : '');
@@ -348,7 +339,7 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
       // SUBE LA FOTO A FIREBASE STORAGE
       String pathFireStore = '';
 
-      if (iniciadaSesionUsuario) {
+      if (_iniciadaSesionUsuario) {
         pathFireStore = await _subirImagenStorage(
             usuarioAPP, image!.path, telefonoCliente, myLogic);
 
@@ -419,9 +410,10 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
     String email = cliente.email!;
     String foto = cliente.foto!;
     String nota = cliente.nota!;
-    if (iniciadaSesionUsuario) {
+    if (_iniciadaSesionUsuario) {
       await FirebaseProvider()
-          .nuevoCliente(usuarioAPP, nombre, telefono, email, foto, nota)
+          .nuevoCliente(
+              _emailSesionUsuario, nombre, telefono, email, foto, nota)
           .whenComplete(() {
         debugPrint('cliente nuevo añadido en Firebase!!');
         Navigator.pushNamed(context, 'clientesScreen');

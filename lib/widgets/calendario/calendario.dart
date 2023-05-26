@@ -19,8 +19,8 @@ class Calendario extends StatefulWidget {
 
 class _CalendarioState extends State<Calendario> {
   bool? pagado;
-  bool iniciadaSesionUsuario = false;
-  String emailSesionUsuario = '';
+  bool _iniciadaSesionUsuario = false;
+  String _emailSesionUsuario = '';
   late final ValueNotifier<List<Event>> selectedEvents;
   List<Map<String, dynamic>> todasLasCitasFB = [];
   List<CitaModel> todasLasCitasDispositivo = [];
@@ -34,46 +34,27 @@ class _CalendarioState extends State<Calendario> {
 
   emailUsuario() async {
     //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-    emailSesionUsuario = context.read<EstadoPagoAppProvider>().emailUsuarioApp;
-    iniciadaSesionUsuario = emailSesionUsuario != '' ? true : false;
-    pagado = context.read<EstadoPagoAppProvider>().estadoPagoApp != 'GRATUITA'
-        ? true
-        : false;
-    setState(() {});
-    await cargaCitas(emailSesionUsuario);
+    _emailSesionUsuario = context.read<EstadoPagoAppProvider>().emailUsuarioApp;
+    _iniciadaSesionUsuario =
+        context.read<EstadoPagoAppProvider>().iniciadaSesionUsuario;
+
+    await cargaCitas(_emailSesionUsuario);
   }
 
   cargaCitas(emailSesionUsuario) async {
-    if (kIsWeb) {
-      // La aplicación se está ejecutando en un navegador web (escritorio)
-
-      // La aplicación se está ejecutando en una plataforma de escritorio
-      iniciadaSesionUsuario = true;
-      emailSesionUsuario = 'luguidu77@gmail.com';
+    if (_iniciadaSesionUsuario) {
       await FirebaseProvider()
           .getTodasLasCitas(emailSesionUsuario)
           .then((citas) {
         todasLasCitasFB = citas;
-        print('citas ejecuntadose en navegador web $citas');
+        // print('citas $citas');
         setState(() {});
       });
     } else {
-      // La aplicación se está ejecutando en un dispositivo móvil
-
-      if (iniciadaSesionUsuario) {
-        await FirebaseProvider()
-            .getTodasLasCitas(emailSesionUsuario)
-            .then((citas) {
-          todasLasCitasFB = citas;
-          print('citas $citas');
-          setState(() {});
-        });
-      } else {
-        await CitaListProvider().cargarCitas().then((citas) {
-          todasLasCitasDispositivo = citas;
-        });
-        setState(() {});
-      }
+      await CitaListProvider().cargarCitas().then((citas) {
+        todasLasCitasDispositivo = citas;
+      });
+      setState(() {});
     }
   }
 
@@ -105,7 +86,7 @@ class _CalendarioState extends State<Calendario> {
     DateTime fecha = DateTime(2023);
     listaEventos.clear();
     // COMPROBAR INICIO SESION PARA TRAER LAS CITAS DE FIREBASE O DISPOSITIVO
-    if (iniciadaSesionUsuario) {
+    if (_iniciadaSesionUsuario) {
       for (var item in todasLasCitasFB) {
         fecha = DateTime.parse(item['dia']);
         Event evento = Event(item['comentario'].toString());

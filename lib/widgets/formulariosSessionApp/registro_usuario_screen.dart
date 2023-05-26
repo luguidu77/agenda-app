@@ -1,15 +1,12 @@
-import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
-import 'package:agendacitas/screens/inicio_config_app.dart';
-import 'package:agendacitas/utils/alertasSnackBar.dart';
-import 'package:agendacitas/widgets/formulariosSessionApp/olvido_password.dart';
-import 'package:flutter/material.dart';
-import 'package:agendacitas/providers/Firebase/sincronizar_firebase.dart';
-import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
-
-import 'package:agendacitas/widgets/formulariosSessionApp/validaciones_form_inicio_session_registro.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../providers/providers.dart';
+import '../../screens/screens.dart';
+import '../../utils/utils.dart';
+import '../widgets.dart';
 
 // ignore: must_be_immutable
 class RegistroUsuarioScreen extends StatefulWidget {
@@ -80,7 +77,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
         ),
         // hello again!
         Text(
-          widget.usuarioAPP != ''
+          hayEmailUsuario
               ? 'Hola ${widget.usuarioAPP.toString().split('@')[0]}!'
               : 'Hola!, ...',
           style: GoogleFonts.bebasNeue(fontSize: 40),
@@ -250,6 +247,36 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 10),
+
+                // ACCEDER CON OTRA CUENTA--------------------------------
+
+                hayEmailUsuario
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            GestureDetector(
+                              onTap: () async {
+                                // GUARDA EN EL PROVIDER Y LIMPIA VARIABLES PARA QUE SE PUEDA INICIAR SESION CON OTRO EMAIL
+                                await PagoProvider().guardaPagado(false, '');
+                                hayEmailUsuario = false;
+                                email = '';
+
+                                setState(() {});
+                              },
+                              child: const Text(
+                                'Acceder con otra cuenta',
+                                style: TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Container()
               ],
             )), // email texfield
 
@@ -284,28 +311,6 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
             )
           ],
         ),
-        // no tienes cuenta? , registrate ahora
-        /*   Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children:  [
-                    const Text(
-                      'No tienes cuenta?',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        mensajeInfo(context, 'texto');
-                      },
-                      child: const Text(
-                        'Registrate ahora',
-                        style: TextStyle(
-                            color: Colors.blue, fontWeight: FontWeight.bold),
-                      ),
-                    )
-                  ],
-                ), */
-
-        //sign in button
       ],
     );
   }

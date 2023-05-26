@@ -1,18 +1,23 @@
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
 
 import '../config/.configuraciones.dart';
-
 
 class EstadoPagoAppProvider extends ChangeNotifier {
   String _estadoPagadaApp = 'INITIAL';
   String _emailUsuarioApp = '';
+  bool _iniciadaSesionUsuario = false;
+  
 
 // _perfil ES LA DATA QUE SE ENVIA AL HACER UN  final perfil = await Provider.of<PerfilUsuarioAppProvider>(context, listen: false);
   String get estadoPagoApp => _estadoPagadaApp;
 
   String get emailUsuarioApp => _emailUsuarioApp;
+
+  bool get iniciadaSesionUsuario => _iniciadaSesionUsuario;
 
   estadoPagoEmailApp(String usuarioAPP) async {
     bool email = usuarioAPP != '' ? true : false;
@@ -20,6 +25,7 @@ class EstadoPagoAppProvider extends ChangeNotifier {
     switch (email) {
       case false:
         _estadoPagadaApp = 'GRATUITA';
+        _iniciadaSesionUsuario = false;
         // notifyListeners();
         debugPrint('#######   estado ###### GRATUITA');
         break;
@@ -29,7 +35,8 @@ class EstadoPagoAppProvider extends ChangeNotifier {
         // asigno el email de usuario
 
         _emailUsuarioApp = usuarioAPP;
-        notifyListeners();
+         _iniciadaSesionUsuario = true;
+        //notifyListeners();
 
         //?  si hay usuario disponible, seteo en provider la disponibilidad semanal para el servicio
 
@@ -93,4 +100,6 @@ class EstadoPagoAppProvider extends ChangeNotifier {
 
     return pruebaActiva;
   }
+
+  
 }

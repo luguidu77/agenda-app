@@ -60,11 +60,9 @@ class _InformesScreenState extends State<InformesScreen> {
 
     var fecha = dateFormat.format(fechaElegida);
 
-    // La aplicación se está ejecutando en un dispositivo móvil
-
-    if (iniciadaSesionUsuario) {
+    if (_iniciadaSesionUsuario) {
       citas =
-          await FirebaseProvider().cargarCitasAnual(emailSesionUsuario, fecha);
+          await FirebaseProvider().cargarCitasAnual(_emailSesionUsuario, fecha);
       debugPrint('TRAE LAS CITAS ANUALES GUARDADAS EN FIREBASE');
     } else {
       citas = await CitaListProvider().cargarCitasAnual(fecha);
@@ -80,25 +78,25 @@ class _InformesScreenState extends State<InformesScreen> {
   }
 
   cantidadPorMes(List fecha, List precio) {
-    double ene = 0;
-    double feb = 0;
-    double mar = 0;
-    double abr = 0;
-    double may = 0;
-    double jun = 0;
-    double jul = 0;
-    double ago = 0;
-    double sep = 0;
-    double oct = 0;
-    double nov = 0;
-    double dic = 0;
+    double ene = 0.0;
+    double feb = 0.0;
+    double mar = 0.0;
+    double abr = 0.0;
+    double may = 0.0;
+    double jun = 0.0;
+    double jul = 0.0;
+    double ago = 0.0;
+    double sep = 0.0;
+    double oct = 0.0;
+    double nov = 0.0;
+    double dic = 0.0;
 
     fecha.map((e) {
       String mes = e.split('-')[1];
 
       switch (mes) {
         case '01':
-          print('mes de enero');
+          //  print('mes de enero');
           int indice = fecha.indexOf(e);
           var paux = precio[indice].toString();
           ene += double.parse(paux);
@@ -215,17 +213,13 @@ class _InformesScreenState extends State<InformesScreen> {
   DateTime fechaElegida = DateTime.now();
   String fechaTexto = '';
   bool? pagado;
-  bool iniciadaSesionUsuario = false;
-  String emailSesionUsuario = '';
+  bool _iniciadaSesionUsuario = false;
+  String _emailSesionUsuario = '';
 
   emailUsuario() async {
-    //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-   
-    emailSesionUsuario = context.read<EstadoPagoAppProvider>().emailUsuarioApp;
-    iniciadaSesionUsuario = emailSesionUsuario != '' ? true : false;
-    pagado = context.read<EstadoPagoAppProvider>().estadoPagoApp != 'GRATUITA'
-        ? true
-        : false;
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
   }
 
   @override

@@ -7,7 +7,6 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../models/personaliza_model.dart';
 import '../providers/providers.dart';
 import '../screens/screens.dart';
-
 import '../utils/utils.dart';
 
 class ListaCitas extends StatefulWidget {

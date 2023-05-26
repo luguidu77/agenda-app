@@ -29,8 +29,8 @@ class _ClientaStepState extends State<ClientaStep> {
   Iterable<Contact> _contacts = [];
   var _actualContact;
   bool? pagado;
-  bool iniciadaSesionUsuario = false;
-  String emailSesionUsuario = '';
+  bool _iniciadaSesionUsuario = false;
+  String _emailSesionUsuario = '';
   ClienteModel cliente = ClienteModel(nombre: '', telefono: '', email: '');
   Map<String, dynamic> clienteFB = {};
 
@@ -42,12 +42,9 @@ class _ClientaStepState extends State<ClientaStep> {
   String txtSwitch = 'Conozco su teléfono';
 
   emailUsuario() async {
-    //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-    emailSesionUsuario = context.read<EstadoPagoAppProvider>().emailUsuarioApp;
-    iniciadaSesionUsuario = emailSesionUsuario != '' ? true : false;
-    pagado = context.read<EstadoPagoAppProvider>().estadoPagoApp != 'GRATUITA'
-        ? true
-        : false;
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
   }
 
   traeColorPrimarioTema() async {
@@ -66,8 +63,6 @@ class _ClientaStepState extends State<ClientaStep> {
     myLogic.init();
 
     super.initState();
-
-    // _askPermissions('/nuevacita');
   }
 
   @override
@@ -333,17 +328,17 @@ class _ClientaStepState extends State<ClientaStep> {
     String vTelefono = myLogic.textControllerTelefono.text;
 
     visibleSelectTelefono ? null : myLogic.textControllerTelefono.text = '0';
-    if (iniciadaSesionUsuario) {
+    if (_iniciadaSesionUsuario) {
       clienteFB = await FirebaseProvider()
-          .cargarClientePorTelefono(emailSesionUsuario, vTelefono);
+          .cargarClientePorTelefono(_emailSesionUsuario, vTelefono);
     } else {
       clientes = await CitaListProvider().cargarClientePorTelefono(vTelefono);
     }
 
-    if (iniciadaSesionUsuario) {
+    if (_iniciadaSesionUsuario) {
       if (clienteFB.isEmpty || vTelefono == '0') {
         await FirebaseProvider().nuevoCliente(
-            emailSesionUsuario,
+            _emailSesionUsuario,
             myLogic.textControllerNombre.text,
             vTelefono,
             myLogic.textControllerEmail.text,
@@ -351,7 +346,7 @@ class _ClientaStepState extends State<ClientaStep> {
             '');
 
         Map<String, dynamic> nuevoCliente = await FirebaseProvider()
-            .cargarClientePorTelefono(emailSesionUsuario, vTelefono);
+            .cargarClientePorTelefono(_emailSesionUsuario, vTelefono);
         idCliente = nuevoCliente['id'];
       } else {
         String nombreEncontrado = clienteFB['nombre'];
@@ -387,7 +382,7 @@ class _ClientaStepState extends State<ClientaStep> {
     print('ID cliente ----------$idCliente');
     clienta.setClientaElegida = {
       'ID': idCliente.toString(),
-      'NOMBRE': iniciadaSesionUsuario
+      'NOMBRE': _iniciadaSesionUsuario
           ? clienteFB['nombre']
           : myLogic.textControllerNombre.text, // nuevoCliente.telefono,
       'TELEFONO': vTelefono,

@@ -1,7 +1,5 @@
 import 'package:agendacitas/firebase_options.dart';
-import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,20 +7,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
 
-import '../../models/perfil_model.dart';
-import '../providers/calendario_provider.dart';
-import '../../widgets/calendario/calendario.dart';
-import '../../widgets/filtros/backdrop_citas.dart';
-import '../../widgets/filtros/items_filter_citas.dart';
-import '../widgets/lista_de_citas.dart';
-import '../providers/Firebase/firebase_provider.dart';
-import '../utils/comprueba_pago.dart';
-import '../providers/dispo_semanal_provider.dart';
-import '../providers/pago_dispositivo_provider.dart';
-import '../utils/disponibilidadSemanal.dart';
-import '../widgets/botones/boton_speed_dial.dart';
-
-import '../config/config.dart';
+import '../models/models.dart';
+import '../providers/providers.dart';
+import '../widgets/widgets.dart';
 
 class CalendarioCitasScreen extends StatefulWidget {
   const CalendarioCitasScreen({Key? key}) : super(key: key);
@@ -33,10 +20,10 @@ class CalendarioCitasScreen extends StatefulWidget {
 
 class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
-  bool iniciadaSesionUsuario =
+  bool _iniciadaSesionUsuario =
       false; // ?  VARIABLE PARA VERIFICAR SI HAY USUARIO CON INCIO DE SESION
   Color colorBotonFlecha = Colors.blueGrey;
-  String usuarioAPP = '';
+  String _emailSesionUsuario = '';
 
   DateFormat dateFormat = DateFormat("yyyy-MM-dd");
   double preciototal = 0;
@@ -95,17 +82,13 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
   }
 
   inicializacion() async {
-   
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
   }
 
   @override
   Widget build(BuildContext context) {
-    final estadoProvider =
-        Provider.of<EstadoPagoAppProvider>(context, listen: true);
-    usuarioAPP = estadoProvider.emailUsuarioApp;
-    iniciadaSesionUsuario = usuarioAPP != '' ? true : false;
-    print('------------------------usuarioapp $usuarioAPP');
-
     var calendarioProvider =
         Provider.of<CalendarioProvider>(context, listen: true);
     fechaElegida = calendarioProvider.fechaSeleccionada;
@@ -138,7 +121,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                 flex: 1,
                 child: Visibility(
                     visible: !visibleCalendario,
-                    child: iniciadaSesionUsuario
+                    child: _iniciadaSesionUsuario
                         ? _fotoPerfil()
                         : Column(
                             children: [
@@ -185,9 +168,9 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                             },
                           ),
                           frontLayer: ListaCitas(
-                            emailusuario: usuarioAPP,
+                            emailusuario: _emailSesionUsuario,
                             fechaElegida: fechaElegida,
-                            iniciadaSesionUsuario: iniciadaSesionUsuario,
+                            iniciadaSesionUsuario: _iniciadaSesionUsuario,
                             filter: filter, // envia 'TODAS' O 'PENDIENTES'
                           ),
                           backTitle: const Text(
@@ -195,12 +178,12 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                             style: TextStyle(fontSize: 14),
                           ),
                           frontTitle: Text(
-                            iniciadaSesionUsuario
-                                ? 'Citas para ${usuarioAPP.split('@')[0]}'
+                            _iniciadaSesionUsuario
+                                ? 'Citas para ${_emailSesionUsuario.split('@')[0]}'
                                 : 'Citas para agendadecitas', // todo: foto o nombre de empleado
                             style: const TextStyle(fontSize: 14),
                           ),
-                          usuarioAPP: usuarioAPP,
+                          usuarioAPP: _emailSesionUsuario,
                         ) //_vercitas(usuarioAPP)),
                   ),
             )
@@ -214,7 +197,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
     try {
       return FutureBuilder(
           future: FirebaseProvider().cargarPerfilFB(
-              usuarioAPP), //todo: cargar todos los empleados no solo el perfil
+              _emailSesionUsuario), //todo: cargar todos los empleados no solo el perfil
           builder: (BuildContext context, AsyncSnapshot<PerfilModel> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Padding(
@@ -507,7 +490,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
       child: Center(
         child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: 1,
+            itemCount: 1, // TODO:  Nº DE EMPLEADOS
             itemBuilder: (BuildContext context, index) {
               return Column(
                 children: [
@@ -517,14 +500,12 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                         borderRadius: BorderRadius.circular(100.0),
                         child: FadeInImage.assetNetwork(
                             placeholder: './assets/icon/galeria-de-fotos.gif',
-                            image:
-                                'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Imagen_no_disponible.svg/300px-Imagen_no_disponible.svg.png',
-                            // data!.foto.toString(),
+                            image: data!.foto.toString(),
                             fit: BoxFit.cover,
                             width: 100),
                       )),
                   Text(
-                    usuarioAPP.split('@')[0],
+                    _emailSesionUsuario.split('@')[0],
                     style: const TextStyle(fontSize: 12),
                   )
                 ],

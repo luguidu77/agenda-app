@@ -1,17 +1,16 @@
 // ignore_for_file: file_names
 
-import 'package:agendacitas/models/cita_model.dart';
-import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
-import 'package:agendacitas/providers/cita_list_provider.dart';
-import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
-import 'package:agendacitas/widgets/botones/floating_action_buton_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
+import '../models/models.dart';
 import '../mylogic_formularios/mylogic.dart';
+import '../providers/providers.dart';
+import '../utils/utils.dart';
+import '../widgets/widgets.dart';
 
 class FechasNoDisponibles extends StatefulWidget {
   const FechasNoDisponibles({Key? key}) : super(key: key);
@@ -36,21 +35,13 @@ class _FechasNoDisponiblesState extends State<FechasNoDisponibles> {
   String horaInicio = '';
   String horaFin = '';
   String asunto = '';
+  String _emailSesionUsuario = '';
+  bool _iniciadaSesionUsuario = false;
 
-  bool? pagado;
-  String usuarioAPP = '';
-  bool iniciadaSesionUsuario = false;
   emailUsuario() async {
-    //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-
-    final provider = Provider.of<PagoProvider>(context, listen: false);
-
-    //? compruebo si hay email para saber si hay sesion iniciada
-    usuarioAPP = provider.pagado['email'];
-    iniciadaSesionUsuario = usuarioAPP != '' ? true : false;
-
-    //? compruebo si pago de la app
-    pagado = provider.pagado['pago'];
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
   }
 
   @override
@@ -59,11 +50,8 @@ class _FechasNoDisponiblesState extends State<FechasNoDisponibles> {
 
     myLogic = MyLogicNoDisponible(citaInicio, citaFin, asunto);
     myLogic.init();
-    /*  servicio = _getServicio();
-    print(servicio); */
-    super.initState();
 
-    // _askPermissions('/nuevacita');
+    super.initState();
   }
 
   @override
@@ -230,71 +218,46 @@ class _FechasNoDisponiblesState extends State<FechasNoDisponibles> {
     );
   }
 
-  funcionDia(context, inicioFin, f) {
-    var firsDdate = DateTime.now();
+  funcionDia(context, inicioFin, f) async {
+    DateTime? diaSeleccionado =
+        await SeleccionFechaHora().seleccionFecha(context) as DateTime;
 
-    var lastDate = DateTime.now().add(const Duration(hours: 720));
-    Intl.defaultLocale = 'es';
-// todo picker fecha
-/*     showMaterialDatePicker(
-        context: context,
-        title: 'Selecciona fecha',
-        firstDate: firsDdate,
-        lastDate: lastDate,
-        selectedDate: DateTime.now(),
-        onChanged: (value) {
-          setState(() {
-            inicioFin
-                //fechaInicio y fechaFin --  VARIABLE QUE SE MANDA A GUARDAR CITA
-                ? fechaInicio =
-                    '${value.year}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}'
-                : fechaFin =
-                    '${value.year}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}';
-            //? FECHA LARGA EN ESPAÑOL PARA PRESENTAR USUARIO
-            String fecha = DateFormat.MMMMEEEEd('es_ES')
-                .format(DateTime.parse(value.toString()));
-            inicioFin
-                ? myLogic.textControllerDiaInicio.text = fecha
-                : myLogic.textControllerDiaFinal.text =
-                    fecha; //'${value.day}-${value.month}';
-          });
-          /*   //todo: pasar por formatar fecha
-          //textoDia lo pasamos al contexto
-          textoDia =
-              '${value.year}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}'; */
-        }); */
+    setState(() {
+      String fecha = DateFormat.MMMMEEEEd('es_ES')
+          .format(DateTime.parse(diaSeleccionado.toString()));
+
+      inicioFin
+          //fechaInicio y fechaFin --  VARIABLE QUE SE MANDA A GUARDAR CITA
+          ? fechaInicio =
+              '${diaSeleccionado.year}-${diaSeleccionado.month.toString().padLeft(2, '0')}-${diaSeleccionado.day.toString().padLeft(2, '0')}'
+          : fechaFin =
+              '${diaSeleccionado.year}-${diaSeleccionado.month.toString().padLeft(2, '0')}-${diaSeleccionado.day.toString().padLeft(2, '0')}';
+
+      inicioFin
+          ? myLogic.textControllerDiaInicio.text = fecha
+          : myLogic.textControllerDiaFinal.text =
+              fecha; //'${value.day}-${value.month}';
+    });
   }
 
-  funcionHora(context, inicioFin) {
-    var time = TimeOfDay.now();
-    Intl.defaultLocale = 'es';
-    // todo picker time
-    /*   showMaterialTimePicker(
-      context: context,
-      title: 'Selecciona hora',
-      selectedTime: time,
-      onChanged: (value) {
-        setState(() {
-          //? fechaInicio  y fechaFin -- VARIABLES QUE SE MANDA A GUARDAR CITA
+  funcionHora(context, inicioFin) async {
+    TimeOfDay? newTime =
+        await SeleccionFechaHora().seleccionHora(context) as TimeOfDay;
 
-          inicioFin
-              ? horaInicio =
-                  ('$fechaInicio ${value.hour.toString().padLeft(2, '0')}:${value.minute.toString().padLeft(2, '0')}:00Z')
-              //! en horaFin coge la fecha de inicio, fechaInicio. (esto es provisional)
-              : horaFin =
-                  ('$fechaInicio ${value.hour.toString().padLeft(2, '0')}:${value.minute.toString().padLeft(2, '0')}:00Z');
-          //texto   que muestra al usuario en pantalla
-          inicioFin
-              ? myLogic.textControllerHoraInicio.text =
-                  ('${value.hour.toString().padLeft(2, '0')}:${value.minute.toString().padLeft(2, '0')}')
-              : myLogic.textControllerHoraFinal.text =
-                  ('${value.hour.toString().padLeft(2, '0')}:${value.minute.toString().padLeft(2, '0')}');
-
-          /*     textoFechaHora =
-              ('$textoDia ${value.hour.toString().padLeft(2, '0')}:${value.minute.toString().padLeft(2, '0')}:00Z'); */
-        });
-      },
-    ); */
+    setState(() {
+      inicioFin
+          ? horaInicio =
+              ('$fechaInicio ${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}:00Z')
+          //! en horaFin coge la fecha de inicio, fechaInicio. (esto es provisional)
+          : horaFin =
+              ('$fechaInicio ${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}:00Z');
+      //texto   que muestra al usuario en pantalla
+      inicioFin
+          ? myLogic.textControllerHoraInicio.text =
+              ('${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}')
+          : myLogic.textControllerHoraFinal.text =
+              ('${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}');
+    });
   }
 
   _validacionFecha(value) {
@@ -355,8 +318,8 @@ class _FechasNoDisponiblesState extends State<FechasNoDisponibles> {
 //?   idservicio== 999 y idcliente= 999
 
 //? solo se guarda una fecha , por lo que antes debo programar para guardar cada dia,desde fecha inicio hasta fecha fin
-    if (iniciadaSesionUsuario) {
-      await FirebaseProvider().nuevaCita(usuarioAPP, fecha, horaInicio,
+    if (_iniciadaSesionUsuario) {
+      await FirebaseProvider().nuevaCita(_emailSesionUsuario, fecha, horaInicio,
           horaFinal, '', comentario, idCliente, idServicio, 'idEmpleado');
     } else {
       var citaElegida = Provider.of<CitaListProvider>(context, listen: false);

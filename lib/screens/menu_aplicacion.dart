@@ -1,17 +1,14 @@
-import 'package:agendacitas/models/perfil_model.dart';
-import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
-import 'package:agendacitas/config/config_personalizar_screen.dart';
-import 'package:agendacitas/screens/disponibilidad_semanal_screen.dart';
-import 'package:agendacitas/screens/servicios_screen.dart';
+
+import 'package:agendacitas/firebase_options.dart';
+import 'package:agendacitas/screens/screens.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../providers/estado_pago_app_provider.dart';
-import '../providers/pago_dispositivo_provider.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:agendacitas/firebase_options.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../providers/providers.dart';
 
 class MenuAplicacion extends StatefulWidget {
   const MenuAplicacion({
@@ -22,10 +19,10 @@ class MenuAplicacion extends StatefulWidget {
 }
 
 class _MenuAplicacionState extends State<MenuAplicacion> {
-  String _usuarioAPP = '';
+  String _emailSesionUsuario = '';
   String _estadopago = '';
   TextStyle estilo = const TextStyle(color: Colors.blueGrey);
-  bool _haySesionIniciada = false;
+  bool _iniciadaSesionUsuario = false;
   String versionApp = '';
   bool versionPlayS = false;
   String comentarioVersion = '';
@@ -72,13 +69,10 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
   }
 
   emailUsuario() async {
-    //traigo email del usuario, del PagoProvider
-    final estadoProvider =
-        Provider.of<EstadoPagoAppProvider>(context, listen: false);
-    _estadopago = estadoProvider.estadoPagoApp;
-    _usuarioAPP = estadoProvider.emailUsuarioApp;
-
-    _haySesionIniciada = _usuarioAPP != '' ? true : false;
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
+    _estadopago = estadoPagoProvider.estadoPagoApp;
   }
 
   @override
@@ -90,51 +84,18 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
     super.initState();
   }
 
-  _fotoPerfil() {
-    try {
-      return StreamBuilder(
-          stream: FirebaseProvider().cargarPerfilFB(_usuarioAPP).asStream(),
-          builder: ((context, AsyncSnapshot<PerfilModel> snapshot) {
-            if (snapshot.hasData) {
-              final data = snapshot.data;
-              return CircleAvatar(
-                backgroundColor: Colors.transparent,
-                child: data!.foto != ''
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(100.0),
-                        child: FadeInImage.assetNetwork(
-                            placeholder: './assets/icon/galeria-de-fotos.gif',
-                            image: data.foto.toString(),
-                            fit: BoxFit.cover,
-                            width: 100),
-                      )
-                    : Image.asset('./assets/icon/icon.png'),
-              );
-
-              /*  return CircleAvatar(
-            backgroundColor: Colors.transparent,
-            child: Image.asset('./assets/icon/icon.png'),
-          ); */
-            }
-            return const CircleAvatar();
-          }));
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return ListView(
       // Important: Remove any padding from the ListView.
       padding: EdgeInsets.zero,
       children: [
-        _haySesionIniciada
+        _iniciadaSesionUsuario
             ? UserAccountsDrawerHeader(
                 decoration: BoxDecoration(
                     color: Theme.of(context)
                         .primaryColor), // Color.fromARGB(255, 122, 121, 197)),
-                currentAccountPicture: _fotoPerfil(),
+                currentAccountPicture: fotoPerfil(_emailSesionUsuario),
                 otherAccountsPictures: [
                   IconButton(
                       color: Colors.white,
@@ -145,7 +106,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
                 accountEmail: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Text(_usuarioAPP),
+                    Text(_emailSesionUsuario),
                     _estadopago == 'PRUEBA_ACTIVA'
                         ? const Card(
                             child: Padding(
@@ -154,7 +115,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
                                 'versión de prueba',
                                 style: TextStyle(
                                     color: Color.fromARGB(255, 99, 11, 23),
-                                    fontSize: 12 ),
+                                    fontSize: 12),
                               ),
                             ),
                           )
@@ -174,14 +135,14 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
                       width: 100,
                     ),
                     Text('Agenda de citas', style: estilo),
-                    _haySesionIniciada
+                    _iniciadaSesionUsuario
                         ? Text('PRO $versionApp', style: estilo)
                         : Text('versión gratuita $versionApp', style: estilo),
                   ]),
                 ))),
         const Divider(),
 
-        !_haySesionIniciada
+        !_iniciadaSesionUsuario
             ? ListTile(
                 textColor: Colors.red,
                 leading: const Icon(Icons.update),
@@ -283,7 +244,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
                   //  _quitarPublicidad(context, enviosugerencia);
                 },
               ), */
-        _haySesionIniciada
+        _iniciadaSesionUsuario
             ? const Text('')
             : ListTile(
                 leading: const Icon(Icons.face_retouching_natural),

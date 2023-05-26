@@ -89,8 +89,6 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
                 onTap: () async {
                   _alertaCerrado();
                   await PagoProvider().guardaPagado(pagado!, usuarioAPP!);
-
-                  await FirebaseAuth.instance.signOut();
                 },
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(color: Colors.black, width: 1),
@@ -272,6 +270,8 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
   }
 
   void _alertaCerrado() async {
-    await mensajeSuccess(context, 'SESION CERRADA, HASTA PRONTO!');
+    mensajeSuccess(context, 'CERRANDO SESION...');
+    await Future.delayed(
+        const Duration(seconds: 2), (() => FirebaseAuth.instance.signOut()));
   }
 }

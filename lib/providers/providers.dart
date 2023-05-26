@@ -9,6 +9,8 @@ export 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 export 'package:agendacitas/providers/recordatorios_provider.dart';
 export 'package:agendacitas/providers/theme_provider.dart';
 export 'package:agendacitas/utils/comprueba_pago.dart';
+export 'package:agendacitas/providers/Firebase/foto_perfil_usuarioAPP.dart';
+export 'package:agendacitas/providers/estado_pago_app_provider.dart';
 
 export '../../providers/Firebase/firebase_provider.dart';
 export '../../providers/personaliza_provider.dart';

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:agendacitas/models/cita_model.dart';
-import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/screens/nuevo_actualizacion_cliente.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -28,8 +27,8 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
   final List<Map<String, dynamic>> _citas = [];
   PagoProvider? data;
   bool pagado = false;
-  String emailSesionUsuario = '';
-  bool iniciadaSesionUsuario = false;
+  String _emailSesionUsuario = '';
+  bool _iniciadaSesionUsuario = false;
   XFile? _image;
   PersonalizaModel personaliza = PersonalizaModel();
 
@@ -46,17 +45,11 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
   }
 
   compruebaPago() async {
-    //   PagoProvider para obtener pago y el email del usuarioAPP
-    //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-
-    emailSesionUsuario = context.read<EstadoPagoAppProvider>().emailUsuarioApp;
-    iniciadaSesionUsuario = emailSesionUsuario != '' ? true : false;
-    pagado = context.read<EstadoPagoAppProvider>().estadoPagoApp != 'GRATUITA'
-        ? true
-        : false;
-    setState(() {});
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
     debugPrint(
-        'datos gardados en tabla Pago (fichaClienteScreen.dart) PAGO: $pagado // EMAIL:$emailSesionUsuario ');
+        'datos gardados en tabla Pago (fichaClienteScreen.dart) PAGO: $pagado // EMAIL:$_emailSesionUsuario ');
   }
 
   @override
@@ -94,21 +87,21 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
               flexibleSpace: FlexibleSpaceBar(
                 centerTitle: true,
                 expandedTitleScale: 1.5,
-                background:
-                    iniciadaSesionUsuario && widget.clienteParametro.foto! != ''
-                        ? SizedBox(
-                            child: Image.network(
-                            widget.clienteParametro.foto!,
-                            width: 150,
-                            height: 150,
-                            fit: BoxFit.cover,
-                          ))
-                        : Image.asset(
-                            "./assets/images/nofoto.jpg",
-                            width: 150,
-                            height: 150,
-                            fit: BoxFit.cover,
-                          ),
+                background: _iniciadaSesionUsuario &&
+                        widget.clienteParametro.foto! != ''
+                    ? SizedBox(
+                        child: Image.network(
+                        widget.clienteParametro.foto!,
+                        width: 150,
+                        height: 150,
+                        fit: BoxFit.cover,
+                      ))
+                    : Image.asset(
+                        "./assets/images/nofoto.jpg",
+                        width: 150,
+                        height: 150,
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             const SliverAppBar(
@@ -142,8 +135,10 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
                   child: TabBarView(
                       // physics: ScrollPhysics(),
                       children: [
-                        _datos(widget.clienteParametro, pagado,
-                            widget.clienteParametro.id),
+                        _datos(
+                          widget.clienteParametro,
+                          pagado,
+                        ),
                         _historial(context, _citas, widget.clienteParametro.id),
                       ]),
                 ),
@@ -189,7 +184,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
       //TaskSnapshot taskSnapshot =
       await storage
           // GUARDO LAS FOTO DE FICHA CLIENTE EN LA SIGUIENTE DIRECCION DEL STORAGE FIREBASE
-          .ref('agendadecitas/clientes/$emailSesionUsuario/foto')
+          .ref('agendadecitas/clientes/$_emailSesionUsuario/foto')
           .putFile(file);
       // CONSULTA DE LA URL EN STORAGE
       // final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
@@ -208,7 +203,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
             builder: (context) => NuevoActualizacionCliente(
               cliente: widget.clienteParametro,
               pagado: pagado,
-              usuarioAPP: emailSesionUsuario,
+              usuarioAPP: _emailSesionUsuario,
             ),
           ),
         );
@@ -220,13 +215,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
     );
   }
 
-  _datos(ClienteModel cliente, bool pagado, idCliente) {
-    BoxDecoration decorationTarjetaNombre = BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
-        gradient: const LinearGradient(colors: [
-          Color.fromARGB(0, 111, 179, 210),
-          Color.fromARGB(73, 111, 179, 210),
-        ]));
+  _datos(ClienteModel cliente, bool pagado) {
     var estiloTelEmail = const TextStyle(fontSize: 14);
     var estiloNombre = const TextStyle(fontSize: 18);
     // int numCitas = citas.length;
@@ -295,12 +284,12 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
     );
   }
 
-  _historial(context, List<Map<String, dynamic>> citas, idCliente) {
+  _historial(context, List<Map<String, dynamic>> citas, String idCliente) {
     return FutureBuilder<dynamic>(
-        future: iniciadaSesionUsuario
+        future: _iniciadaSesionUsuario
             ? FirebaseProvider()
-                .cargarCitasPorCliente(emailSesionUsuario, idCliente)
-            : CitaListProvider().cargarCitasPorCliente(idCliente),
+                .cargarCitasPorCliente(_emailSesionUsuario, idCliente)
+            : CitaListProvider().cargarCitasPorCliente(int.parse(idCliente)),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return SkeletonParagraph(

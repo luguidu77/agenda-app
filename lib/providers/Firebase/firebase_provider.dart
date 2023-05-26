@@ -5,6 +5,7 @@ import 'package:agendacitas/models/perfil_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'dart:async';
 
 import '../../utils/utils.dart';
@@ -678,14 +679,15 @@ class FirebaseProvider extends ChangeNotifier {
     double gananciaDiaria = 0;
     List<Map<String, dynamic>> aux = citas;
     List precios = aux.map((value) {
-      return (value['precio'] != '') ? double.parse(value['precio']) : 0;
+      return (value['precio'] != '') ? double.parse(value['precio']) : 0.0;
     }).toList(); //todo: este campo está pendiende de añadir a tabla cita de firebase
 
     for (double element in precios) {
       gananciaDiaria = gananciaDiaria + element;
     }
-
-    return gananciaDiaria.toString();
+    // Formatear el número con dos decimales
+    String gananciaD = NumberFormat("#.00").format(gananciaDiaria);
+    return gananciaD.toString();
   }
 
   Future<bool> compruebaPagoFB(usuarioAPP) async {

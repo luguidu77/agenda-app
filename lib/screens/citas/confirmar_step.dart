@@ -51,8 +51,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
   String horaFinalTexto = '';
 
   bool? pagado;
-  String emailSesionUsuario = '';
-  bool iniciadaSesionUsuario = false;
+  String _emailSesionUsuario = '';
+  bool _iniciadaSesionUsuario = false;
 
   tiempo() async {
     await tiempoEstablecido.cargarTiempo().then((value) async {
@@ -165,14 +165,9 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
   }
 
   emailUsuario() async {
-    //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-    emailSesionUsuario = context.read<EstadoPagoAppProvider>().emailUsuarioApp;
-    iniciadaSesionUsuario = emailSesionUsuario != '' ? true : false;
-    pagado = context.read<EstadoPagoAppProvider>().estadoPagoApp != 'GRATUITA'
-        ? true
-        : false;
-
-    setState(() {});
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
   }
 
   @override
@@ -291,13 +286,13 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     debugPrint('hora actual ${DateTime.now().toString()}');
 
     int idCita = 0;
-    if (iniciadaSesionUsuario) {
+    if (_iniciadaSesionUsuario) {
       String idServicioAux = idServicio
           .toString(); //id los paso a String porque los id de Firebase son caracteres
       String idEmpleado = '55';
       //###### CREA CITA Y TRAE ID CITA CREADA EN FIREBASE PARA ID DEL RECORDATORIO
       idCita = await FirebaseProvider().nuevaCita(
-          emailSesionUsuario,
+          _emailSesionUsuario,
           fecha,
           horaInicio,
           horaFinal,

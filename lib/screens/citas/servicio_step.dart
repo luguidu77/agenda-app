@@ -33,8 +33,8 @@ class _ServicioStepState extends State<ServicioStep> {
       false; //si no hay servicios, visible boton para ir a sercicios
   late MyLogicServicio myLogic;
 
-  String emailSesionUsuario = '';
-  bool iniciadaSesionUsuario = false;
+  String _emailSesionUsuario = '';
+  bool _iniciadaSesionUsuario = false;
   PersonalizaModel personaliza = PersonalizaModel();
 
   getPersonaliza() async {
@@ -50,11 +50,9 @@ class _ServicioStepState extends State<ServicioStep> {
   }
 
   emailUsuario() async {
-    //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-    emailSesionUsuario = context.read<EstadoPagoAppProvider>().emailUsuarioApp;
-    iniciadaSesionUsuario = emailSesionUsuario != '' ? true : false;
-
-    setState(() {});
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
 
     await cargarDatosServicios();
   }
@@ -64,18 +62,18 @@ class _ServicioStepState extends State<ServicioStep> {
   }
 
   cargarDatosServicios() async {
-    if (iniciadaSesionUsuario) {
+    if (_iniciadaSesionUsuario) {
       debugPrint('TRAE SERVICIOS DE FIREBASE');
       //-----------------------------------------------------------------------------------------------------
       listaAuxFB =
-          await FirebaseProvider().cargarServiciosActivos(emailSesionUsuario);
+          await FirebaseProvider().cargarServiciosActivos(_emailSesionUsuario);
       listaserviciosFB = listaAuxFB;
 
       if (listaserviciosFB.isNotEmpty) {
         for (var item in listaserviciosFB) {
           var nombreCategoria = await FirebaseProvider()
               .cargarCategoriaServiciosID(
-                  emailSesionUsuario, item.idCategoria!);
+                  _emailSesionUsuario, item.idCategoria!);
           if (item.activo == 'true') {
             listNombreServicios.add(
                 '${item.servicio}-${nombreCategoria['nombreCategoria'].toString()}');
@@ -270,7 +268,7 @@ class _ServicioStepState extends State<ServicioStep> {
                     children: [
                       Text(value.toString().split('-')[0]),
                       const SizedBox(width: 5),
-                      iniciadaSesionUsuario
+                      _iniciadaSesionUsuario
                           ? Text(
                               value.toString().split('-')[1],
                               style: const TextStyle(color: Colors.blueGrey),
@@ -284,8 +282,8 @@ class _ServicioStepState extends State<ServicioStep> {
                 setState(() {
                   dropdownValue = newValue!;
                   int index = listNombreServicios.indexOf(dropdownValue);
-                  iniciadaSesionUsuario
-                      ? seleccionaServicioFB(context, emailSesionUsuario,
+                  _iniciadaSesionUsuario
+                      ? seleccionaServicioFB(context, _emailSesionUsuario,
                           listNombreServicios, listaserviciosFB, index)
                       : seleccionaServicio(context, index);
                   indexServicio = index;
@@ -299,7 +297,7 @@ class _ServicioStepState extends State<ServicioStep> {
   }
 
   Container precioServicio(servicio) {
-    bool habilitado = iniciadaSesionUsuario ? true : false;
+    bool habilitado = _iniciadaSesionUsuario ? true : false;
     return Container(
       width: 300,
       decoration: BoxDecoration(
@@ -370,7 +368,7 @@ class _ServicioStepState extends State<ServicioStep> {
   seleccionaServicioFB(context, usuarioApp, List listNombreServcios,
       List<ServicioModelFB> listServicios, index) {
     print(
-        'usuarioapp: $emailSesionUsuario,lista nombres servicios: $listServicios lista servicios: $listServicios');
+        'usuarioapp: $_emailSesionUsuario,lista nombres servicios: $listServicios lista servicios: $listServicios');
     print(listServicios.map((e) => e.servicio));
 
     var servicioElegido = Provider.of<CitaListProvider>(context, listen: false);

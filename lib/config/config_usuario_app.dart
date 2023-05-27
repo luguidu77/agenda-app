@@ -1,12 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../models/models.dart';
 import '../providers/providers.dart';
-import '../utils/utils.dart';
 import '../screens/screens.dart';
+import '../utils/utils.dart';
 
 class ConfigUsuarioApp extends StatefulWidget {
   const ConfigUsuarioApp({Key? key}) : super(key: key);
@@ -18,18 +19,17 @@ class ConfigUsuarioApp extends StatefulWidget {
 class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
   String foto = '';
   bool visibleIndicator = false;
-  bool? pagado;
-  String? usuarioAPP;
+  bool? _iniciadaSesionUsuario;
+  String? _emailSesionUsuario;
   PerfilModel? perfilUsuarioApp;
   bool floatExtended = false;
-  emailUsuario() async {
-    //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-    final pago = await PagoProvider().cargarPago();
-    final p = pago['pago'];
-    (p == 'true') ? pagado = true : pagado = false;
-    final emailUsuario = pago['email'];
-    usuarioAPP = emailUsuario;
-    debugPrint('USUARIO APP $usuarioAPP');
+
+  emailUsuarioApp() async {
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
+
+    debugPrint('USUARIO APP $_emailSesionUsuario');
     setState(() {});
   }
 
@@ -43,7 +43,7 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
       });
     });
 
-    emailUsuario();
+    emailUsuarioApp();
 
     super.initState();
   }
@@ -64,7 +64,7 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
             MaterialPageRoute(
               builder: (context) => NuevoAcutalizacionUsuarioApp(
                 perfilUsuarioApp: perfilUsuarioApp,
-                usuarioAPP: usuarioAPP,
+                usuarioAPP: _emailSesionUsuario,
               ),
             ),
           );
@@ -88,7 +88,8 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
               ListTile(
                 onTap: () async {
                   _alertaCerrado();
-                  await PagoProvider().guardaPagado(pagado!, usuarioAPP!);
+                  await PagoProvider().guardaPagado(
+                      _iniciadaSesionUsuario!, _emailSesionUsuario!);
                 },
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(color: Colors.black, width: 1),
@@ -139,7 +140,8 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
 
   StreamBuilder<PerfilModel> _fichaPerfilUsuario() {
     return StreamBuilder(
-        stream: FirebaseProvider().cargarPerfilFB(usuarioAPP).asStream(),
+        stream:
+            FirebaseProvider().cargarPerfilFB(_emailSesionUsuario).asStream(),
         builder: ((context, AsyncSnapshot<PerfilModel> snapshot) {
           if (snapshot.hasData) {
             final data = snapshot.data;
@@ -191,7 +193,7 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
                 ListTile(
                   leading: const Icon(Icons.email),
                   title: Text(
-                    usuarioAPP.toString(),
+                    _emailSesionUsuario.toString(),
                     // style: const TextStyle(fontSize: 20),
                   ),
                 ),
@@ -243,7 +245,8 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
     setState(() {
       visibleIndicator = true;
     });
-    await SincronizarFirebase().sincronizaDescargaDispositivo(usuarioAPP);
+    await SincronizarFirebase()
+        .sincronizaDescargaDispositivo(_emailSesionUsuario);
   }
 
   _botonCerrar(context) {
@@ -270,7 +273,7 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
   }
 
   void _alertaCerrado() async {
-    mensajeSuccess(context, 'CERRANDO SESION...');
+    mensajeInfo(context, 'CERRANDO SESION...');
     await Future.delayed(
         const Duration(seconds: 2), (() => FirebaseAuth.instance.signOut()));
   }

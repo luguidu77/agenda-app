@@ -1,3 +1,4 @@
+import 'package:agendacitas/widgets/dialogos/dialogo_linealpregessindicator.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -42,6 +43,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   bool loginRegistro = false; //true = login,, false = registro
   bool hayEmailUsuario = false;
 
+  bool showModal = true;
   //TextEditingController textControllerEmail = TextEditingController();
 
   @override
@@ -196,39 +198,39 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                   child: GestureDetector(
                     onTap: () async {
                       // ? INICIO DE SESION , DESCARGA DATOS DE FIREBASE
-                      setState(() {
-                        loading = true;
-                      });
+
                       final form = formKeyInicioSesion.currentState;
                       form!.save();
 
                       if (form.validate()) {
                         debugPrint('FORMULARIO LOGIN VALIDO');
+
+                        dialogoLinealProgressIndicator(
+                            context, 'Comprobando credenciales...');
+
+                        Future.delayed(const Duration(milliseconds: 500),
+                            () async {
+                          Navigator.pop(context);
+                        });
+
                         final res =
                             await validateLoginInput(context, email, password);
+                        // print(res);
 
-                        if (res) {
-                          debugPrint('SESION INICIADA');
-                          /* await Future.delayed(
-                                      const Duration(seconds: 3)); */
-
-                          final pagado =
-                              await FirebaseProvider().compruebaPagoFB(email);
-
-                          await PagoProvider()
-                              .guardaPagado(pagado, email.toString());
+                        if (res == 'wrong-password') {
+                          mensaje('CONTRASEÑA ERRONEA');
+                        } else if (res == 'user-not-found') {
+                          mensaje('USUARIO NO ENCONTRADO');
+                        } else if (res == 'too-many-requests') {
+                          mensaje('USUARIO BLOQUEADO TEMPORALMENTE');
+                        } else {
+                          print(
+                              '--------iniciada sesion correctamente --------------------');
 
                           _irPaginaInicio();
-                          //Restart.restartApp();
                         }
-                        setState(() {
-                          loading = false;
-                        });
                       } else {
                         mensajeError(context, 'FORMULARIO NO VALIDO');
-                        setState(() {
-                          loading = false;
-                        });
                       }
                     },
                     child: Container(
@@ -599,6 +601,10 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                   usuarioAPP: email!,
                 )),
         ModalRoute.withName('home'));
+  }
+
+  void mensaje(String s) {
+    mensajeError(context, s);
   }
 }
 

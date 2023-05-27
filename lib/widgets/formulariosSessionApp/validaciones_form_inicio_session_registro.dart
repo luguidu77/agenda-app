@@ -3,10 +3,11 @@ import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
-Future<bool> validateLoginInput(context,  email, password) async {
-  bool res = false;
+Future<String> validateLoginInput(context, email, password) async {
   //  ! RESPALDO  ( DESCARGA DATOS DE FIREBASE )
+  var data;
   try {
     //INICIALIZA FIREBASE
     await Firebase.initializeApp(
@@ -16,42 +17,24 @@ Future<bool> validateLoginInput(context,  email, password) async {
     await FirebaseAuth.instance
         .signInWithEmailAndPassword(email: email, password: password)
         .then((value) async {
-      //SI EL INICIO DE SESION HA SIDO CORRECTO, EJECUTA LO SIGUIENTE:
-      //GUARDO EN EL PROVIDER DE PAGO : PAGO Y EL EMAIL
-      // await PagoProvider().guardaPagado(true, email);
-      //SNACKBAR
-      await mensajeSuccess(context, 'INICIO DE SESION CORRECTA');
-      //2ª REALIZAR DESCARGA DE DATOS DE FIREBASE HE INSTALARLOS EN DISPOSITIVO
+      //value trae los credenciales del usuario. Se puede utilizar para agregarlo al provider
+      /*  UserCredential(additionalUserInfo: AdditionalUserInfo(isNewUser: false, profile: {}, providerId: null, username: null), credential: null, user: User(displayName: null, email: loli@gmail.com, emailVerified: false, isAnonymous: false, metadata: UserMetadata(creationTime: 2023-05-27 10:13:07.348Z, lastSignInTime: 2023-05-27 10:19:22.222Z), phoneNumber: null, photoURL: null, providerData, [UserInfo(displayName: null, email: loli@gmail.com, phoneNumber: null, photoURL: null, providerId: password, uid: loli@gmail.com)], refreshToken: , tenantId: null, uid: Z3TCba6YfwMCERs6oqpqIghtyWc2)) */
 
-      // todo anulado: await SincronizarFirebase().sincronizaDescargaDispositivo(_email);
-      /*   //3º REDIRIGIR AL HOME
-        Navigator.of(context).pushReplacementNamed('/'); */
-
-      res = true;
+      data = value.toString();
     });
   } on FirebaseAuthException catch (e) {
     // ERRORES DE INICIO DE SESION
-
-    // USUARIO NO ENCONTRADO
-    if (e.code == 'user-not-found') {
-      //SNACKBAR
-
-      mensajeError(context, 'USUARIO NO REGISTRADO');
-      res = false;
-      // CONTRASEÑA ERRONEA
-    } else if (e.code == 'wrong-password') {
-      //SNACKBAR
-
-      mensajeError(context, 'CONTRASEÑA ERRONEA');
-      res = false;
-    }
+    //'wrong-password'
+    // 'user-not-found'
+    //'too-many-requests'(BLOQUEADO USUARIO TEMPORALMENTE POR MAS DE 10 INTENTOS DESDE UNA MISMA IP)
+    return e.code;
   }
 
-  return res;
+  return data;
 }
 
 // ? LOS NUEVOS USUARIOS PAGO 1ª OPCION
-validateRegisterInput(context,  email, password) async {
+validateRegisterInput(context, email, password) async {
   debugPrint('FORMULARIO REGISTRO VALIDO');
 
   // ? activa el onSave de TextFormField

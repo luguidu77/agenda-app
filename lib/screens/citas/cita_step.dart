@@ -17,7 +17,7 @@ class CitaStep extends StatefulWidget {
 
 class _CitaStepState extends State<CitaStep> {
   // bool _pagado = false;
-  bool iniciadaSesionUsuario = false;
+  bool _iniciadaSesionUsuario = false;
   CitaModel cita = CitaModel();
   final _formKey = GlobalKey<FormState>();
   TextStyle estilotextoErrorValidacion = const TextStyle(color: Colors.red);
@@ -34,7 +34,7 @@ class _CitaStepState extends State<CitaStep> {
   String textoFechaHora = '';
   bool _disponible = false;
   Color? color;
-  String usuarioAPP = '';
+  String _emailSesionUsuario = '';
 
   traeColorPrimarioTema() async {
     final provider = Provider.of<ThemeProvider>(context, listen: false);
@@ -45,14 +45,9 @@ class _CitaStepState extends State<CitaStep> {
   }
 
   emailUsuarioApp() async {
-    //?comprueba pago en dispositivo
-    final pago = await CompruebaPago.getPagoEmailDispositivo();
-    debugPrint('datos gardados en tabla Pago (home.dart) $pago');
-
-    //? guardo en variables los datos de pago-> pago y email
-    String emailusuario = pago['email'];
-    usuarioAPP = emailusuario;
-    iniciadaSesionUsuario = usuarioAPP != '' ? true : false;
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
   }
 
   @override
@@ -349,7 +344,7 @@ class _CitaStepState extends State<CitaStep> {
     };
     // COMPRUEBA DISPONIBILIDAD SEMANAL
     Map resp = await _compruebaDisponibilidad(
-        tiempoServicioHoras, tiempoServicioMinutos, usuarioAPP);
+        tiempoServicioHoras, tiempoServicioMinutos, _emailSesionUsuario);
     _disponible = resp['disp'];
 
     debugPrint('disponible: $_disponible');
@@ -367,7 +362,7 @@ class _CitaStepState extends State<CitaStep> {
     //? PREGUNTO SI HAY USUARIO LOGEADO
     debugPrint(
         'pregunto si hay usuario antes de ver disponibilidad:->  $emailusuario  <-');
-    iniciadaSesionUsuario
+    _iniciadaSesionUsuario
         ? diasNoDisponibles = await DisponibilidadSemanal.disponibilidadSemanal(
             context,
             emailusuario) // diasNoDisponibles desde la carpeta utils //Lunes = 1, Martes = 2,Miercoles =3....Domingo = 7
@@ -388,9 +383,9 @@ class _CitaStepState extends State<CitaStep> {
       debugPrint(' DIA SEMANAL DISPONIBLE');
 
       List<Map<String, dynamic>> citas_ = [];
-      if (iniciadaSesionUsuario) {
+      if (_iniciadaSesionUsuario) {
         citas_ = await FirebaseProvider()
-            .getCitasHoraOrdenadaPorFecha(usuarioAPP, textoDia);
+            .getCitasHoraOrdenadaPorFecha(_emailSesionUsuario, textoDia);
       } else {
         citas_ = await CitaListProvider().cargarCitasPorFecha(textoDia);
       }

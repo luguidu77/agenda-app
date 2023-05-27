@@ -1,6 +1,5 @@
 import 'package:agendacitas/.env.dart';
 import 'package:agendacitas/models/cita_model.dart';
-import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -91,7 +90,7 @@ class _MyAppState extends State<MyApp> {
     //?comprueba pago en dispositivo
     final pago = await CompruebaPago.getPagoEmailDispositivo();
     debugPrint('datos gardados en tabla Pago (main.dart) $pago');
-   
+
     if (mounted) {
       setState(() {
         //? guardo en variables los datos de pago->  email

@@ -1,4 +1,3 @@
-
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/screens/screens.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -99,18 +98,18 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
                 otherAccountsPictures: [
                   IconButton(
                       color: Colors.white,
-                      icon: const Icon(Icons.settings),
+                      icon: const Icon(Icons.edit_square),
                       onPressed: () =>
                           {Navigator.pushNamed(context, 'ConfigUsuarioApp')}),
                 ],
-                accountEmail: Row(
+                accountEmail: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(_emailSesionUsuario),
                     _estadopago == 'PRUEBA_ACTIVA'
                         ? const Card(
                             child: Padding(
-                              padding: EdgeInsets.all(8.0),
+                              padding: EdgeInsets.symmetric(horizontal: 5.0),
                               child: Text(
                                 'versión de prueba',
                                 style: TextStyle(

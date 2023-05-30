@@ -1,11 +1,7 @@
-
-
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/Firebase/sincronizar_firebase.dart';
-import '../providers/pago_dispositivo_provider.dart';
+import '../providers/providers.dart';
 
 class ConfigDisponibilidad extends StatefulWidget {
   const ConfigDisponibilidad({Key? key}) : super(key: key);
@@ -15,6 +11,8 @@ class ConfigDisponibilidad extends StatefulWidget {
 }
 
 class _ConfigDisponibilidadState extends State<ConfigDisponibilidad> {
+  String _emailSesionUsuario = '';
+  bool _iniciadaSesionUsuario = false;
   List<String> diasSemana = [
     'Lunes',
     'Martes',
@@ -34,16 +32,15 @@ class _ConfigDisponibilidadState extends State<ConfigDisponibilidad> {
     'Sabado': true,
     'Domingo': true
   };
-  pagoProvider() {
-    //traer email usuarioAPP  del contexto
-    final providerPago = Provider.of<PagoProvider>(context, listen: false);
-    Map<String, dynamic> data = providerPago.pagado;
 
-    return data;
+  emailUsuario() async {
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
   }
 
-  crearEstructuraDisponibilidadFB(usuarioAPP) {
-    SincronizarFirebase()
+  crearEstructuraDisponibilidadFB(usuarioAPP) async {
+    await SincronizarFirebase()
         .actualizaDisponibilidadSemanal(usuarioAPP, diasDisp)
         .then((e) {
       setState(() {});
@@ -52,17 +49,16 @@ class _ConfigDisponibilidadState extends State<ConfigDisponibilidad> {
 
   @override
   void initState() {
+    emailUsuario();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    Map<String, dynamic> data = pagoProvider();
-    String emailusuario = data['email'];
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: emailusuario != '' && data['pago']
+        child: _emailSesionUsuario != '' && _iniciadaSesionUsuario
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -89,7 +85,7 @@ class _ConfigDisponibilidadState extends State<ConfigDisponibilidad> {
                   Expanded(
                     child: StreamBuilder(
                         stream: SincronizarFirebase()
-                            .getDisponibilidadSemanal(emailusuario)
+                            .getDisponibilidadSemanal(_emailSesionUsuario)
                             .asStream(),
                         builder: ((context, AsyncSnapshot<dynamic> snapshot) {
                           final data = snapshot.data;
@@ -126,7 +122,8 @@ class _ConfigDisponibilidadState extends State<ConfigDisponibilidad> {
                                   }));
                             } else {
                               //creamos la estructura en firebase
-                              crearEstructuraDisponibilidadFB(emailusuario);
+                              crearEstructuraDisponibilidadFB(
+                                  _emailSesionUsuario);
 
                               return const Text('CARGANDO...');
                             }
@@ -202,10 +199,11 @@ class _ConfigDisponibilidadState extends State<ConfigDisponibilidad> {
   }
 }
 
+// ignore: must_be_immutable
 class BotonDisponibilidad extends StatefulWidget {
   bool valorBoton;
-  Map disponibilidad;
-  String diaS;
+  final Map disponibilidad;
+  final String diaS;
 
   BotonDisponibilidad(
       {Key? key,
@@ -223,11 +221,13 @@ class _BotonDisponibilidadState extends State<BotonDisponibilidad> {
   @override
   Widget build(BuildContext context) {
     val = widget.valorBoton;
-    //traigo email del usuario, del PagoProvider
 
-    final providerPagoUsuarioAPP =
-        Provider.of<PagoProvider>(context, listen: false);
-    String usuarioAPP = providerPagoUsuarioAPP.pagado['email'];
+    //traigo email del usuario, del EstadoPagoAppProvider
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    String usuarioAPP = estadoPagoProvider.emailUsuarioApp;
+
+    //Disponibilidad semanal provider
+    final disponibilidadSemanalProvider = context.read<DispoSemanalProvider>();
 
     return Column(
       children: [
@@ -246,12 +246,9 @@ class _BotonDisponibilidadState extends State<BotonDisponibilidad> {
                 usuarioAPP,
                 widget.disponibilidad,
               );
-
-              //    ServicioModel servicio = widget.servicio;
-
-              //   servicio.activo = '$value';
-
-              //  CitaListProvider().acutalizarServicio(servicio);
+              // SETEA EL PROVIDER DE DISPONIBILIDAD
+              disponibilidadSemanalProvider
+                  .setDiasDispibles(widget.disponibilidad);
             });
           },
         ),

@@ -42,9 +42,13 @@ class _BackdropFilterCitasState extends State<BackdropFilterCitas>
 
   @override
   Widget build(BuildContext context) {
+    Color colorTema = Theme.of(context).primaryColor;
     return Scaffold(
         appBar: AppBar(
-          /*  flexibleSpace: Container(
+          // ESTABLE EL COLOR DEL TEMA EN EL TITULO DEL WIDGET ( Citas para loli)
+          backgroundColor: colorTema,
+          //flexibleSpace establece un colores con gradiente
+          /*   flexibleSpace: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                   begin: Alignment.centerLeft,
@@ -55,7 +59,6 @@ class _BackdropFilterCitasState extends State<BackdropFilterCitas>
                   ]),
             ),
           ), */
-
           toolbarHeight: 25,
           automaticallyImplyLeading: false,
           title: isFrontLayerVisible ? widget.frontTitle : widget.backTitle,

@@ -1,5 +1,3 @@
-
-
 import 'package:agendacitas/providers/db_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -18,44 +16,11 @@ class ThemeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  var mitemalight = ThemeData();
-
-  void cambiaColor(color) {
-    MaterialColor colorPrimarySwatch = MaterialColor(
-      color,
-      const <int, Color>{
-        50: const Color(0xFFFFFFFF),
-        100: const Color(0xFFFFFFFF),
-        200: const Color(0xFFFFFFFF),
-        300: const Color(0xFFFFFFFF),
-        400: const Color(0xFFFFFFFF),
-        500: const Color(0xFFFFFFFF),
-        600: const Color(0xFFFFFFFF),
-        700: const Color(0xFFFFFFFF),
-        800: const Color(0xFFFFFFFF),
-        900: const Color(0xFFFFFFFF),
-      },
-    );
-
-    mitemalight = ThemeData(
-      scaffoldBackgroundColor: Colors.white,
-      colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: colorPrimarySwatch), // const ColorScheme.light(),
-
-      primaryColor: colorPrimarySwatch,
-      fontFamily: 'Hind',
-      listTileTheme: const ListTileThemeData(textColor: Colors.grey),
-      textTheme: const TextTheme(
-          // headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-          titleLarge: TextStyle(fontSize: 14.0, fontStyle: FontStyle.normal),
-          bodyMedium: TextStyle(
-            fontSize: 18.0,
-            fontStyle: FontStyle.normal,
-            color: Colors.blueGrey,
-          )),
-    );
-
-    notifyListeners();
+  ThemeData _mitemalight = ThemeData();
+  ThemeData get mitemalight => _mitemalight;
+  set themeData(ThemeData themeData) {
+    _mitemalight = themeData;
+    notifyListeners(); // Notificar a los consumidores sobre el cambio
   }
 
   Future<TemaModel> nuevoTema(int color) async {
@@ -85,12 +50,8 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   acutalizarTema(int color) async {
-    // TemaModel(id: 0, color: color);
-    // Map<String, int> tema = {'id': 0, 'color': color};
-
-/*     final newColor = TemaModel(id: 0, color: color);
-    print(newColor.color); */
     await DBProvider.db.actualizarTema(color);
+    cargarTema();
   }
 }
 

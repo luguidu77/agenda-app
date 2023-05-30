@@ -1,12 +1,12 @@
+import 'dart:async';
+
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/models/cita_model.dart';
-import 'package:agendacitas/models/pago_model.dart';
 import 'package:agendacitas/models/perfil_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'dart:async';
 
 import '../../utils/utils.dart';
 
@@ -634,12 +634,16 @@ class FirebaseProvider extends ChangeNotifier {
         var cliente0 = await FirebaseProvider()
             .getClientePorId(emailUsuarioApp, cita['idCliente']);
         clienteFirebase = cliente0;
-
+        print('clientes ------------------------------$clienteFirebase');
         //? TRAE SERVICIO POR SU IDSERVICIOS
         var servicio = await FirebaseProvider()
             .cargarServicioPorId(emailUsuarioApp, cita['idServicio']);
         servicioFirebase = servicio;
         debugPrint('servicio traidas de firebase : ${servicio.toString()}');
+      } else {
+        // EN EL CASO QUE SEA UN NO DISPONIBLE, ASIGNAMOS NULL A LOS ID SERVICIO Y ID CLIENTE
+        servicioFirebase['idServicio'] = null;
+        clienteFirebase['idCliente'] = null;
       }
 
       citasFirebase.add({

@@ -98,6 +98,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Color colorTema = Theme.of(context).primaryColor;
     datosClientes(_emailSesionUsuario);
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -120,6 +121,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
 
       //drawer: const MenuDrawer(), //menuDrawer(context),
       appBar: AppBar(
+          backgroundColor: colorTema,
           automaticallyImplyLeading: false,
           title: const Text('Clientes'),
           shape: const RoundedRectangleBorder(

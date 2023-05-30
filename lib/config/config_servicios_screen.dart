@@ -1,12 +1,8 @@
-import 'package:agendacitas/models/cita_model.dart';
-import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
-import 'package:agendacitas/providers/cita_list_provider.dart';
-
-import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:flutter/material.dart';
 
+import '../models/models.dart';
 import '../mylogic_formularios/mylogic.dart';
-import '../screens/screens.dart';
+import '../providers/providers.dart';
 
 class ConfigServiciosScreen extends StatefulWidget {
   const ConfigServiciosScreen({Key? key}) : super(key: key);

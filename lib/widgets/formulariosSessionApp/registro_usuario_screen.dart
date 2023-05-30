@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../providers/providers.dart';
 import '../../screens/screens.dart';
+
 import '../../utils/utils.dart';
 import '../widgets.dart';
 
@@ -318,6 +319,8 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   }
 
   formCrearCuenta() {
+    String diasDePrueba = DiasDePrueba.getTexto();
+
     final ctlTextPassword1 = TextEditingController();
     final ctlTextPassword2 = TextEditingController();
 
@@ -334,13 +337,9 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
           style: GoogleFonts.bebasNeue(fontSize: 40),
         ),
         const SizedBox(height: 10),
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Text(
-            'Prueba todas las opciones y funcionalidades sin compromiso, sólo necesitas un email y una contraseña, puedes cancelar o suscribirte en cualquier momento. ',
-            style: TextStyle(fontSize: 14),
-          ),
-        ),
+
+        //TEXTO QUE INFORMA DE LOS DIAS DE PRUEBA
+        TextoDiasDePrueba(diasDePrueba: diasDePrueba),
 
         const SizedBox(height: 50),
         Form(
@@ -511,7 +510,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                   ),
                 ),
               ],
-            )), // email texfield
+            )),
 
         const SizedBox(height: 25),
 
@@ -605,6 +604,43 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
 
   void mensaje(String s) {
     mensajeError(context, s);
+  }
+}
+
+class TextoDiasDePrueba extends StatelessWidget {
+  const TextoDiasDePrueba({
+    super.key,
+    required this.diasDePrueba,
+  });
+
+  final String diasDePrueba;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: RichText(
+          textAlign: TextAlign.justify,
+          text: TextSpan(
+              style: const TextStyle(fontSize: 14, color: Colors.black),
+              children: <TextSpan>[
+                const TextSpan(
+                  text: 'Prueba durante ',
+                  style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
+                ),
+                TextSpan(
+                  text: '$diasDePrueba días',
+                  style: const TextStyle(
+                      color: Color.fromARGB(255, 41, 22, 151),
+                      fontWeight: FontWeight.bold),
+                ),
+                const TextSpan(
+                  text:
+                      ', todas las opciones y funcionalidades sin compromiso, sólo necesitas un email y una contraseña, puedes cancelar o suscribirte en cualquier momento. ',
+                  style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
+                )
+              ]),
+        ));
   }
 }
 

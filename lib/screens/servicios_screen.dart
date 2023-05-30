@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
 
 import '../models/models.dart';
@@ -13,8 +14,8 @@ class ServiciosScreen extends StatefulWidget {
 }
 
 class _ServiciosScreenState extends State<ServiciosScreen> {
-  String? usuarioAPP;
-  bool iniciadaSesionUsuario = false;
+  String? _emailSesionUsuario;
+  bool _iniciadaSesionUsuario = false;
   List<ServicioModel> listaAux = [];
   List<ServicioModelFB> listaAuxFB = [];
   List<ServicioModel> listaservicios = [];
@@ -47,12 +48,9 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
   }
 
   emailUsuario() async {
-    //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-    final pago = await PagoProvider().cargarPago();
-    final emailUsuario = pago['email'];
-    usuarioAPP = emailUsuario;
-    iniciadaSesionUsuario = usuarioAPP != '' ? true : false;
-    setState(() {});
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
 
     /*  if (iniciadaSesionUsuario) {
       await cargaServiciosConCategoriasFB(emailUsuario);
@@ -104,8 +102,8 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
   _body(context) {
     return Expanded(
       child: FutureBuilder(
-        future: iniciadaSesionUsuario
-            ? cargaServiciosFB(usuarioAPP!)
+        future: _iniciadaSesionUsuario
+            ? cargaServiciosFB(_emailSesionUsuario!)
             : cargarDatosServiciosDispositivo(),
         builder: (
           BuildContext context,
@@ -132,7 +130,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
               final data = snapshot.data;
 
               // SI TENGO DATOS LOS VISUALIZO EN PANTALLA
-              return iniciadaSesionUsuario
+              return _iniciadaSesionUsuario
                   ? verserviciosFB(context, data)
                   : verServiciosDispositivo(context, data);
             } else {
@@ -306,8 +304,8 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
                     children: [
                       ChangeActivateServicioButtonWidget(
                           servicio: servicioFB,
-                          iniciadaSesionUsuario: iniciadaSesionUsuario,
-                          usuarioAPP: usuarioAPP!)
+                          iniciadaSesionUsuario: _iniciadaSesionUsuario,
+                          usuarioAPP: _emailSesionUsuario!)
                     ],
                   ),
                 ),
@@ -372,8 +370,8 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
                           children: [
                             ChangeActivateServicioButtonWidget(
                                 servicio: dataServicios[index],
-                                iniciadaSesionUsuario: iniciadaSesionUsuario,
-                                usuarioAPP: usuarioAPP!)
+                                iniciadaSesionUsuario: _iniciadaSesionUsuario,
+                                usuarioAPP: _emailSesionUsuario!)
                           ],
                         ),
                       ),
@@ -389,8 +387,8 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
   Widget botonDestactivarServicio(index) {
     return ChangeActivateServicioButtonWidget(
       servicio: listaservicios[index],
-      iniciadaSesionUsuario: iniciadaSesionUsuario,
-      usuarioAPP: usuarioAPP!,
+      iniciadaSesionUsuario: _iniciadaSesionUsuario,
+      usuarioAPP: _emailSesionUsuario!,
     );
   }
 
@@ -417,7 +415,8 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
 
                       setState(() {});
                       //ELIMINA SERVICIO DE FIREBASE
-                      _eliminaServicioFB(usuarioAPP, listIdServicios[index]);
+                      _eliminaServicioFB(
+                          _emailSesionUsuario, listIdServicios[index]);
 
                       //ELIMINIA DE LAS LISTAS
                       listNombreServicios.remove(listNombreServicios[index]);
@@ -486,9 +485,8 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
       Map<String, dynamic> categoria = await FirebaseProvider()
           .cargarCategoriaServiciosID(usuarioAPP, e.idCategoria!);
 
-      print(categoria);
-      print(
-          'todas los servicios $listaServiciosAux <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
+      //  print(categoria);
+      //  print(          'todas los servicios $listaServiciosAux <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
       Map<String, dynamic> newSerCat = {
         'id': e.id,
         'servicio': e.servicio,

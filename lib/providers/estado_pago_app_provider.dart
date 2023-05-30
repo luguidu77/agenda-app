@@ -3,14 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-
 import '../config/.configuraciones.dart';
 
 class EstadoPagoAppProvider extends ChangeNotifier {
   String _estadoPagadaApp = 'INITIAL';
   String _emailUsuarioApp = '';
   bool _iniciadaSesionUsuario = false;
-  
 
 // _perfil ES LA DATA QUE SE ENVIA AL HACER UN  final perfil = await Provider.of<PerfilUsuarioAppProvider>(context, listen: false);
   String get estadoPagoApp => _estadoPagadaApp;
@@ -35,7 +33,7 @@ class EstadoPagoAppProvider extends ChangeNotifier {
         // asigno el email de usuario
 
         _emailUsuarioApp = usuarioAPP;
-         _iniciadaSesionUsuario = true;
+        _iniciadaSesionUsuario = true;
         //notifyListeners();
 
         //?  si hay usuario disponible, seteo en provider la disponibilidad semanal para el servicio
@@ -70,7 +68,8 @@ class EstadoPagoAppProvider extends ChangeNotifier {
     bool pruebaActiva = false;
 
     try {
-      // ignore: await_only_futures necesario el await para esperar retorno
+      //necesario el await para esperar retorno
+      // ignore: await_only_futures
       await FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user != null) {
           DateTime now = DateTime.now();
@@ -100,6 +99,4 @@ class EstadoPagoAppProvider extends ChangeNotifier {
 
     return pruebaActiva;
   }
-
-  
 }

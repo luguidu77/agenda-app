@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cita_model.dart';
-import '../providers/estado_pago_app_provider.dart';
 import '../providers/providers.dart';
 import '../providers/theme_provider.dart';
 import '../widgets/widgets.dart';
@@ -25,10 +24,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool temaDefecto = true;
 
-  ThemeProvider temaDefault = ThemeProvider();
+  ThemeProvider themeProvider = ThemeProvider();
 
   cargarTema() async {
-    
     // comprobamos si hay un color de tema guardado en sqlite, si lo hay cambia el tema con el color guardado
     final colorTema = await ThemeProvider().cargarTema();
 
@@ -36,9 +34,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (color.isNotEmpty) {
       temaDefecto = false;
-      // ignore: use_build_context_synchronously
-      final provider = Provider.of<ThemeProvider>(context, listen: false);
-      provider.cambiaColor(color.first);
+
+      ThemeData newTheme =
+          themeProvider.mitemalight.copyWith(primaryColor: Color(color.first!));
+      themeProvider.themeData = newTheme;
+      setState(() {});
     }
   }
 
@@ -58,17 +58,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      temaDefault = Provider.of<ThemeProvider>(context);
-    });
+    themeProvider = context.watch<ThemeProvider>();
 
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Agenda de citas',
-        themeMode: temaDefault.themeMode,
+        themeMode: themeProvider.themeMode,
         theme: temaDefecto
             ? ThemeData(primarySwatch: Colors.teal)
-            : temaDefault.mitemalight,
+            : ThemeData(
+                primaryColor: themeProvider.mitemalight.primaryColor,
+                floatingActionButtonTheme: FloatingActionButtonThemeData(
+                    backgroundColor: themeProvider.mitemalight.primaryColor),
+              ),
         darkTheme: MyTheme.darkTheme,
         home: WillPopScope(
           onWillPop: () async {

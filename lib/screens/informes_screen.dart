@@ -234,9 +234,11 @@ class _InformesScreenState extends State<InformesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Color colorTema = Theme.of(context).primaryColor;
     return Scaffold(
       // drawer: const MenuDrawer(), //menuDrawer(context),
       appBar: AppBar(
+          backgroundColor: colorTema,
           automaticallyImplyLeading: false,
           title: const Text('Informes'),
           shape: const RoundedRectangleBorder(

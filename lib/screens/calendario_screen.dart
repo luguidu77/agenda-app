@@ -9,6 +9,7 @@ import 'package:skeletons/skeletons.dart';
 
 import '../models/models.dart';
 import '../providers/providers.dart';
+import '../screens/screens.dart';
 import '../widgets/widgets.dart';
 
 class CalendarioCitasScreen extends StatefulWidget {
@@ -57,11 +58,10 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
   //contenedor seleccion de fechas
   int flexContenedorCitas = 9;
 
-  // event
+  // DIAS DISPONIBILIDAD SEMANAL
+  Set<int> diasNoDisponibles =
+      {}; //Lunes = 1, Martes = 2,Miercoles =3....Domingo = 7
 
-  var diasDisp;
-  List diasNoDisponibles =
-      []; //Lunes = 1, Martes = 2,Miercoles =3....Domingo = 7
   String calen = '';
 
   String filter = 'none';
@@ -89,6 +89,12 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // DISPONIBILIDAD SEMANAL PROVIDER
+    final provider = context.watch<DispoSemanalProvider>();
+    diasNoDisponibles = provider.diasNoDisponibles;
+    debugPrint(
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX ${diasNoDisponibles.toString()}');
+
     var calendarioProvider =
         Provider.of<CalendarioProvider>(context, listen: true);
     fechaElegida = calendarioProvider.fechaSeleccionada;
@@ -149,13 +155,21 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                             const SizedBox(
                               height: 50,
                             ),
-                            const Text('Día de la semana no disponible'),
+                            const Text('DIA NO DISPONIBLE PARA CITAR '),
                             const SizedBox(
                               height: 50,
                             ),
-                            Image.asset(
-                              './assets/images/noDisponible.png',
-                              width: MediaQuery.of(context).size.width - 200,
+                            GestureDetector(
+                              onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const DisponibilidadSemanalScreen(),
+                                  )),
+                              child: Image.asset(
+                                ('./assets/icon/beach.png'),
+                                width: MediaQuery.of(context).size.width - 200,
+                              ),
                             ),
                           ],
                         )
@@ -246,14 +260,6 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
     } catch (e) {
       debugPrint(e.toString());
     }
-  }
-
-  dispoProvider() {
-    return Provider.of<DispoSemanalProvider>(context, listen: false);
-  }
-
-  pagoProvider() async {
-    return Provider.of<PagoProvider>(context, listen: false);
   }
 
   toColor(String color) {

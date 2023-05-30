@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/picker.dart';
-
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../models/personaliza_model.dart';
-import '../providers/personaliza_provider.dart';
 import '../providers/providers.dart';
 import '../utils/alertasSnackBar.dart';
 import '../widgets/configRecordatorios.dart';
@@ -46,7 +44,7 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
     if (data.isNotEmpty) {
       personaliza.codpais = data[0].codpais;
       personaliza.moneda = data[0].moneda;
-      mensajeModificado('dato actualizado');
+      // mensajeModificado('dato actualizado');
       setState(() {});
     } else {
       await PersonalizaProvider().nuevoPersonaliza(0, 34, '', '', '€');
@@ -103,6 +101,7 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
   }
 
   _tema(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -111,12 +110,10 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
         const SizedBox(width: 10),
         ElevatedButton(
             style: ElevatedButton.styleFrom(
-              minimumSize: Size(MediaQuery.of(context).size.width / 4, 50),
-            ),
+                minimumSize: Size(MediaQuery.of(context).size.width / 4, 50),
+                backgroundColor: themeProvider.mitemalight.primaryColor),
             onPressed: () async {
-              // todo picker color
-
-              Picker(
+              await Picker(
                 title: const Text('Selecciona color tema'),
                 hideHeader: true,
                 itemExtent: 50,
@@ -134,27 +131,43 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
                           )))
                       .toList(),
                 ),
-                selectedTextStyle: TextStyle(color: Colors.blue),
+                selectedTextStyle: const TextStyle(color: Colors.blue),
                 onConfirm: (Picker picker, List<int> selectedValues) async {
                   int selectedIndex = selectedValues[0];
                   Color selectedColor = colorsList[selectedIndex];
                   // Realiza las acciones necesarias con el color seleccionado
-                  print(selectedColor);
-                  final provider =
-                      Provider.of<ThemeProvider>(context, listen: false);
-                  provider.cambiaColor(selectedColor.value);
-                  //  graba en sqlite el tema elegido
 
+                  /*  final provider =
+                      Provider.of<ThemeProvider>(context, listen: false);
+
+                  await provider.cambiaColor(selectedColor.value); */
+                  // Cambiar el color del tema
+                  // Cambiar el color del tema
+                  ThemeData newTheme = themeProvider.mitemalight.copyWith(
+                    primaryColor: selectedColor,
+                    floatingActionButtonTheme: FloatingActionButtonThemeData(
+                        backgroundColor: selectedColor),
+
+                    /*  iconButtonTheme: IconButtonThemeData(
+                          style: ButtonStyle(
+                        iconColor:
+                            MaterialStateProperty.all<Color>(selectedColor),
+                      )) */
+                  );
+                  themeProvider.themeData = newTheme;
+
+                  //  graba en sqlite el tema elegido
                   final colorTema = await ThemeProvider().cargarTema();
 
                   final color = colorTema.map((e) => e.color);
+
                   if (color.isEmpty) {
                     await ThemeProvider().nuevoTema(selectedColor.value);
                   } else {
                     await ThemeProvider().acutalizarTema(selectedColor.value);
+
                     mensajeModificado('Tema modificado');
                   }
-                  setState(() {});
                 },
               ).showDialog(context);
             },
@@ -228,10 +241,10 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
 
   actualizar(context) {
     getPersonaliza();
-    // setState(() {});
   }
 
   void mensajeModificado(String texto) {
+    setState(() {});
     mensajeSuccess(context, texto);
   }
 

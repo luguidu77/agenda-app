@@ -10,6 +10,7 @@ import '../models/models.dart';
 import '../mylogic_formularios/mylogic.dart';
 import '../providers/providers.dart';
 
+// ignore: must_be_immutable
 class NuevoAcutalizacionUsuarioApp extends StatefulWidget {
   PerfilModel? perfilUsuarioApp;
   String? usuarioAPP;

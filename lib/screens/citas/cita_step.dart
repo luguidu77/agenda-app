@@ -16,33 +16,26 @@ class CitaStep extends StatefulWidget {
 }
 
 class _CitaStepState extends State<CitaStep> {
+  // DISPONIBILIDAD SEMANAL
+  //Lunes = 1, Martes = 2,Miercoles =3....Domingo = 7
+  Set<int> diasNoDisponibles = {}, diasNoDisponiblesProvider = {};
+
   // bool _pagado = false;
   bool _iniciadaSesionUsuario = false;
   CitaModel cita = CitaModel();
   final _formKey = GlobalKey<FormState>();
   TextStyle estilotextoErrorValidacion = const TextStyle(color: Colors.red);
-  String textoErrorValidacionFecha = '';
-  String textoErrorValidacionHora = '';
-  String alertaHora = '';
-  /*  _getServicio() {
-    return servicio = CitaListProvider().getServicioElegido;
-  } */
+  String textoErrorValidacionFecha = '',
+      textoErrorValidacionHora = '',
+      alertaHora = '';
 
   late MyLogicCita myLogic;
 
   String textoDia = '';
   String textoFechaHora = '';
   bool _disponible = false;
-  Color? color;
-  String _emailSesionUsuario = '';
 
-  traeColorPrimarioTema() async {
-    final provider = Provider.of<ThemeProvider>(context, listen: false);
-    // trae color primario del tema para dar color a los clipper (formas de fondo)
-    int t = provider.mitemalight.colorScheme.primary.value;
-    color = Color(t);
-    setState(() {});
-  }
+  String _emailSesionUsuario = '';
 
   emailUsuarioApp() async {
     final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
@@ -52,26 +45,22 @@ class _CitaStepState extends State<CitaStep> {
 
   @override
   void initState() {
-    traeColorPrimarioTema();
     myLogic = MyLogicCita(cita);
-
     myLogic.init();
 
     emailUsuarioApp();
-    /*  servicio = _getServicio();
-    print(servicio); */
-    super.initState();
 
-    // _askPermissions('/nuevacita');
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    //comprueba pago de la app
-    // final estadopago = Provider.of<PagoProvider>(context);
-    // _pagado = estadopago.pagado['pago'];
-    var micontexto = Provider.of<CitaListProvider>(context);
-    //var cita = micontexto.getCitaElegida;
+    // LLEER MICONTEXTO DE CITALISTPROVIDER
+    var micontexto = context.read<CitaListProvider>();
+    // LLEER DIAS SEMANALES NO DISPONIBLES
+    //Lunes = 1, Martes = 2,Miercoles =3....Domingo = 7
+    diasNoDisponiblesProvider =
+        context.read<DispoSemanalProvider>().diasNoDisponibles;
 
     return Scaffold(
       floatingActionButton: FloatingActionButonWidget(
@@ -107,7 +96,7 @@ class _CitaStepState extends State<CitaStep> {
               child: ClipPath(
                   clipper: const Clipper1(),
                   child: Container(
-                    color: color!.withOpacity(0.1),
+                    color: Theme.of(context).primaryColor.withOpacity(0.1),
                     // height: 200,
                   )),
             ),
@@ -118,7 +107,7 @@ class _CitaStepState extends State<CitaStep> {
                   child: Container(
                     width: 295,
                     height: 317,
-                    color: color!.withOpacity(0.18),
+                    color: Theme.of(context).primaryColor.withOpacity(0.1),
                   )),
             ), //DECORACION DE FONDO -----------------------------------
             Column(
@@ -156,6 +145,119 @@ class _CitaStepState extends State<CitaStep> {
         ),
       ),
     );
+  }
+
+  //traer horas y minutos de trabajo para sumarlas
+  seleccionaCita(context, micontexto) async {
+    DateTime fechaInicio = DateTime.parse(textoFechaHora);
+    var servicio = micontexto.getServicioElegido;
+    String tiempoServicio = servicio['TIEMPO'];
+    int tiempoServicioHoras =
+        int.parse('${tiempoServicio[0]}${tiempoServicio[1]}');
+
+    int tiempoServicioMinutos =
+        int.parse('${tiempoServicio[3]}${tiempoServicio[4]}');
+
+    DateTime fechaFinal = fechaInicio.add(
+        Duration(hours: tiempoServicioHoras, minutes: tiempoServicioMinutos));
+
+    debugPrint('fecha1  $fechaInicio ');
+
+    micontexto.setCitaElegida = {
+      'FECHA': textoDia,
+      'HORAINICIO': fechaInicio,
+      'HORAFINAL': fechaFinal
+    };
+    // COMPRUEBA DISPONIBILIDAD SEMANAL
+    Map resp = await _compruebaDisponibilidad(context, tiempoServicioHoras,
+        tiempoServicioMinutos, _emailSesionUsuario);
+
+    _disponible = resp['disp'];
+
+    debugPrint('disponible: $_disponible');
+    setState(() {});
+    return resp;
+  }
+
+  var resp = {'disp': false, 'descrip': ''};
+  _compruebaDisponibilidad(context, tiempoServicioHoras, tiempoServicioMinutos,
+      String emailusuario) async {
+    bool disp = true;
+
+    //? PREGUNTO SI HAY USUARIO LOGEADO
+    debugPrint(
+        'pregunto si hay usuario antes de ver disponibilidad:->  $emailusuario  <-');
+    _iniciadaSesionUsuario
+        ?  diasNoDisponibles = diasNoDisponiblesProvider // diasNoDisponibles desde la carpeta utils //Lunes = 1, Martes = 2,Miercoles =3....Domingo = 7
+        : debugPrint('NO HAY USURIO LOGEADO!!!!');
+
+    debugPrint(
+        ' comprobando disponibilidad semanal ${diasNoDisponibles.contains(DateTime.parse(textoFechaHora).weekday).toString()}');
+    debugPrint(' dia de la semana  ${DateTime.parse(textoFechaHora).weekday}');
+
+    //? COMPROBAR SI EL DIA DE LA SEMANA ESTA DISPONIBLE PARA EL SERVICIO SI LA CONDICION ES TRUE QUIERE DECIR QUE ESTE DIA SEMANAL NO ESTA DISPONIBLE
+    if (diasNoDisponibles.contains(DateTime.parse(textoFechaHora).weekday)) {
+      debugPrint(' DIA SEMANAL NO DISPONIBLE');
+      //  disp = false;
+      resp['disp'] = false;
+      resp['descrip'] =
+          'Los ${obtenerNombreDiaSemana(textoFechaHora)} no están disponibles para citar ';
+      return resp;
+    } else {
+      debugPrint(' DIA SEMANAL DISPONIBLE');
+
+      List<Map<String, dynamic>> citas_ = [];
+      if (_iniciadaSesionUsuario) {
+        citas_ = await FirebaseProvider()
+            .getCitasHoraOrdenadaPorFecha(_emailSesionUsuario, textoDia);
+      } else {
+        citas_ = await CitaListProvider().cargarCitasPorFecha(textoDia);
+      }
+
+      //comprobar disponibilidad PARA  TODAS LAS CITAS PREVIAS
+      if (citas_.isNotEmpty) {
+        List auxInicio = citas_.map((e) => (e['horaInicio'])).toList();
+        List auxFinal = citas_.map((e) => (e['horaFinal'])).toList();
+        debugPrint(auxInicio.toString());
+        debugPrint(auxFinal.toString());
+
+        for (var i = 0; i < citas_.length && disp != false; i++) {
+          DateTime ip = DateTime.parse(auxInicio[i].toString());
+          DateTime fp = DateTime.parse(auxFinal[i].toString());
+
+          alertaHora =
+              '${ip.hour}:${ip.minute.toString().padLeft(2, '0')} a ${fp.hour}:${fp.minute.toString().padLeft(2, '0')}';
+          debugPrint('hora inicio cita cogida $ip');
+          debugPrint('hora final cita cogida $fp');
+
+          DateTime in_ = DateTime.parse(textoFechaHora);
+          DateTime fn_ = in_.add(Duration(
+              hours: tiempoServicioHoras, minutes: tiempoServicioMinutos));
+
+          debugPrint('hora INICIO nueva cita $in_');
+          debugPrint('hora FINAL nueva cita $fn_');
+
+          bool valIpIn = ip.isBefore(in_);
+          bool valFpIn = fp.isBefore(in_) || fp == in_;
+          bool valIpFn = ip.isAfter(fn_) || ip.isAtSameMomentAs(fn_);
+
+          /* LOGICA:   p(COGIDA)   n(NUEVA)
+
+                 ?   Ip < In
+                 ?         SI ES TRUE :   Fp <= In  -> FALSE (CITA ENCONTRADA)
+                 ?         SI ES FALSE:   Ip >= Fn  -> FALSE (CITA ENCONTRADA)
+         */
+
+          if (valIpIn) {
+            valFpIn ? disp = true : disp = false;
+          } else {
+            valIpFn ? disp = true : disp = false;
+          }
+        }
+      }
+      resp['disp'] = disp;
+      return resp;
+    }
   }
 
   void _alertaNoDisponibilidad(String descripDisponibilidad) {
@@ -321,118 +423,18 @@ class _CitaStepState extends State<CitaStep> {
     }
   }
 
-//traer horas y minutos de trabajo para sumarlas
-  seleccionaCita(BuildContext context, micontexto) async {
-    DateTime fechaInicio = DateTime.parse(textoFechaHora);
-    var servicio = micontexto.getServicioElegido;
-    String tiempoServicio = servicio['TIEMPO'];
-    int tiempoServicioHoras =
-        int.parse('${tiempoServicio[0]}${tiempoServicio[1]}');
-
-    int tiempoServicioMinutos =
-        int.parse('${tiempoServicio[3]}${tiempoServicio[4]}');
-
-    DateTime fechaFinal = fechaInicio.add(
-        Duration(hours: tiempoServicioHoras, minutes: tiempoServicioMinutos));
-
-    debugPrint('fecha1  $fechaInicio ');
-
-    micontexto.setCitaElegida = {
-      'FECHA': textoDia,
-      'HORAINICIO': fechaInicio,
-      'HORAFINAL': fechaFinal
-    };
-    // COMPRUEBA DISPONIBILIDAD SEMANAL
-    Map resp = await _compruebaDisponibilidad(
-        tiempoServicioHoras, tiempoServicioMinutos, _emailSesionUsuario);
-    _disponible = resp['disp'];
-
-    debugPrint('disponible: $_disponible');
-    setState(() {});
-    return resp;
-  }
-
-  // COMPRUEBA DISPONIBILIDAD SEMANAL
-  List diasNoDisponibles = [];
-  var resp = {'disp': false, 'descrip': ''};
-  _compruebaDisponibilidad(
-      tiempoServicioHoras, tiempoServicioMinutos, String emailusuario) async {
-    bool disp = true;
-
-    //? PREGUNTO SI HAY USUARIO LOGEADO
-    debugPrint(
-        'pregunto si hay usuario antes de ver disponibilidad:->  $emailusuario  <-');
-    _iniciadaSesionUsuario
-        ? diasNoDisponibles = await DisponibilidadSemanal.disponibilidadSemanal(
-            context,
-            emailusuario) // diasNoDisponibles desde la carpeta utils //Lunes = 1, Martes = 2,Miercoles =3....Domingo = 7
-        : debugPrint('NO HAY USURIO LOGEADO!!!!');
-
-    debugPrint(
-        ' comprobando disponibilidad semanal ${diasNoDisponibles.contains(DateTime.parse(textoFechaHora).weekday).toString()}');
-    debugPrint(' dia de la semana  ${DateTime.parse(textoFechaHora).weekday}');
-
-    //? COMPROBAR SI EL DIA DE LA SEMANA ESTA DISPONIBLE PARA EL SERVICIO SI LA CONDICION ES TRUE QUIERE DECIR QUE ESTE DIA SEMANAL NO ESTA DISPONIBLE
-    if (diasNoDisponibles.contains(DateTime.parse(textoFechaHora).weekday)) {
-      debugPrint(' DIA SEMANAL NO DISPONIBLE');
-      //  disp = false;
-      resp['disp'] = false;
-      resp['descrip'] = 'Día semanal no disponible para citar';
-      return resp;
-    } else {
-      debugPrint(' DIA SEMANAL DISPONIBLE');
-
-      List<Map<String, dynamic>> citas_ = [];
-      if (_iniciadaSesionUsuario) {
-        citas_ = await FirebaseProvider()
-            .getCitasHoraOrdenadaPorFecha(_emailSesionUsuario, textoDia);
-      } else {
-        citas_ = await CitaListProvider().cargarCitasPorFecha(textoDia);
-      }
-
-      //todo: comprobar disponibilidad PARA  TODAS LAS CITAS PREVIAS
-      if (citas_.isNotEmpty) {
-        List auxInicio = citas_.map((e) => (e['horaInicio'])).toList();
-        List auxFinal = citas_.map((e) => (e['horaFinal'])).toList();
-        debugPrint(auxInicio.toString());
-        debugPrint(auxFinal.toString());
-
-        for (var i = 0; i < citas_.length && disp != false; i++) {
-          DateTime ip = DateTime.parse(auxInicio[i].toString());
-          DateTime fp = DateTime.parse(auxFinal[i].toString());
-
-          alertaHora =
-              '${ip.hour}:${ip.minute.toString().padLeft(2, '0')} a ${fp.hour}:${fp.minute.toString().padLeft(2, '0')}';
-          debugPrint('hora inicio cita cogida $ip');
-          debugPrint('hora final cita cogida $fp');
-
-          DateTime in_ = DateTime.parse(textoFechaHora);
-          DateTime fn_ = in_.add(Duration(
-              hours: tiempoServicioHoras, minutes: tiempoServicioMinutos));
-
-          debugPrint('hora INICIO nueva cita $in_');
-          debugPrint('hora FINAL nueva cita $fn_');
-
-          bool valIpIn = ip.isBefore(in_);
-          bool valFpIn = fp.isBefore(in_) || fp == in_;
-          bool valIpFn = ip.isAfter(fn_) || ip.isAtSameMomentAs(fn_);
-
-          /* LOGICA:   p(COGIDA)   n(NUEVA)
-
-                 ?   Ip < In
-                 ?         SI ES TRUE :   Fp <= In  -> FALSE (CITA ENCONTRADA)
-                 ?         SI ES FALSE:   Ip >= Fn  -> FALSE (CITA ENCONTRADA)
-         */
-
-          if (valIpIn) {
-            valFpIn ? disp = true : disp = false;
-          } else {
-            valIpFn ? disp = true : disp = false;
-          }
-        }
-      }
-      resp['disp'] = disp;
-      return resp;
-    }
+  String obtenerNombreDiaSemana(String textoFechaHora) {
+    DateTime fechaHora = DateTime.parse(textoFechaHora);
+    List<String> nombresDiasSemana = [
+      'Lunes',
+      'Martes',
+      'Miércoles',
+      'Jueves',
+      'Viernes',
+      'Sábado',
+      'Domingo'
+    ];
+    int numeroDiaSemana = fechaHora.weekday;
+    return nombresDiasSemana[numeroDiaSemana - 1];
   }
 }

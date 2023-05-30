@@ -15,19 +15,6 @@ class BotonSpeedDial extends StatefulWidget {
 class _BotonSpeedDialState extends State<BotonSpeedDial> {
   bool floatExtended = false;
 
-  // anulado porque da errores de memoria dispose...
-  /* Timer? t;
-  retardo() {
-    t = Timer(const Duration(milliseconds: 500), () {
-      setState(() {
-        t!.cancel();
-        floatExtended = true;
-
-        // Here you can write your code for open new view
-      });
-    });
-  } */
-
   @override
   void initState() {
     // retardo();
@@ -46,15 +33,15 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
     var switchLabelPosition = false;
     var extend = floatExtended;
     var mini = false;
-   // var rmicons = false;
-    var customDialRoot = false;
+    // var rmicons = false;
+    //  var customDialRoot = false;
     var closeManually = false;
     var useRAnimation = true;
     var isDialOpen = ValueNotifier<bool>(false);
     var speedDialDirection = SpeedDialDirection.up;
     var buttonSize = const Size(56.0, 56.0);
     var childrenButtonSize = const Size(56.0, 56.0);
-   // var selectedfABLocation = FloatingActionButtonLocation.endDocked;
+    // var selectedfABLocation = FloatingActionButtonLocation.endDocked;
     return SpeedDial(
       icon: Icons.add,
       activeIcon: Icons.close,
@@ -63,7 +50,7 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
       openCloseDial: isDialOpen,
       childPadding: const EdgeInsets.all(5),
       spaceBetweenChildren: 4,
-      dialRoot: customDialRoot
+      /*  dialRoot: customDialRoot
           ? (ctx, open, toggleChildren) {
               return ElevatedButton(
                 onPressed: toggleChildren,
@@ -78,7 +65,7 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
                 ),
               );
             }
-          : null,
+          : null, */
       buttonSize:
           buttonSize, // it's the SpeedDial size which defaults to 56 itself
       // iconTheme: IconThemeData(size: 22),
@@ -115,9 +102,10 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
       elevation: 8.0,
       animationCurve: Curves.elasticInOut,
       isOpenOnStart: false,
-      shape: customDialRoot
+      shape: /*  customDialRoot
           ? const RoundedRectangleBorder()
-          : const StadiumBorder(),
+          : */
+          const StadiumBorder(),
       children: [
         SpeedDialChild(
           child: const Icon(Icons.calendar_month),

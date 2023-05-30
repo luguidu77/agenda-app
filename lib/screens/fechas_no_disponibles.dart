@@ -70,20 +70,6 @@ class _FechasNoDisponiblesState extends State<FechasNoDisponibles> {
                 mensaje(context);
               } else {
                 debugPrint('formulario NO valido');
-                /*   showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                        title: const Icon(
-                          Icons.warning,
-                          color: Colors.red,
-                        ),
-                        content: Text('Tienes una cita de $alertaHora'),
-                        actions: [
-                          TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Modificar hora'))
-                        ],
-                      )); */
               }
             }),
         body: Center(
@@ -293,7 +279,8 @@ class _FechasNoDisponiblesState extends State<FechasNoDisponibles> {
           ),
           IconButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/', ModalRoute.withName('/'));
               },
               icon: const Icon(
                 Icons.close,
@@ -317,11 +304,13 @@ class _FechasNoDisponiblesState extends State<FechasNoDisponibles> {
 
 //?   idservicio== 999 y idcliente= 999
 
-//? solo se guarda una fecha , por lo que antes debo programar para guardar cada dia,desde fecha inicio hasta fecha fin
+//? solo se guarda UN DIA , por lo que antes debo programar para guardar cada dia,desde fecha inicio hasta fecha fin
     if (_iniciadaSesionUsuario) {
+      //SI HAY INICIADA SESION SE GUARDA EN FIREBASE
       await FirebaseProvider().nuevaCita(_emailSesionUsuario, fecha, horaInicio,
           horaFinal, '', comentario, idCliente, idServicio, 'idEmpleado');
     } else {
+      //SI NO HAY INICIADA SESION SE GUARDA EN DISPOSITIVO
       var citaElegida = Provider.of<CitaListProvider>(context, listen: false);
       await citaElegida.nuevaCita(
         fecha,

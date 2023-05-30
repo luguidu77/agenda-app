@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 import '../../models/models.dart';
-import '../../screens/screens.dart';
 
 class BotonAgregarServicios extends StatefulWidget {
   const BotonAgregarServicios({Key? key}) : super(key: key);
@@ -60,7 +59,7 @@ class _BotonAgregarServiciosState extends State<BotonAgregarServicios> {
     var extend = floatExtended;
     var mini = false;
     // var rmicons = false;
-    var customDialRoot = false;
+    // var customDialRoot = false;
     var closeManually = false;
     var useRAnimation = true;
     var isDialOpen = ValueNotifier<bool>(false);
@@ -76,7 +75,7 @@ class _BotonAgregarServiciosState extends State<BotonAgregarServicios> {
       openCloseDial: isDialOpen,
       childPadding: const EdgeInsets.all(5),
       spaceBetweenChildren: 4,
-      dialRoot: customDialRoot
+      /* dialRoot: customDialRoot
           ? (ctx, open, toggleChildren) {
               return ElevatedButton(
                 onPressed: toggleChildren,
@@ -91,7 +90,7 @@ class _BotonAgregarServiciosState extends State<BotonAgregarServicios> {
                 ),
               );
             }
-          : null,
+          : null, */
       buttonSize:
           buttonSize, // it's the SpeedDial size which defaults to 56 itself
       // iconTheme: IconThemeData(size: 22),
@@ -128,9 +127,10 @@ class _BotonAgregarServiciosState extends State<BotonAgregarServicios> {
       elevation: 8.0,
       animationCurve: Curves.elasticInOut,
       isOpenOnStart: false,
-      shape: customDialRoot
+      shape: /* customDialRoot
           ? const RoundedRectangleBorder()
-          : const StadiumBorder(),
+          : */
+          const StadiumBorder(),
       children: [
         iniciadaSesionUsuario
             ? SpeedDialChild(

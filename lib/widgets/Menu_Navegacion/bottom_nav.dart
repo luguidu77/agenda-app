@@ -13,6 +13,7 @@ class _BNavigatorState extends State<BNavigator> {
 
   @override
   Widget build(BuildContext context) {
+    Color colorTema = Theme.of(context).primaryColor;
     return Builder(
       builder: (context) => BottomAppBar(
           shape: const CircularNotchedRectangle(), //shape of notch
@@ -24,6 +25,7 @@ class _BNavigatorState extends State<BNavigator> {
                 child: Padding(
                   padding: const EdgeInsets.only(right: 78.0),
                   child: BottomNavigationBar(
+                    selectedItemColor: colorTema,
                       currentIndex: index,
                       onTap: (int i) {
                         setState(() {

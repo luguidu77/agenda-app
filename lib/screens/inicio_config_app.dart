@@ -61,9 +61,11 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
                 Provider.of<EstadoPagoAppProvider>(context, listen: false);
             estadoProvider.estadoPagoEmailApp(data.email.toString());
 
-            //DISPONIBILIDAD SEMANAL
-             DisponibilidadSemanal.disponibilidadSemanal(
-                context, data.email.toString());
+            // ###############  DISPONIBILIDAD SEMANAL
+            //invocado DispoSemanalProvider
+            final dDispoSemanal = context.read<DispoSemanalProvider>();
+            DisponibilidadSemanal.disponibilidadSemanal(
+                dDispoSemanal, data.email.toString());
 
             // LOGEADO EN FIREBASE
             debugPrint(

@@ -42,12 +42,13 @@ class _CalendarioState extends State<Calendario> {
   }
 
   cargaCitas(emailSesionUsuario) async {
-    if (_iniciadaSesionUsuario) {
+    if (_iniciadaSesionUsuario && mounted) {
       await FirebaseProvider()
           .getTodasLasCitas(emailSesionUsuario)
           .then((citas) {
         todasLasCitasFB = citas;
         // print('citas $citas');
+
         setState(() {});
       });
     } else {

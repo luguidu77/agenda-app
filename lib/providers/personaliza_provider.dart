@@ -21,7 +21,6 @@ class PersonalizaProvider extends ChangeNotifier {
     personaliza.id = id;
 
     personalizaGuardado.add(personaliza);
-    notifyListeners();
 
     return personaliza;
   }
@@ -29,7 +28,7 @@ class PersonalizaProvider extends ChangeNotifier {
   Future<List<PersonalizaModel>> cargarPersonaliza() async {
     final personalizaGuardado = await DBProvider.db.getPersonaliza();
     this.personalizaGuardado = [...personalizaGuardado];
-    notifyListeners();
+
     return personalizaGuardado;
   }
 

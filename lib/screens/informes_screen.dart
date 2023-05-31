@@ -43,6 +43,8 @@ class _InformesScreenState extends State<InformesScreen> {
   double preciototal = 0.0;
   bool ocultarPrecios = true;
 
+  int contador = 0;
+
   getPersonaliza() async {
     List<PersonalizaModel> data =
         await PersonalizaProvider().cargarPersonaliza();
@@ -78,135 +80,81 @@ class _InformesScreenState extends State<InformesScreen> {
   }
 
   cantidadPorMes(List fecha, List precio) {
-    double ene = 0.0;
-    double feb = 0.0;
-    double mar = 0.0;
-    double abr = 0.0;
-    double may = 0.0;
-    double jun = 0.0;
-    double jul = 0.0;
-    double ago = 0.0;
-    double sep = 0.0;
-    double oct = 0.0;
-    double nov = 0.0;
-    double dic = 0.0;
-
     fecha.map((e) {
       String mes = e.split('-')[1];
 
       switch (mes) {
-        case '01':
-          //  print('mes de enero');
-          int indice = fecha.indexOf(e);
-          var paux = precio[indice].toString();
-          ene += double.parse(paux);
+        case '01': // ENERO
 
-          datosInforme[0] = ene;
-          facturaMes[0] = ene / 100;
-          //setState(() {});
+          funcionSuma(citas, '01');
 
           break;
-        case '02':
-          int indice = fecha.indexOf(e);
-          var paux = precio[indice].toString();
-          feb += double.parse(paux);
+        case '02': // FEBRERO
+          funcionSuma(citas, '02');
 
-          datosInforme[1] = feb;
-          facturaMes[1] = feb / 100;
-          setState(() {});
           break;
-        case '03':
-          int indice = fecha.indexOf(e);
-          var paux = precio[indice].toString();
-          mar += double.parse(paux);
+        case '03': // MARZO
+          funcionSuma(citas, '03');
 
-          datosInforme[2] = mar;
-          facturaMes[2] = mar / 100;
-          setState(() {});
           break;
-        case '04':
-          int indice = fecha.indexOf(e);
-          var paux = precio[indice].toString();
-          abr += double.parse(paux);
+        case '04': // ABRIL
+          funcionSuma(citas, '04');
 
-          datosInforme[3] = abr;
-          facturaMes[3] = abr / 100;
-          setState(() {});
           break;
-        case '05':
-          int indice = fecha.indexOf(e);
-          var paux = precio[indice].toString();
-          may += double.parse(paux);
+        case '05': // MAYO
+          funcionSuma(citas, '05');
 
-          datosInforme[4] = may;
-          facturaMes[4] = may / 100;
-          setState(() {});
           break;
-        case '06':
-          int indice = fecha.indexOf(e);
-          var paux = precio[indice].toString();
-          jun += double.parse(paux);
-
-          datosInforme[5] = jun;
-          facturaMes[4] = jun / 100;
-          setState(() {});
+        case '06': // JUNIO
+          funcionSuma(citas, '06');
           break;
-        case '07':
-          int indice = fecha.indexOf(e);
-          var paux = precio[indice].toString();
-          jul += double.parse(paux);
+        case '07': // JULIO
+          funcionSuma(citas, '07');
 
-          datosInforme[6] = jul;
-          facturaMes[4] = jul / 100;
-          setState(() {});
           break;
-        case '08':
-          int indice = fecha.indexOf(e);
-          var paux = precio[indice].toString();
-          ago += double.parse(paux);
+        case '08': // AGOSTO
+          funcionSuma(citas, '08');
 
-          datosInforme[7] = ago;
-          facturaMes[7] = ago / 100;
-          setState(() {});
           break;
-        case '09':
-          int indice = fecha.indexOf(e);
-          var paux = precio[indice].toString();
-          sep += double.parse(paux);
+        case '09': // SEPTIEMBRE
+          funcionSuma(citas, '09');
 
-          datosInforme[8] = sep;
-          facturaMes[8] = sep / 100;
-          setState(() {});
           break;
-        case '10':
-          int indice = fecha.indexOf(e);
-          var paux = precio[indice].toString();
-          oct += double.parse(paux);
+        case '10': // OCTUBRE
+          funcionSuma(citas, '10');
 
-          datosInforme[9] = oct;
-          facturaMes[9] = oct / 100;
-          setState(() {});
           break;
-        case '11':
-          int indice = fecha.indexOf(e);
-          var paux = precio[indice].toString();
-          nov += double.parse(paux);
+        case '11': //NOVIEMBRE
+          funcionSuma(citas, '11');
 
-          datosInforme[10] = nov;
-          facturaMes[10] = nov / 100;
-          setState(() {});
           break;
-        case '12':
-          int indice = fecha.indexOf(e);
-          var paux = precio[indice].toString();
-          dic += double.parse(paux);
+        case '12': // DICIEMBRE
+          funcionSuma(citas, '12');
 
-          datosInforme[11] = dic;
-          facturaMes[11] = dic / 100;
-          setState(() {});
           break;
       }
     }).toList();
+  }
+
+  void funcionSuma(citas, mes) {
+    // CREA UNA LISTA CON LOS PRECIOS DE LA CITA SIEMPRE Y CUANDO LA FECHA COINCIDA CON EL MES EN CUESTION
+    List precios = citas.map((e) {
+      if (e['fecha'].split('-')[1] == mes) {
+        return e['precio'];
+      } else {
+        return 0.0;
+      }
+    }).toList();
+    double cantidad = 0.0;
+    List preciosAux = precios;
+
+    // SUMA DE TODOS LOS PRECIOS DE LA LISTA
+    cantidad = preciosAux
+        .reduce((valorAnterior, valorActual) => valorAnterior + valorActual);
+
+    // AGREGA AL MES CORRESPONDIENTE LA CANTIDAD TOTAL
+    datosInforme[int.parse(mes) - 1] = cantidad;
+    facturaMes[int.parse(mes) - 1] = cantidad / 100; // formatea dos decimales
   }
 
   DateFormat formatDay = DateFormat('yyyy', 'es_ES');

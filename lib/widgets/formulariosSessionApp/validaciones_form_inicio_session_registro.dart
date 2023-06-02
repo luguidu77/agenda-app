@@ -56,10 +56,12 @@ validateRegisterInput(context, email, password) async {
       debugPrint('The password provided is too weak.');
     } else if (e.code == 'email-already-in-use') {
       debugPrint('The account already exists for that email.');
+      mensajeError(context, 'El usuario ya existe');
     }
     return false;
   } catch (e) {
     debugPrint(e.toString());
+
     return false;
   }
 }

@@ -29,7 +29,7 @@ void main() async {
   await Firebase.initializeApp();
   // initializeDateFormatting().then((_) {
   if (kIsWeb) {
-    // La aplicación se está ejecutando en un navegador web (escritorio)
+    // La aplicación se está ejecutando en un navegador web (escritor0io)
     Stripe.publishableKey = stripePublishableKey;
   } else {
     MobileAds.instance.initialize();

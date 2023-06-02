@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
 
+import '../config/config.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
 import '../screens/screens.dart';
@@ -491,6 +492,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
   }
 
   listaEmpleados(data) {
+    String foto = data.foto == '' ? no_hay_foto : data!.foto.toString();
     return Padding(
       padding: const EdgeInsets.only(left: 8.0),
       child: Center(
@@ -506,7 +508,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                         borderRadius: BorderRadius.circular(100.0),
                         child: FadeInImage.assetNetwork(
                             placeholder: './assets/icon/galeria-de-fotos.gif',
-                            image: data!.foto.toString(),
+                            image: foto,
                             fit: BoxFit.cover,
                             width: 100),
                       )),

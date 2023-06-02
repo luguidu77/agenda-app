@@ -232,10 +232,10 @@ class SincronizarFirebase {
           'horaInicio': cita['horaInicio'],
           'horaFinal': cita['horaFinal'],
           'comentario': cita['comentario'],
-          'idcliente': cita['idcliente'].toString(),
-          'idservicio': cita['idservicio'].toString(),
-          'idempleado': '999',
-          'precio': servicio.precio.toString(),
+          'idcliente': idServicio == 999 ? '999' : cita['idcliente'].toString(),
+          'idservicio': idServicio == 999 ? '999' :cita['idservicio'].toString(),
+          'idempleado': 'idEmpleado',
+          'precio': idServicio == 999 ? '' : servicio.precio.toString(),
         };
 
         await docRef.doc(id.toString()).set(data);
@@ -367,12 +367,12 @@ class SincronizarFirebase {
     final docRef = await _referenciaDocumento(usuarioAPP, 'pago');
 
     if (updown == 'UPLOAD') {
-      var data = {'id': 0, 'pago': true, 'email': usuarioAPP};
+      var data = {'id': 0, 'pago': false, 'email': usuarioAPP};
 
       await docRef.doc(data['id'].toString()).set(data);
     } else {
-      //GUARDA EN DISPOSITIVO PAGO: TRUE, EMAIL: EMAIL DE USUARIO
-      await PagoProvider().guardaPagado(true, usuarioAPP);
+      //GUARDA EN DISPOSITIVO PAGO: FALSE, EMAIL: EMAIL DE USUARIO
+      await PagoProvider().guardaPagado(false, usuarioAPP);
     }
   }
 

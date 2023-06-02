@@ -14,6 +14,9 @@ import 'package:agendacitas/utils/notificaciones/recordatorio_local/recordatorio
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/models.dart';
+import '../../mylogic_formularios/mylogic.dart';
+
 //import 'package:url_launcher/url_launcher_string.dart';
 
 //import 'package:sms_advanced/sms_advanced.dart';
@@ -197,6 +200,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
                       onPressed: () {
                         Navigator.pushNamedAndRemoveUntil(
                             context, '/', ModalRoute.withName('/'));
+
+                        liberarMemoriaEditingController();
                       },
                       icon: const Icon(
                         Icons.close,
@@ -263,6 +268,16 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         ),
       ),
     );
+  }
+
+  void liberarMemoriaEditingController() {
+    final cliente = ClienteModel();
+    final servicio = ServicioModel();
+    final cita = CitaModel();
+
+    MyLogicCliente(cliente).dispose();
+    MyLogicServicio(servicio).dispose();
+    MyLogicCita(cita).dispose();
   }
 
   grabarCita(

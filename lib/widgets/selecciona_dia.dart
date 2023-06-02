@@ -64,8 +64,8 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
     String usuarioAPP = estadopago.pagado['email'];
     bool iniciadaSesionUsuario = usuarioAPP != '' ? true : false;
 
-    var micontexto = Provider.of<CitaListProvider>(context);
-    var cita = micontexto.getCitaElegida;
+    // var micontexto = Provider.of<CitaListProvider>(context);
+    // var cita = micontexto.getCitaElegida;
 
     return Form(
       key: _formKey,
@@ -144,11 +144,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
           //boton reprogramar cita, es visible si viene llamado de formReprogramarReserva.dart
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              true
-                  ? botonReprogramar(usuarioAPP, iniciadaSesionUsuario)
-                  : Container()
-            ],
+            children: [botonReprogramar(usuarioAPP, iniciadaSesionUsuario)],
           )
         ],
       ),

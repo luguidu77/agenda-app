@@ -28,7 +28,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   final formKeyCrearCuenta = GlobalKey<FormState>();
   double? valorindicator;
   bool configuracionFinalizada = false;
-  bool loading = false;
+
 
   bool visibleBotonGPAY = false;
   bool visibleIndicator = false;
@@ -333,7 +333,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
         ),
         // hello again!
         Text(
-          'Hola!, nuev@ por aquí?',
+          'nuev@ por aquí?',
           style: GoogleFonts.bebasNeue(fontSize: 40),
         ),
         const SizedBox(height: 10),
@@ -455,9 +455,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                   child: GestureDetector(
                     onTap: () async {
                       // ? INICIO DE SESION , DESCARGA DATOS DE FIREBASE
-                      setState(() {
-                        loading = true;
-                      });
+                    
                       final form = formKeyCrearCuenta.currentState;
                       form!.save();
 
@@ -472,25 +470,15 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                           // EL RESULTADO DE CREACION DE CUENTA ES CORRECTA
                           debugPrint('CREANDO NUEVA CUENTA');
                           await PagoProvider()
-                              .guardaPagado(true, email.toString());
+                              .guardaPagado(false, email.toString());
                           configuracionInfoPagoRespaldo(email);
-                          _irPaginaInicio();
-                          /*  /* await Future.delayed(
-                                      const Duration(seconds: 3)); */
-                          await PagoProvider()
-                              .guardaPagado(true, email.toString());
 
                           _irPaginaInicio();
-                          //Restart.restartApp(); */
                         }
-                        setState(() {
-                          loading = false;
-                        });
+                      
                       } else {
                         mensajeError(context, 'FORMULARIO NO VALIDO');
-                        setState(() {
-                          loading = false;
-                        });
+                     
                       }
                     },
                     child: Container(
@@ -527,7 +515,9 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
               onTap: () async {
                 const url =
                     'https://pages.flycricket.io/agenda-de-citas/privacy.html';
+                // ignore: deprecated_member_use
                 if (await canLaunch(url)) {
+                  // ignore: deprecated_member_use
                   await launch(url);
                 } else {
                   throw 'Could not launch $url';
@@ -543,49 +533,24 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
             )
           ],
         ),
-        // no tienes cuenta? , registrate ahora
-        /*   Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children:  [
-                    const Text(
-                      'No tienes cuenta?',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        mensajeInfo(context, 'texto');
-                      },
-                      child: const Text(
-                        'Registrate ahora',
-                        style: TextStyle(
-                            color: Colors.blue, fontWeight: FontWeight.bold),
-                      ),
-                    )
-                  ],
-                ), */
-
-        //sign in button
+       
       ],
     );
   }
 
 //METODO PARA GUARDADO DE PAGO Y RESPALDO EN FIREBASE Y PRESENTAR INFORMACION AL USUARIO EN PANTALLA
   configuracionInfoPagoRespaldo(email) async {
-    visibleFormulario = false;
-    visibleIndicator = true;
-    visiblePagoRealizado = true;
+
     try {
-      setState(() {});
+      
       //GUARDA PAGO EN DISPOSITIVO
       await PagoProvider().guardaPagado(true, email);
 
-      visibleGuardarPagoRealizado = true;
+     
 
       // RESPALDO DATOS EN FIREBASE
       await SincronizarFirebase().sincronizaSubeFB(email);
-      setState(() {});
-      visibleRespaldoRealizado = true;
-      configuracionFinalizada = true;
+     
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -664,280 +629,7 @@ Widget filledButton(String text, Color splashColor, Color highlightColor,
   );
 }
 
-_cabeceraPagina(txtregistroLogin) {
-  switch (txtregistroLogin) {
-    case 'Registro':
-      return Column(
-        children: [
-          const SizedBox(
-            height: 10,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Image.asset(
-                './assets/images/cheque.png',
-                width: 30,
-              ),
-              const Text('Pago realizado con éxito')
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Row(
-            children: [
-              Image.asset(
-                './assets/icon/acceso.png',
-                width: 30,
-              ),
-              const Text('Vincula tu cuenta con la nube*:'),
-            ],
-          ),
-          const Text(
-              '* Los datos registrados en esta aplicación serán subidos a Cloud Firestore de Google, que podrás solicitar su eliminación cuando lo consideres oportuno escribiendo a agendadecitaspro@gmail.com. En ningún caso, el administrador de esta aplicación utilizará dichos datos fuera de este ámbito ni los cederá a terceros.',
-              style: TextStyle(fontSize: 10)),
-        ],
-      );
 
-    case 'Registro2':
-      return const Text(
-        'VINCULA LA CUENTA CON TU USUARIO FACILITADO',
-      );
 
-    case 'Login':
-      return const Text('INICIA SESION');
 
-    default:
-  }
-}
 
-_piePagina(context, txtregistroLogin) {
-  return (txtregistroLogin == 'Registro2')
-      ? Container()
-      : Padding(
-          padding: const EdgeInsets.all(18.0),
-          child: GestureDetector(
-            onTap: () =>
-                Navigator.pushNamed(context, 'InstruccionRegistroNuevoUsuario'),
-            child: const ListTile(
-                trailing: Icon(Icons.navigate_next),
-                title: Text(
-                  'Si compraste la app con la segunda opción, sigue las instruciones',
-                  style: TextStyle(fontSize: 14),
-                )),
-          ),
-        );
-}
-
-/* appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        title: const Text('Versión PRO'),
-      ),
-      body: Column(children: [
-        const SizedBox(height: 50),
-        Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: _cabeceraPagina(txtregistroLogin)),
-        Image.asset(
-          './assets/icon/acceso.png',
-          height: 120,
-        ),
-        visibleFormulario
-            ? Form(
-                key: formKey,
-                autovalidateMode: AutovalidateMode.always,
-                child: Column(
-                  children: <Widget>[
-                    CustomTextField(
-                      //   textControllerEmail: textControllerEmail,
-                      onSaved: (input) => email = input
-                      //    _email = textControllerEmail.text;
-
-                      ,
-                      validator: (value) => EmailValidator.validate(value!)
-                          ? null
-                          : "Introduce un email válido",
-                      icon: const Icon(Icons.email),
-                      hint: "EMAIL",
-                    ),
-                    CustomTextField(
-                      //     textControllerEmail: textControllerEmail,
-                      icon: const Icon(Icons.lock),
-                      //  obsecure: true,
-                      onSaved: (input) => password = input,
-                      validator: (input) => input!.isEmpty || input.length < 6
-                          ? "6 caracteres como minimo"
-                          : null,
-                      hint: "CONTRASEÑA",
-                    ),
-
-                    // EL BOTON DE CONFIRMAR FORMULARIO EJECUTA LA FUNCION DEPENDIENDO DE txtregistroLogin
-                    // REGISTRO (_validateRegisterInput)
-                    // LOGIN (_validateLoginInput).
-
-                    filledButton(txtregistroLogin, Colors.white, Colors.blue,
-                        Colors.blue, Colors.white, (() async {
-                      switch (txtregistroLogin) {
-                        case 'Registro':
-                          // ? LOS NUEVOS USUARIOS PAGO 1ª OPCION , SUBIR DATOS A FIREBASE Y REALIZAR REGISTRO
-                          final res = await validateRegisterInput(
-                              context, formKey, email, password);
-                          if (res) {
-                            debugPrint(
-                                'EL FORMULARIO PAGO 1ª OPCION ES VALIDO, REALIZA ACCIONES');
-                            configuracionInfoPagoRespaldo(email);
-                          }
-                          setState(() {
-                            _loading = false;
-                          });
-                          break;
-                        case 'Registro2':
-                          // ? LOS NUEVOS USUARIOS PAGO 2ª OPCION , SUBIR DATOS A FIREBASE SIN REALIZAR REGISTRO
-                          final res = await validateRegisterInput2(
-                              context, formKey, email, password);
-                          if (res) {
-                            debugPrint(
-                                'EL FORMULARIO PAGO 2ª OPCION ES VALIDO, REALIZA ACCIONES');
-                            configuracionInfoPagoRespaldo(email);
-                          }
-                          setState(() {
-                            _loading = false;
-                          });
-                          break;
-                        case 'Login':
-                          // ? INICIO DE SESION , DESCARGA DATOS DE FIREBASE
-                          setState(() {
-                            _loading = true;
-                          });
-                          final form = formKey.currentState;
-                          form!.save();
-
-                          if (form.validate()) {
-                            debugPrint('FORMULARIO LOGIN VALIDO');
-                            final res = await validateLoginInput(
-                                context, form, email, password);
-
-                            print(res);
-                            if (res) {
-                              debugPrint('SESION INICIADA');
-                              await Future.delayed(const Duration(seconds: 3));
-                              await PagoProvider().guardaPagado(true, email!);
-
-                              _irPaginaInicio();
-                              //Restart.restartApp();
-                            }
-                            setState(() {
-                              _loading = false;
-                            });
-                          } else {
-                            mensajeError(context, 'FORMULARIO NO VALIDO');
-                            setState(() {
-                              _loading = false;
-                            });
-                          }
-
-                          break;
-                      }
-                    }), _loading),
-                    /*  (txtregistroLogin == 'Registro')
-                            ? _validateRegisterInput
-                            : _validateLoginInput,
-                        _loading */
-                    _piePagina(context, txtregistroLogin),
-                    const SizedBox(height: 200)
-                  ],
-                ),
-              )
-            : Container(),
-        //? INDICATOR ESPERA...
-        //? pantalla informacion para el usuario de pago y respaldo realizado
-        visibleIndicator
-            ? Column(
-                children: [
-                  configuracionFinalizada
-                      ? Container()
-                      : LinearProgressIndicator(
-                          value: valorindicator,
-                          color: Colors.greenAccent,
-                          backgroundColor: Colors.green,
-                        ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        visiblePagoRealizado
-                            ? const Icon(Icons.check)
-                            : const SizedBox(
-                                width: 10,
-                                height: 10,
-                                child: CircularProgressIndicator()),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        const Text('Pago app Pro')
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        visibleGuardarPagoRealizado
-                            ? const Icon(Icons.check)
-                            : const SizedBox(
-                                width: 10,
-                                height: 10,
-                                child: CircularProgressIndicator()),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        const Text('Guardado de pago')
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        visibleRespaldoRealizado
-                            ? const Icon(Icons.check)
-                            : const SizedBox(
-                                width: 10,
-                                height: 10,
-                                child: CircularProgressIndicator()),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        const Text('Respaldo en la nube')
-                      ],
-                    ),
-                  ),
-                  configuracionFinalizada
-                      ? Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            color: const Color.fromARGB(255, 172, 240, 174),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children: const [
-                                  Text('¡ Configuración realizada con exito !'),
-                                  Text('Reinicia la App e inicia sesión')
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
-                      : Container(
-                          color: Colors.red,
-                          child: const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('NO CIERRE LA APLICACIÓN',
-                                style: TextStyle(color: Colors.white)),
-                          ))
-                ],
-              )
-            : Container(),
-      ]), */

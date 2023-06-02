@@ -707,6 +707,7 @@ class FirebaseProvider extends ChangeNotifier {
       });
     } catch (e) {
       debugPrint(e.toString());
+      pago= false;
     }
     return pago;
   }

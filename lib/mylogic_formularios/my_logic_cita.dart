@@ -3,29 +3,6 @@ import 'package:agendacitas/models/perfil_model.dart';
 import 'package:agendacitas/providers/cita_list_provider.dart';
 import 'package:flutter/material.dart';
 
-class MyLogicCita {
-  MyLogicCita(this.cita);
-  final CitaModel cita;
-
-  var citaContext = CitaListProvider().getCitaElegida;
-
-  final textControllerDia = TextEditingController();
-  final textControllerHora = TextEditingController();
-
-  void save() {}
-
-  void init() {
-    if (cita.dia == null) {
-      textControllerDia.text = '';
-      textControllerHora.text = '';
-    } else {
-      textControllerDia.text = cita.dia.toString();
-      textControllerHora.text = cita.horaInicio.toString();
-      //  textControllerHora.text = cita.horaFinal.toString();
-    }
-  }
-}
-
 class MyLogicNoDisponible {
   MyLogicNoDisponible(this.citaInicio, this.citaFin, this.asunto);
   final CitaModel citaInicio;
@@ -89,6 +66,84 @@ class MyLogicCliente {
       textControllerNota.text = cliente!.nota.toString();
     }
   }
+
+  void dispose() {
+    textControllerNombre.dispose();
+    textControllerTelefono.dispose();
+    textControllerEmail.dispose();
+    textControllerFoto.dispose();
+    textControllerNota.dispose();
+
+    debugPrint(
+        '-------------------------------------------Al cerrar confirmar_step.dart -> dispose---------libero memoria textController formulario step cliente');
+  }
+}
+
+class MyLogicServicio {
+  MyLogicServicio(this.servicio);
+  final ServicioModel servicio;
+
+  final textControllerPrecio = TextEditingController();
+  final textControllerServicio = TextEditingController();
+  final textControllerTiempo = TextEditingController();
+  final textControllerDetalle = TextEditingController();
+
+  void save() {}
+
+  void init() {
+    if (servicio.servicio == null) {
+      textControllerPrecio.text = '';
+      textControllerServicio.text = '';
+      textControllerTiempo.text = '';
+      textControllerDetalle.text = '';
+    } else {
+      textControllerPrecio.text = servicio.precio.toString();
+      textControllerServicio.text = servicio.servicio.toString();
+      textControllerTiempo.text = servicio.tiempo.toString();
+      textControllerDetalle.text = servicio.detalle.toString();
+    }
+  }
+
+  void dispose() {
+    textControllerPrecio.dispose();
+    textControllerServicio.dispose();
+    textControllerTiempo.dispose();
+    textControllerDetalle.dispose();
+
+    debugPrint(
+        '-------------------------------------------Al cerrar confirmar_step.dart -> dispose---------libero memoria textController formulario step servicio');
+  }
+}
+
+class MyLogicCita {
+  MyLogicCita(this.cita);
+  final CitaModel cita;
+
+  var citaContext = CitaListProvider().getCitaElegida;
+
+  final textControllerDia = TextEditingController();
+  final textControllerHora = TextEditingController();
+
+  void save() {}
+
+  void init() {
+    if (cita.dia == null) {
+      textControllerDia.text = '';
+      textControllerHora.text = '';
+    } else {
+      textControllerDia.text = cita.dia.toString();
+      textControllerHora.text = cita.horaInicio.toString();
+      //  textControllerHora.text = cita.horaFinal.toString();
+    }
+  }
+
+  void dispose() {
+    textControllerDia.dispose();
+    textControllerHora.dispose();
+
+    debugPrint(
+        '-------------------------------------------Al cerrar confirmar_step.dart -> dispose---------libero memoria textController formulario step cita');
+  }
 }
 
 class MyLogicUsuarioAPP {
@@ -129,33 +184,6 @@ class MyLogicUsuarioAPP {
       textControllerInstagram.text = perfilUsuarioApp!.instagram.toString();
       textControllerWebsite.text = perfilUsuarioApp!.website.toString();
       textControllerUbicacion.text = perfilUsuarioApp!.ubicacion.toString();
-    }
-  }
-}
-
-class MyLogicServicio {
-  MyLogicServicio(this.servicio);
-  final ServicioModel servicio;
-
-  final textControllerPrecio = TextEditingController();
-  final textControllerServicio = TextEditingController();
-  final textControllerTiempo = TextEditingController();
-  final textControllerDetalle = TextEditingController();
-
-  void save() {}
-
-  void init() {
-    if (servicio.servicio == null) {
-      textControllerPrecio.text = '';
-      textControllerServicio.text = '';
-      textControllerTiempo.text = '';
-      textControllerDetalle.text = '';
-    } else {
-      textControllerPrecio.text = servicio.precio.toString();
-      textControllerServicio.text = servicio.servicio.toString();
-      textControllerTiempo.text = servicio.tiempo.toString();
-      textControllerDetalle.text = servicio.detalle.toString();
-      
     }
   }
 }

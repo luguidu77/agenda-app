@@ -1,4 +1,3 @@
-import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -80,6 +79,7 @@ class _ClientaStepState extends State<ClientaStep> {
               seleccionaCliente(context, clientaElegida);
             });
             Navigator.pushNamed(context, 'servicioStep');
+            
           }
         },
       ),

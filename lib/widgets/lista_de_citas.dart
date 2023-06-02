@@ -194,7 +194,7 @@ class _ListaCitasState extends State<ListaCitas> {
                           },
                           child: GestureDetector(
                             onTap: () {
-                              if (citas[index]['nombre'] != null) {
+                              if (compruebafechaDisponible) {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

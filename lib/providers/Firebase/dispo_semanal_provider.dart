@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 class DispoSemanalProvider extends ChangeNotifier {
@@ -22,7 +23,7 @@ class DispoSemanalProvider extends ChangeNotifier {
       {}; //Lunes = 1, Martes = 2,Miercoles =3....Domingo = 7
 
   setDiasDispibles(newdisponibles) {
-    if (newdisponibles != null) {
+    if (newdisponibles.isNotEmpty) {
       _diasDisp = {
         'Lunes': newdisponibles['Lunes']!,
         'Martes': newdisponibles['Martes']!,

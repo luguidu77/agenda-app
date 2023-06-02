@@ -80,6 +80,7 @@ class _CitaStepState extends State<CitaStep> {
               String descripDisponibilidad = resp['descrip'];
               _alertaNoDisponibilidad(descripDisponibilidad);
             }
+         
           }
         },
       ),
@@ -188,7 +189,8 @@ class _CitaStepState extends State<CitaStep> {
     debugPrint(
         'pregunto si hay usuario antes de ver disponibilidad:->  $emailusuario  <-');
     _iniciadaSesionUsuario
-        ?  diasNoDisponibles = diasNoDisponiblesProvider // diasNoDisponibles desde la carpeta utils //Lunes = 1, Martes = 2,Miercoles =3....Domingo = 7
+        ? diasNoDisponibles =
+            diasNoDisponiblesProvider // diasNoDisponibles desde la carpeta utils //Lunes = 1, Martes = 2,Miercoles =3....Domingo = 7
         : debugPrint('NO HAY USURIO LOGEADO!!!!');
 
     debugPrint(

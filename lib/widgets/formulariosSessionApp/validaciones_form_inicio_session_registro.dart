@@ -5,7 +5,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 Future<String> validateLoginInput(context, email, password) async {
-  //  ! RESPALDO  ( DESCARGA DATOS DE FIREBASE )
   var data;
   try {
     //INICIALIZA FIREBASE
@@ -33,7 +32,7 @@ Future<String> validateLoginInput(context, email, password) async {
 }
 
 // ? LOS NUEVOS USUARIOS PAGO 1ª OPCION
-validateRegisterInput(context, email, password) async {
+creaCuentaUsuarioApp(context, email, password) async {
   debugPrint('FORMULARIO REGISTRO VALIDO');
 
   // ? activa el onSave de TextFormField
@@ -47,15 +46,13 @@ validateRegisterInput(context, email, password) async {
     await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: password);
     //1º INICIO SESION FIREBASE CON EMAIL Y CONTRASEÑA
-    await FirebaseAuth.instance
+    /*  await FirebaseAuth.instance
         .signInWithEmailAndPassword(email: email, password: password);
-    //SI EL INICIO DE SESION HA SIDO CORRECTO, EJECUTA LO SIGUIENTE: (retorna true como formulario validado)
+    //SI EL INICIO DE SESION HA SIDO CORRECTO, EJECUTA LO SIGUIENTE: (retorna true como formulario validado) */
     return true;
   } on FirebaseAuthException catch (e) {
-    if (e.code == 'weak-password') {
-      debugPrint('The password provided is too weak.');
-    } else if (e.code == 'email-already-in-use') {
-      debugPrint('The account already exists for that email.');
+    if (e.code == 'email-already-in-use') {
+     
       mensajeError(context, 'El usuario ya existe');
     }
     return false;

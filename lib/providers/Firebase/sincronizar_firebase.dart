@@ -1,11 +1,11 @@
 import 'package:agendacitas/firebase_options.dart';
-import 'package:agendacitas/models/perfil_model.dart';
-import 'package:agendacitas/providers/cita_list_provider.dart';
-import 'package:agendacitas/providers/db_provider.dart';
-import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+
+import '../../models/models.dart';
+import '../db_provider.dart';
+import '../providers.dart';
 
 //todo sincronizacion primera vez que se hace de pago para subir todo a Firebase
 
@@ -19,7 +19,7 @@ class SincronizarFirebase {
 
 //? UPLOAD: RESPALDO A FIREBASE CON LOS DATOS DEL DISPOSITIVO
   sincronizaSubeFB(usuarioAPP) async {
-    print('sincronizando SUBIENDO datos a firebase');
+    debugPrint('sincronizando SUBIENDO datos a firebase');
     await _iniFirebase();
 
     await _actualizaClientes(usuarioAPP, 'UPLOAD');
@@ -36,7 +36,7 @@ class SincronizarFirebase {
 
     await _disponibilidadSemanal(usuarioAPP, 'UPLOAD');
 
-    print('FIN sincronizando SUBIENDO datos a firebase');
+    debugPrint('FIN sincronizando SUBIENDO datos a firebase');
   }
 
 //? DOWNLOAD: RESTABLECE EL DISPOSITIVO CON LOS DATOS DE FIREBASE
@@ -233,7 +233,8 @@ class SincronizarFirebase {
           'horaFinal': cita['horaFinal'],
           'comentario': cita['comentario'],
           'idcliente': idServicio == 999 ? '999' : cita['idcliente'].toString(),
-          'idservicio': idServicio == 999 ? '999' :cita['idservicio'].toString(),
+          'idservicio':
+              idServicio == 999 ? '999' : cita['idservicio'].toString(),
           'idempleado': 'idEmpleado',
           'precio': idServicio == 999 ? '' : servicio.precio.toString(),
         };

@@ -1,4 +1,5 @@
 import 'package:agendacitas/widgets/dialogos/dialogo_linealpregessindicator.dart';
+import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -28,7 +29,6 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   final formKeyCrearCuenta = GlobalKey<FormState>();
   double? valorindicator;
   bool configuracionFinalizada = false;
-
 
   bool visibleBotonGPAY = false;
   bool visibleIndicator = false;
@@ -214,9 +214,8 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                           Navigator.pop(context);
                         });
 
-                        final res =
+                        var res =
                             await validateLoginInput(context, email, password);
-                        // print(res);
 
                         if (res == 'wrong-password') {
                           mensaje('CONTRASEÑA ERRONEA');
@@ -227,7 +226,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                         } else {
                           print(
                               '--------iniciada sesion correctamente --------------------');
-
+                          //_irPaginaIconoAnimacion();
                           _irPaginaInicio();
                         }
                       } else {
@@ -455,30 +454,17 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                   child: GestureDetector(
                     onTap: () async {
                       // ? INICIO DE SESION , DESCARGA DATOS DE FIREBASE
-                    
+
                       final form = formKeyCrearCuenta.currentState;
                       form!.save();
 
                       if (form.validate()) {
                         debugPrint('FORMULARIO CREACION CUENTA VALIDO');
-
-                        // CREA EN FIREBASE UNA CUENTA NUEVA
-                        final res = await validateRegisterInput(
-                            context, email, password);
-
-                        if (res) {
-                          // EL RESULTADO DE CREACION DE CUENTA ES CORRECTA
-                          debugPrint('CREANDO NUEVA CUENTA');
-                          await PagoProvider()
-                              .guardaPagado(false, email.toString());
-                          configuracionInfoPagoRespaldo(email);
-
-                          _irPaginaInicio();
-                        }
-                      
+                        // ir a PaginaIconoAnimacion con mensaje ok en la creacion de la cuenta
+                        // y boton ir a inicio de sesion
+                        _irPaginaCreacionCuenta(email, password);
                       } else {
                         mensajeError(context, 'FORMULARIO NO VALIDO');
-                     
                       }
                     },
                     child: Container(
@@ -533,27 +519,20 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
             )
           ],
         ),
-       
       ],
     );
   }
 
-//METODO PARA GUARDADO DE PAGO Y RESPALDO EN FIREBASE Y PRESENTAR INFORMACION AL USUARIO EN PANTALLA
-  configuracionInfoPagoRespaldo(email) async {
-
-    try {
-      
-      //GUARDA PAGO EN DISPOSITIVO
-      await PagoProvider().guardaPagado(true, email);
-
-     
-
-      // RESPALDO DATOS EN FIREBASE
-      await SincronizarFirebase().sincronizaSubeFB(email);
-     
-    } catch (e) {
-      debugPrint(e.toString());
-    }
+  void _irPaginaCreacionCuenta(email, password) {
+    FocusScope.of(context).unfocus();
+    Navigator.pushNamed(context, 'paginaIconoAnimacion', arguments: email);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            PaginaIconoAnimado(email: email, password: password),
+      ),
+    );
   }
 
   void _irPaginaInicio() {
@@ -601,9 +580,24 @@ class TextoDiasDePrueba extends StatelessWidget {
                 ),
                 const TextSpan(
                   text:
-                      ', todas las opciones y funcionalidades sin compromiso, sólo necesitas un email y una contraseña, puedes cancelar o suscribirte en cualquier momento. ',
+                      ', todas las opciones y funcionalidades sin publicidad, sólo necesitas un email y una contraseña, puedes cancelar en cualquier momento. ',
                   style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
-                )
+                ),
+                const TextSpan(
+                  text:
+                      'Una vez finalizado el periodo de prueba, tendrás la opción de continuar por ',
+                  style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
+                ),
+                const TextSpan(
+                  text: ' un sólo pago de 9 euros sin suscripción ',
+                  style: TextStyle(
+                      color: Color.fromARGB(255, 41, 22, 151),
+                      fontWeight: FontWeight.bold),
+                ),
+                const TextSpan(
+                  text: '(precio de lanzamiento)',
+                  style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
+                ),
               ]),
         ));
   }
@@ -628,8 +622,3 @@ Widget filledButton(String text, Color splashColor, Color highlightColor,
     onPressed: () => function(),
   );
 }
-
-
-
-
-

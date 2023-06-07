@@ -1,5 +1,7 @@
 import 'package:agendacitas/.env.dart';
 import 'package:agendacitas/models/cita_model.dart';
+
+import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -171,6 +173,11 @@ class _MyAppState extends State<MyApp> {
               'informesScreen': (_) => const InformesScreen(),
               'fichacliente': (_) => FichaClienteScreen(
                     clienteParametro: ClienteModel(nombre: '', telefono: ''),
+                  ),
+
+              'paginaIconoAnimacion': (context) => const PaginaIconoAnimado(
+                    email: '',
+                    password: '',
                   ),
             });
       },

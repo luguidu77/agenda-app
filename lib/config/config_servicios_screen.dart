@@ -151,7 +151,7 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
                       decoration: const InputDecoration(labelText: 'Servicio'),
                     ),
                     TextFormField(
-                      validator: (value) => _validacion(value),
+                      validator: (value) => _validacionPrecio(value),
                       keyboardType: TextInputType.number,
                       controller: myLogic.textControllerPrecio,
                       decoration: const InputDecoration(labelText: 'Precio'),
@@ -376,6 +376,21 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
       textoErrorValidacionAsunto = 'Este campo no puede quedar vacío';
       setState(() {});
       return 'Este campo no puede quedar vacío';
+    } else {
+      return null;
+    }
+  }
+
+  _validacionPrecio(value) {
+    debugPrint(value.isEmpty.toString());
+    if (value.isEmpty) {
+      textoErrorValidacionAsunto = 'Este campo no puede quedar vacío';
+      setState(() {});
+      return 'Este campo no puede quedar vacío';
+    } else if (value.contains(',')) {
+      textoErrorValidacionAsunto = 'Utiliza el "." para los decimales';
+      setState(() {});
+      return 'Utiliza el "." para los decimales';
     } else {
       return null;
     }

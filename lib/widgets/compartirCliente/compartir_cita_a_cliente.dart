@@ -1,4 +1,3 @@
-
 import 'package:agendacitas/models/perfil_model.dart';
 import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
@@ -8,6 +7,8 @@ import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../providers/providers.dart';
 
 class CompartirCitaConCliente extends StatefulWidget {
   final String cliente;
@@ -30,7 +31,7 @@ class CompartirCitaConCliente extends StatefulWidget {
 }
 
 class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
-  String emailPerfilUsuarioApp = '';
+  String _emailSesionUsuario = '';
   PerfilModel perfilUsuarioApp = PerfilModel();
   bool pagado =
       true; //deshabilitado, por defecto la variable pagado=true; podria usarlo por ejemplo para hacer una alerta de comprar la app
@@ -66,14 +67,11 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
   _perfilUsuarioApp() async {
     //traigo email del usuario, del PagoProvider
 
-    final providerPagoUsuarioAPP =
-        Provider.of<PagoProvider>(context, listen: false);
-    emailPerfilUsuarioApp = await providerPagoUsuarioAPP.pagado['email'];
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
 
     //traigo perfil del usuariode la app desde firebase
-    await FirebaseProvider()
-        .cargarPerfilFB(emailPerfilUsuarioApp)
-        .then((value) {
+    await FirebaseProvider().cargarPerfilFB(_emailSesionUsuario).then((value) {
       setState(() {});
       return perfilUsuarioApp = value;
     });

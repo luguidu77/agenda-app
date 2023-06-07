@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+
 import 'package:agendacitas/providers/db_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -180,11 +181,20 @@ class CitaListProvider extends ChangeNotifier {
       return value['precio'];
     }).toList();
 
-    for (double element in precios) {
-      gananciaDiaria = gananciaDiaria + element;
+    for (var element in precios) {
+      if (element != null) {
+        gananciaDiaria = gananciaDiaria + element;
+      }
     }
+
+    String gananciaD = '';
     // Formatear el número con dos decimales
-    String gananciaD = NumberFormat("#.00").format(gananciaDiaria);
+    if (gananciaDiaria != 0.0) {
+      gananciaD = NumberFormat("#.00").format(gananciaDiaria);
+    } else {
+      gananciaD = '0.00';
+    }
+
     return gananciaD.toString();
   }
 

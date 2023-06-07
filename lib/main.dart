@@ -10,6 +10,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
+import 'package:rive_splash_screen/rive_splash_screen.dart';
 
 import 'providers/providers.dart';
 import 'screens/screens.dart';
@@ -30,13 +31,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   // initializeDateFormatting().then((_) {
-  if (kIsWeb) {
-    // La aplicación se está ejecutando en un navegador web (escritor0io)
-    Stripe.publishableKey = stripePublishableKey;
-  } else {
-    MobileAds.instance.initialize();
-    Stripe.publishableKey = stripePublishableKey;
-  }
+
+  MobileAds.instance.initialize();
+  Stripe.publishableKey = stripePublishableKey;
+
   //});
   runApp(const MyApp());
 }
@@ -151,14 +149,21 @@ class _MyAppState extends State<MyApp> {
                 : inicioConfigApp
                     ? 'clientesScreen'
                     : 'clientesScreen', */
-            home: InicioConfigApp(usuarioAPP: usuarioAPP),
+            home: SplashScreen.navigate(
+                until: () => Future.delayed(const Duration(seconds: 2)),
+                startAnimation: 'Timeline 1',
+                loopAnimation: 'Timeline 1',
+                backgroundColor: Colors.white,
+                name: 'assets/icon/iconoapp.riv',
+                next: (context) => InicioConfigApp(usuarioAPP: usuarioAPP)),
             routes: {
               //home
               'Login': (context) =>
                   RegistroUsuarioScreen(registroLogin: 'Login', usuarioAPP: ''),
               'Bienvenida': (context) => const Bienvenida(),
               'home': (BuildContext context) => const HomeScreen(),
-              'InicioConfigApp': (context) => InicioConfigApp(usuarioAPP: ''),
+              'InicioConfigApp': (context) =>
+                  const InicioConfigApp(usuarioAPP: ''),
 
               'clientesScreen': (_) => const ClientesScreen(),
 

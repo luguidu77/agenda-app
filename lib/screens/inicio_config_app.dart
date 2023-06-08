@@ -18,7 +18,15 @@ class InicioConfigApp extends StatefulWidget {
 }
 
 class _InicioConfigAppState extends State<InicioConfigApp> {
-  inicializaProviderEstadoPagoEmail() async {}
+  /* inicializaProviderEstadoPagoEmail() {
+
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+     final emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    if (estadoPagoProvider.estadoPagoApp == 'INITIAL' && mounted) {
+      Navigator.pushReplacementNamed(context, 'finalizacionPruebaScreen',
+          arguments: emailSesionUsuario);
+    }
+  } */
 
   getPersonaliza() async {
     List<PersonalizaModel> data =
@@ -38,8 +46,8 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
 
   @override
   void initState() {
+   // inicializaProviderEstadoPagoEmail();
     getPersonaliza();
-    //inicializaProviderEstadoPagoEmail();
 
     super.initState();
   }
@@ -52,6 +60,7 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
             final User data = snapshot.data;
+            
             debugPrint(
                 'seteando provider email:(inicio_config_app) ${data.email.toString()}');
 
@@ -59,6 +68,7 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
             // EMAIL
             final estadoProvider =
                 Provider.of<EstadoPagoAppProvider>(context, listen: false);
+
             estadoProvider.estadoPagoEmailApp(data.email.toString());
 
             // ###############  DISPONIBILIDAD SEMANAL

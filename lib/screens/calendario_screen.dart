@@ -26,6 +26,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
       false; // ?  VARIABLE PARA VERIFICAR SI HAY USUARIO CON INCIO DE SESION
   Color colorBotonFlecha = Colors.blueGrey;
   String _emailSesionUsuario = '';
+  String _estadoPagadaApp = '';
 
   DateFormat dateFormat = DateFormat("yyyy-MM-dd");
   double preciototal = 0;
@@ -90,6 +91,21 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+
+    _estadoPagadaApp = estadoPagoProvider.estadoPagoApp;
+
+    if (_estadoPagadaApp == 'PRUEBA_CADUCADA' && mounted) {
+      Future.delayed(const Duration(seconds: 5), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => FinalizacionPrueba(
+                    usuarioAPP: _emailSesionUsuario,
+                  )),
+        );
+      });
+    }
     // DISPONIBILIDAD SEMANAL PROVIDER
     final provider = context.watch<DispoSemanalProvider>();
     diasNoDisponibles = provider.diasNoDisponibles;

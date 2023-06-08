@@ -616,6 +616,16 @@ class FirebaseProvider extends ChangeNotifier {
     final docRef = await _referenciaDocumento(usuarioAPP, 'categoriaServicio');
     await docRef.doc(categoria.id.toString()).update(newCategoria);
   }
+  // actualizar el pago en Firebase
+   actualizaPago(String usuarioAPP) async {
+    final docRef = await _referenciaDocumento(usuarioAPP, 'pago');
+
+ 
+      var data = {'id': 0, 'pago': true, 'email': usuarioAPP};
+
+      await docRef.doc(data['id'].toString()).set(data);
+   
+  }
 
   leerBasedatosFirebase(emailUsuarioApp, fecha) async {
     print(fecha);

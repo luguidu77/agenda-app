@@ -56,8 +56,9 @@ class EstadoPagoAppProvider extends ChangeNotifier {
           pruebaActiva
               ? _estadoPagadaApp = 'PRUEBA_ACTIVA'
               : _estadoPagadaApp = 'PRUEBA_CADUCADA';
+
           debugPrint('#######   estado ###### $_estadoPagadaApp');
-          //  notifyListeners();
+          //
         }
 
         break;
@@ -82,11 +83,6 @@ class EstadoPagoAppProvider extends ChangeNotifier {
           if (now.subtract(diasDePrueba).isAfter(fecha)) {
             debugPrint('fecha cumplida prueba caducada');
             pruebaActiva = false;
-            /*  Navigator.pushReplacementNamed(
-                  context, 'finalizacionPruebaScreen',
-                  arguments: {
-                    'usuarioAPP': user.email.toString(),
-                  }); */
           } else {
             pruebaActiva = true;
             debugPrint('en tiempo prueba gratuita');

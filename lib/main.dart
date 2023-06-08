@@ -1,9 +1,7 @@
 import 'package:agendacitas/.env.dart';
-import 'package:agendacitas/models/cita_model.dart';
 
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -12,6 +10,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:rive_splash_screen/rive_splash_screen.dart';
 
+import 'models/models.dart';
 import 'providers/providers.dart';
 import 'screens/screens.dart';
 import 'widgets/formulariosSessionApp/registro_usuario_screen.dart'; //utilizado para anular la rotación de pantalla
@@ -184,6 +183,8 @@ class _MyAppState extends State<MyApp> {
                     email: '',
                     password: '',
                   ),
+              'finalizacionPruebaScreen': (context) => FinalizacionPrueba(),
+              
             });
       },
     );

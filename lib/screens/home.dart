@@ -42,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+
   @override
   void initState() {
     //iniciamos myBnB(bottomNavigationBar) trayendo BNavigator
@@ -50,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
         index = i;
       });
     });
-
+ 
     cargarTema();
 
     super.initState();
@@ -162,8 +163,6 @@ class _HomeScreenState extends State<HomeScreen> {
           'PlanAmigoVinculaCuenta': (context) => const PlanAmigoVinculaCuenta(),
           'DisponibilidadSemanalScreen': (context) =>
               const DisponibilidadSemanalScreen(),
-
-          'finalizacionPruebaScreen': (context) => const FinalizacionPrueba()
         });
   }
 }

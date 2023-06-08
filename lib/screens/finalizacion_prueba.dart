@@ -1,8 +1,11 @@
+import 'package:agendacitas/screens/comprar_aplicacion.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class FinalizacionPrueba extends StatefulWidget {
-  const FinalizacionPrueba({Key? key}) : super(key: key);
+  String usuarioAPP;
+  FinalizacionPrueba({Key? key, this.usuarioAPP = ''}) : super(key: key);
 
   @override
   State<FinalizacionPrueba> createState() => _FinalizacionPruebaState();
@@ -11,8 +14,7 @@ class FinalizacionPrueba extends StatefulWidget {
 class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> parametros =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    // final parametros = ModalRoute.of(context)?.settings.arguments;
 
     return SafeArea(
       child: Scaffold(
@@ -21,10 +23,19 @@ class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(parametros['usuarioAPP'].toString()),
+              Text(widget.usuarioAPP.toString()),
               const Text('El periodo de prueba a finalizado'),
               ElevatedButton(
-                  onPressed: () => {FirebaseAuth.instance.signOut()},
+                  onPressed: () => {
+                        //FirebaseAuth.instance.signOut()
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ComprarAplicacion(
+                                  // usuarioAPP: email,
+                                  )),
+                        )
+                      },
                   child: const Text('ok'))
             ],
           ),

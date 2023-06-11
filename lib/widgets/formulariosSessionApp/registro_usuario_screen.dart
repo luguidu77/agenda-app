@@ -207,7 +207,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                         debugPrint('FORMULARIO LOGIN VALIDO');
 
                         dialogoLinealProgressIndicator(
-                            context, 'Comprobando credenciales...');
+                            context, 'Comprobando credenciales');
 
                         Future.delayed(const Duration(milliseconds: 500),
                             () async {

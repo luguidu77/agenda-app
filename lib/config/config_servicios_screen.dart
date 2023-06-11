@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../models/models.dart';
 import '../mylogic_formularios/mylogic.dart';
@@ -12,8 +13,8 @@ class ConfigServiciosScreen extends StatefulWidget {
 }
 
 class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
-  String? usuarioAPP;
-  bool iniciadaSesionUsuario = false;
+  String? _emailSesionUsuario;
+  bool _iniciadaSesionUsuario = false;
   String textoErrorValidacionAsunto = '';
   final _formKey = GlobalKey<FormState>();
   ServicioModel servicio =
@@ -34,15 +35,14 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
 
   emailUsuario() async {
     //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-    final pago = await PagoProvider().cargarPago();
-    final emailUsuario = pago['email'];
-    usuarioAPP = emailUsuario;
-    iniciadaSesionUsuario = usuarioAPP != '' ? true : false;
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
     setState(() {});
     await cargarDatosCategorias();
 
     //DATA TRAIDA POR NAVIGATOR PUSHNAMED (ARGUMENTS)
-    if (iniciadaSesionUsuario) {
+    if (_iniciadaSesionUsuario) {
       dataFB = ModalRoute.of(context)!.settings.arguments as ServicioModelFB;
 
       agregaModificaFB = (dataFB.servicio == null) ? true : false;
@@ -101,13 +101,13 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              if (iniciadaSesionUsuario) {
+              if (_iniciadaSesionUsuario) {
                 debugPrint('iniciada sesion');
                 debugPrint('agregaModificaFB $agregaModificaFB');
 
                 (agregaModificaFB)
-                    ? agregaServicioFB(usuarioAPP)
-                    : modificarServicioFB(usuarioAPP, dataFB,
+                    ? agregaServicioFB(_emailSesionUsuario)
+                    : modificarServicioFB(_emailSesionUsuario, dataFB,
                         idCategoriaElegida); // METODO MODIFICAR SERVICIO
               } else {
                 (agregaModifica)
@@ -118,7 +118,7 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
           },
           child: const Icon(Icons.save),
         ),
-        body: iniciadaSesionUsuario
+        body: _iniciadaSesionUsuario
             ? _formularioFB(context, agregaModificaFB)
             : _formulario(context, agregaModifica),
       ),
@@ -397,9 +397,10 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
   }
 
   cargarDatosCategorias() async {
-    if (iniciadaSesionUsuario) {
+    if (_iniciadaSesionUsuario) {
       debugPrint('TRAE CATEGORIAS DE FIREBASE');
-      listaAux = await FirebaseProvider().cargarCategoriaServicios(usuarioAPP);
+      listaAux = await FirebaseProvider()
+          .cargarCategoriaServicios(_emailSesionUsuario);
     }
 
     listaCategoriaServicios = listaAux;
@@ -453,7 +454,7 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
 
   getcategoria(idCategoria) async {
     Map<String, dynamic> categoria = await FirebaseProvider()
-        .cargarCategoriaServiciosID(usuarioAPP, idCategoria!);
+        .cargarCategoriaServiciosID(_emailSesionUsuario, idCategoria!);
 
     return categoria['nombreCategoria'];
   }

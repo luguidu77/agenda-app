@@ -130,7 +130,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
                     child: SingleChildScrollView(
                   child: Column(children: [
                     const Image(
-                      image: AssetImage('assets/icon/icon.png'),
+                      image: AssetImage('assets/icon/splash.riv'),
                       width: 100,
                     ),
                     Text('Agenda de citas', style: estilo),

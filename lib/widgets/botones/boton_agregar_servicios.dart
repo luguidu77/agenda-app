@@ -1,8 +1,10 @@
-import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
+import '../../providers/providers.dart';
 
 class BotonAgregarServicios extends StatefulWidget {
   const BotonAgregarServicios({Key? key}) : super(key: key);
@@ -13,8 +15,8 @@ class BotonAgregarServicios extends StatefulWidget {
 
 class _BotonAgregarServiciosState extends State<BotonAgregarServicios> {
   bool floatExtended = false;
-  String? usuarioAPP;
-  bool iniciadaSesionUsuario = false;
+//String _emailSesionUsuario = '';
+  bool _iniciadaSesionUsuario = false;
   // anulado porque da errores de memoria dispose...
   /* Timer? t;
   retardo() {
@@ -29,10 +31,9 @@ class _BotonAgregarServiciosState extends State<BotonAgregarServicios> {
   } */
   emailUsuario() async {
     //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-    final pago = await PagoProvider().cargarPago();
-    final emailUsuario = pago['email'];
-    usuarioAPP = emailUsuario;
-    iniciadaSesionUsuario = usuarioAPP != '' ? true : false;
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    //  _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
     setState(() {});
 
     /*  if (iniciadaSesionUsuario) {
@@ -132,7 +133,7 @@ class _BotonAgregarServiciosState extends State<BotonAgregarServicios> {
           : */
           const StadiumBorder(),
       children: [
-        iniciadaSesionUsuario
+        _iniciadaSesionUsuario
             ? SpeedDialChild(
                 child: const Icon(Icons.category),
                 // backgroundColor: Colors.red,
@@ -163,7 +164,7 @@ class _BotonAgregarServiciosState extends State<BotonAgregarServicios> {
           onTap: () {
             // formulario agregar servicio
             Navigator.pushNamed(context, 'configServicios',
-                arguments: iniciadaSesionUsuario
+                arguments: _iniciadaSesionUsuario
                     ? ServicioModelFB()
                     : ServicioModel());
           },

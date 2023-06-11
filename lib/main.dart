@@ -23,8 +23,14 @@ import 'widgets/formulariosSessionApp/registro_usuario_screen.dart'; //utilizado
 //?            quitar PAGADO DEL home.dart -->> PagoProvider().guardaPagado(true);
 //?            comprobar pago STRIPE en PRODUCTION google_pay_payment_profile.json y variables en wallet/ tarjetaPago.dart
 //?     flutter build appbundle
-//?   C:\Users\ritag\Documents\Agenda Citas Flutter\agendadecitas2etapa\build\app\outputs\bundle\release
+//?     C:\ProyectosFutter\agenda3\build\app\outputs\bundle\release
 //      VER SOLUCIONES DE ERRORES README.md
+//! GITHUB :
+/* 
+git add . 
+git commit -m "modificando splash"  
+git push
+*/
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -150,10 +156,10 @@ class _MyAppState extends State<MyApp> {
                     : 'clientesScreen', */
             home: SplashScreen.navigate(
                 until: () => Future.delayed(const Duration(seconds: 2)),
-                startAnimation: 'Timeline 1',
-                loopAnimation: 'Timeline 1',
+                startAnimation: 'start',
+                loopAnimation: 'start',
                 backgroundColor: Colors.white,
-                name: 'assets/icon/iconoapp.riv',
+                name: 'assets/icon/splash.riv',
                 next: (context) => InicioConfigApp(usuarioAPP: usuarioAPP)),
             routes: {
               //home

@@ -1,11 +1,13 @@
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../models/cita_model.dart';
 import '../mylogic_formularios/mylogic.dart';
 import '../providers/Firebase/firebase_provider.dart';
 
 import '../providers/pago_dispositivo_provider.dart';
+import '../providers/providers.dart';
 
 class ConfigCategoriaServiciosScreen extends StatefulWidget {
   const ConfigCategoriaServiciosScreen({Key? key}) : super(key: key);
@@ -17,8 +19,8 @@ class ConfigCategoriaServiciosScreen extends StatefulWidget {
 
 class _ConfigCategoriaServiciosScreenState
     extends State<ConfigCategoriaServiciosScreen> {
-  String? usuarioAPP;
-  bool iniciadaSesionUsuario = false;
+  String? _emailSesionUsuario;
+  bool _iniciadaSesionUsuario = false;
   String textoErrorValidacionAsunto = '';
   final _formKey = GlobalKey<FormState>();
   CategoriaServicioModel categoria =
@@ -33,11 +35,9 @@ class _ConfigCategoriaServiciosScreenState
   String dropdownValue = '';
   emailUsuario() async {
     //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
-    final pago = await PagoProvider().cargarPago();
-    final emailUsuario = pago['email'];
-    usuarioAPP = emailUsuario;
-    iniciadaSesionUsuario = usuarioAPP != '' ? true : false;
-    setState(() {});
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
 
     await cargarDatosCategorias();
 
@@ -72,9 +72,9 @@ class _ConfigCategoriaServiciosScreenState
             onPressed: () {
               if (_formKey.currentState!.validate()) {
                 (agregaModificaFB)
-                    ? agregaCategoria(usuarioAPP!)
-                    : modificarCategoria(
-                        usuarioAPP!, dataFB); // METODO MODIFICAR SERVICIO
+                    ? agregaCategoria(_emailSesionUsuario!)
+                    : modificarCategoria(_emailSesionUsuario!,
+                        dataFB); // METODO MODIFICAR SERVICIO
               }
             },
             child: const Icon(Icons.save),
@@ -183,9 +183,10 @@ class _ConfigCategoriaServiciosScreenState
   }
 
   cargarDatosCategorias() async {
-    if (iniciadaSesionUsuario) {
+    if (_iniciadaSesionUsuario) {
       debugPrint('TRAE CATEGORIAS DE FIREBASE');
-      listaAux = await FirebaseProvider().cargarCategoriaServicios(usuarioAPP);
+      listaAux = await FirebaseProvider()
+          .cargarCategoriaServicios(_emailSesionUsuario);
     }
 
     listaCategoriaServicios = listaAux;

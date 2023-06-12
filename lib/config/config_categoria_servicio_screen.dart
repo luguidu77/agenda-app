@@ -1,13 +1,11 @@
-import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cita_model.dart';
 import '../mylogic_formularios/mylogic.dart';
-import '../providers/Firebase/firebase_provider.dart';
-
-import '../providers/pago_dispositivo_provider.dart';
 import '../providers/providers.dart';
+import '../screens/screens.dart';
+import '../utils/utils.dart';
 
 class ConfigCategoriaServiciosScreen extends StatefulWidget {
   const ConfigCategoriaServiciosScreen({Key? key}) : super(key: key);
@@ -130,7 +128,8 @@ class _ConfigCategoriaServiciosScreenState
 
     await FirebaseProvider()
         .nuevaCategoriaServicio(usuarioAPP, categoria, detalle);
-    mensajeSuccess(context, 'Categoria agregada');
+    mensaje('Categoria agregada');
+
     myLogic.textControllerNombreCategoria.clear();
     myLogic.textControllerDetalle.clear();
 
@@ -144,7 +143,7 @@ class _ConfigCategoriaServiciosScreenState
     auxCategoria.detalle = myLogic.textControllerDetalle.text;
 
     FirebaseProvider().actualizarCategoriaServicioFB(usuarioAPP, auxCategoria);
-
+    mensaje('Categoria modificada');
     //Navigator.pushReplacementNamed(context, 'Servicios');
   }
 
@@ -159,7 +158,11 @@ class _ConfigCategoriaServiciosScreenState
           ),
           IconButton(
               onPressed: () {
-                Navigator.pop(context, true);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ServiciosScreen(),
+                    ));
               },
               icon: const Icon(
                 Icons.close,
@@ -195,41 +198,16 @@ class _ConfigCategoriaServiciosScreenState
       for (var item in listaCategoriaServicios) {
         listNombreCategoriaServicios.add(item.nombreCategoria.toString());
       }
-      print(listNombreCategoriaServicios);
+      debugPrint(listNombreCategoriaServicios.toString());
 
       dropdownValue = listNombreCategoriaServicios[0];
       setState(() {});
     }
   }
 
-/*   Widget categoriaServicios(BuildContext context) {
-    return DropdownButtonFormField(
-      decoration: const InputDecoration(
-          labelText: 'Categoría',
-          border: UnderlineInputBorder(borderSide: BorderSide.none)),
-      //opcion color para cambio tema: iconEnabledColor: Colors.amber,
-      hint: const Text('ELIGE UNA CATEGORÍA'),
+  void mensaje(texto) {
+    mensajeSuccess(context, texto);
+  }
 
-      validator: (value) => value == null ? 'Seleciona una categoría' : null,
-      items: listNombreCategoriaServicios
-          .map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-      onChanged: (String? newValue) {
-        setState(() {
-          dropdownValue = newValue!;
-          myLogic.textControllerCategoria.text = newValue;
-          int index = listNombreCategoriaServicios.indexOf(dropdownValue);
-          /*   iniciadaSesionUsuario
-                      ? seleccionaServicioFB(context, usuarioAPP,
-                          listNombreCategoriaServicios, listaCategoriaServicios, index)
-                      : seleccionaServicio(context, index);
-                  indexServicio = index; */
-        });
-      },
-    );
-  } */
+
 }

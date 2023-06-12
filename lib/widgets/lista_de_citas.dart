@@ -39,7 +39,7 @@ class _ListaCitasState extends State<ListaCitas> {
       personaliza.codpais = data[0].codpais;
       personaliza.moneda = data[0].moneda;
 
-      setState(() {});
+      //setState(() {});
     }
   }
 

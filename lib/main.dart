@@ -154,13 +154,17 @@ class _MyAppState extends State<MyApp> {
                 : inicioConfigApp
                     ? 'clientesScreen'
                     : 'clientesScreen', */
-            home: SplashScreen.navigate(
+            home: /*  SplashScreen.navigate(
+                 width: 200,
+              height: 200,
+                fit: BoxFit.fitWidth,
                 until: () => Future.delayed(const Duration(seconds: 2)),
                 startAnimation: 'start',
                 loopAnimation: 'start',
                 backgroundColor: Colors.white,
                 name: 'assets/icon/splash.riv',
-                next: (context) => InicioConfigApp(usuarioAPP: usuarioAPP)),
+                next: (context) => */
+                InicioConfigApp(usuarioAPP: usuarioAPP),
             routes: {
               //home
               'Login': (context) =>
@@ -190,7 +194,6 @@ class _MyAppState extends State<MyApp> {
                     password: '',
                   ),
               'finalizacionPruebaScreen': (context) => FinalizacionPrueba(),
-              
             });
       },
     );

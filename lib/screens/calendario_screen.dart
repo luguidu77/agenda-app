@@ -81,7 +81,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
 
     novedades();
 
-    Publicidad.publicidad(_estadoPagadaApp);
+    Publicidad.publicidad(_iniciadaSesionUsuario);
     super.initState();
   }
 
@@ -89,7 +89,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
     final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
     _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
     _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
-    _estadoPagadaApp = estadoPagoProvider.emailUsuarioApp;
+    _estadoPagadaApp = estadoPagoProvider.estadoPagoApp;
   }
 
   @override

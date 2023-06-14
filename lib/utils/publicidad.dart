@@ -1,5 +1,6 @@
 // anuncios interstitial   ca-app-pub-4178469533505255/1195354253
 
+import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class PublicidadId {
@@ -13,10 +14,11 @@ class PublicidadId {
 }
 
 class Publicidad {
-  static publicidad(estadoPagadaApp) async {
+  static publicidad(iniciadaSesionUsuario) async {
     InterstitialAd? interstitialAd;
-
-    if (estadoPagadaApp == 'COMPRADA' || estadoPagadaApp == 'PRUEBA_ACTIVA') {
+    debugPrint(
+        'Si hay iniciada sesion no hay publicidad ############### iniciada sesion: ${iniciadaSesionUsuario.toString()}');
+    if (iniciadaSesionUsuario) {
       return null;
     } else {
       InterstitialAd.load(

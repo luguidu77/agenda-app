@@ -3,18 +3,17 @@
 import 'dart:io';
 
 import 'package:agendacitas/main.dart';
-import 'package:agendacitas/models/cita_model.dart';
-import 'package:agendacitas/providers/estado_pago_app_provider.dart';
-import 'package:agendacitas/screens/ficha_cliente_screen.dart';
-import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
+import '../models/models.dart';
 import '../mylogic_formularios/mylogic.dart';
 import '../providers/providers.dart';
+import '../screens/screens.dart';
+import '../utils/utils.dart';
 
 class NuevoActualizacionCliente extends StatefulWidget {
   /*  ClienteModel clienteParametro;
@@ -36,6 +35,9 @@ class NuevoActualizacionCliente extends StatefulWidget {
 }
 
 class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
+  final _formKey = GlobalKey<FormState>();
+  TextStyle estilotextoErrorValidacion = const TextStyle(color: Colors.red);
+  String textoValidacion = '';
   final ImagePicker _picker = ImagePicker();
   bool _iniciadaSesionUsuario = false;
   String _emailSesionUsuario = '';
@@ -102,14 +104,17 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
             ? const Icon(Icons.add)
             : const Icon(Icons.change_circle_outlined),
         onPressed: () async {
-          if (!cargandoImagen) {
-            cliente = await clienteDatos();
-            setState(() {});
-            nuevoCliente
-                ? _nuevoCliente(_emailSesionUsuario, cliente, pagado, myLogic)
-                : _refrescaFicha(_emailSesionUsuario, cliente, pagado, myLogic);
-          } else {
-            mensajeError(context, 'NO ACTUALIZADO, CARGANDO FOTO');
+          if (_formKey.currentState!.validate()) {
+            if (!cargandoImagen) {
+              cliente = await clienteDatos();
+              setState(() {});
+              nuevoCliente
+                  ? _nuevoCliente(_emailSesionUsuario, cliente, pagado, myLogic)
+                  : _refrescaFicha(
+                      _emailSesionUsuario, cliente, pagado, myLogic);
+            } else {
+              mensajeError(context, 'NO ACTUALIZADO, CARGANDO FOTO');
+            }
           }
         },
       ),
@@ -236,35 +241,44 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
                 )
               ],
             ),
-            //todo: NO HAY FORM PARA VALIDAR LAS ENTRADAS?
-            TextField(
-              controller: myLogic.textControllerNombre,
-              decoration: const InputDecoration(labelText: 'Nombre'),
-            ),
-            TextField(
-              keyboardType: TextInputType.number,
-              controller: myLogic.textControllerTelefono,
-              decoration: const InputDecoration(labelText: 'Telefono'),
-            ),
-            TextField(
-              keyboardType: TextInputType.emailAddress,
-              controller: myLogic.textControllerEmail,
-              decoration: const InputDecoration(labelText: 'Email'),
-            ),
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    validator: (value) => _validacion(value),
+                    controller: myLogic.textControllerNombre,
+                    decoration: const InputDecoration(labelText: 'Nombre'),
+                  ),
+                  TextFormField(
+                    validator: (value) => _validacion(value),
+                    keyboardType: TextInputType.number,
+                    controller: myLogic.textControllerTelefono,
+                    decoration: const InputDecoration(labelText: 'Telefono'),
+                  ),
+                  TextFormField(
+                    validator: (value) => _validacion(value),
+                    keyboardType: TextInputType.emailAddress,
+                    controller: myLogic.textControllerEmail,
+                    decoration: const InputDecoration(labelText: 'Email'),
+                  ),
 
-            /*  TextField(
+                  /*  TextField(
               //todo: quitar en produccion
               enabled: false,
               controller: myLogic.textControllerFoto,
               decoration: const InputDecoration(labelText: 'Foto'),
             ), */
-            TextField(
-              controller: myLogic.textControllerNota,
-              decoration: const InputDecoration(labelText: 'Notas'),
-            ),
-            const SizedBox(
-              height: 200,
-            ),
+                  TextFormField(
+                    controller: myLogic.textControllerNota,
+                    decoration: const InputDecoration(labelText: 'Notas'),
+                  ),
+                  const SizedBox(
+                    height: 200,
+                  ),
+                ],
+              ),
+            )
           ],
         ),
       ),
@@ -423,7 +437,12 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
           .nuevoCliente(nombre, telefono, email, foto, nota)
           .whenComplete(() {
         debugPrint('cliente nuevo añadido!!');
-        Navigator.pushNamed(context, 'clientesScreen');
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => HomeScreen(
+                      index: 2,
+                    )));
       });
     }
   }
@@ -438,5 +457,11 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
     cliente.foto = myLogic.textControllerFoto.text;
     cliente.nota = myLogic.textControllerNota.text;
     return cliente;
+  }
+
+  _validacion(value) {
+    if (value.isEmpty) {
+      return 'Este campo no puede quedar vacío';
+    }
   }
 }

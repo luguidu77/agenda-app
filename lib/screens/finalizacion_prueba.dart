@@ -1,5 +1,5 @@
 import 'package:agendacitas/screens/comprar_aplicacion.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
@@ -31,7 +31,7 @@ class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => ComprarAplicacion(
+                              builder: (context) => const ComprarAplicacion(
                                   // usuarioAPP: email,
                                   )),
                         )

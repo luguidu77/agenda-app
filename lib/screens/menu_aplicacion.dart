@@ -1,4 +1,5 @@
 import 'package:agendacitas/firebase_options.dart';
+import 'package:agendacitas/screens/comprar_aplicacion.dart';
 import 'package:agendacitas/screens/screens.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -130,7 +131,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
                     child: SingleChildScrollView(
                   child: Column(children: [
                     const Image(
-                      image: AssetImage('assets/icon/splash.riv'),
+                      image: AssetImage('assets/icon/icon.png'),
                       width: 100,
                     ),
                     Text('Agenda de citas', style: estilo),
@@ -230,7 +231,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
           },
         ),
 
-        /*  _haySesionIniciada
+        _estadopago == 'COMPRADA'
             ? const Text('')
             : ListTile(
                 leading: const Icon(Icons.monetization_on),
@@ -239,10 +240,16 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
                   style: estilo,
                 ),
                 onTap: () {
-                  Navigator.pushNamed(context, 'TarjetaPago');
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ComprarAplicacion(
+                            // usuarioAPP: email,
+                            )),
+                  );
                   //  _quitarPublicidad(context, enviosugerencia);
                 },
-              ), */
+              ),
         _iniciadaSesionUsuario
             ? const Text('')
             : ListTile(

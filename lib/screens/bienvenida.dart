@@ -29,7 +29,7 @@ class _BienvenidaState extends State<Bienvenida> {
 
   void _irHomeScreen(context) {
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(builder: (_) =>  HomeScreen(index: 0,)),
     );
   }
 

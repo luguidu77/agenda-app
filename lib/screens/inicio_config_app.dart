@@ -46,7 +46,7 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
 
   @override
   void initState() {
-   // inicializaProviderEstadoPagoEmail();
+    // inicializaProviderEstadoPagoEmail();
     getPersonaliza();
 
     super.initState();
@@ -60,7 +60,7 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
             final User data = snapshot.data;
-            
+
             debugPrint(
                 'seteando provider email:(inicio_config_app) ${data.email.toString()}');
 
@@ -81,7 +81,9 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
             debugPrint(
                 'inicio_config_app.dart ----------------> LOGEADO EN FIREBASE');
 
-            return const HomeScreen();
+            return HomeScreen(
+              index: 0,
+            );
           } else {
             // NO LOGUEADO EN FIREBASE
             debugPrint(

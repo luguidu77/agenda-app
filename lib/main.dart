@@ -5,10 +5,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
-import 'package:rive_splash_screen/rive_splash_screen.dart';
+
 
 import 'models/models.dart';
 import 'providers/providers.dart';
@@ -92,6 +93,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   inicializacion() async {
+     FlutterNativeSplash.remove();
     //?comprueba pago en dispositivo
     final pago = await CompruebaPago.getPagoEmailDispositivo();
     debugPrint('datos gardados en tabla Pago (main.dart) $pago');
@@ -170,7 +172,7 @@ class _MyAppState extends State<MyApp> {
               'Login': (context) =>
                   RegistroUsuarioScreen(registroLogin: 'Login', usuarioAPP: ''),
               'Bienvenida': (context) => const Bienvenida(),
-              'home': (BuildContext context) => const HomeScreen(),
+              'home': (BuildContext context) =>  HomeScreen(index: 0,),
               'InicioConfigApp': (context) =>
                   const InicioConfigApp(usuarioAPP: ''),
 

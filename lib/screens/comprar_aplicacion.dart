@@ -6,11 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
 import 'package:pay/pay.dart' as pay;
+import 'package:url_launcher/url_launcher.dart';
 
 const _paymentItems = [
   pay.PaymentItem(
     label: 'Total',
-    amount: '9.00',
+    amount: '1.50',
     status: pay.PaymentItemStatus.final_price,
   )
 ];
@@ -34,7 +35,7 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
   bool visibleRespaldoRealizado = false;
   // MyLogicUsuarioAPP myLogic = MyLogicUsuarioAPP();
 
-  GlobalKey _key = new GlobalKey();
+  final GlobalKey _key = GlobalKey();
 
   void update() {
     setState(() {});
@@ -48,6 +49,7 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       key: _key,
       title: 'Material App',
       home: Scaffold(
@@ -78,16 +80,53 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
                           ),
                           const Text(
                               'Sin publicidad para ahorrar tiempo a tus clientes. \n\n'
-                              'Con nuevas características como "ficha de cliente" \n\n'
-                              'Sincronización en la nube y envios sms /email a tus clientes. \n\n'),
+                              'Con nuevas características \n\n'
+                              'Crea una cuenta en la nube y accede desde otro dispositivo. \n\n'),
+
+                          const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text.rich(
+                                  TextSpan(
+                                      text:
+                                          'En el formulario de pago introduce el',
+                                      style: TextStyle(
+                                          color: Color.fromARGB(
+                                              255, 136, 133, 133))),
+                                ),
+                                Text.rich(
+                                  TextSpan(
+                                      text:
+                                          'mismo email de sesión de la aplicación'),
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                                Text.rich(
+                                  TextSpan(
+                                      text:
+                                          'para una vez comprobado el pago poder activar tu cuenta como pagada. (Un sólo pago, sin suscripción)'),
+                                  style: TextStyle(
+                                      color:
+                                          Color.fromARGB(255, 136, 133, 133)),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          //botonGPAY(context), ############## BOTON GOOGLE PAY -------------------------------------
                           ElevatedButton.icon(
-                              onPressed: () => {
-                                    update(),
-                                    visibleFormulario = true,
-                                    visible = false,
-                                  },
+                              onPressed: () async {
+                                const url =
+                                    'https://buy.stripe.com/4gwcPE5XdeEecGA001';
+                                if (await canLaunch(url)) {
+                                  await launch(url);
+                                } else {
+                                  throw 'Could not launch $url';
+                                }
+                              },
                               icon: const Icon(Icons.app_registration_rounded),
-                              label: const Text('Pago y registro online')),
+                              label: const Text('Comprar')),
                           const SizedBox(
                             height: 50,
                           ),
@@ -99,16 +138,17 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
                           const Text(
                               'Creación App para tus clientes, con opción a coger cita desde su app. \n\n'
                               'Marketplace App de profesionales como tú que ofrecen diferentes servicios" \n\n'),
-                          ElevatedButton.icon(
+                          /*  ElevatedButton.icon(
                               style: ButtonStyle(
                                   backgroundColor: MaterialStateProperty.all(
-                                      Color.fromARGB(255, 171, 172, 173))),
+                                      const Color.fromARGB(
+                                          255, 171, 172, 173))),
                               onPressed: () => {},
                               icon: const Icon(Icons.app_registration_rounded),
-                              label: const Text('Pago y registro online')),
+                              label: const Text('Pago de la aplicación')), */
                         ],
                       )
-                    : const Text('Pago y Registro online'),
+                    : const Text('Pago de la aplicación'),
 
                 //? FORMULARIO REGISTRO
                 visibleFormulario
@@ -117,16 +157,15 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
                         child: SizedBox(
                           child: Column(
                             children: [
-                              TextField(
+                              const TextField(
                                 controller: null,
-                                decoration:
-                                    const InputDecoration(labelText: 'Email'),
+                                decoration: InputDecoration(labelText: 'Email'),
                               ),
-                              TextField(
+                              const TextField(
                                 keyboardType: TextInputType.number,
                                 controller: null,
-                                decoration: const InputDecoration(
-                                    labelText: 'Contraseña'),
+                                decoration:
+                                    InputDecoration(labelText: 'Contraseña'),
                               ),
                               const SizedBox(
                                 height: 20,
@@ -218,11 +257,12 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
                               ? Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Container(
-                                    color: Color.fromARGB(255, 172, 240, 174),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                    color: const Color.fromARGB(
+                                        255, 172, 240, 174),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8.0),
                                       child: Column(
-                                        children: const [
+                                        children: [
                                           Text(
                                               '¡ Configuración realizada con exito !'),
                                           Text(

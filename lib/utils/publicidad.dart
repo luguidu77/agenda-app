@@ -13,27 +13,29 @@ class PublicidadId {
 }
 
 class Publicidad {
- 
-  InterstitialAd? interstitialAd;
+  static publicidad(estadoPagadaApp) async {
+    InterstitialAd? interstitialAd;
 
-  publicidad() async {
-    InterstitialAd.load(
-      adUnitId: PublicidadId
-          .interstitialAdUnitId, //todo: cambiar a real cuando se publique en playstore
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (InterstitialAd ad) {
-          interstitialAd = ad;
-          ad.show();
-        },
-        onAdFailedToLoad: (LoadAdError error) {
-          interstitialAd = null;
+    if (estadoPagadaApp == 'COMPRADA' || estadoPagadaApp == 'PRUEBA_ACTIVA') {
+      return null;
+    } else {
+      InterstitialAd.load(
+        adUnitId: PublicidadId
+            .interstitialAdUnitId, //interstitialAdUnitIdPueba o interstitialAdUnitId
+        request: const AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (InterstitialAd ad) {
+            interstitialAd = ad;
+            ad.show();
+          },
+          onAdFailedToLoad: (LoadAdError error) {
+            interstitialAd = null;
 
-          //publicidad();
-        },
-      ),
-    );
-
-    return interstitialAd;
+            //publicidad();
+          },
+        ),
+      );
+      return interstitialAd;
+    }
   }
 }

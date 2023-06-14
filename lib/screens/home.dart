@@ -9,15 +9,14 @@ import '../widgets/widgets.dart';
 import 'screens.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
-
+  HomeScreen({Key? key, required this.index}) : super(key: key);
+  int index = 0;
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   //trae mediante funcion de BNavigator el index de la pagina menu de abajo , myBnB
-  int index = 0;
   BNavigator? myBnB;
 
   ThemeData? tema;
@@ -42,16 +41,15 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-
   @override
   void initState() {
     //iniciamos myBnB(bottomNavigationBar) trayendo BNavigator
     myBnB = BNavigator(currentIndex: (i) {
       setState(() {
-        index = i;
+        widget.index = i;
       });
     });
- 
+
     cargarTema();
 
     super.initState();
@@ -106,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Scaffold(
               bottomNavigationBar: myBnB,
               body: RutasNav(
-                index: index,
+                index: widget.index,
               )),
         ),
         routes: {

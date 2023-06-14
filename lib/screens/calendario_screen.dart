@@ -11,6 +11,7 @@ import '../config/config.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
 import '../screens/screens.dart';
+import '../utils/utils.dart';
 import '../widgets/widgets.dart';
 
 class CalendarioCitasScreen extends StatefulWidget {
@@ -80,6 +81,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
 
     novedades();
 
+    Publicidad.publicidad(_estadoPagadaApp);
     super.initState();
   }
 
@@ -87,6 +89,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
     final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
     _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
     _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
+    _estadoPagadaApp = estadoPagoProvider.emailUsuarioApp;
   }
 
   @override

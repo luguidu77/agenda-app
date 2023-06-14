@@ -391,7 +391,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
                 int.parse(widget.idServicio), usuarioAP, iniciadaSesionUsuario);
             setState(() {});
             if (_disponible) {
-              _pagado ? null : Publicidad().publicidad();
+              // ? null : Publicidad().publicidad();
 
               // cita original
               final Map<String, dynamic> oldCita = widget.cita;

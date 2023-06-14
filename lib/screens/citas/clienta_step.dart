@@ -79,7 +79,6 @@ class _ClientaStepState extends State<ClientaStep> {
               seleccionaCliente(context, clientaElegida);
             });
             Navigator.pushNamed(context, 'servicioStep');
-            
           }
         },
       ),
@@ -183,7 +182,12 @@ class _ClientaStepState extends State<ClientaStep> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             TextButton(
-              onPressed: () => Navigator.pushNamed(context, 'clientesScreen'),
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => HomeScreen(
+                            index: 2,
+                          ))),
               child: const Icon(Icons.favorite_border_outlined),
             ),
             TextButton(

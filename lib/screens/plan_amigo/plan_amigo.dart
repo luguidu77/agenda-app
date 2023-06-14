@@ -35,7 +35,7 @@ class _PlanAmigoState extends State<PlanAmigo> {
 
   @override
   void initState() {
-    Publicidad().publicidad();
+    //Publicidad().publicidad();
     myLogic = MyLogicNoPlanAmigo(tuEmail, amigoEmail);
     myLogic.init();
     traeTuEmail();

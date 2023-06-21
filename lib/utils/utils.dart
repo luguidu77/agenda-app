@@ -8,3 +8,4 @@ export 'package:agendacitas/utils/formatear.dart';
 export '../utils/notificaciones/recordatorio_local/recordatorio_local.dart';
 export '../../utils/dias_de_prueba_formateada.dart';
 export 'package:agendacitas/utils/publicidad.dart';
+export 'package:agendacitas/utils/comunicacion/comunicaciones.dart';

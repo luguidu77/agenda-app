@@ -56,7 +56,7 @@ class StripeService {
     // var paymentMethodCard = await Stripe.instance.createPaymentMethod(PaymentMethodParams.card());
     var paymentIntent =
         await StripeService.createPaymentIntent(amount!, currency!);
-        
+
     print(paymentIntent!['client_secret']);
     final clientSecret = paymentIntent[
         'client_secret']; // tiene que traer de response.body el 'client_secret'
@@ -75,7 +75,7 @@ class StripeService {
             //   merchantCountryCode: 'ES',
             merchantDisplayName: 'Agenda de citas Pro'));
 
-    var res = await Stripe.instance.confirmPaymentSheetPayment();
+    await Stripe.instance.confirmPaymentSheetPayment();
     return null;
     // retorna StripeTranscationResponse
   }

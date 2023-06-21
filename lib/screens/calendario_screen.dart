@@ -211,11 +211,9 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                             'FILTRAR',
                             style: TextStyle(fontSize: 14),
                           ),
-                          frontTitle: Text(
-                            _iniciadaSesionUsuario
-                                ? 'Citas para ${_emailSesionUsuario.split('@')[0]}'
-                                : 'Citas para agendadecitas', // todo: foto o nombre de empleado
-                            style: const TextStyle(fontSize: 14),
+                          frontTitle: const Text(
+                            'CITAS',
+                            style: TextStyle(fontSize: 14),
                           ),
                           usuarioAPP: _emailSesionUsuario,
                         ) //_vercitas(usuarioAPP)),
@@ -298,36 +296,30 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
   novedades() async {
 //? COMPRUEBA NOVEDADES EN FIREBASE
 
-    if (kIsWeb) {
-      // La aplicación se está ejecutando en un navegador web (escritorio)
-    } else {
-      // La aplicación se está ejecutando en un dispositivo móvil
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
 
-      await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform);
-
-      final db = FirebaseFirestore.instance;
+    final db = FirebaseFirestore.instance;
 
 // creo una referencia al documento que contiene la version
-      final docRefVersion =
-          db.collection("novedades").doc("7JAa1HMGRDSk0z9WKjk3");
+    final docRefVersion =
+        db.collection("novedades").doc("7JAa1HMGRDSk0z9WKjk3");
 
-      var data = await docRefVersion.get().then(
-            (doc) => doc.data(),
-          );
+    var data = await docRefVersion.get().then(
+          (doc) => doc.data(),
+        );
 
-      bool activo = data!['activo'];
-      novedad = data['novedad'];
-      String color = data['color'];
-      colorNovedad = toColor(color);
-      //  String iconoAux = data['icono'];
-      // iconoNovedad =;
+    bool activo = data!['activo'];
+    novedad = data['novedad'];
+    String color = data['color'];
+    colorNovedad = toColor(color);
+    //  String iconoAux = data['icono'];
+    // iconoNovedad =;
 
-      if (activo) {
-        novedadActivo = true;
+    if (activo) {
+      novedadActivo = true;
 
-        setState(() {});
-      }
+      setState(() {});
     }
   }
 
@@ -531,10 +523,8 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                             fit: BoxFit.cover,
                             width: 100),
                       )),
-                  Text(
-                    _emailSesionUsuario.split('@')[0],
-                    style: const TextStyle(fontSize: 12),
-                  )
+                  denominacionNegocio(_emailSesionUsuario,
+                      color: Colors.black, size: 15.0),
                 ],
               );
             }),

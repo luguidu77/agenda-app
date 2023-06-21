@@ -19,7 +19,7 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason> alertaNoEmail(
   return ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
-mensajeSuccess(context, String texto) {
+void mensajeSuccess(context, String texto) {
   return showTopSnackBar(
     Overlay.of(context),
     CustomSnackBar.success(
@@ -28,7 +28,7 @@ mensajeSuccess(context, String texto) {
   );
 }
 
-mensajeInfo(context, String texto) {
+void mensajeInfo(context, String texto) {
   return showTopSnackBar(
     Overlay.of(context),
     CustomSnackBar.info(
@@ -37,7 +37,7 @@ mensajeInfo(context, String texto) {
   );
 }
 
-mensajeError(context, String texto) {
+void mensajeError(context, String texto) {
   return showTopSnackBar(
     Overlay.of(context),
     CustomSnackBar.error(

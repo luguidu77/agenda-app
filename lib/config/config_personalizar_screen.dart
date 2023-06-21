@@ -17,13 +17,18 @@ class ConfigPersonalizar extends StatefulWidget {
 }
 
 class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
-  List<Color> colorsList = [
+  List<Color> colorsList = const [
     Colors.red,
-    Colors.green,
+    Color.fromARGB(255, 117, 187, 120),
+    Color.fromARGB(255, 120, 139, 88),
+    Color.fromARGB(255, 54, 204, 196),
     Colors.blue,
     Colors.yellow,
     Colors.orange,
     Colors.purple,
+    Color.fromARGB(255, 238, 84, 136),
+    Color.fromARGB(255, 231, 157, 207),
+    Color.fromARGB(255, 255, 149, 28),
   ];
 
   PersonalizaModel personaliza = PersonalizaModel();

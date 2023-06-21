@@ -17,10 +17,12 @@ fotoPerfil(emailSesionUsuario) {
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(100.0),
                       child: FadeInImage.assetNetwork(
-                          placeholder: './assets/icon/galeria-de-fotos.gif',
-                          image: data.foto.toString(),
-                          fit: BoxFit.cover,
-                          width: 100),
+                        placeholder: './assets/icon/galeria-de-fotos.gif',
+                        image: data.foto.toString(),
+                        fit: BoxFit.fill,
+                        imageScale: 1.5,
+                        //width: 500
+                      ),
                     )
                   : Image.asset('./assets/icon/icon.png'),
             );

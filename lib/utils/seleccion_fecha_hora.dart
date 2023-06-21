@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 class SeleccionFechaHora {
   Future<DateTime?> seleccionFecha(context) async {
     var firstDate = DateTime.now().subtract(const Duration(days: 60));
-    var lastDate = DateTime.now().add(const Duration(days: 30));
+    var lastDate = DateTime.now().add(const Duration(days: 365));
     Intl.defaultLocale = 'es_EU';
     // print(localization.supportedLocales);
     DateTime? diaSeleccionado = await showDatePicker(

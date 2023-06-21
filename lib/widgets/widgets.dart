@@ -12,3 +12,5 @@ export 'package:agendacitas/widgets/filtros/items_filter_citas.dart';
 export 'package:agendacitas/widgets/lista_de_citas.dart';
 export 'package:agendacitas/widgets/formulariosSessionApp/olvido_password.dart';
 export 'package:agendacitas/widgets/formulariosSessionApp/validaciones_form_inicio_session_registro.dart';
+export 'package:agendacitas/widgets/tarjeta_info_descartable.dart';
+export '../widgets/denominacion_del_negocio.dart';

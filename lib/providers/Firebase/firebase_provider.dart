@@ -116,7 +116,7 @@ class FirebaseProvider extends ChangeNotifier {
   }
 
   nuevoServicio(String emailUsuarioAPP, String servicio, String tiempo,
-      double precio, String detalle, String categoria) async {
+      double precio, String detalle, String categoria, int index) async {
     final Map<String, dynamic> newServicio = ({
       'activo': 'true',
       'servicio': servicio,
@@ -124,6 +124,7 @@ class FirebaseProvider extends ChangeNotifier {
       'precio': precio,
       'detalle': detalle,
       'categoria': categoria,
+      'index': index
     });
     //rinicializa Firebase
     await _iniFirebase();
@@ -336,22 +337,26 @@ class FirebaseProvider extends ChangeNotifier {
     final docRef = await _referenciaDocumento(emailUsuario, 'servicio');
 
     try {
-      await docRef.get().then((QuerySnapshot snapshot) async => {
-            for (var element in snapshot.docs)
-              {
-                //AGREGA LOS SERVICIOS
-                // print('${element['cate']}'),
-                data.add({
-                  'id': element.id.toString(),
-                  'servicio': element['servicio'],
-                  'detalle': element['detalle'],
-                  'precio': element['precio'],
-                  'tiempo': element['tiempo'],
-                  'activo': element['activo'],
-                  'categoria': element['categoria']
-                })
-              }
-          });
+      await docRef
+          .orderBy('index')
+          .get()
+          .then((QuerySnapshot snapshot) async => {
+                for (var element in snapshot.docs)
+                  {
+                    //AGREGA LOS SERVICIOS
+                    // print('${element['cate']}'),
+                    data.add({
+                      'id': element.id.toString(),
+                      'servicio': element['servicio'],
+                      'detalle': element['detalle'],
+                      'precio': element['precio'],
+                      'tiempo': element['tiempo'],
+                      'activo': element['activo'],
+                      'categoria': element['categoria'],
+                      'index': element['index'] // para reordenar la lista
+                    }),
+                  }
+              });
     } catch (e) {
       // print(e);
     }
@@ -364,7 +369,8 @@ class FirebaseProvider extends ChangeNotifier {
           precio: element['precio'],
           tiempo: element['tiempo'],
           activo: element['activo'],
-          idCategoria: element['categoria']);
+          idCategoria: element['categoria'],
+          index: element['index']);
 
       listaServicios.add(newServicio);
     }
@@ -386,7 +392,8 @@ class FirebaseProvider extends ChangeNotifier {
           'precio': element.precio,
           'tiempo': element.tiempo,
           'activo': element.activo,
-          'categoria': element.idCategoria
+          'categoria': element.idCategoria,
+          'index': element.index, // para reordenar la lista
         });
       }
     }
@@ -399,7 +406,8 @@ class FirebaseProvider extends ChangeNotifier {
           precio: element['precio'],
           tiempo: element['tiempo'],
           activo: element['activo'],
-          idCategoria: element['categoria']);
+          idCategoria: element['categoria'],
+          index: element['index']);
 
       listaServiciosActivos.add(newServicio);
     }
@@ -573,7 +581,57 @@ class FirebaseProvider extends ChangeNotifier {
     await docRef.doc(cita.id.toString()).update(newCita);
   }
 
-  actualizarServicio(String usuarioAPP, ServicioModel servicio) async {
+  buscarDocumento(emailUsuario, indexItem) async {
+    await _iniFirebase();
+    final docRef = await _referenciaDocumento(emailUsuario, 'servicio');
+    QuerySnapshot querySnapshot =
+        await docRef.where('index', isEqualTo: indexItem).get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      for (DocumentSnapshot documentSnapshot in querySnapshot.docs) {
+        String documentId = documentSnapshot.id;
+        print('ID del documento: $documentId');
+        // Aquí puedes realizar las operaciones adicionales que desees con el ID del documento
+
+        return documentId;
+      }
+    } else {
+      print(
+          'No se encontraron documentos que cumplan con los criterios de búsqueda.');
+    }
+
+    return 'id buscado de firebase';
+  }
+
+  // SE USA PARA ORDENAR LISTA SERVICIOS POR SU INDEX
+  modificaIndexServicio(
+      String emailUsuario,
+      var oldIdServicio,
+      var newIdServicio,
+      int oldItemIndex,
+      int newItemIndex,
+      int oldListIndex,
+      int newListIndex) async {
+    await _iniFirebase();
+
+    //modifica el index añadiendole el digito del index de la lista
+
+    final int newIndexAdaptado =
+        newListIndex != 0 ? newItemIndex + newListIndex * 100 : newItemIndex;
+    final int oldIndexAdaptado =
+        oldListIndex != 0 ? oldItemIndex + oldListIndex * 100 : oldItemIndex;
+
+    //referencia a la coleccion cita
+    final docRef = await _referenciaDocumento(emailUsuario, 'servicio');
+    await docRef
+        .doc(oldIdServicio.toString())
+        .update({'index': newIndexAdaptado});
+    await docRef
+        .doc(newIdServicio.toString())
+        .update({'index': oldIndexAdaptado});
+  }
+
+  actualizarServicio(String usuarioAPP, ServicioModelFB servicio) async {
     print(servicio.servicio);
     Map<String, Object?> newServicio = {
       'activo': servicio.activo,
@@ -581,6 +639,7 @@ class FirebaseProvider extends ChangeNotifier {
       'precio': servicio.precio,
       'servicio': servicio.servicio,
       'tiempo': servicio.tiempo,
+      'index': servicio.index
     };
 
     await _iniFirebase();
@@ -597,6 +656,7 @@ class FirebaseProvider extends ChangeNotifier {
       'servicio': servicio.servicio,
       'tiempo': servicio.tiempo,
       'categoria': servicio.idCategoria,
+      'index': servicio.index
     };
 
     await _iniFirebase();
@@ -616,15 +676,14 @@ class FirebaseProvider extends ChangeNotifier {
     final docRef = await _referenciaDocumento(usuarioAPP, 'categoriaServicio');
     await docRef.doc(categoria.id.toString()).update(newCategoria);
   }
+
   // actualizar el pago en Firebase
-   actualizaPago(String usuarioAPP) async {
+  actualizaPago(String usuarioAPP) async {
     final docRef = await _referenciaDocumento(usuarioAPP, 'pago');
 
- 
-      var data = {'id': 0, 'pago': true, 'email': usuarioAPP};
+    var data = {'id': 0, 'pago': true, 'email': usuarioAPP};
 
-      await docRef.doc(data['id'].toString()).set(data);
-   
+    await docRef.doc(data['id'].toString()).set(data);
   }
 
   leerBasedatosFirebase(emailUsuarioApp, fecha) async {
@@ -717,7 +776,7 @@ class FirebaseProvider extends ChangeNotifier {
       });
     } catch (e) {
       debugPrint(e.toString());
-      pago= false;
+      pago = false;
     }
     return pago;
   }

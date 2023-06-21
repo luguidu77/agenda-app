@@ -1,6 +1,5 @@
 import 'package:agendacitas/firebase_options.dart';
-import 'package:agendacitas/screens/comprar_aplicacion.dart';
-import 'package:agendacitas/screens/screens.dart';
+import 'package:agendacitas/screens/servicios_screen_draggable.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +7,11 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../models/models.dart';
 import '../providers/providers.dart';
+import '../screens/screens.dart';
+import '../utils/utils.dart';
+import '../widgets/widgets.dart';
 
 class MenuAplicacion extends StatefulWidget {
   const MenuAplicacion({
@@ -108,14 +111,16 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
 
         const Divider(),
 
-        // REPORTES Y SUGERENCIAS
-        _reportes(),
-
         // COMPRAR LA APLICACION
         _estadopago == 'COMPRADA' ? const Text('') : _comprarAPP(context),
 
         // PLAN AMIGO
-        _iniciadaSesionUsuario ? const Text('') : _planAmigo(context),
+        _estadopago == 'COMPRADA' ? const Text('') : _planAmigo(context),
+
+        // REPORTES Y SUGERENCIAS
+        _reportes(),
+
+        //_pruebaEnvioEmail(context),
 
         //VALORAR LA APLICACION Y LA VERSION DISPONIBLE
         _valoracionApp(),
@@ -129,6 +134,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
             color: Theme.of(context)
                 .primaryColor), // Color.fromARGB(255, 122, 121, 197)),
         currentAccountPicture: fotoPerfil(_emailSesionUsuario),
+        currentAccountPictureSize: const Size.square(95.0),
         otherAccountsPictures: [
           IconButton(
               color: Colors.white,
@@ -136,24 +142,39 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
               onPressed: () =>
                   {Navigator.pushNamed(context, 'ConfigUsuarioApp')}),
         ],
-        accountEmail: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(_emailSesionUsuario),
-            _estadopago == 'PRUEBA_ACTIVA'
-                ? const Card(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 5.0),
-                      child: Text(
-                        'versión de prueba',
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 99, 11, 23),
-                            fontSize: 12),
-                      ),
+        accountEmail: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              denominacionNegocio(_emailSesionUsuario),
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _estadopago == 'PRUEBA_ACTIVA'
+                        ? const Card(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 5.0),
+                              child: Text(
+                                'versión de prueba',
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 99, 11, 23),
+                                    fontSize: 12),
+                              ),
+                            ),
+                          )
+                        : Container(),
+                    Text(
+                      'versión $versionApp',
+                      style: const TextStyle(
+                          color: Color.fromARGB(255, 99, 11, 23), fontSize: 10),
                     ),
-                  )
-                : Container()
-          ],
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
         accountName: const Text(''));
   }
@@ -171,9 +192,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
               width: 100,
             ),
             Text('Agenda de citas', style: estilo),
-            _iniciadaSesionUsuario
-                ? Text('PRO $versionApp', style: estilo)
-                : Text('versión gratuita $versionApp', style: estilo),
+            Text('versión gratuita $versionApp', style: estilo),
           ]),
         )));
   }
@@ -234,7 +253,8 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
         style: estilo,
       ),
       onTap: () {
-        _sendMail('Tengo sugerencias para Agenda de Citas: ');
+        Comunicaciones.enviaEmailConAsunto(
+            'Reporte y/o sugerencias para Agenda de Citas');
       },
     );
   }
@@ -273,6 +293,20 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
     );
   }
 
+  ListTile _pruebaEnvioEmail(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.face_retouching_natural),
+      title: Text(
+        ' prueba envio automatico email',
+        style: estilo,
+      ),
+      onTap: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const EnvioSensinblue()));
+      },
+    );
+  }
+
   ListTile _valoracionApp() {
     return ListTile(
         textColor: Colors.red,
@@ -290,30 +324,11 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
         onTap: () async {
           const url =
               'https://play.google.com/store/apps/details?id=agendadecitas.app';
-          if (await canLaunch(url)) {
-            await launch(url);
+          if (await launchUrl(Uri.parse(url))) {
+            await launchUrl(Uri.parse(url));
           } else {
             throw 'Could not launch $url';
           }
         });
   }
-}
-
-_sendMail(String subject) async {
-  String? encodeQueryParameters(Map<String, String> params) {
-    return params.entries
-        .map((MapEntry<String, String> e) =>
-            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
-        .join('&');
-  }
-
-  final Uri emailLaunchUri = Uri(
-    scheme: 'mailto',
-    path: 'agendadecitaspro@gmail.com',
-    query: encodeQueryParameters(<String, String>{
-      'subject': subject,
-    }),
-  );
-
-  await launchUrl(emailLaunchUri);
 }

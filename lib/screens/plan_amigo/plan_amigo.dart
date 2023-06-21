@@ -1,6 +1,3 @@
-
-
-
 import 'package:agendacitas/providers/plan_amigo_provider.dart';
 import 'package:agendacitas/utils/publicidad.dart';
 import 'package:agendacitas/widgets/botones/floating_action_buton_widget.dart';
@@ -35,7 +32,7 @@ class _PlanAmigoState extends State<PlanAmigo> {
 
   @override
   void initState() {
-    //Publicidad().publicidad();
+    Publicidad.publicidad(false);
     myLogic = MyLogicNoPlanAmigo(tuEmail, amigoEmail);
     myLogic.init();
     traeTuEmail();

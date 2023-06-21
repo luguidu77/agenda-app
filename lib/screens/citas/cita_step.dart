@@ -80,7 +80,6 @@ class _CitaStepState extends State<CitaStep> {
               String descripDisponibilidad = resp['descrip'];
               _alertaNoDisponibilidad(descripDisponibilidad);
             }
-         
           }
         },
       ),
@@ -378,29 +377,30 @@ class _CitaStepState extends State<CitaStep> {
 
   funcionDia(context) async {
     DateTime? diaSeleccionado =
-        await SeleccionFechaHora().seleccionFecha(context) as DateTime;
-
-    setState(() {
-      String fecha = DateFormat.MMMMEEEEd('es_ES')
-          .format(DateTime.parse(diaSeleccionado.toString()));
-      myLogic.textControllerDia.text = fecha; //'${value.day}-${value.month}';
-      textoDia =
-          '${diaSeleccionado.year}-${diaSeleccionado.month.toString().padLeft(2, '0')}-${diaSeleccionado.day.toString().padLeft(2, '0')}';
-      myLogic.textControllerHora.text = '';
-    });
+        await SeleccionFechaHora().seleccionFecha(context);
+    if (diaSeleccionado != null) {
+      setState(() {
+        String fecha = DateFormat.MMMMEEEEd('es_ES')
+            .format(DateTime.parse(diaSeleccionado.toString()));
+        myLogic.textControllerDia.text = fecha; //'${value.day}-${value.month}';
+        textoDia =
+            '${diaSeleccionado.year}-${diaSeleccionado.month.toString().padLeft(2, '0')}-${diaSeleccionado.day.toString().padLeft(2, '0')}';
+        myLogic.textControllerHora.text = '';
+      });
+    }
   }
 
   funcionHorarios(context) async {
-    TimeOfDay? newTime =
-        await SeleccionFechaHora().seleccionHora(context) as TimeOfDay;
+    TimeOfDay? newTime = await SeleccionFechaHora().seleccionHora(context);
+    if (newTime != null) {
+      setState(() {
+        myLogic.textControllerHora.text =
+            ('${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}');
 
-    setState(() {
-      myLogic.textControllerHora.text =
-          ('${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}');
-
-      textoFechaHora =
-          ('$textoDia ${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}:00Z');
-    });
+        textoFechaHora =
+            ('$textoDia ${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}:00Z');
+      });
+    }
   }
 
   _validacionFecha(value) {

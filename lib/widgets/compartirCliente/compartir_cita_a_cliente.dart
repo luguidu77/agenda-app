@@ -1,12 +1,12 @@
-import 'package:agendacitas/models/perfil_model.dart';
-import 'package:agendacitas/models/personaliza_model.dart';
-
-import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+import '../../models/models.dart';
 import '../../providers/providers.dart';
+import '../../screens/screens.dart';
+import '../../utils/utils.dart';
+import '../widgets.dart';
 
 class CompartirCitaConCliente extends StatefulWidget {
   final String cliente;
@@ -34,6 +34,8 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
   bool pagado =
       true; //deshabilitado, por defecto la variable pagado=true; podria usarlo por ejemplo para hacer una alerta de comprar la app
   String? telefonoCodpais;
+
+  bool visible = true;
   compruebaPago() async {
     //   PagoProvider para obtener pago y el email del usuarioAPP
     final providerPagoUsuarioAPP =
@@ -43,15 +45,15 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
       pagado = providerPagoUsuarioAPP.pagado['pago'];
     });
 
-    print(
-        'datos gardados en tabla Pago (fichaClienteScreen.dart) PAGO: $pagado');
+    debugPrint(
+        'datos gardados en tabla Pago (fichaClienteScreen.dart) PAGO: ${pagado.toString()}');
   }
 
   _getCodPais() async {
     List<PersonalizaModel> data =
         await PersonalizaProvider().cargarPersonaliza();
     //COMPRUEBO QUE HAY UN CODIGO DE PAIS ESTABLECIDO PREVIAMENTE, SI NO , ESTABLEZCO EL 34 POR DEFECTO
-    //TODO: SI NO HAY CODIGO ESTABLECIDO, REDIRIGIR A PERSONALIZAR O TARJETA ESTABLECER CODIGO PAIS
+
     return (data.isNotEmpty) ? data[0].codpais : 34;
   }
 
@@ -89,135 +91,93 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
   Widget build(BuildContext context) {
     print(perfilUsuarioApp.telefono);
 
-    return Center(
-      child: Column(
-        children: [
-          const Text(
-            'Comparte la cita con tu client@',
-            style: TextStyle(
-                color: Colors.blueGrey,
-                fontWeight: FontWeight.bold,
-                fontSize: 15),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          GestureDetector(
-            onTap: () {
-              _enviarWhatsapp(perfilUsuarioApp, widget.cliente,
-                  telefonoCodpais!, widget.fechaCita, widget.servicio);
-            },
-            child: const Card(
-              child: ListTile(
-                title: Text('Whatsapp'),
-                trailing: Icon(Icons.messenger_outline_sharp),
-              ),
+    return Column(
+      children: [
+        const Text(
+          'Comparte la cita con tu client@',
+          style: TextStyle(
+              color: Colors.blueGrey,
+              fontWeight: FontWeight.bold,
+              fontSize: 15),
+        ),
+        // VISIBLE UNA TARJETA INFO SI NO HAY DENOMINACION DEL PERFIL DE USUARIO
+        if (perfilUsuarioApp.denominacion == '')
+          TarjetaInfo(
+              colorTexto: Colors.white,
+              colorTarjeta: const Color.fromARGB(83, 64, 88, 226),
+              icono: const FaIcon(FontAwesomeIcons.exclamation),
+              titulo: 'SUGERENCIA',
+              texto: 'Edita tu perfil para que se comparta en las citas',
+              accion: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ConfigUsuarioApp()))),
+        const SizedBox(
+          height: 10,
+        ),
+        GestureDetector(
+          onTap: () {
+            Comunicaciones().compartirCitaWhatsapp(
+                perfilUsuarioApp,
+                widget.cliente,
+                telefonoCodpais!,
+                widget.fechaCita,
+                widget.servicio);
+          },
+          child: const Card(
+            child: ListTile(
+              title: Text('Whatsapp'),
+              trailing: FaIcon(FontAwesomeIcons.whatsapp),
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              pagado
-                  ? (widget.email != '')
-                      ? _enviarEmail(widget.cliente, widget.email,
-                          widget.fechaCita, widget.servicio)
-                      : alertaNoEmail(context)
-                  : alerta(context);
-            },
-            child: const Card(
-              child: ListTile(
-                title: Text('Email'),
-                trailing: Icon(Icons.email),
-              ),
+        ),
+        GestureDetector(
+          onTap: () {
+            pagado
+                ? (widget.email != '')
+                    ? Comunicaciones().compartirCitaEmail(
+                        perfilUsuarioApp,
+                        widget.cliente,
+                        widget.email,
+                        widget.fechaCita,
+                        widget.servicio)
+                    : alertaNoEmail(context)
+                : alerta(context);
+          },
+          child: const Card(
+            child: ListTile(
+              title: Text('Email'),
+              trailing: FaIcon(FontAwesomeIcons.envelope),
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              pagado
-                  ? _enviarSms(widget.cliente, widget.telefono,
-                      widget.fechaCita, widget.servicio)
-                  : alerta(context); //  /utils/alertaNodisponible.dart
-            },
-            child: const Card(
-              child: ListTile(
-                title: Text('SMS'),
-                subtitle: Text(
-                  'El coste de SMS dependerá de su operadora telefónica',
-                  style: TextStyle(fontSize: 12, color: Colors.red),
-                ),
-                trailing: Icon(Icons.sms),
+        ),
+        GestureDetector(
+          onTap: () {
+            pagado
+                ? Comunicaciones().compartirCitaSms(
+                    perfilUsuarioApp,
+                    widget.cliente,
+                    widget.telefono,
+                    widget.fechaCita,
+                    widget.servicio)
+                : alerta(context); //  /utils/alertaNodisponible.dart
+          },
+          child: const Card(
+            child: ListTile(
+              title: Text('SMS'),
+              subtitle: Text(
+                'El coste de SMS dependerá de su operadora telefónica',
+                style: TextStyle(fontSize: 12, color: Colors.red),
               ),
+              trailing: FaIcon(FontAwesomeIcons.commentSms),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
-  }
-
-  String textoCompartir(PerfilModel perfilUsuarioApp, String clienta,
-      String fecha, String servicio) {
-    //EL MENSAJE CAMBIA SI HAY INICIADO UN USUARIO DE APP
-    if (perfilUsuarioApp.denominacion != '') {
-      return 'Hola $clienta,\n' +
-          'su cita ha sido reservada con ${perfilUsuarioApp.denominacion} para el día $fecha h.\n'
-              'Servicio a realizar : $servicio.\n\n'
-              'Si no pudieras asistir cancelala para que otra persona pueda aprovecharla.\n\n'
-              'Telefono: ${perfilUsuarioApp.telefono}\n'
-              'Web: ${perfilUsuarioApp.website}\n'
-              'Facebook: ${perfilUsuarioApp.facebook}\n'
-              'Instagram: ${perfilUsuarioApp.instagram}\n'
-              'Dónde estamos: ${perfilUsuarioApp.ubicacion}\n';
-    } else {
-      return 'Hola $clienta,\n'
-          'su cita ha sido reservada para el día $fecha h.\n'
-          'Servicio a realizar : $servicio.\n\n'
-          'Si no pudieras asistir cancelala para que otra persona pueda aprovecharla.';
-    }
-  }
-
-  _enviarWhatsapp(PerfilModel perfilUsuarioApp, String clienta, String telefono,
-      String fecha, String servicio) async {
-    String telef = '+$telefono';
-
-    String texto = textoCompartir(perfilUsuarioApp, clienta, fecha, servicio);
-
-    await launch('https://api.whatsapp.com/send?phone=$telef&text=$texto');
-  }
-
-  _enviarEmail(
-      String clienta, String email, String fecha, String servicio) async {
-    String? encodeQueryParameters(Map<String, String> params) {
-      return params.entries
-          .map((MapEntry<String, String> e) =>
-              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
-          .join('&');
-    }
-
-    String texto = textoCompartir(perfilUsuarioApp, clienta, fecha, servicio);
-    final Uri emailLaunchUri = Uri(
-      scheme: 'mailto',
-      path: email,
-      query: encodeQueryParameters(<String, String>{
-        'subject': texto,
-      }),
-    );
-
-    await launchUrl(emailLaunchUri);
-  }
-
-  _enviarSms(
-      String clienta, String telefono, String fecha, String servicio) async {
-    String texto = textoCompartir(perfilUsuarioApp, clienta, fecha, servicio);
-    final Uri smsLaunchUri = Uri(
-      scheme: 'sms',
-      path: telefono,
-      queryParameters: <String, String>{
-        'body': texto,
-      },
-    );
-
-    await launchUrl(smsLaunchUri);
   }
 }
+
 
 // para playStore hay se necesita solicitar permiso de usuario para SMS, y formularios para poder cambiar textos web y como llegar
 

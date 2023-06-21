@@ -8,6 +8,7 @@ import '../providers/theme_provider.dart';
 import '../widgets/widgets.dart';
 import 'screens.dart';
 
+// ignore: must_be_immutable
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key? key, required this.index}) : super(key: key);
   int index = 0;

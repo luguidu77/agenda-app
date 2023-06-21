@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/models.dart';
 import '../mylogic_formularios/mylogic.dart';
 import '../providers/providers.dart';
+import '../utils/optiene_numero_mayor_index_firebase.dart';
 
 class ConfigServiciosScreen extends StatefulWidget {
   const ConfigServiciosScreen({Key? key}) : super(key: key);
@@ -33,6 +34,8 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
   String idCategoriaElegida = '';
   String dropdownValue = '';
 
+  int indexMayor = 0;
+
   emailUsuario() async {
     //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
     final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
@@ -40,7 +43,9 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
     _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
     setState(() {});
     await cargarDatosCategorias();
-
+    indexMayor = await devuelveIndexMayorServicios(
+        _iniciadaSesionUsuario, _emailSesionUsuario);
+    print('index mayor de la lista : ----------------------$indexMayor');
     //DATA TRAIDA POR NAVIGATOR PUSHNAMED (ARGUMENTS)
     if (_iniciadaSesionUsuario) {
       dataFB = ModalRoute.of(context)!.settings.arguments as ServicioModelFB;
@@ -322,10 +327,10 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
     final tiempo = myLogicFB.textControllerTiempo.text;
     final precio = double.parse(myLogicFB.textControllerPrecio.text);
     final detalle = myLogicFB.textControllerDetalle.text;
-    final categoria = myLogicFB.textControllerCategoria.text;
+    final categoria = idCategoriaElegida;
 
-    FirebaseProvider().nuevoServicio(
-        usuarioApp, servicio, tiempo, precio, detalle, categoria);
+    FirebaseProvider().nuevoServicio(usuarioApp, servicio, tiempo, precio,
+        detalle, categoria, indexMayor + 1);
 
     Navigator.pushReplacementNamed(context, 'Servicios');
   }
@@ -339,6 +344,7 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
     auxservicio.detalle = myLogicFB.textControllerDetalle.text;
     auxservicio.activo = 'true';
     auxservicio.idCategoria = idCategoriaElegida;
+    auxservicio.index = 111;
     print(
         '----------------------------que idcategoria guarda   $idCategoriaElegida');
 
@@ -442,10 +448,11 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
           dropdownValue = newValue!;
           myLogicFB.textControllerCategoria.text = newValue;
 
-          int index = listNombreCategoriaServicios.indexOf(dropdownValue);
-          idCategoriaElegida = idCategoria[index];
+          int indexCategoriaElegida = listNombreCategoriaServicios.indexOf(dropdownValue);
+          idCategoriaElegida = idCategoria[indexCategoriaElegida];
 
           print(idCategoriaElegida);
+          print(indexCategoriaElegida);
           print(idCategoria);
         });
       },

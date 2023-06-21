@@ -297,8 +297,8 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
               onTap: () async {
                 const url =
                     'https://pages.flycricket.io/agenda-de-citas/privacy.html';
-                if (await canLaunch(url)) {
-                  await launch(url);
+                if (await launchUrl(Uri.parse(url))) {
+                  await launchUrl(Uri.parse(url));
                 } else {
                   throw 'Could not launch $url';
                 }
@@ -502,9 +502,8 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                 const url =
                     'https://pages.flycricket.io/agenda-de-citas/privacy.html';
                 // ignore: deprecated_member_use
-                if (await canLaunch(url)) {
-                  // ignore: deprecated_member_use
-                  await launch(url);
+                if (await launchUrl(Uri.parse(url))) {
+                  await launchUrl(Uri.parse(url));
                 } else {
                   throw 'Could not launch $url';
                 }

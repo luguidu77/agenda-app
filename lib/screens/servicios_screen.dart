@@ -1,3 +1,4 @@
+import 'package:agendacitas/screens/servicios_screen_draggable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
@@ -128,7 +129,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
               return const Text('Error');
             } else if (snapshot.hasData) {
               final data = snapshot.data;
-
+              print(data);
               // SI TENGO DATOS LOS VISUALIZO EN PANTALLA
               return _iniciadaSesionUsuario
                   ? verserviciosFB(context, data)
@@ -162,10 +163,10 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
 
   // SERVICIOS CON CATEGORIAS DESDE FIREBASE
   verserviciosFB(context, List<Map<String, dynamic>> listdataServicios) {
-    print('###########servicios:   $listdataServicios');
+    debugPrint('########### servicios:   ${listdataServicios.toString()}');
     //estructura recibida: [{sinCategoria: Instance of 'ServicioModelFB'}, {cat 2: Instance of 'ServicioModelFB'}, {cat 1: Instance of 'ServicioModelFB'}, {cat 1: Instance of 'ServicioModelFB'}]
 
-    /* 'id': e.id,
+    /*      'id': e.id,
             'servicio': e.servicio,
             'detalle': e.detalle,
             'tiempo': e.tiempo,
@@ -186,6 +187,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
                 'idCategoria': e['idcategoria'],
                 'nombreCategoria': e['nombreCategoria'],
                 'detalleCategoria': e['detalleCategoria'],
+                'index': e['index']
               }
             })
         .toList();
@@ -204,11 +206,14 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
       mapFilter[myMap['nombreCat']] = myMap;
     }
 
+// listFilter lista con las categorias filtrada que quita las repetidas -------------------------
     final List<Map<String, dynamic>> listFilter = mapFilter.keys
         .map((key) => mapFilter[key] as Map<String, dynamic>)
         .toList();
-    // listFilter lista filtrada que quita las repetidas -------------------------
-    return ListView(
+
+    return ServiciosScreenDraggable(servicios: listdataServicios, usuarioAPP: _emailSesionUsuario!,);
+
+    /* ListView(
         children: listFilter.map((cat) {
       return Column(
         children: [
@@ -242,7 +247,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
           }).toList())
         ],
       );
-    }).toList());
+    }).toList()); */
   }
 
 // SERVICIOS DE FIREBASE
@@ -255,7 +260,8 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
         precio: servicio['precio'],
         servicio: servicio['servicio'],
         tiempo: servicio['tiempo'],
-        idCategoria: servicio['idCategoria']);
+        idCategoria: servicio['idCategoria'],
+        index: servicio['index']);
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -494,9 +500,10 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
         'tiempo': e.tiempo,
         'precio': e.precio,
         'activo': e.activo,
+        'index': e.index, // para reordenar la lista
         'idcategoria': categoria['id'],
         'nombreCategoria': categoria['nombreCategoria'],
-        'detalleCategoria': categoria['detalle']
+        'detalleCategoria': categoria['detalle'],
       };
 
       data.add(newSerCat);

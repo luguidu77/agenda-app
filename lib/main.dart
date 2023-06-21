@@ -6,10 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter_stripe/flutter_stripe.dart'; 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
-
 
 import 'models/models.dart';
 import 'providers/providers.dart';
@@ -24,7 +23,7 @@ import 'widgets/formulariosSessionApp/registro_usuario_screen.dart'; //utilizado
 //?            quitar PAGADO DEL home.dart -->> PagoProvider().guardaPagado(true);
 //?            comprobar pago STRIPE en PRODUCTION google_pay_payment_profile.json y variables en wallet/ tarjetaPago.dart
 //?     flutter build appbundle
-//?     C:\ProyectosFutter\agenda3\build\app\outputs\bundle\release
+//?             C:\ProyectosFutter\agenda3\build\app\outputs\bundle\release
 //      VER SOLUCIONES DE ERRORES README.md
 //! GITHUB :
 /* 
@@ -93,7 +92,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   inicializacion() async {
-     FlutterNativeSplash.remove();
+    FlutterNativeSplash.remove();
     //?comprueba pago en dispositivo
     final pago = await CompruebaPago.getPagoEmailDispositivo();
     debugPrint('datos gardados en tabla Pago (main.dart) $pago');
@@ -172,7 +171,9 @@ class _MyAppState extends State<MyApp> {
               'Login': (context) =>
                   RegistroUsuarioScreen(registroLogin: 'Login', usuarioAPP: ''),
               'Bienvenida': (context) => const Bienvenida(),
-              'home': (BuildContext context) =>  HomeScreen(index: 0,),
+              'home': (BuildContext context) => HomeScreen(
+                    index: 0,
+                  ),
               'InicioConfigApp': (context) =>
                   const InicioConfigApp(usuarioAPP: ''),
 

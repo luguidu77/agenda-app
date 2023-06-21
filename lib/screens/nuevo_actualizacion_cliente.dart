@@ -257,7 +257,7 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
                     decoration: const InputDecoration(labelText: 'Telefono'),
                   ),
                   TextFormField(
-                    validator: (value) => _validacion(value),
+                    //validator: (value) => _validacion(value),
                     keyboardType: TextInputType.emailAddress,
                     controller: myLogic.textControllerEmail,
                     decoration: const InputDecoration(labelText: 'Email'),

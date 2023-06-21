@@ -295,7 +295,8 @@ class SincronizarFirebase {
                 'precio': e.precio,
                 'detalle': e.detalle,
                 'activo': e.activo,
-                'categoria': 'sincategoria'
+                'categoria': 'sincategoria',
+                'index': 1
               })
           .toList();
       print('servicios en el telefono :$serviciosDispositivo');
@@ -308,7 +309,8 @@ class SincronizarFirebase {
           'precio': servicio['precio'],
           'detalle': servicio['detalle'],
           'activo': servicio['activo'],
-          'categoria': servicio['categoria']
+          'categoria': servicio['categoria'],
+          'index': servicio['index']
         };
         await docRef.doc(id.toString()).set(data);
       }

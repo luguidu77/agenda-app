@@ -1,4 +1,3 @@
-import 'package:agendacitas/providers/personaliza_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -6,6 +5,8 @@ import '../models/cita_model.dart';
 import '../models/personaliza_model.dart';
 
 import '../mylogic_formularios/mylogic.dart';
+import '../providers/providers.dart';
+import '../utils/utils.dart';
 import '../widgets/botones/form_reprogramar_reserva.dart';
 import '../widgets/compartirCliente/compartir_cita_a_cliente.dart';
 
@@ -248,7 +249,9 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Comunicaciones.hacerLlamadaTelefonica(telefono.toString());
+                },
                 icon: const Icon(Icons.phone),
                 label: Text(
                   telefono!,
@@ -256,7 +259,9 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                       fontSize: 15, fontWeight: FontWeight.bold),
                 )),
             ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Comunicaciones.enviarEmail(email.toString());
+                },
                 icon: const Icon(Icons.mail),
                 label: Text(
                   email!,

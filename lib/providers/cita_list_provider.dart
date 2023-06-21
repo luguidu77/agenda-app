@@ -67,13 +67,17 @@ class CitaListProvider extends ChangeNotifier {
   }
 
   Future<ServicioModel> nuevoServicio(String servicio, String tiempo,
-      double precio, String detalle, String activo) async {
+      double precio, String detalle, String activo, ) async {
+
+
+        
     final nuevoServicio = new ServicioModel(
         servicio: servicio,
         tiempo: tiempo,
         precio: precio,
         detalle: detalle,
-        activo: activo);
+        activo: activo,
+        );
 
     final id = await DBProvider.db.nuevoServicio(nuevoServicio);
 

@@ -119,8 +119,8 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
                               onPressed: () async {
                                 const url =
                                     'https://buy.stripe.com/4gwcPE5XdeEecGA001';
-                                if (await canLaunch(url)) {
-                                  await launch(url);
+                                if (await launchUrl(Uri.parse(url))) {
+                                  await launchUrl(Uri.parse(url));
                                 } else {
                                   throw 'Could not launch $url';
                                 }

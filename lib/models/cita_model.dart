@@ -166,16 +166,17 @@ class ServicioModelFB {
   String? detalle;
   String? activo;
   String? idCategoria;
+  int? index;
 
-  ServicioModelFB({
-    this.id,
-    this.servicio,
-    this.tiempo,
-    this.precio,
-    this.detalle,
-    this.activo,
-    this.idCategoria,
-  });
+  ServicioModelFB(
+      {this.id,
+      this.servicio,
+      this.tiempo,
+      this.precio,
+      this.detalle,
+      this.activo,
+      this.idCategoria,
+      this.index});
 
   factory ServicioModelFB.fromJson(Map<String, dynamic> json) =>
       ServicioModelFB(
@@ -186,6 +187,7 @@ class ServicioModelFB {
         detalle: json["detalle"],
         activo: json["activo"],
         idCategoria: json["categoria"],
+        index: json["index"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -196,6 +198,7 @@ class ServicioModelFB {
         "detalle": detalle,
         "activo": activo,
         "categoria": idCategoria,
+        "index": index,
       };
 }
 

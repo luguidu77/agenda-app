@@ -451,6 +451,23 @@ class FirebaseProvider extends ChangeNotifier {
     return listaCategoriaServicios;
   }
 
+  Future<List> cargarCategorias(emailUsuario) async {
+    List listaCategoriaServicios = [];
+
+    await _iniFirebase();
+
+    final docRef =
+        await _referenciaDocumento(emailUsuario, 'categoriaServicio');
+
+    QuerySnapshot queryCat = await docRef.get();
+
+    queryCat.docs.forEach((element) {
+      listaCategoriaServicios.add(element.data());
+    });
+
+    return listaCategoriaServicios;
+  }
+
   cargarCategoriaServiciosID(emailUsuario, String idCategoria) async {
     Map<String, dynamic> data = {};
 
@@ -581,6 +598,17 @@ class FirebaseProvider extends ChangeNotifier {
     await docRef.doc(cita.id.toString()).update(newCita);
   }
 
+  buscarIndiceCategoria(emailUsuario, idCategoria) async {
+    await _iniFirebase();
+    final docRef = await _referenciaDocumento(emailUsuario, 'servicio');
+    QuerySnapshot snapshot =
+        await docRef.where('categoria', isEqualTo: idCategoria).get();
+
+    List<QueryDocumentSnapshot> documentos = snapshot.docs;
+
+    return 'id buscado de firebase';
+  }
+
   buscarDocumento(emailUsuario, indexItem) async {
     await _iniFirebase();
     final docRef = await _referenciaDocumento(emailUsuario, 'servicio');
@@ -631,7 +659,7 @@ class FirebaseProvider extends ChangeNotifier {
         .update({'index': oldIndexAdaptado});
   }
 
-  actualizarServicio(String usuarioAPP, ServicioModelFB servicio) async {
+  /* actualizarServicio(String usuarioAPP, ServicioModelFB servicio) async {
     print(servicio.servicio);
     Map<String, Object?> newServicio = {
       'activo': servicio.activo,
@@ -645,7 +673,7 @@ class FirebaseProvider extends ChangeNotifier {
     await _iniFirebase();
     final docRef = await _referenciaDocumento(usuarioAPP, 'servicio');
     await docRef.doc(servicio.id.toString()).update(newServicio);
-  }
+  } */
 
   actualizarServicioFB(String usuarioAPP, ServicioModelFB servicio) async {
     print(servicio.servicio);

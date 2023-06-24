@@ -524,6 +524,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
 
   void _irPaginaCreacionCuenta(email, password) {
     FocusScope.of(context).unfocus();
+
     Navigator.pushNamed(context, 'paginaIconoAnimacion', arguments: email);
     Navigator.push(
       context,
@@ -588,15 +589,15 @@ class TextoDiasDePrueba extends StatelessWidget {
                   style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
                 ),
                 const TextSpan(
-                  text: ' un sólo pago de 9 euros sin suscripción ',
+                  text: ' un sólo pago sin suscripción ',
                   style: TextStyle(
                       color: Color.fromARGB(255, 41, 22, 151),
                       fontWeight: FontWeight.bold),
                 ),
-                const TextSpan(
+                /*  const TextSpan(
                   text: '(precio de lanzamiento)',
                   style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
-                ),
+                ), */
               ]),
         ));
   }

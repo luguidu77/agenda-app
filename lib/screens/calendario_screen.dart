@@ -99,7 +99,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
     _estadoPagadaApp = estadoPagoProvider.estadoPagoApp;
 
     if (_estadoPagadaApp == 'PRUEBA_CADUCADA' && mounted) {
-      Future.delayed(const Duration(seconds: 5), () {
+      Future.delayed(const Duration(seconds: 10), () {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

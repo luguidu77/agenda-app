@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -73,53 +74,57 @@ class _ConfigCategoriaServiciosScreenState
                     ? agregaCategoria(_emailSesionUsuario!)
                     : modificarCategoria(_emailSesionUsuario!,
                         dataFB); // METODO MODIFICAR SERVICIO
+
+                setState(() {});
               }
             },
             child: const Icon(Icons.save),
           ),
-          body: _formularioFB(
-              context, agregaModificaFB)), // todo Categorias no servicios
+          body: _formularioFB(context, agregaModificaFB)),
     );
   }
 
   _formularioFB(context, agregaModificaFB) {
     return Padding(
       padding: const EdgeInsets.all(18.0),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            _botonCerrar(),
-            const SizedBox(height: 10),
-            Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    Text(
-                      (agregaModificaFB)
-                          ? "Agregar categoría "
-                          : 'Editar categoría',
-                      style: const TextStyle(fontSize: 28),
-                    ),
-                    const SizedBox(
-                      height: 50,
-                    ),
-                    TextFormField(
-                      validator: (value) => _validacion(value),
-                      controller: myLogic.textControllerNombreCategoria,
-                      decoration: const InputDecoration(labelText: 'Categoría'),
-                    ),
-                    TextFormField(
-                      validator: (value) => _validacion(value),
-                      controller: myLogic.textControllerDetalle,
-                      decoration: const InputDecoration(labelText: 'Detalle'),
-                    ),
-                  ],
-                )),
-            const SizedBox(height: 150)
-          ],
-        ),
+      child: Column(
+        children: [
+          _botonCerrar(),
+          const SizedBox(height: 10),
+          _formulario(agregaModificaFB),
+          const SizedBox(height: 20),
+          const Text('Categorias disponibles'),
+          const SizedBox(height: 10),
+          _listaCategorias()
+        ],
       ),
     );
+  }
+
+  Form _formulario(agregaModificaFB) {
+    return Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            Text(
+              (agregaModificaFB) ? "Agregar categoría " : 'Editar categoría',
+              style: const TextStyle(fontSize: 28),
+            ),
+            const SizedBox(
+              height: 50,
+            ),
+            TextFormField(
+              validator: (value) => _validacion(value),
+              controller: myLogic.textControllerNombreCategoria,
+              decoration: const InputDecoration(labelText: 'Categoría'),
+            ),
+            TextFormField(
+              validator: (value) => _validacion(value),
+              controller: myLogic.textControllerDetalle,
+              decoration: const InputDecoration(labelText: 'Detalle'),
+            ),
+          ],
+        ));
   }
 
   agregaCategoria(String usuarioAPP) async {
@@ -209,5 +214,34 @@ class _ConfigCategoriaServiciosScreenState
     mensajeSuccess(context, texto);
   }
 
+  _listaCategorias() {
+    return Flexible(
+      child: FutureBuilder(
+        future: FirebaseProvider().cargarCategorias(_emailSesionUsuario),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text('Error al cargar los datos');
+          }
 
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const LinearProgressIndicator();
+          }
+
+          return ListView(
+            children: snapshot.data!.map((document) {
+              return Text(
+                document['nombreCategoria'],
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Colors.blueGrey),
+              )
+                  //subtitle: Text(data['campo2']),
+                  ;
+            }).toList(),
+          );
+        },
+      ),
+    );
+  }
 }

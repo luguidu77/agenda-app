@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:agendacitas/screens/screens.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -58,7 +59,13 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
           title: const Text('Versión PRO'),
           actions: [
             IconButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const Bienvenida(
+                              // usuarioAPP: email,
+                              )),
+                    ),
                 icon: const Icon(Icons.close)),
             const SizedBox(
               width: 10,

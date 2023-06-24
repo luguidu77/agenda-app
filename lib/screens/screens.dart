@@ -11,7 +11,7 @@ export 'package:agendacitas/screens/disponibilidad_semanal_screen.dart';
 export 'package:agendacitas/screens/fechas_no_disponibles.dart';
 export 'package:agendacitas/screens/ficha_cliente_screen.dart';
 export 'package:agendacitas/screens/detalles_cita_screen.dart';
-export 'package:agendacitas/screens/finalizacion_prueba.dart';
+export 'package:agendacitas/screens/finalizacion_prueba_screen.dart';
 export 'package:agendacitas/screens/instruccion_registro_nuevo_usuario.dart';
 export 'package:agendacitas/screens/menu_aplicacion.dart';
 export 'package:agendacitas/screens/nuevo_actualizacion_cliente.dart';

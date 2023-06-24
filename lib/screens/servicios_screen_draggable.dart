@@ -123,7 +123,10 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
         padding: const EdgeInsets.all(8),
         child: Text(
           list.header,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              color: Colors.blueGrey),
         ),
       ),
       children: list.items.map((item) {
@@ -141,17 +144,33 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
 
         // #####################   TARJETAS DE SERVICIOS ###############################
         return DragAndDropItem(
-            canDrag: true,
+            canDrag: canDrag,
             child: GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, 'configServicios',
                     arguments: servicioFB);
               },
               child: ListTile(
-                title: Text(item.title),
+                title: Text(
+                  item.title,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                ),
                 //leading: Text(item.leading),
-                subtitle: Text(item.subtitle.toString()),
-                //trailing: const Icon(Icons.move_down_rounded),
+                subtitle: Text(
+                  item.subtitle.toString(),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.blueGrey),
+                ),
+                trailing: Text(
+                  item.tiempo.toString(),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.blueGrey),
+                ), //const Icon(Icons.move_down_rounded),
               ),
             ));
       }).toList(),
@@ -174,12 +193,15 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
     int newItemIndex,
     int newListIndex,
   ) async {
-    final int newIndexAdaptado =
+/*     final int newIndexAdaptado =
         newListIndex != 0 ? newItemIndex + newListIndex * 100 : newItemIndex;
     final int oldIndexAdaptado =
-        oldListIndex != 0 ? oldItemIndex + oldListIndex * 100 : oldItemIndex;
+        oldListIndex != 0 ? oldItemIndex + oldListIndex * 100 : oldItemIndex; */
+    final oldIndexAdaptado = 100;
+    final newIndexAdaptado = 101;
     var oldIdServicio = await buscaDocumento(oldIndexAdaptado);
     var newIdServicio = await buscaDocumento(newIndexAdaptado);
+
     setState(() {
       final oldListItems = listCategorias[oldListIndex].children;
       final newListItems = listCategorias[newListIndex].children;
@@ -189,14 +211,19 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
 
       debugPrint(widget.servicios.toString());
       debugPrint(
-          'oldListIndex: INDICE LISTA OLD------------------------${oldListIndex..toString()}');
+          'oldListIndex: INDICE LISTA OLD------------------------${oldListIndex.toString()}');
       debugPrint(
-          'newListIndex: INDICE LISTA NEW------------------------${newListIndex..toString()}');
+          'newListIndex: INDICE LISTA NEW------------------------${newListIndex.toString()}');
 
       debugPrint(
           'oldItemIndes: INDECE ITEM OLD POSICION :  ${oldItemIndex.toString()}');
       debugPrint(
           'newItemIndes: INDECE ITEM NEW POSICION :  ${newItemIndex.toString()}');
+
+      debugPrint(
+          'oldItemIndes: INDECE ITEM OLD POSICION  adaptado:  ${oldIndexAdaptado.toString()}');
+      debugPrint(
+          'newItemIndes: INDECE ITEM NEW POSICION adaptado:  ${newIndexAdaptado.toString()}');
 
       debugPrint(' oldIdServicio: ID DEL SERVICIO INICIO ${oldIdServicio}');
       debugPrint(' oldIdServicio: ID DEL SERVICIO FIANL ${newIdServicio}');
@@ -204,7 +231,7 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
 
       if (oldListIndex == newListIndex) {
         // PERMITE MODIFICAR SI SON ITEM DE LA MISMA LISTA
-        FirebaseProvider().modificaIndexServicio(
+        /*   FirebaseProvider().modificaIndexServicio(
             widget.usuarioAPP,
             oldIdServicio,
             newIdServicio,
@@ -212,7 +239,7 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
             newItemIndex,
             oldListIndex,
             newListIndex);
-
+ */
         final movedItem = oldListItems.removeAt(oldItemIndex);
         newListItems.insert(newItemIndex, movedItem);
       } else {

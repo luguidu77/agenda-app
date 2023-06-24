@@ -43,9 +43,7 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
     _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
     setState(() {});
     await cargarDatosCategorias();
-    indexMayor = await devuelveIndexMayorServicios(
-        _iniciadaSesionUsuario, _emailSesionUsuario);
-    print('index mayor de la lista : ----------------------$indexMayor');
+
     //DATA TRAIDA POR NAVIGATOR PUSHNAMED (ARGUMENTS)
     if (_iniciadaSesionUsuario) {
       dataFB = ModalRoute.of(context)!.settings.arguments as ServicioModelFB;
@@ -443,18 +441,24 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
           child: Text(value),
         );
       }).toList(),
-      onChanged: (String? newValue) {
+      onChanged: (String? newValue) async {
+        late int indexCategoriaElegida;
         setState(() {
           dropdownValue = newValue!;
           myLogicFB.textControllerCategoria.text = newValue;
 
-          int indexCategoriaElegida = listNombreCategoriaServicios.indexOf(dropdownValue);
+          indexCategoriaElegida =
+              listNombreCategoriaServicios.indexOf(dropdownValue);
           idCategoriaElegida = idCategoria[indexCategoriaElegida];
 
           print(idCategoriaElegida);
           print(indexCategoriaElegida);
           print(idCategoria);
         });
+        // envio el indexCategoriaElegida para devolver el index mayor dependiendo de la categoria elegida
+        indexMayor = await devuelveIndexMayorServicios(
+            _iniciadaSesionUsuario, _emailSesionUsuario, indexCategoriaElegida);
+        print('index mayor de la lista : ----------------------$indexMayor');
       },
     );
   }

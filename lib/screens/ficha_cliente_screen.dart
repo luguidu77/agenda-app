@@ -12,6 +12,7 @@ import 'package:skeletons/skeletons.dart';
 
 import '../models/personaliza_model.dart';
 import '../providers/providers.dart';
+import '../utils/utils.dart';
 
 class FichaClienteScreen extends StatefulWidget {
   final ClienteModel clienteParametro;
@@ -157,21 +158,6 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
                     ],
                   ),
                 )),
-            /*  Align(
-                alignment: AlignmentDirectional.center,
-                child: TabBar(
-                    indicatorColor: Colors.white,
-                    isScrollable: true,
-                    tabs: [
-                      Tab(
-                        text: 'Datos',
-                      ),
-                      Tab(
-                        text: 'Historial',
-                      ),
-                    ]),
-              ),
-            ), */
             SliverToBoxAdapter(
               child: SizedBox(
                 height: 800,
@@ -256,82 +242,185 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
       },
       icon: const Icon(
         Icons.edit,
-        color: Colors.black12,
+        color: Color.fromARGB(171, 231, 224, 224),
       ),
     );
   }
 
   _datos(ClienteModel cliente, bool pagado) {
-    var estiloTelEmail = const TextStyle(fontSize: 14);
-    var estiloNombre = const TextStyle(fontSize: 18);
+    var estiloNombre = const TextStyle(
+        fontSize: 18,
+        color: Color.fromARGB(171, 231, 224, 224),
+        fontWeight: FontWeight.bold);
+    var estiloTelEmail = const TextStyle(
+        fontSize: 18,
+        color: Color.fromARGB(171, 231, 224, 224),
+        fontWeight: FontWeight.bold);
+    var estiloNotas = const TextStyle(
+        fontSize: 18, color: Color.fromARGB(171, 231, 224, 224));
     // int numCitas = citas.length;
 
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          //nivelCliente(iniciadaSesionUsuario, usuarioAPP, cliente),
-          Row(
-            children: [
-              Text(
-                '${cliente.nombre}',
-                style: estiloNombre,
-              ),
-              iconoModificar(),
-            ],
-          ),
-          const SizedBox(height: 50),
-          Row(
-            children: [
-              const Icon(Icons.phone),
-              const SizedBox(
-                width: 20,
-              ),
-              Text(
-                '${cliente.telefono}',
-                style: estiloTelEmail,
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Row(
-            children: [
-              const Icon(Icons.mail),
-              const SizedBox(
-                width: 20,
-              ),
-              Text(
-                cliente.email ?? '---',
-                style: estiloTelEmail,
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Column(
-            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Row(
-                children: [
-                  Icon(Icons.info),
-                  SizedBox(
-                    width: 20,
+    return Column(
+      children: [
+        SizedBox(
+          height: 350,
+          child: Card(
+            color: const Color.fromARGB(179, 56, 34, 155),
+            elevation: 4, // Elevación de la tarjeta
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10), // Bordes redondeados
+            ),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      iconoModificar(),
+                    ],
                   ),
-                  Text('Información:'),
-                ],
-              ),
-              Text(
-                cliente.nota ?? '---',
-              ),
-            ],
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.only(top: 00.0),
+                  child: Text(
+                    '${cliente.nombre}',
+                    style: estiloNombre,
+                  ),
+                ),
+                const SizedBox(width: 16), // Espacio entre las columnas
+                const Divider(
+                  color: Colors.white,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 50.0, left: 20),
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Comunicaciones.hacerLlamadaTelefonica(
+                            cliente.telefono.toString()),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.phone), // Icono de teléfono
+                            const SizedBox(
+                                width: 8), // Espacio entre el icono y el texto
+                            Text(
+                              '${cliente.telefono}',
+                              style: estiloTelEmail,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      GestureDetector(
+                        onTap: () => Comunicaciones.enviarEmail(
+                            cliente.email.toString()),
+                        child: Row(
+                          children: [
+                            const Icon(
+                                Icons.email), // Icono de correo electrónico
+                            const SizedBox(
+                                width: 8), // Espacio entre el icono y el texto
+                            Text(
+                              cliente.email == '' ? 'Email' : cliente.email!,
+                              style: estiloTelEmail,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Row(
+                        children: [
+                          const Icon(Icons.notes), // Icono de notas
+                          const SizedBox(
+                              width: 8), // Espacio entre el icono y el texto
+                          Text(
+                            cliente.nota == '' ? 'Notas' : cliente.nota!,
+                            style: estiloNotas,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            /* Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                //nivelCliente(iniciadaSesionUsuario, usuarioAPP, cliente),
+                Row(
+                  children: [
+                    Text(
+                      '${cliente.nombre}',
+                      style: estiloNombre,
+                    ),
+                    iconoModificar(),
+                  ],
+                ),
+                const SizedBox(height: 50),
+                Row(
+                  children: [
+                    const Icon(Icons.phone),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Text(
+                      '${cliente.telefono}',
+                      style: estiloTelEmail,
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  children: [
+                    const Icon(Icons.mail),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Text(
+                      cliente.email ?? '---',
+                      style: estiloTelEmail,
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Column(
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.info),
+                        SizedBox(
+                          width: 20,
+                        ),
+                        Text('Información:'),
+                      ],
+                    ),
+                    Text(
+                      cliente.nota ?? '---',
+                    ),
+                  ],
+                ),
+              ],
+            ), */
           ),
-        ],
-      ),
+        ),
+        SizedBox(
+          height: 100,
+        )
+      ],
     );
   }
 

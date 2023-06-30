@@ -600,11 +600,10 @@ class FirebaseProvider extends ChangeNotifier {
 
   buscarIndiceCategoria(emailUsuario, idCategoria) async {
     await _iniFirebase();
-    final docRef = await _referenciaDocumento(emailUsuario, 'servicio');
-    QuerySnapshot snapshot =
-        await docRef.where('categoria', isEqualTo: idCategoria).get();
+    // final docRef = await _referenciaDocumento(emailUsuario, 'servicio');
+    // QuerySnapshot snapshot =  await docRef.where('categoria', isEqualTo: idCategoria).get();
 
-    List<QueryDocumentSnapshot> documentos = snapshot.docs;
+    /// List<QueryDocumentSnapshot> documentos = snapshot.docs;
 
     return 'id buscado de firebase';
   }

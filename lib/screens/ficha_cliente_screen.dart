@@ -22,7 +22,8 @@ class FichaClienteScreen extends StatefulWidget {
   State<FichaClienteScreen> createState() => _FichaClienteScreenState();
 }
 
-class _FichaClienteScreenState extends State<FichaClienteScreen> {
+class _FichaClienteScreenState extends State<FichaClienteScreen>
+    with SingleTickerProviderStateMixin {
   final ImagePicker _picker = ImagePicker();
   final List<Map<String, dynamic>> _citas = [];
   PagoProvider? data;
@@ -31,6 +32,9 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
   bool _iniciadaSesionUsuario = false;
   XFile? _image;
   PersonalizaModel personaliza = PersonalizaModel();
+
+  List<bool> isSelected = [true, false];
+  TabController? tabController;
 
   getPersonaliza() async {
     List<PersonalizaModel> data =
@@ -56,8 +60,15 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
   void initState() {
     getPersonaliza();
     compruebaPago();
+    tabController = TabController(length: 2, vsync: this);
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    tabController!.dispose();
+    super.dispose();
   }
 
   @override
@@ -77,7 +88,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
                   onPressed: () => Navigator.pushReplacementNamed(context, '/'),
                   //  Navigator.pushNamed(context, 'clientesScreen'),
                   icon: const Icon(Icons.arrow_back)),
-              actions: [iconoModificar()],
+              //  actions: [iconoModificar()],
               elevation: 0.0,
               pinned: true,
               // backgroundColor: Colors.deepPurple,
@@ -104,15 +115,49 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
                       ),
               ),
             ),
-            const SliverAppBar(
-              // backgroundColor: Color.fromARGB(59, 119, 117, 117),
-              automaticallyImplyLeading: false,
-              pinned: true,
-              primary: false,
-              elevation: 8.0,
+            SliverAppBar(
+                toolbarHeight: 80,
+                forceMaterialTransparency: true,
+                automaticallyImplyLeading: false,
+                pinned: true,
+                primary: false,
+                elevation: 0.0,
+                title: Align(
+                  alignment: AlignmentDirectional.center,
+                  child: ToggleButtons(
+                    color: Colors.black.withOpacity(0.60),
+                    selectedColor: const Color(0xFF6200EE),
+                    selectedBorderColor: const Color(0xFF6200EE),
+                    fillColor: const Color(0xFF6200EE).withOpacity(0.08),
+                    splashColor: const Color(0xFF6200EE).withOpacity(0.12),
+                    hoverColor: const Color(0xFF6200EE).withOpacity(0.04),
+                    borderRadius: BorderRadius.circular(4.0),
+                    isSelected: isSelected,
+                    onPressed: (i) {
+                      // Respond to button selection
+                      setState(() {
+                        switch (i) {
+                          case 0:
+                            isSelected = [true, false];
+                            tabController!.index = 0;
 
-              // backgroundColor: Colors.deepPurple,
-              title: Align(
+                          case 1:
+                            isSelected = [false, true];
+                            tabController!.index = 1;
+                          default:
+                        }
+
+                        // isSelected[index] = !isSelected[index];
+                      });
+                    },
+                    children: const [
+                      Icon(Icons.person),
+                      Icon(Icons.calendar_month),
+                      // Icon(Icons.notifications),
+                    ],
+                  ),
+                )),
+            /*  Align(
                 alignment: AlignmentDirectional.center,
                 child: TabBar(
                     indicatorColor: Colors.white,
@@ -126,13 +171,14 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
                       ),
                     ]),
               ),
-            ),
+            ), */
             SliverToBoxAdapter(
               child: SizedBox(
                 height: 800,
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: TabBarView(
+                      controller: tabController,
                       // physics: ScrollPhysics(),
                       children: [
                         _datos(
@@ -195,7 +241,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
 
   iconoModificar() {
     return IconButton(
-      iconSize: 50,
+      iconSize: 30,
       onPressed: () async {
         Navigator.pushReplacement(
           context,
@@ -209,7 +255,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
         );
       },
       icon: const Icon(
-        Icons.settings,
+        Icons.edit,
         color: Colors.black12,
       ),
     );
@@ -227,9 +273,14 @@ class _FichaClienteScreenState extends State<FichaClienteScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           //nivelCliente(iniciadaSesionUsuario, usuarioAPP, cliente),
-          Text(
-            '${cliente.nombre}',
-            style: estiloNombre,
+          Row(
+            children: [
+              Text(
+                '${cliente.nombre}',
+                style: estiloNombre,
+              ),
+              iconoModificar(),
+            ],
           ),
           const SizedBox(height: 50),
           Row(

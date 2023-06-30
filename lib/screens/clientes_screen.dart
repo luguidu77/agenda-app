@@ -32,6 +32,8 @@ class _ClientesScreenState extends State<ClientesScreen> {
     super.initState();
   }
 
+  Color colorbotones = const Color.fromARGB(255, 96, 125, 139);
+
   List<int> numCitas = [];
   TextEditingController busquedaController = TextEditingController();
   //String usuarioAPP = '';
@@ -120,7 +122,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
       ),
 
       //drawer: const MenuDrawer(), //menuDrawer(context),
-      appBar: AppBar(
+      /*  appBar: AppBar(
           backgroundColor: colorTema,
           automaticallyImplyLeading: false,
           title: const Text('Clientes'),
@@ -129,19 +131,21 @@ class _ClientesScreenState extends State<ClientesScreen> {
               bottom: Radius.circular(20),
             ),
           ),
-          actions: const [ChangeThemeButtonWidget()]),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                _textoBusqueda(),
-              ],
+          actions: const [ChangeThemeButtonWidget()]), */
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  _textoBusqueda(),
+                ],
+              ),
             ),
-          ),
-          _listaClientes(),
-        ],
+            _listaClientes(),
+          ],
+        ),
       ),
     );
   }
@@ -246,12 +250,13 @@ class _ClientesScreenState extends State<ClientesScreen> {
                             ),
                       title: Text(listaClientes[index].nombre.toString()),
                       subtitle: Text(listaClientes[index].telefono.toString()),
-                      trailing: ElevatedButton.icon(
-                          style: ButtonStyle(
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0),
+                      trailing: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: colorbotones,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(2),
                               ),
                             ),
                           ),
@@ -269,12 +274,15 @@ class _ClientesScreenState extends State<ClientesScreen> {
                             );
                           },
                           icon: const Icon(Icons.calendar_today_outlined),
-                          label: const Text('dar cita')),
+                          label: const Text('CITAR')),
                     ),
                     Row(
                       children: [
                         //? BOTON TELEFONO DE EDICION RAPIDA DE NOMBRE Y TELEFONO
                         TextButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: colorbotones,
+                            ),
                             onPressed: () => setState(() {
                                   _cardConfigCliente(
                                       context, listaClientes[index]);
@@ -283,6 +291,9 @@ class _ClientesScreenState extends State<ClientesScreen> {
                             label: const Text('')),
                         //? BOTON ACCESO A DATOS DEL CLIENTE Y SU HISTORIAL
                         TextButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: colorbotones,
+                            ),
                             onPressed: () {
                               //1ºrefresco los datos cliente por si han sido editados
                               datosClientes(_emailSesionUsuario);

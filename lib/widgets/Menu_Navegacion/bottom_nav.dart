@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 
 class BNavigator extends StatefulWidget {
   final Function currentIndex;
@@ -14,47 +15,59 @@ class _BNavigatorState extends State<BNavigator> {
   @override
   Widget build(BuildContext context) {
     Color colorTema = Theme.of(context).primaryColor;
-    return Builder(
-      builder: (context) => BottomAppBar(
-          shape: const CircularNotchedRectangle(), //shape of notch
-          notchMargin: 5,
-          //color: Colors.blueGrey,
-          child: Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 78.0),
-                  child: BottomNavigationBar(
-                    selectedItemColor: colorTema,
-                      currentIndex: index,
-                      onTap: (int i) {
-                        setState(() {
-                          index = i;
-                          widget.currentIndex(i);
-                        });
-                      },
-                      backgroundColor: const Color.fromARGB(0, 255, 255, 255),
-                      elevation: 0.0,
-                      type: BottomNavigationBarType.fixed,
-                      iconSize: 35.0,
-                      selectedFontSize: 14.0,
-                      unselectedFontSize: 12.0,
-                      //  backgroundColor: Colors.red,
-                      items: const [
-                        BottomNavigationBarItem(
-                            icon: Icon(Icons.calendar_month_outlined),
-                            label: 'Citas'),
-                        BottomNavigationBarItem(
-                            icon: Icon(Icons.bar_chart), label: 'Informe'),
-                        BottomNavigationBarItem(
-                            icon: Icon(Icons.people_alt), label: 'Clientes'),
-                        BottomNavigationBarItem(
-                            icon: Icon(Icons.menu), label: 'Menu'),
-                      ]),
-                ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 20,
+            color: Colors.black.withOpacity(.1),
+          )
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
+        child: GNav(
+            rippleColor: Colors.grey[300]!,
+            hoverColor: Colors.grey[100]!,
+            backgroundColor: Colors.transparent,
+            iconSize: 24,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+            gap: 8,
+            duration: const Duration(milliseconds: 900),
+            tabBackgroundColor: colorTema.withOpacity(0.3),
+            color: Colors.grey,
+            activeColor: Colors.white,
+            curve: Curves.easeInCubic,
+            tabBorderRadius: 15,
+
+            //tabMargin: EdgeInsets.zero,
+            tabs: const [
+              GButton(
+                icon: Icons.calendar_month_outlined,
+                text: 'Citas',
+              ),
+              GButton(
+                icon: Icons.bar_chart,
+                text: 'Informe',
+              ),
+              GButton(
+                icon: Icons.people_alt,
+                text: 'Clientes',
+              ),
+              GButton(
+                icon: Icons.menu,
+                text: 'Menu',
               ),
             ],
-          )),
+            selectedIndex: index,
+            onTabChange: (i) {
+              setState(() {
+                index = i;
+                widget.currentIndex(i);
+              });
+            }),
+      ),
     );
   }
 }

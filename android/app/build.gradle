@@ -60,8 +60,8 @@ android {
         applicationId "agendadecitas.app"
         minSdkVersion 23
         targetSdkVersion flutter.targetSdkVersion
-        versionCode 53 // aumentar en unidades al subir a playstore
-        versionName "3.04"
+        versionCode 54 // aumentar en unidades al subir a playstore
+        versionName "3.10"
         multiDexEnabled true
     }
 

@@ -65,7 +65,9 @@ class _HomeScreenState extends State<HomeScreen> {
         title: 'Agenda de citas',
         themeMode: themeProvider.themeMode,
         theme: temaDefecto
-            ? ThemeData(primarySwatch: Colors.teal)
+            ? ThemeData(
+                primarySwatch: Colors.teal,
+              )
             : ThemeData(
                 primaryColor: themeProvider.mitemalight.primaryColor,
                 floatingActionButtonTheme: FloatingActionButtonThemeData(

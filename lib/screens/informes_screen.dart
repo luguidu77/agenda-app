@@ -1,12 +1,10 @@
 import 'package:agendacitas/widgets/change_theme_button.dart';
 import 'package:agendacitas/widgets/line_chart.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/personaliza_model.dart';
-import '../providers/estado_pago_app_provider.dart';
 import '../providers/providers.dart';
 
 class InformesScreen extends StatefulWidget {
@@ -185,7 +183,7 @@ class _InformesScreenState extends State<InformesScreen> {
     Color colorTema = Theme.of(context).primaryColor;
     return Scaffold(
       // drawer: const MenuDrawer(), //menuDrawer(context),
-      appBar: AppBar(
+      /*  appBar: AppBar(
           backgroundColor: colorTema,
           automaticallyImplyLeading: false,
           title: const Text('Informes'),
@@ -194,14 +192,16 @@ class _InformesScreenState extends State<InformesScreen> {
               bottom: Radius.circular(20),
             ),
           ),
-          actions: const [ChangeThemeButtonWidget()]),
-      body: Column(
-        children: [
-          _fecha(),
-          _grafico(),
-          _facturaTotal(),
-          _datos(),
-        ],
+          actions: const [ChangeThemeButtonWidget()]), */
+      body: SafeArea(
+        child: Column(
+          children: [
+            _fecha(),
+            _grafico(),
+            _facturaTotal(),
+            _datos(),
+          ],
+        ),
       ),
     );
   }

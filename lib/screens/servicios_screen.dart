@@ -126,7 +126,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
             )));
           } else if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasError) {
-              return const Text('Error');
+              return Text('Error: ${snapshot.error}');
             } else if (snapshot.hasData) {
               final data = snapshot.data;
               print(data);
@@ -211,7 +211,10 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
         .map((key) => mapFilter[key] as Map<String, dynamic>)
         .toList();
 
-    return ServiciosScreenDraggable(servicios: listdataServicios, usuarioAPP: _emailSesionUsuario!,);
+    return ServiciosScreenDraggable(
+      servicios: listdataServicios,
+      usuarioAPP: _emailSesionUsuario!,
+    );
 
     /* ListView(
         children: listFilter.map((cat) {

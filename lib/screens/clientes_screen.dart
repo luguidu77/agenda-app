@@ -202,7 +202,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
               )));
             } else if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasError) {
-                return const Text('Error');
+                return Text(' error:  ${snapshot.error}');
               } else if (snapshot.hasData) {
                 final data = snapshot.data;
 

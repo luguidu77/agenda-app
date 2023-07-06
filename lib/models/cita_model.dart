@@ -162,7 +162,7 @@ class ServicioModelFB {
   var id;
   String? servicio;
   String? tiempo;
-  double? precio;
+  var precio;
   String? detalle;
   String? activo;
   String? idCategoria;

@@ -1,4 +1,5 @@
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
+import 'package:agendacitas/screens/screens.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:collection/collection.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
@@ -145,33 +146,69 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
         // #####################   TARJETAS DE SERVICIOS ###############################
         return DragAndDropItem(
             canDrag: canDrag,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, 'configServicios',
-                    arguments: servicioFB);
-              },
-              child: ListTile(
-                title: Text(
-                  item.title,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.blueGrey),
+            child: Column(
+              children: [
+                Container(
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        color: Color.fromARGB(179, 232, 5, 5),
+                        width: 5,
+                      ),
+                    ),
+                  ),
+                  child: Dismissible(
+                    dismissThresholds: const {
+                      DismissDirection.startToEnd: 0.0,
+                    },
+                    background: Container(
+                      color: Colors.red,
+                      child: const Row(
+                        children: [
+                          SizedBox(width: 15.0),
+                          Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ),
+                    key: GlobalKey(),
+                    onDismissed: (direction) {
+                      _mensajeAlerta(context, item.id);
+                    },
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, 'configServicios',
+                            arguments: servicioFB);
+                      },
+                      child: ListTile(
+                        title: Text(
+                          item.title,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueGrey),
+                        ),
+                        //leading: Text(item.leading),
+                        subtitle: Text(
+                          item.subtitle.toString(),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Colors.blueGrey),
+                        ),
+                        trailing: Text(
+                          item.tiempo.toString(),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Colors.blueGrey),
+                        ), //const Icon(Icons.move_down_rounded),
+                      ),
+                    ),
+                  ),
                 ),
-                //leading: Text(item.leading),
-                subtitle: Text(
-                  item.subtitle.toString(),
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.blueGrey),
-                ),
-                trailing: Text(
-                  item.tiempo.toString(),
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.blueGrey),
-                ), //const Icon(Icons.move_down_rounded),
-              ),
+              ],
             ));
       }).toList(),
     );
@@ -275,5 +312,54 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
 
     print(documentId);
     return documentId;
+  }
+
+  Future<dynamic> _mensajeAlerta(context, String index) {
+    return showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Icon(
+                Icons.warning,
+                color: Colors.red,
+              ),
+              content: const Text('¿ Quieres este servicio ?'),
+              actions: [
+                ElevatedButton.icon(
+                    onPressed: () {
+                      FirebaseProvider()
+                          .elimarServicio(widget.usuarioAPP, index)
+                          .then((value) {
+                        mensajeSuccess(context, 'Eliminado correctamente');
+                        volver(context);
+                      });
+                    },
+                    icon: const Icon(Icons.delete_forever_outlined),
+                    label: const Text('Eliminar')),
+                const SizedBox(
+                  width: 20,
+                ),
+                TextButton(
+                    onPressed: () {
+                      volver(context);
+                    },
+                    child: const Text(
+                      ' No ',
+                      style: TextStyle(fontSize: 18),
+                    )),
+              ],
+            )).then((value) => setState(
+          () {},
+        ));
+  }
+
+  void volver(context) {
+    Navigator.pop(context);
+    setState(() {});
+    /*  Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ServiciosScreen(),
+        )); */
   }
 }

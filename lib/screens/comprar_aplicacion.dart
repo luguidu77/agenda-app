@@ -124,8 +124,9 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
                           //botonGPAY(context), ############## BOTON GOOGLE PAY -------------------------------------
                           ElevatedButton.icon(
                               onPressed: () async {
+                                // 5,45€ https://buy.stripe.com/7sIcPEclB53EbCwfYY
                                 const url =
-                                    'https://buy.stripe.com/4gwcPE5XdeEecGA001';
+                                    'https://buy.stripe.com/7sIcPEclB53EbCwfYY';
                                 if (await launchUrl(Uri.parse(url))) {
                                   await launchUrl(Uri.parse(url));
                                 } else {

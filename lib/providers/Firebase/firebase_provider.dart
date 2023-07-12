@@ -566,8 +566,12 @@ class FirebaseProvider extends ChangeNotifier {
     //  await DBProvider.db.eliminarCita(id);
   }
 
-  elimarServicio(int id) async {
-    // await DBProvider.db.eliminarServicio(id);
+  elimarServicio(String emailUsuarioAPP, String id) async {
+    await _iniFirebase();
+    //referencia al documento
+    final docRef = await _referenciaDocumento(emailUsuarioAPP, 'servicio');
+
+    await docRef.doc(id).delete();
   }
 
   eliminaTodosLosClientes() async {

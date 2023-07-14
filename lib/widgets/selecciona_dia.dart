@@ -42,8 +42,14 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
   CitaModel cita = CitaModel();
   final _formKey = GlobalKey<FormState>();
   bool _pagado = false;
+  bool _iniciadaSesionUsuario =
+      false; // ?  VARIABLE PARA VERIFICAR SI HAY USUARIO CON INCIO DE SESION
+  String _emailSesionUsuario = '';
+  String _estadoPagadaApp = '';
+
   @override
   void initState() {
+    inicializacion();
     // traeColorPrimarioTema();
     myLogic = MyLogicCita(cita);
 
@@ -55,15 +61,15 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
     // _askPermissions('/nuevacita');
   }
 
+  inicializacion() async {
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
+    _estadoPagadaApp = estadoPagoProvider.estadoPagoApp;
+  }
+
   @override
   Widget build(BuildContext context) {
-    //comprueba pago de la app
-    final estadopago = Provider.of<PagoProvider>(context);
-    _pagado = estadopago.pagado['pago'];
-    //? compruebo si hay email para saber si hay sesion iniciada
-    String usuarioAPP = estadopago.pagado['email'];
-    bool iniciadaSesionUsuario = usuarioAPP != '' ? true : false;
-
     // var micontexto = Provider.of<CitaListProvider>(context);
     // var cita = micontexto.getCitaElegida;
 
@@ -144,7 +150,9 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
           //boton reprogramar cita, es visible si viene llamado de formReprogramarReserva.dart
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
-            children: [botonReprogramar(usuarioAPP, iniciadaSesionUsuario)],
+            children: [
+              botonReprogramar(_emailSesionUsuario, _iniciadaSesionUsuario)
+            ],
           )
         ],
       ),
@@ -241,7 +249,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
   }
 
 // traer horas y minutos de trabajo para sumarlas
-  seleccionaCita(BuildContext context, int idServicio, usuarioAPP,
+  seleccionaCita(BuildContext context, idServicio, usuarioAPP,
       iniciadaSesionUsuario) async {
     print('idservicio  = $idServicio');
     //COMPRUEBO EL TIEMPO DEL SERVICIO A PRESTAR
@@ -387,8 +395,11 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
     return ElevatedButton(
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            _disponible = await seleccionaCita(context,
-                int.parse(widget.idServicio), usuarioAP, iniciadaSesionUsuario);
+            _disponible = await seleccionaCita(
+                context,
+                /*  int.parse */ (widget.idServicio),
+                usuarioAP,
+                iniciadaSesionUsuario);
             setState(() {});
             if (_disponible) {
               // ? null : Publicidad().publicidad();
@@ -465,6 +476,6 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
 
   void snackbar() {
     mensajeSuccess(context, 'CITA REPROGRAMADA');
-    Navigator.pushNamed(context, 'home');
+    Navigator.pushReplacementNamed(context, '/');
   }
 }

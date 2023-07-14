@@ -9,7 +9,7 @@ export 'package:agendacitas/widgets/botones/boton_speed_dial.dart';
 export 'package:agendacitas/widgets/calendario/calendario.dart';
 export 'package:agendacitas/widgets/filtros/backdrop_citas.dart';
 export 'package:agendacitas/widgets/filtros/items_filter_citas.dart';
-export 'package:agendacitas/widgets/lista_de_citas.dart';
+export 'package:agendacitas/widgets/_lista_de_citas.dart';
 export 'package:agendacitas/widgets/formulariosSessionApp/olvido_password.dart';
 export 'package:agendacitas/widgets/formulariosSessionApp/validaciones_form_inicio_session_registro.dart';
 export 'package:agendacitas/widgets/tarjeta_info_descartable.dart';

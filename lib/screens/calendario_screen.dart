@@ -1,4 +1,5 @@
 import 'package:agendacitas/firebase_options.dart';
+import 'package:agendacitas/widgets/lista_de_citas.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -201,7 +202,9 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                               });
                             },
                           ),
-                          frontLayer: ListaCitas(
+                          frontLayer: // ListaCitasNuevo(),
+
+                              ListaCitas(
                             emailusuario: _emailSesionUsuario,
                             fechaElegida: fechaElegida,
                             iniciadaSesionUsuario: _iniciadaSesionUsuario,

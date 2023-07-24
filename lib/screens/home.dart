@@ -149,6 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 usuarioAPP: '',
               ),
           'ModificacionCitaScreen': (context) => const DetallesCitaScreen(
+                emailUsuario: '',
                 reserva: {},
               ),
           'FichaClienteScreen': (context) => FichaClienteScreen(

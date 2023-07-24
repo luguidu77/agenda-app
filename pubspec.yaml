@@ -103,6 +103,7 @@ dependencies:
   drag_and_drop_lists: ^0.3.3
   google_nav_bar: ^5.0.6
   syncfusion_flutter_calendar: ^22.1.38
+  
 
 dev_dependencies:
   flutter_test:

@@ -12,6 +12,8 @@ import '../utils/utils.dart';
 import '../widgets/change_theme_button.dart';
 import '../widgets/widgets.dart';
 
+
+
 class MenuAplicacion extends StatefulWidget {
   const MenuAplicacion({
     Key? key,
@@ -77,11 +79,13 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
     _estadopago = estadoPagoProvider.estadoPagoApp;
   }
 
+
   @override
   void initState() {
     // leerBasedatos();
     emailUsuario();
     version();
+
 
     super.initState();
   }
@@ -98,6 +102,8 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
 
             // CABECERA CUANDO ES APP GRATUITA
             : _cabeceraGratuita(),
+
+    
 
         // CONFIGURA LOS SERVICIOS QUE OFRECEN A CLIENTES
         _serviciosQueOfrece(context),

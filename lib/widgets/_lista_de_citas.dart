@@ -1,3 +1,4 @@
+import 'package:agendacitas/widgets/elimina_cita.dart';
 import 'package:agendacitas/widgets/lista_de_citas.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -130,12 +131,14 @@ class _ListaCitasState extends State<ListaCitas> {
               }
             }),
         Expanded(
-            // todo TARJETAS DE LAS CITAS CONCERTADAS ##############################
-            child:
-                ListaCitasNuevo(fechaElegida: widget.fechaElegida, citas: citas)
+          // todo TARJETAS DE LAS CITAS CONCERTADAS ##############################
+          child:
+              // todo: citas SYNCFUSION
+              //  ListaCitasNuevo(fechaElegida: widget.fechaElegida, citas: citas)
 
-            // newMethod(citas),
-            ),
+              // todo: citas tarjetas
+              newMethod(citas),
+        ),
       ],
     );
   }
@@ -196,8 +199,11 @@ class _ListaCitasState extends State<ListaCitas> {
                 ),
               ),
               key: GlobalKey(),
-              onDismissed: (direction) {
-                _mensajeAlerta(context, index, citas);
+              onDismissed: (direction) async {
+                await mensajeAlerta(context, index, citas,
+                    widget.iniciadaSesionUsuario, widget.emailusuario);
+
+                setState(() {});
               },
               child: GestureDetector(
                 onTap: () {
@@ -206,7 +212,7 @@ class _ListaCitasState extends State<ListaCitas> {
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            DetallesCitaScreen(reserva: citas[index]),
+                            DetallesCitaScreen(emailUsuario: widget.emailusuario, reserva: citas[index]),
                       ),
                     );
                   } else {

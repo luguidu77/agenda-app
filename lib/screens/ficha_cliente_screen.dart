@@ -250,14 +250,14 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
   _datos(ClienteModel cliente, bool pagado) {
     var estiloNombre = const TextStyle(
         fontSize: 18,
-        color: Color.fromARGB(171, 231, 224, 224),
+        color: Color.fromARGB(171, 31, 6, 119),
         fontWeight: FontWeight.bold);
     var estiloTelEmail = const TextStyle(
         fontSize: 18,
-        color: Color.fromARGB(171, 231, 224, 224),
+        color: Color.fromARGB(171, 39, 7, 128),
         fontWeight: FontWeight.bold);
-    var estiloNotas = const TextStyle(
-        fontSize: 18, color: Color.fromARGB(171, 231, 224, 224));
+    var estiloNotas =
+        const TextStyle(fontSize: 18, color: Color.fromARGB(171, 39, 7, 128));
     // int numCitas = citas.length;
 
     return Column(
@@ -265,7 +265,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
         SizedBox(
           height: 350,
           child: Card(
-            color: const Color.fromARGB(179, 56, 34, 155),
+            color: Color.fromARGB(253, 241, 241, 243),
             elevation: 4, // Elevación de la tarjeta
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10), // Bordes redondeados

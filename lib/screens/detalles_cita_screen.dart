@@ -9,10 +9,14 @@ import '../providers/providers.dart';
 import '../utils/utils.dart';
 import '../widgets/botones/form_reprogramar_reserva.dart';
 import '../widgets/compartirCliente/compartir_cita_a_cliente.dart';
+import '../widgets/elimina_cita.dart';
 
 class DetallesCitaScreen extends StatefulWidget {
+  final String emailUsuario;
   final Map<String, dynamic> reserva;
-  const DetallesCitaScreen({Key? key, required this.reserva}) : super(key: key);
+  const DetallesCitaScreen(
+      {Key? key, required this.reserva, required this.emailUsuario})
+      : super(key: key);
 
   @override
   State<DetallesCitaScreen> createState() => _DetallesCitaScreenState();
@@ -131,66 +135,24 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
             const SizedBox(
               height: 30,
             ),
-            _detallesCliente(),
-            const Divider(),
-            const SizedBox(
-              height: 30,
-            ),
             const Text(
               'DETALLES DE LA CITA',
               style: TextStyle(fontSize: 28),
             ),
             const SizedBox(
-              height: 10,
+              height: 20,
             ),
-            Text(
-              fechaLarga!,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            visibleBotonFormulario
-                ? ElevatedButton.icon(
-                    onPressed: () {
-                      setState(() {});
-                      visibleFormulario
-                          ? visibleFormulario = false
-                          : visibleFormulario = true;
-                    },
-                    icon: Icon(visibleFormulario ? Icons.cancel : Icons.edit),
-                    label: Text(visibleFormulario
-                        ? 'Cerrar Reprogramación'
-                        : 'Reprogramar cita'))
-                : Container(),
             const SizedBox(
               height: 20,
             ),
             visibleFormulario
                 ? FormReprogramaReserva(idServicio: idServicio, cita: cita)
                 : Container(),
-            Text(
-              servicio!,
-              style: const TextStyle(fontSize: 20),
-            ),
-            Text(
-              detalle!,
-              style: const TextStyle(fontSize: 20),
-            ),
-            Text(
-              'PRECIO: $precio ${personaliza.moneda}',
-              style: const TextStyle(fontSize: 20),
-            ),
+            _detallesCita(),
             const SizedBox(
-              height: 10,
+              height: 30,
             ),
-            Text(
-              'Información de la cita: $comentario',
-              style: const TextStyle(fontSize: 20),
-            ),
-            const SizedBox(
-              height: 50,
-            ),
+            const Divider(),
             visibleBotonFormulario
                 ?
                 // EN CARPETA WIDGET/ COMPARTIRCLIENTE/
@@ -234,42 +196,45 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
     return Column(
       children: [
         Center(
-          child: Column(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _foto(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    nombre!,
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  ElevatedButton.icon(
+                      onPressed: () {
+                        Comunicaciones.hacerLlamadaTelefonica(
+                            telefono.toString());
+                      },
+                      icon: const Icon(Icons.phone),
+                      label: Text(
+                        telefono!,
+                        style: const TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
+                      )),
+                  ElevatedButton.icon(
+                      onPressed: () {
+                        Comunicaciones.enviarEmail(email.toString());
+                      },
+                      icon: const Icon(Icons.mail),
+                      label: Text(
+                        email!,
+                        style: const TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
+                      )),
+                ],
+              )
             ],
           ),
         ),
         const SizedBox(height: 20),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              nombre!,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            ElevatedButton.icon(
-                onPressed: () {
-                  Comunicaciones.hacerLlamadaTelefonica(telefono.toString());
-                },
-                icon: const Icon(Icons.phone),
-                label: Text(
-                  telefono!,
-                  style: const TextStyle(
-                      fontSize: 15, fontWeight: FontWeight.bold),
-                )),
-            ElevatedButton.icon(
-                onPressed: () {
-                  Comunicaciones.enviarEmail(email.toString());
-                },
-                icon: const Icon(Icons.mail),
-                label: Text(
-                  email!,
-                  style: const TextStyle(
-                      fontSize: 15, fontWeight: FontWeight.bold),
-                )),
-          ],
-        )
       ],
     );
   }
@@ -280,16 +245,97 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
       child: foto != ''
           ? Image.network(
               foto,
-              width: 150,
-              height: 150,
+              width: 100,
+              height: 100,
               fit: BoxFit.cover,
             )
           : Image.asset(
               "./assets/images/nofoto.jpg",
-              width: 150,
-              height: 150,
+              width: 100,
+              height: 100,
               fit: BoxFit.cover,
             ),
+    );
+  }
+
+  _botonesCita() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        ElevatedButton.icon(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+            ),
+            onPressed: () async {
+              final res = await mensajeAlerta(
+                  context,
+                  0,
+                  widget.reserva,
+                  (widget.emailUsuario == '') ? false : true,
+                  widget.emailUsuario);
+
+              if (res == true) {
+                // ignore: use_build_context_synchronously
+                Navigator.pushReplacementNamed(context, '/');
+              }
+            },
+            icon: const Icon(Icons.delete),
+            label: const Text('Eliminar')),
+        visibleBotonFormulario
+            ? ElevatedButton.icon(
+                onPressed: () {
+                  setState(() {});
+                  visibleFormulario
+                      ? visibleFormulario = false
+                      : visibleFormulario = true;
+                },
+                icon: Icon(visibleFormulario ? Icons.cancel : Icons.edit),
+                label: Text(visibleFormulario
+                    ? 'Cerrar Reprogramación'
+                    : 'Reprogramar cita'))
+            : Container(),
+      ],
+    );
+  }
+
+  _detallesCita() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _detallesCliente(),
+            Text(
+              fechaLarga!,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              'SERVICIO: $servicio',
+              style: const TextStyle(fontSize: 15),
+            ),
+            Text(
+              detalle!,
+              style: const TextStyle(fontSize: 15),
+            ),
+            Text(
+              'PRECIO: $precio ${personaliza.moneda}',
+              style: const TextStyle(fontSize: 14),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              'Notas de la cita: $comentario',
+              style: const TextStyle(fontSize: 14),
+            ),
+            _botonesCita(),
+          ],
+        ),
+      ),
     );
   }
 }

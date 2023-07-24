@@ -21,6 +21,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
     return Scaffold(
         // ················   Config calendario ······································
         body: SfCalendar(
+      viewNavigationMode: ViewNavigationMode.none,
       appointmentTextStyle: const TextStyle(
           color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
       headerHeight: 0, // oculta fecha
@@ -35,10 +36,13 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DetallesCitaScreen(reserva: cita),
+            //todo :   email del usuario
+            builder: (context) => DetallesCitaScreen(emailUsuario: 'emailusuario',reserva: cita),
           ),
         );
       },
+      onDragEnd: (appointmentDragEndDetails) =>
+          print(appointmentDragEndDetails.appointment),
       view: CalendarView.day,
       initialDisplayDate: widget.fechaElegida,
       dataSource: MeetingDataSource(getAppointments()),

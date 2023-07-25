@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
+import '../providers/providers.dart';
 import '../screens/screens.dart';
 import '../utils/utils.dart';
 
@@ -16,20 +18,33 @@ class ListaCitasNuevo extends StatefulWidget {
 }
 
 class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
+  String _emailSesionUsuario = '';
+  emailUsuarioApp() async {
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+  }
+
+  @override
+  void initState() {
+    emailUsuarioApp();
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // ················   Config calendario ······································
         body: SfCalendar(
+      // ················   Config calendario ······································
       viewNavigationMode: ViewNavigationMode.none,
       appointmentTextStyle: const TextStyle(
           color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
       headerHeight: 0, // oculta fecha
-      allowDragAndDrop: true,
+      allowDragAndDrop: false,
       onTap: (CalendarTapDetails details) {
-        DateTime date = details.date!;
+        // DateTime date = details.date!;
         dynamic appointments = details.appointments;
-        CalendarElement view = details.targetElement;
+        // CalendarElement view = details.targetElement;
 
         Map<String, dynamic> cita = json.decode(appointments[0].notes);
         print(cita);
@@ -37,7 +52,8 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           context,
           MaterialPageRoute(
             //todo :   email del usuario
-            builder: (context) => DetallesCitaScreen(emailUsuario: 'emailusuario',reserva: cita),
+            builder: (context) => DetallesCitaScreen(
+                emailUsuario: _emailSesionUsuario, reserva: cita),
           ),
         );
       },

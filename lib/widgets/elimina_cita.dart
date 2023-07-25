@@ -38,11 +38,12 @@ mensajeAlerta(BuildContext context, int index, citas,
               ElevatedButton.icon(
                   onPressed: () {
                     iniciadaSesionUsuario
+                        //ELIMINA CITA EN FIREBASE
                         ? _eliminarCitaFB(emailusuario, idCita)
                         //ELIMINA CITA EN DISPOSITIVO
                         : _eliminarCita(context, idCita, textoNombre);
 
-                    //ELIMINA CITA EN FIREBASE
+                    
                     respuesta = true;
                     Navigator.pop(context);
                   },

@@ -32,6 +32,8 @@ git commit -m "modificando splash"
 git push
 */
 
+//https://help.syncfusion.com/common/essential-studio/licensing/how-to-register-in-an-application
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();

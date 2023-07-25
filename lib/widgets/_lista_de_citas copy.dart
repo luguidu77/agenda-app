@@ -199,6 +199,7 @@ class _ListaCitasState extends State<ListaCitas> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => DetallesCitaScreen(
+                                        emailUsuario: widget.emailusuario,
                                         reserva: citas[index]),
                                   ),
                                 );

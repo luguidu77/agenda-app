@@ -392,7 +392,8 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
   }
 
   botonReprogramar(String usuarioAP, bool iniciadaSesionUsuario) {
-    return ElevatedButton(
+    return ElevatedButton.icon(
+        icon: const Icon(Icons.rebase_edit),
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
             _disponible = await seleccionaCita(
@@ -451,7 +452,11 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
             }
           }
         },
-        child: const Text('Reprogramar'));
+        style: ButtonStyle(
+          backgroundColor:
+              MaterialStateProperty.all<Color>(Color.fromARGB(255, 12, 4, 122)),
+        ),
+        label: const Text('Reprogramar'));
   }
 
   void alertaCitaNoDisponible() {

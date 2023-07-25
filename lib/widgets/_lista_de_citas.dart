@@ -133,17 +133,17 @@ class _ListaCitasState extends State<ListaCitas> {
         Expanded(
           // todo TARJETAS DE LAS CITAS CONCERTADAS ##############################
           child:
-              // todo: citas SYNCFUSION
-              //  ListaCitasNuevo(fechaElegida: widget.fechaElegida, citas: citas)
+              //  citas SYNCFUSION
+               ListaCitasNuevo(fechaElegida: widget.fechaElegida, citas: citas)
 
-              // todo: citas tarjetas
-              newMethod(citas),
+              //  citas tarjetas hechas por mi (sin usar)
+              // newMethod(citas),
         ),
       ],
     );
   }
 
-  ListView newMethod(citas) {
+  /* ListView newMethod(citas) {
     return ListView.builder(
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       itemCount: citas.length,
@@ -233,9 +233,9 @@ class _ListaCitasState extends State<ListaCitas> {
         );
       },
     );
-  }
+  } */
 
-  Card _tarjetasCitas(bool compruebafechaDisponible, citas, int index,
+  /* Card _tarjetasCitas(bool compruebafechaDisponible, citas, int index,
       String horaInicio, Color estiloHorario, String horaFinal) {
     print('todas las citas $citas <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
     return Card(
@@ -352,9 +352,9 @@ class _ListaCitasState extends State<ListaCitas> {
             ),
           ),
         ));
-  }
+  } */
 
-  void _eliminarCitaFB(usuarioAPP, id) {
+ /*  void _eliminarCitaFB(usuarioAPP, id) {
     SincronizarFirebase().eliminaCitaId(usuarioAPP, id.toString());
     // convierto el id que viene como String en int
     int idEntero = convertirIdEnEntero(id);
@@ -428,7 +428,7 @@ class _ListaCitasState extends State<ListaCitas> {
               ],
             ));
   }
-
+ */
   todasLasCitas(fecha) {
     return FutureBuilder<dynamic>(
       future: widget.iniciadaSesionUsuario

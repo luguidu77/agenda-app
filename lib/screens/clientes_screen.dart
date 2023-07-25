@@ -67,7 +67,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
       //initState();
     } else {
       listaClientes = listaAux;
-
+     
       for (var element in listaClientes) {
         traeCitaPorCliente(element.id).then((value) {
           numCitas.add(value);

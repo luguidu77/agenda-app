@@ -261,7 +261,8 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
       //TIEMPO DEL SERVICIO
       resServicio.tiempo = resServicioFB['tiempo'];
     } else {
-      resServicio = await CitaListProvider().cargarServicioPorId(idServicio);
+      resServicio =
+          await CitaListProvider().cargarServicioPorId(int.parse(idServicio));
     }
 
     print('tiempo del Servicio  = ${resServicio.tiempo}');
@@ -431,7 +432,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
               } else {
                 //reprogramacion de fecha y hora de la cita
                 CitaModel newCita = CitaModel();
-                newCita.id = oldCita['id'];
+                newCita.id = int.parse(oldCita['id']);
                 newCita.dia = fecha;
                 newCita.horaInicio = textoFechaHora;
                 newCita.horaFinal = textoHoraF;

@@ -21,7 +21,8 @@ mensajeAlerta(BuildContext context, int index, citas,
     idCita = citas[index]['id'];
   } else {
     textoNombre = citas['nombre'].toString();
-    idCita = citas['id'].toString();
+    idCita =
+        iniciadaSesionUsuario ? citas['id'].toString() : int.parse(citas['id']);
   }
   print(idCita);
 
@@ -43,7 +44,6 @@ mensajeAlerta(BuildContext context, int index, citas,
                         //ELIMINA CITA EN DISPOSITIVO
                         : _eliminarCita(context, idCita, textoNombre);
 
-                    
                     respuesta = true;
                     Navigator.pop(context);
                   },

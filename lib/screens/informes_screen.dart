@@ -138,7 +138,7 @@ class _InformesScreenState extends State<InformesScreen> {
     // CREA UNA LISTA CON LOS PRECIOS DE LA CITA SIEMPRE Y CUANDO LA FECHA COINCIDA CON EL MES EN CUESTION
     List precios = citas.map((e) {
       if (e['fecha'].split('-')[1] == mes) {
-        return e['precio'];
+        return e['precio'].toDouble();
       } else {
         return 0.0;
       }

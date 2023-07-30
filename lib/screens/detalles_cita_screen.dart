@@ -195,38 +195,36 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
             children: [
               _foto(),
               const SizedBox(width: 6),
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      nombre!,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    ElevatedButton.icon(
-                        onPressed: () {
-                          Comunicaciones.hacerLlamadaTelefonica(
-                              telefono.toString());
-                        },
-                        icon: const Icon(Icons.phone),
-                        label: const Text(
-                          'llamar',
-                          style: TextStyle(fontSize: 12),
-                        )),
-                    ElevatedButton.icon(
-                        onPressed: () {
-                          Comunicaciones.enviarEmail(email.toString());
-                        },
-                        icon: const Icon(Icons.mail),
-                        label: const Text(
-                          'Enviar un email',
-                          style: TextStyle(
-                            fontSize: 12,
-                          ),
-                        )),
-                  ],
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    nombre!,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  ElevatedButton.icon(
+                      onPressed: () {
+                        Comunicaciones.hacerLlamadaTelefonica(
+                            telefono.toString());
+                      },
+                      icon: const Icon(Icons.phone),
+                      label: const Text(
+                        'llamar',
+                        style: TextStyle(fontSize: 12),
+                      )),
+                  ElevatedButton.icon(
+                      onPressed: () {
+                        Comunicaciones.enviarEmail(email.toString());
+                      },
+                      icon: const Icon(Icons.mail),
+                      label: const Text(
+                        'Enviar un email',
+                        style: TextStyle(
+                          fontSize: 12,
+                        ),
+                      )),
+                ],
               )
             ],
           ),
@@ -300,17 +298,15 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _detallesCliente(),
-              visibleFormulario
-                  ? FormReprogramaReserva(idServicio: idServicio, cita: cita)
-                  : _detalles(),
-              _botonesCita(),
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _detallesCliente(),
+            visibleFormulario
+                ? FormReprogramaReserva(idServicio: idServicio, cita: cita)
+                : _detalles(),
+            _botonesCita(),
+          ],
         ),
       ),
     );

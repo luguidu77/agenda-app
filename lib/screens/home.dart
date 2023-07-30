@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -52,6 +53,8 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     cargarTema();
+
+    messangingFirebase();
 
     super.initState();
   }
@@ -166,5 +169,17 @@ class _HomeScreenState extends State<HomeScreen> {
           'DisponibilidadSemanalScreen': (context) =>
               const DisponibilidadSemanalScreen(),
         });
+  }
+
+  // ####### GUARDA EL TOKEN PARA ENVIOS DE NOTIFICACIONES
+  void messangingFirebase() async {
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    final emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    debugPrint(fcmToken.toString());
+    if (emailSesionUsuario != '') {
+      FirebaseProvider().actualizaTokenMessaging(emailSesionUsuario, fcmToken!);
+    }
   }
 }

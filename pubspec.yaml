@@ -83,6 +83,8 @@ dependencies:
   firebase_auth: ^4.6.0
   firebase_storage: ^11.2.0
   cloud_firestore: ^4.7.0
+  # NOTIFICACIONES FIREBASE
+  firebase_messaging: ^14.6.5
 
   image_picker: ^0.8.6
 
@@ -103,6 +105,10 @@ dependencies:
   drag_and_drop_lists: ^0.3.3
   google_nav_bar: ^5.0.6
   syncfusion_flutter_calendar: ^22.1.38
+  twilio_flutter: ^0.0.9
+  
+  
+  
   
 
 dev_dependencies:

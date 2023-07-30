@@ -60,8 +60,8 @@ android {
         applicationId "agendadecitas.app"
         minSdkVersion 23
         targetSdkVersion flutter.targetSdkVersion
-        versionCode 58 // aumentar en unidades al subir a playstore
-        versionName "4.00"
+        versionCode 61 // aumentar en unidades al subir a playstore
+        versionName "4.02"
         multiDexEnabled true
     }
 
@@ -92,12 +92,15 @@ flutter {
     source '../..'
 }
 
+
 dependencies {
     //notification
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
     // Import the Firebase BoM
-    implementation platform('com.google.firebase:firebase-bom:30.2.0')
+    implementation(platform("com.google.firebase:firebase-bom:32.2.0"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.google.firebase:firebase-messaging:20.1.0'
     implementation 'com.android.support:multidex:1.0.3'
     // Stripe Android SDK
     implementation 'com.stripe:stripe-android:20.17.0'

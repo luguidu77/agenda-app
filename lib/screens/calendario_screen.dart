@@ -1,8 +1,7 @@
 import 'package:agendacitas/firebase_options.dart';
-import 'package:agendacitas/widgets/lista_de_citas.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -91,6 +90,9 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
     _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
     _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
     _estadoPagadaApp = estadoPagoProvider.estadoPagoApp;
+
+    // ESCUCHA DE NOTIFICACIONES DE FIREBASE MESSAGING
+    await NotificacionesFirebaseMessaging().setupFlutterNotifications();
   }
 
   @override
@@ -195,13 +197,14 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                           ],
                         )
                       : BackdropFilterCitas(
-                          backLayer: ItemsFiltersCitas(
-                            onFilterChange: (f) {
-                              setState(() {
-                                filter = f;
-                              });
-                            },
-                          ),
+                          backLayer: Container()
+                          /*  EnviosRecordatorios( 
+                            usuarioAPP: _emailSesionUsuario,
+                            fechaElegida: fechaElegida
+
+                           
+                          ) */
+                          ,
                           frontLayer: // ListaCitasNuevo(),
 
                               ListaCitas(
@@ -211,7 +214,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                             filter: filter, // envia 'TODAS' O 'PENDIENTES'
                           ),
                           backTitle: const Text(
-                            'FILTRAR',
+                            'RECORDATOIOS',
                             style: TextStyle(fontSize: 14),
                           ),
                           frontTitle: const Text(

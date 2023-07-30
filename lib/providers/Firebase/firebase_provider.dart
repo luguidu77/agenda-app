@@ -602,6 +602,19 @@ class FirebaseProvider extends ChangeNotifier {
     await docRef.doc(cita.id.toString()).update(newCita);
   }
 
+  actualizaTokenMessaging(String usuarioAPP, String token) async {
+    await _iniFirebase();
+    final docRef = await _referenciaDocumento(usuarioAPP, 'perfil');
+    // Update a single field
+    docRef
+        .doc('perfilUsuarioApp')
+        .update({'tokenMessaging': token}).then((value) {
+      print("Field updated successfully!");
+    }).catchError((error) {
+      print("Error updating field: $error");
+    });
+  }
+
   buscarIndiceCategoria(emailUsuario, idCategoria) async {
     await _iniFirebase();
     // final docRef = await _referenciaDocumento(emailUsuario, 'servicio');

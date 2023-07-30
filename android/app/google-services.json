@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "669231682418-2klbuhn6l00n3shurl2jt7mgem7mhfe5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "agendadecitas.app",
+            "certificate_hash": "71a663f788ecb643be379fa908194b8533d7f62c"
+          }
+        },
+        {
+          "client_id": "669231682418-qqg70cnij8da86rb4moh97d9kff3332u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "agendadecitas.app",
+            "certificate_hash": "ccc066a7ad8239282bb55de5fe44644f0e721af9"
+          }
+        },
+        {
           "client_id": "669231682418-1adh4lhuprmqt8teqtil7lplml933545.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -32,10 +48,46 @@
               "client_type": 3
             },
             {
-              "client_id": "669231682418-hu1rs884ve5po6ioogdiscdpq3u5d93b.apps.googleusercontent.com",
+              "client_id": "669231682418-b4navjna0ctcvmd6km8t9n87lruvrqj9.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "agendadecitas.app.agendadecitas"
+                "bundle_id": "com.example.agendo"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:669231682418:android:723b5f979b7f3c31d7c3eb",
+        "android_client_info": {
+          "package_name": "com.example.agendo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "669231682418-1adh4lhuprmqt8teqtil7lplml933545.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbR2Fm8mMy9be3VGyZ0_rI7C715uBMos0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "669231682418-1adh4lhuprmqt8teqtil7lplml933545.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "669231682418-b4navjna0ctcvmd6km8t9n87lruvrqj9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.agendo"
               }
             }
           ]

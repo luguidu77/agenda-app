@@ -1,6 +1,9 @@
 //https://www.youtube.com/watch?v=n5SpF7nuVRk
 //https://www.youtube.com/watch?v=6sEJBevHrm0
 
+import 'dart:io';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -142,4 +145,75 @@ class NotificationService {
 
 void datapayload(data) async {
   // print(data);
+}
+
+class NotificacionesFirebaseMessaging {
+  //### NOTIFICACIONES  DESDE FIREBASE MESSAGING ############################################
+  //https://medium.com/@alvarohurtadobo/configurando-firebase-push-notifications-en-flutter-3-3-9e9eed94bbb7
+  // NOTIFICACIONES A USUARIOS DE LA APLICACION CON INICIO DE SESION
+
+  // ### NOTIFICACIONES FIREBASE
+  late AndroidNotificationChannel channel;
+  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPluginMessaging;
+  bool isFlutterLocalNotificationsInitialized = false;
+  //##############################
+  Future<void> setupFlutterNotifications() async {
+    FirebaseMessaging.onMessage.listen(showFlutterNotification);
+    if (isFlutterLocalNotificationsInitialized) {
+      return;
+    }
+    channel = const AndroidNotificationChannel(
+      'high_importance_channel', // id
+      'High Importance Notifications', // title
+      description:
+          'This channel is used for important notifications.', // description
+      importance: Importance.high,
+    );
+
+    flutterLocalNotificationsPluginMessaging =
+        FlutterLocalNotificationsPlugin();
+
+    /// Crear un canal de notificación
+    /// We use this channel in the `AndroidManifest.xml` file to override the
+    /// default FCM channel to enable heads up notifications.
+    await flutterLocalNotificationsPluginMessaging
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+    /// Update the iOS foreground notification presentation options to allow
+    /// heads up notifications.
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    isFlutterLocalNotificationsInitialized = true;
+  }
+
+  void showFlutterNotification(RemoteMessage message) {
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android;
+    if (notification != null &&
+        android != null &&
+        (Platform.isAndroid || Platform.isIOS)) {
+      flutterLocalNotificationsPluginMessaging.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            importance: Importance.high,
+            channel.id,
+            channel.name,
+            channelDescription: channel.description,
+            icon: '@mipmap/launcher_icon',
+          ),
+        ),
+      );
+    }
+  }
+
+  void guardarToken(String? fcmToken) {}
 }

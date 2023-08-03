@@ -1,3 +1,8 @@
+import 'package:agendacitas/screens/creacion_citas/creacion_cita_cliente.dart';
+import 'package:agendacitas/screens/creacion_citas/creacion_cita_confirmar.dart';
+import 'package:agendacitas/screens/creacion_citas/creacion_cita_listado_servicios.dart';
+
+import 'package:agendacitas/screens/servicios_screen%20copy.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +12,7 @@ import '../models/cita_model.dart';
 import '../providers/providers.dart';
 import '../providers/theme_provider.dart';
 import '../widgets/widgets.dart';
+import 'creacion_citas/creacion_cita_servicio.dart';
 import 'screens.dart';
 
 // ignore: must_be_immutable
@@ -168,6 +174,12 @@ class _HomeScreenState extends State<HomeScreen> {
           'PlanAmigoVinculaCuenta': (context) => const PlanAmigoVinculaCuenta(),
           'DisponibilidadSemanalScreen': (context) =>
               const DisponibilidadSemanalScreen(),
+
+          'creacionCitaCliente': (context) => const CreacionCitaCliente(),
+          'creacionCitaServicio': (context) => const CreacionCitaServicio(),
+          'creacionCitaComfirmar': (context) => const CreacionCitaConfirmar(),
+          'serviciosCitas': (_) => const ServiciosCreacionCita(),
+   
         });
   }
 

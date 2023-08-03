@@ -1,4 +1,5 @@
 import 'package:agendacitas/firebase_options.dart';
+import 'package:agendacitas/screens/servicios_screen%20copy.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,6 @@ import '../screens/screens.dart';
 import '../utils/utils.dart';
 import '../widgets/change_theme_button.dart';
 import '../widgets/widgets.dart';
-
-
 
 class MenuAplicacion extends StatefulWidget {
   const MenuAplicacion({
@@ -32,8 +31,6 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
   String comentarioVersion = '';
   bool enviosugerencia = false;
   bool necesitaActualizar = false;
-
-  
 
   version() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -86,7 +83,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
     // leerBasedatos();
     emailUsuario();
     version();
-   
+
     super.initState();
   }
 
@@ -102,8 +99,6 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
 
             // CABECERA CUANDO ES APP GRATUITA
             : _cabeceraGratuita(),
-
-      
 
         // CONFIGURA LOS SERVICIOS QUE OFRECEN A CLIENTES
         _serviciosQueOfrece(context),
@@ -337,6 +332,4 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
           }
         });
   }
-
-
 }

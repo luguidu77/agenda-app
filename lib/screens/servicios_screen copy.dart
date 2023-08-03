@@ -7,10 +7,8 @@ import '../models/models.dart';
 import '../providers/providers.dart';
 import '../widgets/widgets.dart';
 
-
-// ########### esta pagina pagina no esta en uso, 
+// ########### esta pagina pagina no esta en uso,
 //############ pagina actual : servicios_screen_draggable
-
 
 class ServiciosScreen extends StatefulWidget {
   const ServiciosScreen({Key? key}) : super(key: key);

@@ -19,7 +19,7 @@ export 'package:agendacitas/screens/nuevo_actualizacion_usuarioapp.dart';
 export 'package:agendacitas/screens/plan_amigo/plan_amigo_vincula_cuenta.dart';
 export 'package:agendacitas/config/config_servicios_screen.dart';
 export 'package:agendacitas/screens/plan_amigo/plan_amigo.dart';
-export 'package:agendacitas/screens/servicios_screen.dart';
+export 'package:agendacitas/screens/creacion_citas/serviciosCreacionCita.dart';
 export 'package:agendacitas/config/config_tema_screen.dart';
 export 'package:agendacitas/screens/bienvenida.dart';
 export 'package:agendacitas/screens/home.dart';

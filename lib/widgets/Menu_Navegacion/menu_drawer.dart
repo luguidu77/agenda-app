@@ -1,8 +1,7 @@
-
 import 'package:agendacitas/models/perfil_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/config/config_personalizar_screen.dart';
-import 'package:agendacitas/screens/servicios_screen.dart';
+import 'package:agendacitas/screens/creacion_citas/serviciosCreacionCita.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -206,7 +205,7 @@ class _MenuDrawerState extends State<MenuDrawer> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ServiciosScreen(),
+                    builder: (context) => const ServiciosCreacionCita(),
                   ));
             },
           ),

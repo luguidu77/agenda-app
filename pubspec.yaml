@@ -106,6 +106,7 @@ dependencies:
   google_nav_bar: ^5.0.6
   syncfusion_flutter_calendar: ^22.1.38
   twilio_flutter: ^0.0.9
+  flutter_native_timezone: ^2.0.0
   
   
   

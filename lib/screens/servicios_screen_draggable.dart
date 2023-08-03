@@ -157,54 +157,33 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
                       ),
                     ),
                   ),
-                  child: Dismissible(
-                    dismissThresholds: const {
-                      DismissDirection.startToEnd: 0.0,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, 'creacionCitaComfirmar',
+                          arguments: servicioFB);
                     },
-                    background: Container(
-                      color: Colors.red,
-                      child: const Row(
-                        children: [
-                          SizedBox(width: 15.0),
-                          Icon(
-                            Icons.delete,
-                            color: Colors.white,
-                          ),
-                        ],
+                    child: ListTile(
+                      title: Text(
+                        item.title,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueGrey),
                       ),
-                    ),
-                    key: GlobalKey(),
-                    onDismissed: (direction) {
-                      _mensajeAlerta(context, item.id);
-                    },
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, 'configServicios',
-                            arguments: servicioFB);
-                      },
-                      child: ListTile(
-                        title: Text(
-                          item.title,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blueGrey),
-                        ),
-                        //leading: Text(item.leading),
-                        subtitle: Text(
-                          item.subtitle.toString(),
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.blueGrey),
-                        ),
-                        trailing: Text(
-                          item.tiempo.toString(),
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.blueGrey),
-                        ), //const Icon(Icons.move_down_rounded),
+                      //leading: Text(item.leading),
+                      subtitle: Text(
+                        item.subtitle.toString(),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.blueGrey),
                       ),
+                      trailing: Text(
+                        item.tiempo.toString(),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.blueGrey),
+                      ), //const Icon(Icons.move_down_rounded),
                     ),
                   ),
                 ),

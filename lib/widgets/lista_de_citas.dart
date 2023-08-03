@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -51,16 +50,22 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         dynamic appointments = details.appointments;
         // CalendarElement view = details.targetElement;
 
-        Map<String, dynamic> cita = json.decode(appointments[0].notes);
-        print(cita);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            //todo :   email del usuario
-            builder: (context) => DetallesCitaScreen(
-                emailUsuario: _emailSesionUsuario, reserva: cita),
-          ),
-        );
+        if (appointments != null) {
+          Map<String, dynamic> cita = json.decode(appointments[0].notes);
+          print(cita);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              //todo :   email del usuario
+              builder: (context) => DetallesCitaScreen(
+                  emailUsuario: _emailSesionUsuario, reserva: cita),
+            ),
+          );
+        } else {
+          print(details.date);
+          Navigator.pushNamed(context, 'creacionCitaCliente',
+              arguments: details.date);
+        }
       },
 
       onDragEnd: (AppointmentDragEndDetails appointmentDragEndDetails) {

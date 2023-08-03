@@ -165,7 +165,7 @@ class _ConfigCategoriaServiciosScreenState
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const ServiciosScreen(),
+                      builder: (context) => const ServiciosCreacionCita(),
                     ));
               },
               icon: const Icon(

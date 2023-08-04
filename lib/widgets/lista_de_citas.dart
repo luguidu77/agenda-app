@@ -40,6 +40,17 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
     return Scaffold(
         body: SfCalendar(
       // ················   Config calendario ······································
+
+      // CONFIGURA VISTA TIEMPO
+      timeSlotViewSettings: const TimeSlotViewSettings(
+          timeFormat: 'HH:mm', // FORMATO 24H
+          startHour: 10, // INICIO LABORAL
+          endHour: 22, // FINAL LABORAL
+          timeInterval: Duration(minutes: 15) //INTERVALOS DE TIEMPO
+
+          ),
+      //cellBorderColor: Colors.deepOrange,
+
       viewNavigationMode: ViewNavigationMode.none,
       appointmentTextStyle: const TextStyle(
           color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),

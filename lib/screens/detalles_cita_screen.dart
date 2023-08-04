@@ -301,7 +301,15 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _detallesCliente(),
+            widget.reserva['nombre'] != null
+                ? const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'El cliente fué eliminado',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  )
+                : _detallesCliente(),
             visibleFormulario
                 ? FormReprogramaReserva(idServicio: idServicio, cita: cita)
                 : _detalles(),

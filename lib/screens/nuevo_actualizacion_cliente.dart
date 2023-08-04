@@ -430,19 +430,20 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
               _emailSesionUsuario, nombre, telefono, email, foto, nota)
           .whenComplete(() {
         debugPrint('cliente nuevo añadido en Firebase!!');
-        Navigator.pushNamed(context, 'clientesScreen');
+        Navigator.pop(context);
       });
     } else {
       await CitaListProvider()
           .nuevoCliente(nombre, telefono, email, foto, nota)
           .whenComplete(() {
         debugPrint('cliente nuevo añadido!!');
-        Navigator.pushReplacement(
+        Navigator.pop(context);
+        /*  Navigator.pushReplacement(
             context,
             MaterialPageRoute(
                 builder: (BuildContext context) => HomeScreen(
                       index: 2,
-                    )));
+                    ))); */
       });
     }
   }

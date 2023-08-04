@@ -1,4 +1,5 @@
 import 'package:agendacitas/.env.dart';
+import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -38,12 +39,11 @@ git push
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  
+
   // initializeDateFormatting().then((_) {
 
   MobileAds.instance.initialize();
   Stripe.publishableKey = stripePublishableKey;
-  
 
   //});
   runApp(const MyApp());
@@ -141,6 +141,8 @@ class _MyAppState extends State<MyApp> {
             create: (BuildContext context) => CalendarioProvider()),
         ChangeNotifierProvider(
             create: (BuildContext context) => EstadoPagoAppProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => CreacionCitaProvider()),
       ],
       builder: (context, _) {
         return MaterialApp(

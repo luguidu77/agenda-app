@@ -179,7 +179,6 @@ class _HomeScreenState extends State<HomeScreen> {
           'creacionCitaServicio': (context) => const CreacionCitaServicio(),
           'creacionCitaComfirmar': (context) => const CreacionCitaConfirmar(),
           'serviciosCitas': (_) => const ServiciosCreacionCita(),
-   
         });
   }
 

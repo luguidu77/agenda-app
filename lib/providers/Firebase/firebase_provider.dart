@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/perfil_model.dart';
+import 'package:agendacitas/providers/db_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -274,28 +275,29 @@ class FirebaseProvider extends ChangeNotifier {
   cargarCitasPorCliente(String email, idCliente) async {
     List<Map<String, dynamic>> listaCitas = [];
     Map<String, dynamic> servicio;
+    try {
+      await _iniFirebase();
 
-    await _iniFirebase();
+      final docRef = await _referenciaDocumento(email, 'cita');
 
-    final docRef = await _referenciaDocumento(email, 'cita');
-
-    await docRef.get().then((QuerySnapshot snapshot) async => {
-          for (var cita in snapshot.docs)
-            {
-              servicio = await cargarServicioPorId(email, cita['idservicio']),
-              //AGREGA CITAS POR ID DE CLIENTE
-              if (idCliente == cita['idcliente'])
-                {
-                  listaCitas.add({
-                    'id': cita.id,
-                    'dia': cita['dia'],
-                    'servicio': servicio['servicio'],
-                    'precio': cita['precio'],
-                    'detalle': servicio['detalle'],
-                  })
-                }
-            }
-        });
+      await docRef.get().then((QuerySnapshot snapshot) async => {
+            for (var cita in snapshot.docs)
+              {
+                servicio = await cargarServicioPorId(email, cita['idservicio']),
+                //AGREGA CITAS POR ID DE CLIENTE
+                if (idCliente == cita['idcliente'])
+                  {
+                    listaCitas.add({
+                      'id': cita.id,
+                      'dia': cita['dia'],
+                      'servicio': servicio['servicio'],
+                      'precio': cita['precio'],
+                      'detalle': servicio['detalle'],
+                    })
+                  }
+              }
+          });
+    } catch (e) {}
 
     return listaCitas;
   }
@@ -562,23 +564,35 @@ class FirebaseProvider extends ChangeNotifier {
     return cliente;
   }
 
-  elimarCita(int id) async {
-    //  await DBProvider.db.eliminarCita(id);
+  elimarCita(String emailUsuarioAPP, id) async {
+    if (emailUsuarioAPP != '') {
+      await _iniFirebase();
+      final docRef = await _referenciaDocumento(emailUsuarioAPP, 'cita');
+
+      await docRef.doc(id).delete();
+    } else {
+      await DBProvider.db.eliminarCita(id);
+    }
   }
 
   elimarServicio(String emailUsuarioAPP, String id) async {
-    await _iniFirebase();
-    //referencia al documento
-    final docRef = await _referenciaDocumento(emailUsuarioAPP, 'servicio');
+    try {
+      await _iniFirebase();
+      //referencia al documento
+      final docRef = await _referenciaDocumento(emailUsuarioAPP, 'servicio');
 
-    await docRef.doc(id).delete();
+      await docRef.doc(id).delete();
+      debugPrint('cita eliminada');
+    } catch (e) {
+      debugPrint('No pudo elimnarse la cita ${id.toString()}');
+    }
   }
 
   eliminaTodosLosClientes() async {
     //  await DBProvider.db.eliminaTodoslosClientes();
   }
 
-  elimarCliente(int id) async {
+  elimarCliente(String id) async {
     //  await DBProvider.db.eliminarCliente(id);
   }
 

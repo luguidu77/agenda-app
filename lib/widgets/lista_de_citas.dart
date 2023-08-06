@@ -44,7 +44,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
       // CONFIGURA VISTA TIEMPO
       timeSlotViewSettings: const TimeSlotViewSettings(
           timeFormat: 'HH:mm', // FORMATO 24H
-          startHour: 10, // INICIO LABORAL
+          startHour: 8, // INICIO LABORAL
           endHour: 22, // FINAL LABORAL
           timeInterval: Duration(minutes: 15) //INTERVALOS DE TIEMPO
 

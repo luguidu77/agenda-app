@@ -202,6 +202,8 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
         cancelText: 'Cancelar',
         hideHeader: true,
         adapter: DateTimePickerAdapter(
+          minHour: 8,
+          maxHour: 21,
           type: PickerDateTimeType.kHM,
           isNumberMonth: true,
         ),

@@ -86,7 +86,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
           slivers: [
             SliverAppBar(
               leading: IconButton(
-                  onPressed: () => Navigator.pushReplacementNamed(context, '/'),
+                  onPressed: () => Navigator.pop(context),
                   //  Navigator.pushNamed(context, 'clientesScreen'),
                   icon: const Icon(Icons.arrow_back)),
               //  actions: [iconoModificar()],

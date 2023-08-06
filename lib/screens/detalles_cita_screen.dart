@@ -301,7 +301,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            widget.reserva['nombre'] != null
+            widget.reserva['nombre'] == null
                 ? const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text(

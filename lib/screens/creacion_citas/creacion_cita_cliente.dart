@@ -1,3 +1,4 @@
+import 'package:agendacitas/providers/db_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/style/.estilos_creacion_cita.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
@@ -39,6 +40,7 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
   bool? pagado;
   bool _iniciadaSesionUsuario = false;
   String _emailSesionUsuario = '';
+  String coincidencias = '';
   pagoProvider() async {
     return Provider.of<PagoProvider>(context, listen: false);
   }
@@ -76,10 +78,12 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
 
     if (busquedaController.text.length > 2) {
       listaClientes = listaClientes
-          .where((element) =>
-              element.nombre!.contains(busquedaController.text.toUpperCase()))
+          .where((element) => element.nombre!
+              .toUpperCase()
+              .contains(busquedaController.text.toUpperCase()))
           .toList();
     } else {
+      coincidencias = 'ninguna coincidencia';
       // aux = listaClientes;
     }
     return listaClientes;
@@ -136,7 +140,16 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
                       color: Colors.white, // Color del icono
                     ),
                   ),
-                  Text('Añade un nuevo cliente')
+                  Text(
+                    'Añade un nuevo cliente',
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  )
                 ],
               ),
             ),
@@ -156,19 +169,19 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
         child: Stack(
           children: [
             TextFormField(
-                decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search),
-                    // labelText: 'Busqueda de cliente',
-                    helperText: 'Mínimo 3 letras'),
-                onChanged: (String value) {
-                  setState(() {});
+              decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.search),
+                  // labelText: 'Busqueda de cliente',
+                  helperText: 'Mínimo 3 letras'),
+              onChanged: (String value) {
+                setState(() {});
 
-                  ///busquedaController.text = value;
-                  //  busquedaController.selection = TextSelection.fromPosition(
-                  //     TextPosition(offset: busquedaController.text.length));
-                },
-                controller: null // busquedaController,
-                ),
+                busquedaController.text = value;
+                busquedaController.selection = TextSelection.fromPosition(
+                    TextPosition(offset: busquedaController.text.length));
+              },
+              controller: busquedaController,
+            ),
           ],
         ),
       ),
@@ -207,6 +220,25 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
                 } else if (snapshot.hasData) {
                   final data = snapshot.data;
 
+                  // SI HAY DATA PERO ESTA VACIA SE VISUALIZA ICONO CAJA VACIA eJ: CUANDO SE HACE BUSQUEDA Y NO HAY COINCIDENCIAS
+                  if (data.isEmpty) {
+                    return Center(
+                      child: Column(
+                        children: [
+                          //Text('Sin resultados'),
+                          SizedBox(
+                              width: 150,
+                              child:
+                                  Image.asset('./assets/images/caja-vacia.png'))
+                        ],
+                      ),
+                    );
+                  }
+                  // ORDENA ALFABETICAMENTE POR NOMBRE CLIENTE
+                  data.sort((a, b) => a.nombre!
+                      .toString()
+                      .toUpperCase()
+                      .compareTo(b.nombre!.toString().toUpperCase()));
                   // SI TENGO DATOS LOS VISUALIZO EN PANTALLA
                   return verclientes(context, data, fecha);
                 } else {
@@ -247,96 +279,36 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
                   child: Column(
                     children: [
                       ListTile(
-                        leading: _iniciadaSesionUsuario &&
-                                listaClientes[index].foto! != ''
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(150.0),
-                                child: Image.network(
-                                  listaClientes[index].foto!,
-                                  width: 50,
-                                  height: 50,
-                                  fit: BoxFit.cover,
-                                ))
-                            : ClipRRect(
-                                borderRadius: BorderRadius.circular(150.0),
-                                child: Image.asset(
-                                  "./assets/images/nofoto.jpg",
-                                  width: 50,
-                                  height: 50,
-                                  fit: BoxFit.cover,
+                          leading: _iniciadaSesionUsuario &&
+                                  listaClientes[index].foto! != ''
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(150.0),
+                                  child: Image.network(
+                                    listaClientes[index].foto!,
+                                    width: 50,
+                                    height: 50,
+                                    fit: BoxFit.cover,
+                                  ))
+                              : ClipRRect(
+                                  borderRadius: BorderRadius.circular(150.0),
+                                  child: Image.asset(
+                                    "./assets/images/nofoto.jpg",
+                                    width: 50,
+                                    height: 50,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
-                        title: Text(listaClientes[index].nombre.toString()),
-                        subtitle:
-                            Text(listaClientes[index].telefono.toString()),
-                        trailing: OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: colorbotones,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(2),
-                                ),
-                              ),
-                            ),
-                            onPressed: () {
-                              menuInferior(context, listaClientes[index]);
-                            },
-                            icon: const Icon(Icons.menu),
-                            label: const Text('')),
-                      ),
-                      Row(
-                        children: [
-                          //? BOTON TELEFONO DE EDICION RAPIDA DE NOMBRE Y TELEFONO
-                          TextButton.icon(
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: colorbotones,
-                              ),
-                              onPressed: () => setState(() {
-                                    _cardConfigCliente(
-                                        context, listaClientes[index]);
-                                  }),
-                              icon: const Icon(Icons.phonelink_setup_sharp),
-                              label: const Text('')),
-                          //? BOTON ACCESO A DATOS DEL CLIENTE Y SU HISTORIAL
-                          TextButton.icon(
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: colorbotones,
-                              ),
-                              onPressed: () {
-                                //1ºrefresco los datos cliente por si han sido editados
-                                datosClientes(_emailSesionUsuario);
-                                //2ºn navega a Ficha Cliente con sus datos
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                      pageBuilder: (BuildContext context,
-                                              Animation<double> animation,
-                                              Animation<double>
-                                                  secondaryAnimation) =>
-                                          FichaClienteScreen(
-                                            clienteParametro: ClienteModel(
-                                                id: listaClientes[index]
-                                                    .id
-                                                    .toString(),
-                                                nombre:
-                                                    listaClientes[index].nombre,
-                                                telefono: listaClientes[index]
-                                                    .telefono,
-                                                email:
-                                                    listaClientes[index].email,
-                                                foto: listaClientes[index].foto,
-                                                nota:
-                                                    listaClientes[index].nota),
-                                          ),
-                                      transitionDuration: // ? TIEMPO PARA QUE SE APRECIE EL HERO DE LA FOTO
-                                          const Duration(milliseconds: 600)),
-                                );
+                          title: Text(listaClientes[index].nombre.toString()),
+                          subtitle:
+                              Text(listaClientes[index].telefono.toString()),
+                          trailing: InkWell(
+                              onTap: () {
+                                menuInferior(context, listaClientes[index]);
                               },
-                              icon: const Icon(Icons.card_travel_outlined),
-                              label: const Text(''))
-                        ],
-                      )
+                              child: const Icon(
+                                Icons.padding_rounded,
+                                size: 40,
+                              ))),
                     ],
                   ),
                 ),
@@ -434,33 +406,26 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
               title: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Eliminar cliente'),
-                  Icon(
-                    Icons.edit_attributes,
-                    color: Colors.red,
-                  ),
+                  Text('ELIMINAR CLIENTE'),
                 ],
               ),
               //  content: Text('Edición clienta'),
               actions: [
-                Row(
+                Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextButton(
-                        onPressed: () async {
-                          cliente.id = idCliente;
+                        onPressed: //null,
+                            () {
+                          // ELIMINA CLIENTE DE FIREBASE Y SUS CITAS
 
-                          cliente.nombre = myLogic.textControllerNombre.text;
-                          cliente.telefono =
-                              myLogic.textControllerTelefono.text;
-                          await _actualizar(cliente);
-                          setState(() {});
-                          // ACTUALIZA CLIENTE DE FIREBASE
-                          await _eliminarCliente(_emailSesionUsuario, cliente);
                           Navigator.pop(context);
+
+                          _eliminacion(idCliente);
                         },
                         child: const Text(
-                          'ELIMINAR',
+                          'ELIMINAR PERMANENTEMENTE ESTE CLIENTE Y SUS CITAS CONCERTADAS',
                         )),
                   ],
                 ),
@@ -472,8 +437,21 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
     SincronizarFirebase().actualizarCliente(emailSesionUsuario, cliente);
   }
 
-  _eliminarCliente(String emailSesionUsuario, ClienteModel cliente) {
-    SincronizarFirebase().eliminaClienteId(emailSesionUsuario, cliente.id);
+  _eliminarCliente(bool iniciadaSesion, idCliente) async {
+    if (iniciadaSesion) {
+      // SI HAY INICIO DE SESION , ELIMINAR DE FIREBASE ###############
+
+      // BORRADO DE TODOAS LAS CITAS DEL CLIENTE
+      List<Map<String, dynamic>> citas = await FirebaseProvider()
+          .cargarCitasPorCliente(_emailSesionUsuario, idCliente);
+
+      for (var cita in citas) {
+        await FirebaseProvider().elimarCita(_emailSesionUsuario, cita['id']);
+      }
+
+      SincronizarFirebase().eliminaClienteId(_emailSesionUsuario, idCliente);
+    }
+    //SI NO HAY INICIO DE SESION, NO HACE NADA, DESHABILITADA ESTA OPCION  ############
   }
 
   cargaClientesFirebase(String emailSesionUsuario) async {
@@ -506,10 +484,6 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
     // retorno numero de citas del cliente
     return citas;
   }
-/* 
-  _eliminarClienteFB(usuarioAPP, id) {
-    SincronizarFirebase().eliminaClienteId(usuarioAPP, id.toString());
-  } */
 
   Future<void> acutalizaLista() async {
     setState(() {});
@@ -587,18 +561,47 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
                 onTap: () {
                   _cardEliminarCliente(context, cliente);
                 },
-                child: Text(
+                child: const Text(
                   'Eliminar',
                   style: TextStyle(color: Colors.red),
                 ),
               )
-            : Container(),
+
+            //EN CUENTA GRATUITA ESTA DESHABILITADA ESTA OPCION
+            : const Text('Eliminar', style: TextStyle(color: Colors.grey)),
         const SizedBox(height: 20),
       ],
     );
   }
 
-  void _alertaEliminacion() {}
+  void _alertaEliminacion() {
+    mensajeSuccess(context, 'Cliente y todo su historial eliminado');
+    setState(() {});
+  }
+
+  Future<void> _eliminacion(idCliente) async {
+    Navigator.pop(context);
+    dialogoEspera();
+
+    await _eliminarCliente(_iniciadaSesionUsuario, idCliente);
+
+    _alertaEliminacion();
+  }
+
+  dialogoEspera() {
+    return showDialog(
+      context: context,
+      builder: (context) => const AlertDialog(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Eliminando...'),
+          ],
+        ),
+        //  content: Text('Edición clienta'),
+      ),
+    );
+  }
 }
 
 _actualizar(ClienteModel cliente) {

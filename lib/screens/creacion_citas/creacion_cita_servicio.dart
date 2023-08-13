@@ -3,8 +3,7 @@ import 'package:agendacitas/screens/creacion_citas/historial_citas.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/capitaliza_palabras.dart';
 import 'package:agendacitas/screens/screens.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/cli_commands.dart';
-import 'package:path/path.dart';
+
 import 'package:provider/provider.dart';
 
 import 'provider/creacion_cita_provider.dart';

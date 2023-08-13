@@ -19,6 +19,7 @@ class ServiciosCreacionCita extends StatefulWidget {
 }
 
 class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
+
   late CreacionCitaProvider contextoCreacionCita;
   String? _emailSesionUsuario;
 
@@ -42,18 +43,6 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
 
   PersonalizaModel personaliza = PersonalizaModel();
 
-  getPersonaliza() async {
-    List<PersonalizaModel> data =
-        await PersonalizaProvider().cargarPersonaliza();
-
-    if (data.isNotEmpty) {
-      personaliza.codpais = data[0].codpais;
-      personaliza.moneda = data[0].moneda;
-
-      setState(() {});
-    }
-  }
-
   emailUsuario() async {
     final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
     _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
@@ -71,7 +60,6 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
 
   @override
   void initState() {
-    getPersonaliza();
     emailUsuario();
 
     super.initState();
@@ -89,6 +77,7 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
   bool floatExtended = false;
   @override
   Widget build(BuildContext context) {
+    
     return SafeArea(
       child: Scaffold(
           body: Column(
@@ -206,6 +195,7 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
         .map((key) => mapFilter[key] as Map<String, dynamic>)
         .toList();
 
+    // TARJETAS DE LOS SERVICIOS ---------------------------
     return ServiciosScreenDraggable(
       servicios: listdataServicios,
       usuarioAPP: _emailSesionUsuario!,
@@ -213,7 +203,7 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
   }
 
 // SERVICIOS DE FIREBASE ( NO ESTA HABILITADO)
-  Widget targetasServiciosFb(Map<String, dynamic> servicio) {
+  /* Widget targetasServiciosFb(Map<String, dynamic> servicio) {
     // PRIMERO ADAPTO EL MAP a ServicioModelFB
     ServicioModelFB servicioFB = ServicioModelFB(
         id: servicio['id'],
@@ -229,9 +219,6 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
       padding: const EdgeInsets.all(8.0),
       child: GestureDetector(
         onTap: () {
-
-
-         
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -262,7 +249,7 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
                           children: [
                             Text('${servicioFB.tiempo.toString()} '),
                             Text(
-                              '${servicioFB.precio.toString()} ${personaliza.moneda}',
+                              '${servicioFB.precio.toString()} ${contextoPersonaliza.getPersonaliza['MONEDA']}',
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
@@ -287,7 +274,7 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
             )),
       ),
     );
-  }
+  } */
 
 //  SERVICIOS DE DISPOSITIVO
   verServiciosDispositivo(context, dataServicios) {

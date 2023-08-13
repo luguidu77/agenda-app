@@ -10,15 +10,7 @@ class CreacionCitaProvider extends ChangeNotifier {
     'PRECIO': '',
     'DETALLE': '',
   };
-  List<Map<String, dynamic>> _listaServiciosElegidos = [
-    {
-      'ID': 0,
-      'SERVICIO': '',
-      'TIEMPO': '',
-      'PRECIO': '',
-      'DETALLE': '',
-    }
-  ];
+  List<Map<String, dynamic>> _listaServiciosElegidos = [];
 
   // Map<String, dynamic> get getServicioElegido => _servicioElegido;
 

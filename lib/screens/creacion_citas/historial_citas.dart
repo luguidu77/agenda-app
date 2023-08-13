@@ -16,6 +16,7 @@ class HistorialCitas extends StatefulWidget {
 }
 
 class _HistorialCitasState extends State<HistorialCitas> {
+  late PersonalizaProvider contextoPersonaliza;
   PersonalizaModel personaliza = PersonalizaModel();
   final List<Map<String, dynamic>> _citas = [];
   bool pagado = false;
@@ -25,13 +26,15 @@ class _HistorialCitasState extends State<HistorialCitas> {
   @override
   void initState() {
     inicializacion();
-    getPersonaliza();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    // TRAE CONTEXTO PERSONALIZA ( MONEDA )
+    contextoPersonaliza = context.read<PersonalizaProvider>();
+       return Scaffold(
       body: _historial(context, _citas, widget.clienteParametro.id),
     );
   }
@@ -80,7 +83,7 @@ class _HistorialCitasState extends State<HistorialCitas> {
                                     citas[index]['dia'].toString()))),
                             Text('${citas[index]['servicio']}'),
                             Text(
-                                '${citas[index]['precio']} ${personaliza.moneda}')
+                                '${citas[index]['precio']} ${contextoPersonaliza.getPersonaliza['MONEDA']}')
                           ],
                         ),
                       ),
@@ -119,17 +122,5 @@ class _HistorialCitasState extends State<HistorialCitas> {
     _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
     debugPrint(
         'datos gardados en tabla Pago (fichaClienteScreen.dart) PAGO: $pagado // EMAIL:$_emailSesionUsuario ');
-  }
-
-  void getPersonaliza() async {
-    List<PersonalizaModel> data =
-        await PersonalizaProvider().cargarPersonaliza();
-
-    if (data.isNotEmpty) {
-      personaliza.codpais = data[0].codpais;
-      personaliza.moneda = data[0].moneda;
-
-      setState(() {});
-    }
   }
 }

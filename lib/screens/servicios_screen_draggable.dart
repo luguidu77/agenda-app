@@ -1,5 +1,3 @@
-import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
-import 'package:agendacitas/screens/screens.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:collection/collection.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
@@ -8,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../models/lista_draggable_servicios_model.dart';
 import '../models/models.dart';
+import '../providers/providers.dart';
 import 'creacion_citas/provider/creacion_cita_provider.dart';
 
 /* List<DraggableList> allLists = [
@@ -50,6 +49,7 @@ class ServiciosScreenDraggable extends StatefulWidget {
 }
 
 class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
+  late PersonalizaProvider contextoPersonaliza;
   late CreacionCitaProvider contextoCreacionCita;
   late List<DragAndDropList> listCategorias;
   late List<DraggableList> convertedListCategorias = [];
@@ -87,16 +87,23 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
   @override
   void initState() {
     super.initState();
+    // TRAE CONTEXTO PERSONALIZA ( MONEDA ). ES NECESARIO INIZIALIZARLA ANTES DE LLAMAR A  buildList DONDE SE UTILIZA EL CONTEXTO PARA LA MONEDA
+    contextoPersonaliza = context.read<PersonalizaProvider>();
+
     adaptacionListas();
     allLists = convertedListCategorias;
+
     //···  allList = a la lista adaptada traida de servicios firebase ·····
     listCategorias = allLists.map(buildList).toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    // contexto Creacion de la cita
     contextoCreacionCita = context.read<CreacionCitaProvider>();
+
     final backgroundColor = Theme.of(context).canvasColor;
+
     return DragAndDropLists(
       // lastItemTargetHeight: 50,
       listPadding: const EdgeInsets.all(16),
@@ -163,13 +170,13 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
                   ),
                   child: GestureDetector(
                     onTap: () {
-                      contextoCreacionCita.setListaServiciosElegidos = [
+                      contextoCreacionCita.setAgregaAListaServiciosElegidos = [
                         {
                           'ID': 2,
                           'SERVICIO': item.title,
                           'TIEMPO': item.tiempo,
                           'PRECIO': item.subtitle,
-                          'DETALLE': item.detalle, 
+                          'DETALLE': item.detalle,
                         }
                       ];
                       Navigator.pushNamed(context, 'creacionCitaComfirmar',
@@ -184,7 +191,7 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
                       ),
                       //leading: Text(item.leading),
                       subtitle: Text(
-                        item.subtitle.toString(),
+                        '${item.subtitle.toString()} ${contextoPersonaliza.getPersonaliza['MONEDA']} ',
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,

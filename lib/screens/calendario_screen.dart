@@ -79,6 +79,8 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
 
     inicializacion();
 
+    
+
     novedades();
 
     // Publicidad.publicidad(_iniciadaSesionUsuario);

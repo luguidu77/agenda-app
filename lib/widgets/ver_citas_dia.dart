@@ -2,6 +2,7 @@ import 'package:agendacitas/widgets/elimina_cita.dart';
 import 'package:agendacitas/widgets/lista_de_citas.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -30,29 +31,18 @@ class ListaCitas extends StatefulWidget {
 }
 
 class _ListaCitasState extends State<ListaCitas> {
+  late PersonalizaProvider contextoPersonaliza;
   DateFormat dateFormat = DateFormat("yyyy-MM-dd");
   PersonalizaModel personaliza = PersonalizaModel();
 
-  getPersonaliza() async {
-    List<PersonalizaModel> data =
-        await PersonalizaProvider().cargarPersonaliza();
-
-    if (data.isNotEmpty) {
-      personaliza.codpais = data[0].codpais;
-      personaliza.moneda = data[0].moneda;
-
-      //setState(() {});
-    }
-  }
-
   @override
   void initState() {
-    getPersonaliza();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    contextoPersonaliza = context.read<PersonalizaProvider>();
     var fecha = dateFormat.format(widget.fechaElegida);
     // CITAS SEGUN SELECCION FILTRO (TODAS, SOLO PENDIENTES)
     if (widget.filter == 'TODAS') {
@@ -103,7 +93,7 @@ class _ListaCitasState extends State<ListaCitas> {
 
                   // SI TENGO DATOS LOS VISUALIZO EN PANTALLA
                   return Text(
-                    'GANANCIAS HOY $data ${personaliza.moneda}',
+                    'GANANCIAS HOY $data ${contextoPersonaliza.getPersonaliza['MONEDA']}',
                     style: const TextStyle(fontSize: 12),
                   );
                 } else {

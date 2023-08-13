@@ -1,6 +1,9 @@
 import 'package:agendacitas/models/models.dart';
+import 'package:agendacitas/screens/creacion_citas/historial_citas.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/capitaliza_palabras.dart';
 import 'package:agendacitas/screens/screens.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/cli_commands.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 
@@ -64,24 +67,14 @@ class _CreacionCitaServicioState extends State<CreacionCitaServicio> {
             flex: 2,
             child: Column(
               children: [
-                Text('Reservado recientemente por ${cliente.nombre}'),
+                Text(
+                  'Reservado recientemente por ${CapitalizaPalabras.capitalizeWords(cliente.nombre.toString())}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 Expanded(
-                  child: ListView.builder(
-                      itemCount: 3,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (BuildContext context, int) {
-                        return Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                Text('servicio. tiempo'),
-                                Text('precio €')
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
+                  child: HistorialCitas(
+                    clienteParametro: cliente,
+                  ),
                 ),
               ],
             ),

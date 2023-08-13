@@ -4,9 +4,11 @@ import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:collection/collection.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../models/lista_draggable_servicios_model.dart';
 import '../models/models.dart';
+import 'creacion_citas/provider/creacion_cita_provider.dart';
 
 /* List<DraggableList> allLists = [
   const DraggableList(header: 'categoria 1', items: [
@@ -48,6 +50,7 @@ class ServiciosScreenDraggable extends StatefulWidget {
 }
 
 class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
+  late CreacionCitaProvider contextoCreacionCita;
   late List<DragAndDropList> listCategorias;
   late List<DraggableList> convertedListCategorias = [];
   List<DraggableListItem> convertedListServiciosCategorizados = [];
@@ -92,6 +95,7 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
 
   @override
   Widget build(BuildContext context) {
+    contextoCreacionCita = context.read<CreacionCitaProvider>();
     final backgroundColor = Theme.of(context).canvasColor;
     return DragAndDropLists(
       // lastItemTargetHeight: 50,
@@ -159,6 +163,15 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
                   ),
                   child: GestureDetector(
                     onTap: () {
+                      contextoCreacionCita.setListaServiciosElegidos = [
+                        {
+                          'ID': 2,
+                          'SERVICIO': item.title,
+                          'TIEMPO': item.tiempo,
+                          'PRECIO': item.subtitle,
+                          'DETALLE': item.detalle, 
+                        }
+                      ];
                       Navigator.pushNamed(context, 'creacionCitaComfirmar',
                           arguments: servicioFB);
                     },

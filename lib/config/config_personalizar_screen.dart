@@ -17,6 +17,9 @@ class ConfigPersonalizar extends StatefulWidget {
 }
 
 class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
+  // contextoPersonaliza es la variable para actuar con este contexto
+  late PersonalizaProvider contextoPersonaliza;
+
   List<Color> colorsList = const [
     Colors.red,
     Color.fromARGB(255, 117, 187, 120),
@@ -47,6 +50,10 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
         await PersonalizaProvider().cargarPersonaliza();
 
     if (data.isNotEmpty) {
+      contextoPersonaliza.setPersonaliza = {
+        'CODPAIS': data[0].codpais,
+        'MONEDA': data[0].moneda
+      };
       personaliza.codpais = data[0].codpais;
       personaliza.moneda = data[0].moneda;
       // mensajeModificado('dato actualizado');
@@ -59,6 +66,8 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
 
   @override
   Widget build(BuildContext context) {
+    contextoPersonaliza = context.read<PersonalizaProvider>();
+    print(contextoPersonaliza.getPersonaliza['CODPAIS']);
     return SafeArea(
       child: Scaffold(
         body: Padding(

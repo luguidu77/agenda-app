@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cita_model.dart';
+import '../models/models.dart';
 import '../providers/providers.dart';
 import '../providers/theme_provider.dart';
 import '../widgets/widgets.dart';
@@ -24,6 +25,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // contextoPersonaliza es la variable para actuar con este contexto
+  late PersonalizaProvider contextoPersonaliza;
   //trae mediante funcion de BNavigator el index de la pagina menu de abajo , myBnB
   BNavigator? myBnB;
 
@@ -60,6 +63,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     cargarTema();
 
+    personaliza();
+
     messangingFirebase();
 
     super.initState();
@@ -67,6 +72,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    contextoPersonaliza = context.read<PersonalizaProvider>();
+    print(contextoPersonaliza.getPersonaliza['CODPAIS']);
     themeProvider = context.watch<ThemeProvider>();
 
     return MaterialApp(
@@ -191,6 +198,24 @@ class _HomeScreenState extends State<HomeScreen> {
     debugPrint(fcmToken.toString());
     if (emailSesionUsuario != '') {
       FirebaseProvider().actualizaTokenMessaging(emailSesionUsuario, fcmToken!);
+    }
+  }
+
+  void personaliza() async {
+    List<PersonalizaModel> data =
+        await PersonalizaProvider().cargarPersonaliza();
+
+    if (data.isNotEmpty) {
+      contextoPersonaliza.setPersonaliza = {
+        'CODPAIS': data[0].codpais,
+        'MONEDA': data[0].moneda
+      };
+
+      // mensajeModificado('dato actualizado');
+      // setState(() {});
+    } else {
+      await PersonalizaProvider().nuevoPersonaliza(0, 34, '', '', '€');
+      personaliza();
     }
   }
 }

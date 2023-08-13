@@ -9,10 +9,7 @@ import 'package:skeletons/skeletons.dart';
 import '../../models/models.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
-import '../servicios_screen copy.dart';
-
-// ########### esta pagina pagina no esta en uso,
-//############ pagina actual : servicios_screen_draggable
+import 'provider/creacion_cita_provider.dart';
 
 class ServiciosCreacionCita extends StatefulWidget {
   const ServiciosCreacionCita({Key? key}) : super(key: key);
@@ -22,7 +19,9 @@ class ServiciosCreacionCita extends StatefulWidget {
 }
 
 class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
+  late CreacionCitaProvider contextoCreacionCita;
   String? _emailSesionUsuario;
+
   bool _iniciadaSesionUsuario = false;
   List<ServicioModel> listaAux = [];
   List<ServicioModelFB> listaAuxFB = [];
@@ -213,7 +212,7 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
     );
   }
 
-// SERVICIOS DE FIREBASE
+// SERVICIOS DE FIREBASE ( NO ESTA HABILITADO)
   Widget targetasServiciosFb(Map<String, dynamic> servicio) {
     // PRIMERO ADAPTO EL MAP a ServicioModelFB
     ServicioModelFB servicioFB = ServicioModelFB(
@@ -230,6 +229,9 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
       padding: const EdgeInsets.all(8.0),
       child: GestureDetector(
         onTap: () {
+
+
+         
           Navigator.push(
               context,
               MaterialPageRoute(

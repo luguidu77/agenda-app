@@ -3,8 +3,17 @@ import 'package:agendacitas/providers/db_provider.dart';
 import 'package:flutter/material.dart';
 
 class PersonalizaProvider extends ChangeNotifier {
-  List<PersonalizaModel> personalizaGuardado = [];
+  var _personaliza = {};
 
+  get getPersonaliza => _personaliza;
+
+  set setPersonaliza(nuevoPersonaliza) {
+    _personaliza = nuevoPersonaliza;
+
+    notifyListeners();
+  }
+
+  List<PersonalizaModel> _personalizaGuardado = [];
   Future<PersonalizaModel> nuevoPersonaliza(
       int id, int codpais, String mensaje, String enlace, String moneda) async {
     final personaliza = PersonalizaModel(
@@ -20,14 +29,14 @@ class PersonalizaProvider extends ChangeNotifier {
     //asinar el ID de la base de datos al modelo
     personaliza.id = id;
 
-    personalizaGuardado.add(personaliza);
+    _personalizaGuardado.add(personaliza);
 
     return personaliza;
   }
 
   Future<List<PersonalizaModel>> cargarPersonaliza() async {
     final personalizaGuardado = await DBProvider.db.getPersonaliza();
-    this.personalizaGuardado = [...personalizaGuardado];
+    _personalizaGuardado = [...personalizaGuardado];
 
     return personalizaGuardado;
   }

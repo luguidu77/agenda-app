@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class CreacionCitaProvider extends ChangeNotifier {
   // CONTEXTO servicioElegido ############################
+
   Map<String, dynamic> _servicioElegido = {
     'ID': 0,
     'SERVICIO': '',
@@ -9,11 +10,37 @@ class CreacionCitaProvider extends ChangeNotifier {
     'PRECIO': '',
     'DETALLE': '',
   };
+  List<Map<String, dynamic>> _listaServiciosElegidos = [
+    {
+      'ID': 0,
+      'SERVICIO': '',
+      'TIEMPO': '',
+      'PRECIO': '',
+      'DETALLE': '',
+    }
+  ];
 
-  Map<String, dynamic> get getServicioElegido => _servicioElegido;
+  // Map<String, dynamic> get getServicioElegido => _servicioElegido;
 
-  set setServicioElegido(Map<String, dynamic> nuevoServicio) {
+  /*  set setServicioElegido(Map<String, dynamic> nuevoServicio) {
     _servicioElegido = nuevoServicio;
+    notifyListeners();
+  } */
+
+  List<Map<String, dynamic>> get getServiciosElegidos =>
+      _listaServiciosElegidos;
+
+  set setListaServiciosElegidos(
+      List<Map<String, dynamic>> nuevoListaServicios) {
+    _listaServiciosElegidos = nuevoListaServicios;
+
+    notifyListeners();
+  }
+
+  set setAgregaAListaServiciosElegidos(
+      List<Map<String, dynamic>> nuevoListaServicios) {
+    _listaServiciosElegidos.add(nuevoListaServicios.first);
+
     notifyListeners();
   }
 

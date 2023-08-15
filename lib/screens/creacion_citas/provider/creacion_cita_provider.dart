@@ -36,6 +36,12 @@ class CreacionCitaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  set setEliminaItemListaServiciosElegidos(List<Map<String, dynamic>> item) {
+    _listaServiciosElegidos.remove(item.first);
+    print(item.first);
+    notifyListeners();
+  }
+
   // CONTEXTO citaElegida ############################
   Map<String, dynamic> _citaElegida = {
     'FECHA': '',

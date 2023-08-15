@@ -54,8 +54,8 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // VISUALIZACION DEL CONTEXTO EN PRUEBAS
-                  //Text('SERVICIOS : ${contextoCreacionCita.getServiciosElegidos}'),
-                  Padding(
+                  //  Text(  'SERVICIOS : ${contextoCreacionCita.getServiciosElegidos}'),
+                  const Padding(
                     padding: EdgeInsets.all(28.0),
                     child: Text(
                       'Confirmar cita',
@@ -74,20 +74,18 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                     ],
                   ),
                   servicios(),
-                  Container(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text('añade otro servicio'),
-                          ElevatedButton.icon(
-                            onPressed: () => menuInferior(context),
-                            icon: Icon(Icons.plus_one_sharp),
-                            label: Text(''),
-                          )
-                        ],
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        const Text('añade otro servicio'),
+                        ElevatedButton.icon(
+                          onPressed: () => menuInferior(context),
+                          icon: const Icon(Icons.plus_one_sharp),
+                          label: const Text(''),
+                        )
+                      ],
                     ),
                   ),
                   const Divider(),
@@ -97,128 +95,99 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
   }
 
   servicios() {
+    return SizedBox(
+      height: contextoCreacionCita.getServiciosElegidos.length * 90,
+      child: ListView.builder(
+          itemCount: contextoCreacionCita.getServiciosElegidos.length,
+          itemBuilder: ((context, index) {
+            return card(index);
+          })),
+    );
+  }
+
+  card(index) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          Container(
-            height: 300,
-            child: Expanded(
-              child: ListView(
-                children: List.generate(
-                    contextoCreacionCita.getServiciosElegidos.length, (index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          left: BorderSide(
-                            color: Colors.blue, // Color del borde izquierdo
-                            width: 5, // Ancho del borde izquierdo
-                          ),
-                        ),
-                      ),
-                      height: 70,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${contextoCreacionCita.getServiciosElegidos[index]['SERVICIO']}',
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Row(
-                              children: [
-                                //Text('19:00 - 20-00'),
-                                Text(
-                                    '${contextoCreacionCita.getServiciosElegidos[index]['TIEMPO']} h')
-                              ],
-                            ),
-                            Text(
-                                '${contextoCreacionCita.getServiciosElegidos[index]['PRECIO']} ${contextoPersonaliza.getPersonaliza['MONEDA']}'),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              ),
+      child: Container(
+        decoration: const BoxDecoration(
+          border: Border(
+            left: BorderSide(
+              color: Colors.blue, // Color del borde izquierdo
+              width: 5, // Ancho del borde izquierdo
             ),
           ),
-        ],
-      ),
-    );
-
-    /*  return Container(
-              decoration: const BoxDecoration(
-                border: Border(
-                  left: BorderSide(
-                    color: Colors.blue, // Color del borde izquierdo
-                    width: 5, // Ancho del borde izquierdo
+        ),
+        height: 70,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${contextoCreacionCita.getServiciosElegidos[index]['SERVICIO']}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  height: 10,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
                     children: [
+                      //Text('19:00 - 20-00'),
                       Text(
-                        '${contextoCreacionCita.getServiciosElegidos.first['SERVICIO']}',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Row(
-                        children: [
-                          //Text('19:00 - 20-00'),
-                          Text(
-                              '${contextoCreacionCita.getServiciosElegidos.first['TIEMPO']} h')
-                        ],
-                      ),
-                      Text(
-                          '${contextoCreacionCita.getServiciosElegidos.first['PRECIO']} ${contextoPersonaliza.getPersonaliza['MONEDA']}')
+                          '${contextoCreacionCita.getServiciosElegidos[index]['TIEMPO']} h')
                     ],
                   ),
-                ),
+                  Text(
+                      '${contextoCreacionCita.getServiciosElegidos[index]['PRECIO']} ${contextoPersonaliza.getPersonaliza['MONEDA']}'),
+                ],
               ),
-            ); */
+              IconButton(
+                  onPressed: () {
+                    contextoCreacionCita.setEliminaItemListaServiciosElegidos =
+                        [contextoCreacionCita.getServiciosElegidos[index]];
+                    setState(() {});
+                  },
+                  icon: const Icon(
+                    Icons.delete,
+                    color: Color.fromARGB(255, 206, 45, 34),
+                  ))
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   vercliente(context, ClienteModel cliente) {
-    return Container(
-      child: Card(
-        child: ClipRect(
-          child: SizedBox(
-            //Banner aqui -----------------------------------------------
-            child: Column(
-              children: [
-                ListTile(
-                  leading: _emailSesionUsuario != '' && cliente.foto != ''
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(150.0),
-                          child: Image.network(
-                            cliente.foto!,
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover,
-                          ))
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(150.0),
-                          child: Image.asset(
-                            "./assets/images/nofoto.jpg",
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover,
-                          ),
+    return Card(
+      child: ClipRect(
+        child: SizedBox(
+          //Banner aqui -----------------------------------------------
+          child: Column(
+            children: [
+              ListTile(
+                leading: _emailSesionUsuario != '' && cliente.foto != ''
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(150.0),
+                        child: Image.network(
+                          cliente.foto!,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        ))
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(150.0),
+                        child: Image.asset(
+                          "./assets/images/nofoto.jpg",
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
                         ),
-                  title: Text(cliente.nombre!.toString()),
-                  subtitle: Text(cliente.telefono!.toString()),
-                ),
-              ],
-            ),
+                      ),
+                title: Text(cliente.nombre!.toString()),
+                subtitle: Text(cliente.telefono!.toString()),
+              ),
+            ],
           ),
         ),
       ),
@@ -258,17 +227,63 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
   }
 
   barraInferior() {
+    var totalPrecio = 0.0;
+    List<String> tiempos = [];
+
+    for (var element in contextoCreacionCita.getServiciosElegidos) {
+      totalPrecio = double.parse(element['PRECIO']) + totalPrecio;
+
+      tiempos.add(element['TIEMPO']);
+    }
+
+    final String totalTiempo = sumarTiempo(tiempos);
+
     return Container(
+      color: const Color.fromARGB(141, 255, 193, 7),
+      height: 100,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Precio total 33€ (1h)'),
-            ElevatedButton(onPressed: null, child: Text('Confirmar cita'))
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'TOTAL $totalPrecio €',
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'TIEMPO $totalTiempo',
+                  style: const TextStyle(
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
+            const ElevatedButton(onPressed: null, child: Text('Confirmar cita'))
           ],
         ),
       ),
     );
   }
+}
+
+sumarTiempo(tiempos) {
+  Duration sumaTiempos = Duration();
+
+  for (String tiempo in tiempos) {
+    List<String> partes = tiempo.split(":");
+    int horas = int.parse(partes[0]);
+    int minutos = int.parse(partes[1]);
+
+    sumaTiempos += Duration(hours: horas, minutes: minutos);
+  }
+
+  int horasSumadas = sumaTiempos.inHours;
+  int minutosRestantes = sumaTiempos.inMinutes.remainder(60);
+  print("Total: $horasSumadas horas $minutosRestantes minutos");
+  return "$horasSumadas h $minutosRestantes m";
 }

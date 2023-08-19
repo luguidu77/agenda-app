@@ -34,7 +34,7 @@ class _CreacionCitaServicioState extends State<CreacionCitaServicio> {
           Text(
               'HORAINICIO : ${contextoCreacionCita.getCitaElegida['HORAINICIO']}'),
           Text(
-              'HORAFINAL : ${contextoCreacionCita.getCitaElegida['HORAFINALF']}'),
+              'HORAFINAL : ${contextoCreacionCita.getCitaElegida['HORAFINAL']}'),
 
           Text('NOMBRE : ${contextoCreacionCita.getClienteElegido['NOMBRE']}'),
           Text(

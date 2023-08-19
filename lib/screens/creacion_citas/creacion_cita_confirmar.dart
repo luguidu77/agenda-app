@@ -1,9 +1,11 @@
+import 'package:agendacitas/screens/citas/confirmar_step.dart';
 import 'package:agendacitas/screens/creacion_citas/serviciosCreacionCita.dart';
 import 'package:agendacitas/screens/creacion_citas/style/.estilos_creacion_cita.dart';
 import 'package:agendacitas/screens/servicios_screen%20copy.dart';
 import 'package:agendacitas/screens/servicios_screen_draggable.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -20,6 +22,11 @@ class CreacionCitaConfirmar extends StatefulWidget {
 }
 
 class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
+  Duration sumaTiempos = Duration();
+  late DateTime horafinal;
+  late DateTime horainicio;
+  late String totalTiempo;
+  var totalPrecio = 0.0;
   late PersonalizaProvider contextoPersonaliza;
   late CreacionCitaProvider contextoCreacionCita;
   ClienteModel cliente = ClienteModel();
@@ -32,6 +39,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
   @override
   void initState() {
     inicializacion();
+    contextoCita(); // añado duracion de los servicios y sumo los precios
     super.initState();
   }
 
@@ -39,9 +47,6 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
   Widget build(BuildContext context) {
     // TRAE CONTEXTO PERSONALIZA ( MONEDA )
     contextoPersonaliza = context.read<PersonalizaProvider>();
-
-    // LLEER MICONTEXTO DE CreacionCitaProvider
-    contextoCreacionCita = context.read<CreacionCitaProvider>();
 
     cliente.nombre = contextoCreacionCita.getClienteElegido['NOMBRE'];
     cliente.telefono = contextoCreacionCita.getClienteElegido['TELEFONO'];
@@ -54,7 +59,8 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // VISUALIZACION DEL CONTEXTO EN PRUEBAS
-                  //  Text(  'SERVICIOS : ${contextoCreacionCita.getServiciosElegidos}'),
+                  Text(
+                      'SERVICIOS : ${contextoCreacionCita.getServiciosElegidos}'),
                   const Padding(
                     padding: EdgeInsets.all(28.0),
                     child: Text(
@@ -63,12 +69,38 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                     ),
                   ),
                   vercliente(context, cliente),
+                  const SizedBox(
+                    height: 15,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      Text(DateFormat.MMMMEEEEd('es_ES').format(DateTime.parse(
-                          contextoCreacionCita.getCitaElegida['FECHA']
-                              .toString()))),
+                      Column(
+                        children: [
+                          Text(DateFormat.MMMMEEEEd('es_ES').format(
+                              DateTime.parse(contextoCreacionCita
+                                  .getCitaElegida['FECHA']
+                                  .toString()))),
+                          Row(
+                            children: [
+                              Text(
+                                DateFormat.Hm('es_ES').format(DateTime.parse(
+                                    contextoCreacionCita.getCitaElegida['FECHA']
+                                        .toString())),
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              const Text(' - '),
+                              Text(
+                                DateFormat.Hm('es_ES').format(
+                                    DateTime.parse(horafinal.toString())),
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                       const ElevatedButton(
                           onPressed: null, child: Text('Modificar'))
                     ],
@@ -76,17 +108,18 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                   servicios(),
                   Padding(
                     padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        const Text('añade otro servicio'),
-                        ElevatedButton.icon(
-                          onPressed: () => menuInferior(context),
-                          icon: const Icon(Icons.plus_one_sharp),
-                          label: const Text(''),
-                        )
-                      ],
-                    ),
+                    child: GestureDetector(
+                        onTap: () => menuInferior(context),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            FaIcon(FontAwesomeIcons.circlePlus),
+                            Text('añade otro servicio'),
+                            SizedBox(
+                              width: 15,
+                            )
+                          ],
+                        )),
                   ),
                   const Divider(),
                 ],
@@ -143,8 +176,13 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
               ),
               IconButton(
                   onPressed: () {
+                    // elimino servicio del contexto
                     contextoCreacionCita.setEliminaItemListaServiciosElegidos =
                         [contextoCreacionCita.getServiciosElegidos[index]];
+                    // reseteo la suma de tiempos
+                    sumaTiempos = const Duration(hours: 0, minutes: 0);
+                    // actualiza precio total y tiempo total
+                    contextoCita();
                     setState(() {});
                   },
                   icon: const Icon(
@@ -227,8 +265,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
   }
 
   barraInferior() {
-    var totalPrecio = 0.0;
-    List<String> tiempos = [];
+    /*  List<String> tiempos = [];
 
     for (var element in contextoCreacionCita.getServiciosElegidos) {
       totalPrecio = double.parse(element['PRECIO']) + totalPrecio;
@@ -236,7 +273,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
       tiempos.add(element['TIEMPO']);
     }
 
-    final String totalTiempo = sumarTiempo(tiempos);
+    final String totalTiempo = sumarTiempo(tiempos); */
 
     return Container(
       color: const Color.fromARGB(141, 255, 193, 7),
@@ -263,27 +300,61 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                 ),
               ],
             ),
-            const ElevatedButton(onPressed: null, child: Text('Confirmar cita'))
+            ElevatedButton(
+                onPressed: () {
+                  DateTime horainicio =
+                      contextoCreacionCita.getCitaElegida['HORAINICIO'];
+
+                  contextoCreacionCita.setCitaElegida = {
+                    'FECHA': contextoCreacionCita.getCitaElegida['FECHA'],
+                    'HORAINICIO': horainicio,
+                    'HORAFINAL': horafinal
+                  };
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ConfirmarStep(),
+                      ));
+                },
+                child: const Text('Confirmar cita'))
           ],
         ),
       ),
     );
   }
-}
 
-sumarTiempo(tiempos) {
-  Duration sumaTiempos = Duration();
+  sumarTiempo(tiempos) {
+    for (String tiempo in tiempos) {
+      List<String> partes = tiempo.split(":");
+      int horas = int.parse(partes[0]);
+      int minutos = int.parse(partes[1]);
 
-  for (String tiempo in tiempos) {
-    List<String> partes = tiempo.split(":");
-    int horas = int.parse(partes[0]);
-    int minutos = int.parse(partes[1]);
+      sumaTiempos += Duration(hours: horas, minutes: minutos);
+    }
 
-    sumaTiempos += Duration(hours: horas, minutes: minutos);
+    int horasSumadas = sumaTiempos.inHours;
+    int minutosRestantes = sumaTiempos.inMinutes.remainder(60);
+    print("Total: $horasSumadas horas $minutosRestantes minutos");
+    return "$horasSumadas h $minutosRestantes m";
   }
 
-  int horasSumadas = sumaTiempos.inHours;
-  int minutosRestantes = sumaTiempos.inMinutes.remainder(60);
-  print("Total: $horasSumadas horas $minutosRestantes minutos");
-  return "$horasSumadas h $minutosRestantes m";
+  void contextoCita() {
+    // LLEER MICONTEXTO DE CreacionCitaProvider
+    contextoCreacionCita = context.read<CreacionCitaProvider>();
+    List<String> tiempos = [];
+    totalPrecio = 0.0;
+    totalTiempo = "0 h 0 m";
+
+    for (var element in contextoCreacionCita.getServiciosElegidos) {
+      totalPrecio = double.parse(element['PRECIO']) + totalPrecio;
+
+      tiempos.add(element['TIEMPO']);
+    }
+
+    totalTiempo = sumarTiempo(tiempos);
+
+    horainicio = contextoCreacionCita.getCitaElegida['HORAINICIO'];
+    horafinal = horainicio.add(sumaTiempos);
+    setState(() {});
+  }
 }

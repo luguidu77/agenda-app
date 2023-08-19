@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
 import '../../mylogic_formularios/mylogic.dart';
+import '../creacion_citas/provider/creacion_cita_provider.dart';
 
 //import 'package:url_launcher/url_launcher_string.dart';
 
@@ -29,6 +30,8 @@ class ConfirmarStep extends StatefulWidget {
 }
 
 class _ConfirmarStepState extends State<ConfirmarStep> {
+  late CreacionCitaProvider contextoCreacionCita;
+  final citaElegida = CitaListProvider();
   List<String> tRecordatorioGuardado = [];
   String tiempoTextoRecord = '';
   var tiempoEstablecido = RecordatoriosProvider();
@@ -78,16 +81,18 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
   }
 
   guardalacita() async {
-    var citaElegida = Provider.of<CitaListProvider>(context, listen: false);
-    debugPrint('cita elegida ${citaElegida.getCitaElegida}');
-    var clienta = citaElegida.getClientaElegida;
+    // LLEER MICONTEXTO DE CreacionCitaProvider
+    contextoCreacionCita = context.read<CreacionCitaProvider>();
+    debugPrint('cita elegida ${contextoCreacionCita.getCitaElegida}');
+    var clienta = contextoCreacionCita.getClienteElegido;
     clientaTexto = clienta['NOMBRE'];
     telefono = clienta['TELEFONO'];
     email = clienta['EMAIL'];
 
-    Map<String, dynamic> servicio = citaElegida.getServicioElegido;
+    List<Map<String, dynamic>> listaServicios =
+        contextoCreacionCita.getServiciosElegidos;
 
-    Map<String, dynamic> citaFechaHora = citaElegida.getCitaElegida;
+    Map<String, dynamic> citaFechaHora = contextoCreacionCita.getCitaElegida;
 
     DateTime cita = DateTime.parse(
       citaFechaHora['HORAINICIO'].toString(),
@@ -105,31 +110,26 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
           .toString();
     }
 
-    String fecha =
-        '${DateTime.parse(citaFechaHora['FECHA']).day.toString().padLeft(2, '0')}/${DateTime.parse(citaFechaHora['FECHA']).month.toString().padLeft(2, '0')}';
+    String fecha = 'dia / mes';
+    // '${DateTime.parse(citaFechaHora['FECHA']).day.toString().padLeft(2, '0')}/${DateTime.parse(citaFechaHora['FECHA']).month.toString().padLeft(2, '0')}';
 
     //todo: pasar por la clase formater hora y fecha
-    String textoHoraInicio =
-        '${DateTime.parse(citaFechaHora['HORAINICIO'].toString()).hour.toString().padLeft(2, '0')}:${DateTime.parse(citaFechaHora['HORAINICIO'].toString()).minute.toString().padLeft(2, '0')}';
+    String textoHoraInicio = 'hora inicio';
+    '${DateTime.parse(citaFechaHora['HORAINICIO'].toString()).hour.toString().padLeft(2, '0')}:${DateTime.parse(citaFechaHora['HORAINICIO'].toString()).minute.toString().padLeft(2, '0')}';
     String textoHoraFinal =
         '${DateTime.parse(citaFechaHora['HORAFINAL'].toString()).hour.toString().padLeft(2, '0')}:${DateTime.parse(citaFechaHora['HORAFINAL'].toString()).minute.toString().padLeft(2, '0')}';
 
     //VARIABLES PARA PRESENTARLA EN PANTALLA AL USUARIO
-    servicioTexto = servicio['SERVICIO'];
-    precioTexto = servicio['PRECIO'];
+    //todo: SUMAR TODOS LOS SERVICIOS ELEGIDOS -------------------------------------??????
+    servicioTexto = listaServicios.first['SERVICIO'];
+    precioTexto = listaServicios.first['PRECIO'];
     fechaTexto = fecha;
     horaInicioTexto = textoHoraInicio;
     horaFinalTexto = textoHoraFinal;
-    citaConfirmadaMes = DateTime.parse(citaFechaHora['FECHA'])
-        .month
-        .toString()
-        .padLeft(2, '0')
-        .toString();
-    citaConfirmadaDia = DateTime.parse(citaFechaHora['FECHA'])
-        .day
-        .toString()
-        .padLeft(2, '0')
-        .toString();
+    citaConfirmadaMes =
+        (citaFechaHora['FECHA']).month.toString().padLeft(2, '0').toString();
+    citaConfirmadaDia =
+        (citaFechaHora['FECHA']).day.toString().padLeft(2, '0').toString();
 
     //? FECHA LARGA EN ESPAÑOL
     final String fechaLargaEspa = DateFormat.MMMMEEEEd('es_ES')
@@ -149,16 +149,16 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         context,
         fecha,
         textoHoraInicio,
-        citaElegida,
+        //citaElegida,
         citaFechaHora['FECHA'].toString(),
         citaFechaHora['HORAINICIO'].toString(),
         citaFechaHora['HORAFINAL'].toString(),
-        servicio['DETALLE'],
+        listaServicios.first['DETALLE'],
         clienta['ID'],
-        servicio['ID'],
+        listaServicios.first['ID'],
         clienta['NOMBRE'],
-        servicio['SERVICIO'],
-        servicio['PRECIO']);
+        listaServicios.first['SERVICIO'],
+        listaServicios.first['PRECIO']);
 
     setState(() {});
   }
@@ -284,7 +284,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
       context,
       fechaTexto,
       horaIniciotexto,
-      CitaListProvider citaElegida,
+      //CitaListProvider citaElegida,
       String fecha,
       String horaInicio,
       String horaFinal,

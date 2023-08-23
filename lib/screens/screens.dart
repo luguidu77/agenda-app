@@ -1,7 +1,7 @@
 export 'package:agendacitas/screens/calendario_screen.dart';
 export 'package:agendacitas/screens/clientes_screen.dart';
 export 'package:agendacitas/screens/citas/cita_step.dart';
-export 'package:agendacitas/screens/citas/confirmar_step.dart';
+export 'package:agendacitas/screens/creacion_citas/creacion_cita_resumen.dart';
 export 'package:agendacitas/screens/citas/servicio_step.dart';
 export 'package:agendacitas/config/confg_cliente_screen.dart';
 export 'package:agendacitas/config/config_categoria_servicio_screen.dart';

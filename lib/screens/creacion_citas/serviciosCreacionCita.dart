@@ -19,6 +19,7 @@ class ServiciosCreacionCita extends StatefulWidget {
 }
 
 class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
+  late PersonalizaProvider contextoPersonaliza;
   late CreacionCitaProvider contextoCreacionCita;
   String? _emailSesionUsuario;
 
@@ -60,7 +61,9 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
   @override
   void initState() {
     emailUsuario();
-
+    // TRAE CONTEXTO PERSONALIZA ( MONEDA ). ES NECESARIO INIZIALIZARLA ANTES DE LLAMAR A  buildList DONDE SE UTILIZA EL CONTEXTO PARA LA MONEDA
+    contextoPersonaliza = context.read<PersonalizaProvider>();
+    contextoCreacionCita = context.read<CreacionCitaProvider>();
     super.initState();
   }
 
@@ -113,26 +116,34 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
           } else if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
-            } else if (snapshot.hasData) {
+            } else if (snapshot.hasData && snapshot.data.isNotEmpty) {
               final data = snapshot.data;
-              print(data);
+
               // SI TENGO DATOS LOS VISUALIZO EN PANTALLA
               return _iniciadaSesionUsuario
                   ? verserviciosFB(context, data)
                   : verServiciosDispositivo(context, data);
             } else {
               return //NO HAY SERVICIOS
-                  Column(
-                children: [
-                  const Text('No tienes servicios que ofrecer'),
-                  const SizedBox(
-                    height: 50,
+                  Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Text(
+                          'AÚN NO TIENES SERVICIOS QUE OFRECER PARA CONCERTAR UNA CITA'),
+                      const SizedBox(
+                        height: 50,
+                      ),
+                      ElevatedButton(
+                          onPressed: () =>
+                              Navigator.pushNamed(context, 'Servicios'),
+                          child: const Text('AÑADE TU PRIMER SERVICIO')),
+                    ],
                   ),
-                  Image.asset(
-                    'assets/images/caja-vacia.png',
-                    width: MediaQuery.of(context).size.width - 250,
-                  ),
-                ],
+                ),
               );
             }
           } else {
@@ -196,67 +207,116 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
   verServiciosDispositivo(context, dataServicios) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: ListView.builder(
-          padding: EdgeInsets.zero,
-          itemCount: dataServicios.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Padding(
-              padding: const EdgeInsets.all(1.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CreacionCitaConfirmar(),
-                      ));
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                          color: const Color.fromARGB(141, 158, 158, 158)),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(dataServicios[index].servicio,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold)),
-                            Text(dataServicios[index].detalle),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        children: [
+          ListView.builder(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              itemCount: dataServicios.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Padding(
+                  padding: const EdgeInsets.all(1.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      // PRIMERO ADAPTO EL item AL MODELO ServicioModel , PARA ENVIAR COMO ARGUMENTO A configServicios (editar servicio)
+                      ServicioModel servicio = ServicioModel(
+                        id: dataServicios[index].id,
+                        activo: dataServicios[index].activo,
+                        detalle: dataServicios[index].detalle,
+                        precio: dataServicios[index].precio,
+                        servicio: dataServicios[index].servicio,
+                        tiempo: dataServicios[index].tiempo,
+                        //  idCategoria: dataServicios[index].idCategoria,
+                        //idCategoria: item.categoria,
+                        /*    index: item.index */
+                      );
+                      contextoCreacionCita.setAgregaAListaServiciosElegidos = [
+                        {
+                          'ID': dataServicios[index].id.toString(),
+                          'SERVICIO': dataServicios[index].servicio.toString(),
+                          'TIEMPO': dataServicios[index].tiempo.toString(),
+                          'PRECIO': dataServicios[index].precio.toString(),
+                          'DETALLE': dataServicios[index].detalle.toString(),
+                        }
+                      ];
+
+                      Navigator.pushNamed(context, 'creacionCitaComfirmar',
+                          arguments: servicio);
+                    },
+                    child: ListTile(
+                      title: Text(
+                        dataServicios[index].servicio,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: Colors.blueGrey),
+                      ),
+                      //leading: Text(item.leading),
+                      subtitle: Text(
+                        '${dataServicios[index].precio} ${contextoPersonaliza.getPersonaliza['MONEDA']} ',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                            color: Colors.blueGrey),
+                      ),
+                      trailing: Text(
+                        dataServicios[index].tiempo,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: Colors.blueGrey),
+                      ), //const Icon(Icons.move_down_rounded),
+                    ),
+
+                    /*  Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                              color: const Color.fromARGB(141, 158, 158, 158)),
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Text('${dataServicios[index].tiempo} '),
-                                Text(
-                                  '${dataServicios[index].precio.toString()} ${personaliza.moneda}',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                Text(dataServicios[index].servicio,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold)),
+                                Text(dataServicios[index].detalle),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('${dataServicios[index].tiempo} '),
+                                    Text(
+                                      '${dataServicios[index].precio.toString()} ${personaliza.moneda}',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Column(
+                              children: [
+                                ChangeActivateServicioButtonWidget(
+                                    servicio: dataServicios[index],
+                                    iniciadaSesionUsuario: _iniciadaSesionUsuario,
+                                    usuarioAPP: _emailSesionUsuario!)
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          children: [
-                            ChangeActivateServicioButtonWidget(
-                                servicio: dataServicios[index],
-                                iniciadaSesionUsuario: _iniciadaSesionUsuario,
-                                usuarioAPP: _emailSesionUsuario!)
-                          ],
-                        ),
-                      ),
-                    ],
+                    ), */
                   ),
-                ),
-              ),
-            );
-          }),
+                );
+              }),
+        ],
+      ),
     );
   }
 

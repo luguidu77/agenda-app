@@ -11,6 +11,7 @@ import '../../models/models.dart';
 import '../../mylogic_formularios/my_logic_cita.dart';
 import '../../providers/providers.dart';
 import '../screens.dart';
+import 'utils/appBar.dart';
 
 class CreacionCitaCliente extends StatefulWidget {
   const CreacionCitaCliente({super.key});
@@ -98,16 +99,10 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
 
     return SafeArea(
       child: Scaffold(
+        appBar: appBarCreacionCita('Selecciona cliente', true),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(28.0),
-              child: Text(
-                'Selecciona cliente',
-                style: estilo,
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(

@@ -130,7 +130,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
           } else if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
-            } else if (snapshot.hasData) {
+            } else if (snapshot.hasData && snapshot.data.isNotEmpty) {
               final data = snapshot.data;
               print(data);
               // SI TENGO DATOS LOS VISUALIZO EN PANTALLA
@@ -140,18 +140,25 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
             } else {
               return //NO HAY SERVICIOS
                   Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _botonCerrar(),
                   const SizedBox(
                     height: 50,
                   ),
                   const Text('No tienes servicios que ofrecer'),
                   const SizedBox(
-                    height: 50,
+                    height: 10,
                   ),
                   Image.asset(
                     'assets/images/caja-vacia.png',
                     width: MediaQuery.of(context).size.width - 250,
+                  ),
+                  const SizedBox(
+                    height: 250,
+                  ),
+                  const Text('AGREGA TU PRIMER SERVICIO'),
+                  const SizedBox(
+                    height: 5,
                   ),
                 ],
               );
@@ -474,8 +481,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
           ),
           IconButton(
               onPressed: () {
-                Navigator.pushNamedAndRemoveUntil(
-                    context, '/', ModalRoute.withName('/'));
+                Navigator.pop(context);
               },
               icon: const Icon(
                 Icons.close,

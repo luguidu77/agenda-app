@@ -171,32 +171,39 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
             Visibility(
               visible: !visibleCalendario,
               child: Expanded(
-                  flex: flexContenedorCitas,
-                  child: diasNoDisponibles.contains(fechaElegida.weekday)
-                      ? Column(
-                          children: [
-                            const SizedBox(
-                              height: 50,
+                flex: flexContenedorCitas,
+                child: diasNoDisponibles.contains(fechaElegida.weekday)
+                    ? Column(
+                        children: [
+                          const SizedBox(
+                            height: 50,
+                          ),
+                          const Text('DIA NO DISPONIBLE PARA CITAR '),
+                          const SizedBox(
+                            height: 50,
+                          ),
+                          GestureDetector(
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const DisponibilidadSemanalScreen(),
+                                )),
+                            child: Image.asset(
+                              ('./assets/icon/beach.png'),
+                              width: MediaQuery.of(context).size.width - 200,
                             ),
-                            const Text('DIA NO DISPONIBLE PARA CITAR '),
-                            const SizedBox(
-                              height: 50,
-                            ),
-                            GestureDetector(
-                              onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const DisponibilidadSemanalScreen(),
-                                  )),
-                              child: Image.asset(
-                                ('./assets/icon/beach.png'),
-                                width: MediaQuery.of(context).size.width - 200,
-                              ),
-                            ),
-                          ],
-                        )
-                      : BackdropFilterCitas(
+                          ),
+                        ],
+                      )
+                    : ListaCitas(
+                        emailusuario: _emailSesionUsuario,
+                        fechaElegida: fechaElegida,
+                        iniciadaSesionUsuario: _iniciadaSesionUsuario,
+                        filter: filter, // envia 'TODAS' O 'PENDIENTES'
+                      ),
+
+                /* BackdropFilterCitas(
                           backLayer: Container()
                           /*  EnviosRecordatorios( 
                             usuarioAPP: _emailSesionUsuario,
@@ -222,8 +229,8 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                             style: const TextStyle(fontSize: 14),
                           ),
                           usuarioAPP: _emailSesionUsuario,
-                        ) //_vercitas(usuarioAPP)),
-                  ),
+                        )  */ //_vercitas(usuarioAPP)),
+              ),
             )
           ],
         ),
@@ -511,29 +518,31 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
   listaEmpleados(data) {
     String foto = data.foto == '' ? no_hay_foto : data!.foto.toString();
     return Padding(
-      padding: const EdgeInsets.only(left: 8.0),
+      padding: const EdgeInsets.only(left: 18.0),
       child: Center(
-        child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 1, // TODO:  Nº DE EMPLEADOS
-            itemBuilder: (BuildContext context, index) {
-              return Column(
-                children: [
-                  CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(100.0),
-                        child: FadeInImage.assetNetwork(
-                            placeholder: './assets/icon/galeria-de-fotos.gif',
-                            image: foto,
-                            fit: BoxFit.cover,
-                            width: 100),
-                      )),
-                  denominacionNegocio(_emailSesionUsuario,
-                      color: Colors.black, size: 15.0),
-                ],
-              );
-            }),
+        child: Expanded(
+          child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: 1, // TODO:  Nº DE EMPLEADOS
+              itemBuilder: (BuildContext context, index) {
+                return Column(
+                  children: [
+                    CircleAvatar(
+                        backgroundColor: Colors.transparent,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(100.0),
+                          child: FadeInImage.assetNetwork(
+                              placeholder: './assets/icon/galeria-de-fotos.gif',
+                              image: foto,
+                              fit: BoxFit.cover,
+                              width: 100),
+                        )),
+                    denominacionNegocio(_emailSesionUsuario,
+                        color: Colors.black, size: 15.0),
+                  ],
+                );
+              }),
+        ),
       ),
     );
   }

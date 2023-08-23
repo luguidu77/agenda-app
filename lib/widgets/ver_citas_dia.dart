@@ -1,15 +1,12 @@
-import 'package:agendacitas/widgets/elimina_cita.dart';
 import 'package:agendacitas/widgets/lista_de_citas.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
-import 'package:top_snackbar_flutter/custom_snack_bar.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../models/personaliza_model.dart';
 import '../providers/providers.dart';
-import '../screens/screens.dart';
+
 import '../utils/utils.dart';
 
 class ListaCitas extends StatefulWidget {

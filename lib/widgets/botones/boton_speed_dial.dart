@@ -1,4 +1,5 @@
 import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/utils/alertasSnackBar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -113,13 +114,14 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
           // foregroundColor: Colors.white,
           label: 'Crea una cita',
           onTap: () {
-            Navigator.push(
+            mensajeInfo(context, 'SELECCIONA UNA HORA EN EL CALENDARIO');
+            /*   Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => ClientaStep(
                       clienteParametro:
                           ClienteModel(nombre: '', telefono: '', email: ''))),
-            );
+            ); */
           },
         ),
         SpeedDialChild(

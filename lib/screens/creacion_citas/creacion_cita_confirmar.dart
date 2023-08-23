@@ -1,6 +1,7 @@
-import 'package:agendacitas/screens/citas/confirmar_step.dart';
+import 'package:agendacitas/screens/creacion_citas/creacion_cita_resumen.dart';
 import 'package:agendacitas/screens/creacion_citas/serviciosCreacionCita.dart';
 import 'package:agendacitas/screens/creacion_citas/style/.estilos_creacion_cita.dart';
+import 'package:agendacitas/utils/utils.dart';
 
 import 'package:flutter/material.dart';
 
@@ -12,6 +13,7 @@ import '../../models/models.dart';
 import '../../providers/providers.dart';
 
 import 'provider/creacion_cita_provider.dart';
+import 'utils/appBar.dart';
 
 class CreacionCitaConfirmar extends StatefulWidget {
   const CreacionCitaConfirmar({super.key});
@@ -50,79 +52,82 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
     cliente.nombre = contextoCreacionCita.getClienteElegido['NOMBRE'];
     cliente.telefono = contextoCreacionCita.getClienteElegido['TELEFONO'];
     cliente.foto = contextoCreacionCita.getClienteElegido['FOTO'];
-    return SafeArea(
-        child: Scaffold(
-            bottomNavigationBar: barraInferior(),
-            body: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // VISUALIZACION DEL CONTEXTO EN PRUEBAS
-                  //Text( 'SERVICIOS : ${contextoCreacionCita.getServiciosElegidos}'),
-                  const Padding(
-                    padding: EdgeInsets.all(28.0),
-                    child: Text(
-                      'Confirmar cita',
-                      style: titulo,
+    return WillPopScope(
+      onWillPop: () async =>
+          false, // inhabilita el regreso a la pagina anterior
+      child: SafeArea(
+          child: Scaffold(
+              appBar: appBarCreacionCita('Resumen de la cita', false,
+                  action: botonCancelar()),
+              bottomNavigationBar: barraInferior(),
+              body: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // VISUALIZACION DEL CONTEXTO EN PRUEBAS
+                    //Text( 'SERVICIOS : ${contextoCreacionCita.getServiciosElegidos}'),
+
+                    vercliente(context, cliente),
+                    const SizedBox(
+                      height: 15,
                     ),
-                  ),
-                  vercliente(context, cliente),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        children: [
-                          Text(DateFormat.MMMMEEEEd('es_ES').format(
-                              DateTime.parse(contextoCreacionCita
-                                  .getCitaElegida['FECHA']
-                                  .toString()))),
-                          Row(
-                            children: [
-                              Text(
-                                DateFormat.Hm('es_ES').format(DateTime.parse(
-                                    contextoCreacionCita.getCitaElegida['FECHA']
-                                        .toString())),
-                                style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                              const Text(' - '),
-                              Text(
-                                DateFormat.Hm('es_ES').format(
-                                    DateTime.parse(horafinal.toString())),
-                                style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const ElevatedButton(
-                          onPressed: null, child: Text('Modificar'))
-                    ],
-                  ),
-                  servicios(),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: GestureDetector(
-                        onTap: () => menuInferior(context),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Column(
                           children: [
-                            FaIcon(FontAwesomeIcons.circlePlus),
-                            Text('añade otro servicio'),
-                            SizedBox(
-                              width: 15,
-                            )
+                            Text(DateFormat.MMMMEEEEd('es_ES').format(
+                                DateTime.parse(contextoCreacionCita
+                                    .getCitaElegida['FECHA']
+                                    .toString()))),
+                            Row(
+                              children: [
+                                Text(
+                                  DateFormat.Hm('es_ES').format(DateTime.parse(
+                                      contextoCreacionCita
+                                          .getCitaElegida['FECHA']
+                                          .toString())),
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const Text(' - '),
+                                Text(
+                                  DateFormat.Hm('es_ES').format(
+                                      DateTime.parse(horafinal.toString())),
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
                           ],
-                        )),
-                  ),
-                  const Divider(),
-                ],
-              ),
-            )));
+                        ),
+                        const ElevatedButton(
+                            onPressed: null, child: Text('Modificar'))
+                      ],
+                    ),
+                    servicios(),
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: GestureDetector(
+                          onTap: () => menuInferior(context),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              FaIcon(FontAwesomeIcons.circlePlus),
+                              Text('añade otro servicio'),
+                              SizedBox(
+                                width: 15,
+                              )
+                            ],
+                          )),
+                    ),
+                    const Divider(),
+                  ],
+                ),
+              ))),
+    );
   }
 
   servicios() {
@@ -306,6 +311,10 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                             MaterialPageRoute(
                               builder: (context) => const ConfirmarStep(),
                             ));
+
+                        _iniciadaSesionUsuario
+                            ? null
+                            : Publicidad.publicidad(_iniciadaSesionUsuario);
                       }
                     : null,
                 child: const Text('Confirmar cita'))
@@ -360,5 +369,24 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
     };
 
     setState(() {});
+  }
+
+  Widget? botonCancelar() {
+    return GestureDetector(
+      onTap: () {
+        // al cancelar, limpiamos el contexto de los servicios
+        contextoCreacionCita.getServiciosElegidos.clear();
+
+        Navigator.pushNamed(context, '/');
+
+        _iniciadaSesionUsuario
+            ? null
+            : Publicidad.publicidad(_iniciadaSesionUsuario);
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Icon(FontAwesomeIcons.close),
+      ),
+    );
   }
 }

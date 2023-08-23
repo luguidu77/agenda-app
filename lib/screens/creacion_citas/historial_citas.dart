@@ -40,12 +40,12 @@ class _HistorialCitasState extends State<HistorialCitas> {
     );
   }
 
-  _historial(context, List<Map<String, dynamic>> citas, String idCliente) {
+  _historial(context, List<Map<String, dynamic>> citas, idCliente) {
     return FutureBuilder<dynamic>(
         future: _iniciadaSesionUsuario
             ? FirebaseProvider()
                 .cargarCitasPorCliente(_emailSesionUsuario, idCliente)
-            : CitaListProvider().cargarCitasPorCliente(int.parse(idCliente)),
+            : CitaListProvider().cargarCitasPorCliente(idCliente),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return SkeletonParagraph(

@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import 'provider/creacion_cita_provider.dart';
 import 'style/.estilos_creacion_cita.dart';
+import 'utils/appBar.dart';
 
 class CreacionCitaServicio extends StatefulWidget {
   const CreacionCitaServicio({super.key});
@@ -26,11 +27,13 @@ class _CreacionCitaServicioState extends State<CreacionCitaServicio> {
         ModalRoute.of(context)?.settings.arguments as ClienteModel;
     return SafeArea(
       child: Scaffold(
+          appBar: appBarCreacionCita('Selecciona servicio', true),
           body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // VISUALIZACION DEL CONTEXTO EN PRUEBAS
-          Text('FECHA : ${contextoCreacionCita.getCitaElegida['FECHA']}'),
+            padding: const EdgeInsets.all(8.0),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              // VISUALIZACION DEL CONTEXTO EN PRUEBAS
+              /*  Text('FECHA : ${contextoCreacionCita.getCitaElegida['FECHA']}'),
           Text(
               'HORAINICIO : ${contextoCreacionCita.getCitaElegida['HORAINICIO']}'),
           Text(
@@ -40,42 +43,33 @@ class _CreacionCitaServicioState extends State<CreacionCitaServicio> {
           Text(
               'TELEFONO : ${contextoCreacionCita.getClienteElegido['TELEFONO']}'),
           Text('EMAIL : ${contextoCreacionCita.getClienteElegido['EMAIL']}'),
-          Text('NOTA : ${contextoCreacionCita.getClienteElegido['NOTA']}'),
+          Text('NOTA : ${contextoCreacionCita.getClienteElegido['NOTA']}'), */
 
-          //
-          const Expanded(
-            flex: 1,
-            child: Padding(
-              padding: EdgeInsets.only(top: 28.0),
-              child: Text(
-                'Selecciona servicio',
-                style: titulo,
+              //
+
+              Text(
+                'Reservado por ${CapitalizaPalabras.capitalizeWords(cliente.nombre.toString())}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-            ),
-          ),
-          Text(
-            'Reservado por ${CapitalizaPalabras.capitalizeWords(cliente.nombre.toString())}',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          Expanded(
-            flex: 1,
-            child: Expanded(
-              child: HistorialCitas(
-                clienteParametro: cliente,
+              Expanded(
+                flex: 1,
+                child: Expanded(
+                  child: HistorialCitas(
+                    clienteParametro: cliente,
+                  ),
+                ),
               ),
-            ),
-          ),
-          const Divider(),
-          const Padding(
-            padding: EdgeInsets.only(top: 10.0),
-            child: Text(
-              'Servicios disponibles',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          const Expanded(flex: 6, child: ServiciosCreacionCita())
-        ]),
-      )),
+              const Divider(),
+              const Padding(
+                padding: EdgeInsets.only(top: 10.0),
+                child: Text(
+                  'Servicios disponibles',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              const Expanded(flex: 6, child: ServiciosCreacionCita())
+            ]),
+          )),
     );
   }
 }

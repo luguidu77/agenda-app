@@ -35,7 +35,7 @@ class _CreacionCitaServicioState extends State<CreacionCitaServicio> {
               'HORAINICIO : ${contextoCreacionCita.getCitaElegida['HORAINICIO']}'),
           Text(
               'HORAFINAL : ${contextoCreacionCita.getCitaElegida['HORAFINAL']}'),
-
+          Text('idCliente : ${contextoCreacionCita.getClienteElegido['ID']}'),
           Text('NOMBRE : ${contextoCreacionCita.getClienteElegido['NOMBRE']}'),
           Text(
               'TELEFONO : ${contextoCreacionCita.getClienteElegido['TELEFONO']}'),
@@ -46,36 +46,31 @@ class _CreacionCitaServicioState extends State<CreacionCitaServicio> {
           const Expanded(
             flex: 1,
             child: Padding(
-              padding: EdgeInsets.all(28.0),
+              padding: EdgeInsets.only(top: 28.0),
               child: Text(
                 'Selecciona servicio',
                 style: titulo,
               ),
             ),
           ),
-          /*  Expanded(
-            flex: 1,
-            child: Row(
-              children: [
-                Text('form busqueda') //  _textoBusqueda(),
-              ],
-            ),
-          ), */
-
+          Text(
+            'Reservado por ${CapitalizaPalabras.capitalizeWords(cliente.nombre.toString())}',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           Expanded(
-            flex: 2,
-            child: Column(
-              children: [
-                Text(
-                  'Reservado recientemente por ${CapitalizaPalabras.capitalizeWords(cliente.nombre.toString())}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Expanded(
-                  child: HistorialCitas(
-                    clienteParametro: cliente,
-                  ),
-                ),
-              ],
+            flex: 1,
+            child: Expanded(
+              child: HistorialCitas(
+                clienteParametro: cliente,
+              ),
+            ),
+          ),
+          const Divider(),
+          const Padding(
+            padding: EdgeInsets.only(top: 10.0),
+            child: Text(
+              'Servicios disponibles',
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           const Expanded(flex: 6, child: ServiciosCreacionCita())

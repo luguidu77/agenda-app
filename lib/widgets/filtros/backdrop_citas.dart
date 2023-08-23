@@ -63,14 +63,15 @@ class _BackdropFilterCitasState extends State<BackdropFilterCitas>
           automaticallyImplyLeading: false,
           title: isFrontLayerVisible ? widget.frontTitle : widget.backTitle,
           elevation: 0.0,
-          actions: [
+          //todo DESACTIVADO EL BOTON PARA ABRIR Y CERRAR EL LAUYOUT TRASERO
+          /*  actions: [
             GestureDetector(
-              onTap: () => _toggleLayer(),
+              onTap: () => _toggleLayer(),   // DESPLAZA EL CALENDARIO Y DEJA VER LA PARTE DE ATRAS
               child: Container(
                   padding: const EdgeInsets.only(right: 4, top: 7.5),
                   child: const SizedBox(child: Icon(Icons.filter_list))),
             ),
-          ],
+          ], */
         ),
         body: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {

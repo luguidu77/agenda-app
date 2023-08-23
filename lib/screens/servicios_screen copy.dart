@@ -217,6 +217,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
     return ServiciosScreenDraggable(
       servicios: listdataServicios,
       usuarioAPP: _emailSesionUsuario!,
+      procede: 'SERVICIOS_SCREEN',
     );
 
     /* ListView(

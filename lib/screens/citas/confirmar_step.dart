@@ -126,6 +126,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     fechaTexto = fecha;
     horaInicioTexto = textoHoraInicio;
     horaFinalTexto = textoHoraFinal;
+
     citaConfirmadaMes =
         (citaFechaHora['FECHA']).month.toString().padLeft(2, '0').toString();
     citaConfirmadaDia =
@@ -135,13 +136,16 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     final String fechaLargaEspa = DateFormat.MMMMEEEEd('es_ES')
         .add_jm()
         .format(DateTime.parse(citaFechaHora['HORAINICIO'].toString()));
-    // print(fechaLargaEspa); // something like 2013-04-20
+    // print(fechaLargaEspa);
     fechaTexto = fechaLargaEspa;
 
     fechaMesEspa = DateFormat.MMM('es_ES')
         .format(DateTime.parse(citaFechaHora['HORAINICIO'].toString()));
-    // print(fechaMesEspa); // something like 2013-04-20
+    // print(fechaMesEspa); // something ago, sep...
     fechaTexto = fechaLargaEspa;
+    DateTime dateTime = citaFechaHora['HORAINICIO'];
+    String dateOnlyString =
+        '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
 
     //
     // ignore: use_build_context_synchronously
@@ -150,7 +154,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         fecha,
         textoHoraInicio,
         //citaElegida,
-        citaFechaHora['FECHA'].toString(),
+        dateOnlyString,
         citaFechaHora['HORAINICIO'].toString(),
         citaFechaHora['HORAFINAL'].toString(),
         listaServicios.first['DETALLE'],
@@ -159,6 +163,9 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         clienta['NOMBRE'],
         listaServicios.first['SERVICIO'],
         listaServicios.first['PRECIO']);
+
+    // limpia la lista de servicios
+    listaServicios.clear();
 
     setState(() {});
   }

@@ -37,18 +37,20 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
   @override
   Widget build(BuildContext context) {
+    int tiempoServicios = 1;
+
     return Scaffold(
         body: SfCalendar(
       // ················   Config calendario ······································
 
       // CONFIGURA VISTA TIEMPO
       timeSlotViewSettings: const TimeSlotViewSettings(
-          timeFormat: 'HH:mm', // FORMATO 24H
-          startHour: 8, // INICIO LABORAL
-          endHour: 22, // FINAL LABORAL
-          timeInterval: Duration(minutes: 15) //INTERVALOS DE TIEMPO
-
-          ),
+        timeFormat: 'HH:mm', // FORMATO 24H
+        startHour: 8, // INICIO LABORAL
+        endHour: 22, // FINAL LABORAL
+        timeInterval: Duration(minutes: 15), //INTERVALOS DE TIEMPO
+        timeIntervalHeight: 20, // tamaño de las casillas
+      ),
       //cellBorderColor: Colors.deepOrange,
 
       viewNavigationMode: ViewNavigationMode.none,
@@ -61,36 +63,43 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         dynamic appointments = details.appointments;
         // CalendarElement view = details.targetElement;
 
+        //###### SI AL HACER CLIC EN EL CALENDARIO, EXISTE UNA CITA NAVEGA A LOS DETALLES DE LA CITA, SI NO HAY CITA NAVEGA A CREACION DE UNA NUEVA CITA-----------
         if (appointments != null) {
           Map<String, dynamic> cita = json.decode(appointments[0].notes);
-          print(cita);
+          // print(cita);
           Navigator.push(
             context,
             MaterialPageRoute(
-              //todo :   email del usuario
               builder: (context) => DetallesCitaScreen(
                   emailUsuario: _emailSesionUsuario, reserva: cita),
             ),
           );
         } else {
-          print(details.date);
+          // print(details.date);
           Navigator.pushNamed(context, 'creacionCitaCliente',
               arguments: details.date);
         }
       },
 
-      onDragEnd: (AppointmentDragEndDetails appointmentDragEndDetails) {
+      onDragEnd: (AppointmentDragEndDetails appointmentDragEndDetails) async {
+        //  print(appointmentDragEndDetails.appointment);
+
         if (_iniciadaSesionUsuario) {
           Map<String, dynamic> cita = json.decode(meetings.first.notes!);
-          print(cita);
+
+          // OBTENER LA DIFERENCIA ENTRE LA HORA DE INICIO Y LA FINAL PARA CONOCER EL TIEMPO DE LA CITA
+          List<int> tiempoServicios =
+              calculaTiempo(cita['horaInicio'], cita['horaFinal']);
 
           final nuevaHora = appointmentDragEndDetails.droppingTime!;
+
           String textoDia =
               '${nuevaHora.year}-${nuevaHora.month.toString().padLeft(2, '0')}-${nuevaHora.day.toString().padLeft(2, '0')}';
           String textoFechaHoraInicio =
               ('$textoDia ${nuevaHora.hour.toString().padLeft(2, '0')}:${nuevaHora.minute.toString().padLeft(2, '0')}:00Z');
+          // a la hora final le sumo el tiempoServicios
           String textoFechaHoraFinal =
-              ('$textoDia ${(nuevaHora.hour + 3).toString().padLeft(2, '0')}:${nuevaHora.minute.toString().padLeft(2, '0')}:00Z');
+              ('$textoDia ${(nuevaHora.hour + tiempoServicios[0]).toString().padLeft(2, '0')}:${(nuevaHora.minute + tiempoServicios[1]).toString().padLeft(2, '0')}:00Z');
 
           String fecha =
               '${DateTime.parse(textoFechaHoraInicio).year.toString()}-${DateTime.parse(textoFechaHoraInicio).month.toString().padLeft(2, '0')}-${DateTime.parse(textoFechaHoraInicio).day.toString().padLeft(2, '0')}';
@@ -109,9 +118,11 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
           debugPrint('$fecha  $textoFechaHoraInicio $textoFechaHoraFinal');
 
-          FirebaseProvider().actualizarCita(_emailSesionUsuario, newCita);
+          await FirebaseProvider().actualizarCita(_emailSesionUsuario, newCita);
 
-          mensajeSuccess(context, 'Cita reprogramada');
+          // ignore: use_build_context_synchronously
+          mensajeSuccess(context,
+              'Cita reprogramada para las ${nuevaHora.hour.toString().padLeft(2, '0')}:${nuevaHora.minute.toString().padLeft(2, '0')}');
         } else {
           setState(() {});
           mensajeError(context, 'No disponible para esta versión');
@@ -135,25 +146,41 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
       final DateTime fechaInicio = DateTime.parse(cita['horaInicio']);
       final DateTime fechaFinal = DateTime.parse(cita['horaFinal']);
       final DateTime startTime = DateTime(fechaInicio.year, fechaInicio.month,
-          fechaInicio.day, fechaInicio.hour, 0, 0);
+          fechaInicio.day, fechaInicio.hour, fechaInicio.minute, 0);
       final DateTime endTime = DateTime(fechaFinal.year, fechaFinal.month,
-          fechaFinal.day, fechaFinal.hour, 0, 0);
+          fechaFinal.day, fechaFinal.hour, fechaFinal.minute, 0);
 
       meetings.add(Appointment(
+          // TRAEMOS TODOS LOS DATOS QUE NOS HARA FALTA PARA TRABAJAR CON ELLOS POSTERIORMENTE
           notes:
-              '{"id": "${cita['id']}","idCliente": "${cita['idCliente']}","idEmpleado": "${cita['idEmpleado']}","idServicio": "${cita['idServicio']}","nombre": "${cita['nombre']}", "horaInicio": "${cita['horaInicio']}", "telefono": " ${cita['telefono']}", "email":" ${cita['email']}", "servicio":" ${cita['servicio']}", "detalle":" ${cita['detalle'].toString()}" ,"precio":" ${cita['precio']}","foto" : "${cita['foto']}", "comentario":" ${cita['comentario']}"}',
+              '{"id": "${cita['id']}","idCliente": "${cita['idCliente']}","idEmpleado": "${cita['idEmpleado']}","idServicio": "${cita['idServicio']}","nombre": "${cita['nombre']}", "horaInicio": "${cita['horaInicio']}","horaFinal": "${cita['horaFinal']}", "telefono": " ${cita['telefono']}", "email":" ${cita['email']}", "servicio":" ${cita['servicio']}", "detalle":" ${cita['detalle'].toString()}" ,"precio":" ${cita['precio']}","foto" : "${cita['foto']}", "comentario":" ${cita['comentario']}"}',
           id: cita['id'],
           startTime: startTime,
           endTime: endTime,
-          subject:
-              '$horaInicio - $horaFinal  ${cita['nombre']} : ${cita['servicio']}',
+          // DATOS QUE SE VISUALIZAN EN EL CALENDARIO DE LA CITA
+          subject: /* '$horaInicio - $horaFinal' */
+              ' ${cita['nombre']}'
+              '\n servicio: ${cita['servicio']}'
+              ' precio: ${cita['precio']}'
+              '\n nota: ${cita['comentario']}',
+
           //location: 'es-ES',
           color: fechaFinal.isBefore(DateTime.now())
-              ? Colors.red
-              : Colors.blueAccent));
+              ? const Color.fromARGB(255, 173, 73, 66)
+              : const Color.fromARGB(255, 100, 127, 172)));
     }
     print(meetings);
     return meetings;
+  }
+
+  List<int> calculaTiempo(timestamp1, timestamp2) {
+    DateTime dateTime1 = DateTime.parse(timestamp1);
+    DateTime dateTime2 = DateTime.parse(timestamp2);
+    Duration difference = dateTime2.difference(dateTime1);
+
+    int hours = difference.inHours;
+    int minutes = difference.inMinutes % 60;
+    return [hours, minutes];
   }
 }
 

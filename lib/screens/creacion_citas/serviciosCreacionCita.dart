@@ -19,7 +19,6 @@ class ServiciosCreacionCita extends StatefulWidget {
 }
 
 class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
-
   late CreacionCitaProvider contextoCreacionCita;
   String? _emailSesionUsuario;
 
@@ -77,7 +76,6 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
   bool floatExtended = false;
   @override
   Widget build(BuildContext context) {
-    
     return SafeArea(
       child: Scaffold(
           body: Column(
@@ -150,15 +148,6 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
     debugPrint('########### servicios:   ${listdataServicios.toString()}');
     //estructura recibida: [{sinCategoria: Instance of 'ServicioModelFB'}, {cat 2: Instance of 'ServicioModelFB'}, {cat 1: Instance of 'ServicioModelFB'}, {cat 1: Instance of 'ServicioModelFB'}]
 
-    /*      'id': e.id,
-            'servicio': e.servicio,
-            'detalle': e.detalle,
-            'tiempo': e.tiempo,
-            'precio': e.precio,
-            'activo': e.activo,
-            'idcategoria': e.idCategoria,
-            'nombreCategoria': element.nombreCategoria,
-            'detalleCategoria': element.detalle */
     List<Map<String, Map<String, dynamic>>> aux = listdataServicios
         .map((e) => {
               e['nombreCategoria'].toString(): {
@@ -195,88 +184,15 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
         .map((key) => mapFilter[key] as Map<String, dynamic>)
         .toList();
 
-    // TARJETAS DE LOS SERVICIOS ---------------------------
+//########## TARJETAS DE LOS SERVICIOS  FIREBASE ---------------------------
     return ServiciosScreenDraggable(
       servicios: listdataServicios,
       usuarioAPP: _emailSesionUsuario!,
+      procede: 'CREACION_DE_CITA',
     );
   }
 
-// SERVICIOS DE FIREBASE ( NO ESTA HABILITADO)
-  /* Widget targetasServiciosFb(Map<String, dynamic> servicio) {
-    // PRIMERO ADAPTO EL MAP a ServicioModelFB
-    ServicioModelFB servicioFB = ServicioModelFB(
-        id: servicio['id'],
-        activo: servicio['activo'],
-        detalle: servicio['detalle'],
-        precio: servicio['precio'],
-        servicio: servicio['servicio'],
-        tiempo: servicio['tiempo'],
-        idCategoria: servicio['idCategoria'],
-        index: servicio['index']);
-
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CreacionCitaConfirmar(),
-              ));
-        },
-        child: Container(
-            decoration: BoxDecoration(
-                border:
-                    Border.all(color: const Color.fromARGB(141, 158, 158, 158)),
-                borderRadius: BorderRadius.circular(5)),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 8,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Text(servicio['servicio']),
-                        Text(servicioFB.servicio.toString(),
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold)),
-                        Text(servicioFB.detalle.toString()),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('${servicioFB.tiempo.toString()} '),
-                            Text(
-                              '${servicioFB.precio.toString()} ${contextoPersonaliza.getPersonaliza['MONEDA']}',
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    children: [
-                      ChangeActivateServicioButtonWidget(
-                          servicio: servicioFB,
-                          iniciadaSesionUsuario: _iniciadaSesionUsuario,
-                          usuarioAPP: _emailSesionUsuario!)
-                    ],
-                  ),
-                ),
-              ],
-            )),
-      ),
-    );
-  } */
-
-//  SERVICIOS DE DISPOSITIVO
+//######### TARJETA DE LOS SERVICIOS DE DISPOSITIVO
   verServiciosDispositivo(context, dataServicios) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -291,7 +207,7 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CreacionCitaConfirmar(),
+                        builder: (context) => const CreacionCitaConfirmar(),
                       ));
                 },
                 child: Container(
@@ -301,31 +217,27 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
                       borderRadius: BorderRadius.circular(5)),
                   child: Row(
                     children: [
-                      Expanded(
-                        flex: 8,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Text(dataServicios[index].servicio,
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(dataServicios[index].servicio,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            Text(dataServicios[index].detalle),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('${dataServicios[index].tiempo} '),
+                                Text(
+                                  '${dataServicios[index].precio.toString()} ${personaliza.moneda}',
                                   style: const TextStyle(
-                                      fontWeight: FontWeight.bold)),
-                              Text(dataServicios[index].detalle),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('${dataServicios[index].tiempo} '),
-                                  Text(
-                                    '${dataServicios[index].precio.toString()} ${personaliza.moneda}',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                       Expanded(

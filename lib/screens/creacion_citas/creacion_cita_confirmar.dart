@@ -1,10 +1,9 @@
 import 'package:agendacitas/screens/citas/confirmar_step.dart';
 import 'package:agendacitas/screens/creacion_citas/serviciosCreacionCita.dart';
 import 'package:agendacitas/screens/creacion_citas/style/.estilos_creacion_cita.dart';
-import 'package:agendacitas/screens/servicios_screen%20copy.dart';
-import 'package:agendacitas/screens/servicios_screen_draggable.dart';
-import 'package:fl_chart/fl_chart.dart';
+
 import 'package:flutter/material.dart';
+
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -59,8 +58,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // VISUALIZACION DEL CONTEXTO EN PRUEBAS
-                  Text(
-                      'SERVICIOS : ${contextoCreacionCita.getServiciosElegidos}'),
+                  //Text( 'SERVICIOS : ${contextoCreacionCita.getServiciosElegidos}'),
                   const Padding(
                     padding: EdgeInsets.all(28.0),
                     child: Text(
@@ -301,21 +299,15 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
               ],
             ),
             ElevatedButton(
-                onPressed: () {
-                  DateTime horainicio =
-                      contextoCreacionCita.getCitaElegida['HORAINICIO'];
-
-                  contextoCreacionCita.setCitaElegida = {
-                    'FECHA': contextoCreacionCita.getCitaElegida['FECHA'],
-                    'HORAINICIO': horainicio,
-                    'HORAFINAL': horafinal
-                  };
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ConfirmarStep(),
-                      ));
-                },
+                onPressed: totalPrecio != 0.0
+                    ? () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ConfirmarStep(),
+                            ));
+                      }
+                    : null,
                 child: const Text('Confirmar cita'))
           ],
         ),
@@ -329,12 +321,14 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
       int horas = int.parse(partes[0]);
       int minutos = int.parse(partes[1]);
 
+      // SUMA TOTAL DE LOS TIEMPOS DE LOS SERVICIOS
       sumaTiempos += Duration(hours: horas, minutes: minutos);
     }
 
     int horasSumadas = sumaTiempos.inHours;
     int minutosRestantes = sumaTiempos.inMinutes.remainder(60);
     print("Total: $horasSumadas horas $minutosRestantes minutos");
+
     return "$horasSumadas h $minutosRestantes m";
   }
 
@@ -351,10 +345,20 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
       tiempos.add(element['TIEMPO']);
     }
 
+    // SE USA ESTA VARIABLE PARA REPRESENTARLA EN PANTALLA
     totalTiempo = sumarTiempo(tiempos);
 
+    // SUMA A HORA DE INICIO EL TIEMPO DEL O LOS SERVICIOS
     horainicio = contextoCreacionCita.getCitaElegida['HORAINICIO'];
     horafinal = horainicio.add(sumaTiempos);
+
+    //actualiza contexto de la cita
+    contextoCreacionCita.setCitaElegida = {
+      'FECHA': contextoCreacionCita.getCitaElegida['FECHA'],
+      'HORAINICIO': horainicio,
+      'HORAFINAL': horafinal
+    };
+
     setState(() {});
   }
 }

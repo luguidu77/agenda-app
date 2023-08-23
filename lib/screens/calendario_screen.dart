@@ -1,7 +1,7 @@
 import 'package:agendacitas/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -78,8 +78,6 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
     fechaTextoDia = formatDia.format(DateTime.parse(fechaElegida.toString()));
 
     inicializacion();
-
-    
 
     novedades();
 
@@ -219,9 +217,9 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                             'RECORDATOIOS',
                             style: TextStyle(fontSize: 14),
                           ),
-                          frontTitle: const Text(
-                            'CITAS',
-                            style: TextStyle(fontSize: 14),
+                          frontTitle: Text(
+                            'Citas para ${_emailSesionUsuario.toString().split('@')[0]}',
+                            style: const TextStyle(fontSize: 14),
                           ),
                           usuarioAPP: _emailSesionUsuario,
                         ) //_vercitas(usuarioAPP)),

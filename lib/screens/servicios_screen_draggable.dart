@@ -38,10 +38,14 @@ List<DraggableList> allLists = [];
 
 class ServiciosScreenDraggable extends StatefulWidget {
   ServiciosScreenDraggable(
-      {super.key, required this.servicios, required this.usuarioAPP});
+      {super.key,
+      required this.servicios,
+      required this.usuarioAPP,
+      required this.procede});
 
   List<Map<String, dynamic>> servicios;
   String usuarioAPP;
+  String procede;
 
   @override
   State<ServiciosScreenDraggable> createState() =>
@@ -137,7 +141,7 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
           list.header,
           style: const TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 20,
+              fontSize: 10,
               color: Colors.blueGrey),
         ),
       ),
@@ -164,7 +168,7 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
                     border: Border(
                       left: BorderSide(
                         color: Color.fromARGB(179, 232, 5, 5),
-                        width: 5,
+                        width: 2,
                       ),
                     ),
                   ),
@@ -172,21 +176,27 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
                     onTap: () {
                       contextoCreacionCita.setAgregaAListaServiciosElegidos = [
                         {
-                          'ID': 2,
+                          'ID': item.id.toString(),
                           'SERVICIO': item.title,
                           'TIEMPO': item.tiempo,
                           'PRECIO': item.subtitle,
                           'DETALLE': item.detalle,
                         }
                       ];
-                      Navigator.pushNamed(context, 'creacionCitaComfirmar',
-                          arguments: servicioFB);
+                      // DEPENDIENDO DE DE LA PAGINA QUE PROVENGA, NAVEGARA A LA PAGINACORRESPONDIENTE( PUEDE PRECEDER DE CONFIGURACION DE SERVICIOS O DE CREACION DE LA CITA)
+                      widget.procede == 'CREACION_DE_CITA'
+                          ? Navigator.pushNamed(
+                              context, 'creacionCitaComfirmar',
+                              arguments: servicioFB)
+                          : Navigator.pushNamed(context, 'configServicios',
+                              arguments: servicioFB);
                     },
                     child: ListTile(
                       title: Text(
                         item.title,
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
+                            fontSize: 15,
                             color: Colors.blueGrey),
                       ),
                       //leading: Text(item.leading),
@@ -194,14 +204,14 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
                         '${item.subtitle.toString()} ${contextoPersonaliza.getPersonaliza['MONEDA']} ',
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                            fontSize: 10,
                             color: Colors.blueGrey),
                       ),
                       trailing: Text(
                         item.tiempo.toString(),
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                            fontSize: 15,
                             color: Colors.blueGrey),
                       ), //const Icon(Icons.move_down_rounded),
                     ),

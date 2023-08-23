@@ -3,6 +3,7 @@ import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provid
 import 'package:agendacitas/screens/creacion_citas/style/.estilos_creacion_cita.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
 
@@ -264,6 +265,7 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
                 'HORAFINAL': '',
               };
               contextoCreacionCita.setClienteElegido = {
+                'ID': listaClientes[index].id.toString(),
                 'NOMBRE': listaClientes[index].nombre.toString(),
                 'TELEFONO': listaClientes[index].telefono.toString(),
                 'EMAIL': listaClientes[index].email.toString(),
@@ -305,10 +307,9 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
                               onTap: () {
                                 menuInferior(context, listaClientes[index]);
                               },
-                              child: const Icon(
-                                Icons.padding_rounded,
-                                size: 40,
-                              ))),
+                              child: const Icon(FontAwesomeIcons.circleInfo
+                                  //size: 40,
+                                  ))),
                     ],
                   ),
                 ),

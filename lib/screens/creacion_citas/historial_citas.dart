@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
@@ -34,7 +35,7 @@ class _HistorialCitasState extends State<HistorialCitas> {
   Widget build(BuildContext context) {
     // TRAE CONTEXTO PERSONALIZA ( MONEDA )
     contextoPersonaliza = context.read<PersonalizaProvider>();
-       return Scaffold(
+    return Scaffold(
       body: _historial(context, _citas, widget.clienteParametro.id),
     );
   }
@@ -78,9 +79,12 @@ class _HistorialCitasState extends State<HistorialCitas> {
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
                           children: [
-                            Text(DateFormat.MMMMEEEEd('es_ES').format(
-                                DateTime.parse(
-                                    citas[index]['dia'].toString()))),
+                            Text(
+                              DateFormat.MMMMEEEEd('es_ES').format(
+                                  DateTime.parse(
+                                      citas[index]['dia'].toString())),
+                              style: TextStyle(fontSize: 10),
+                            ),
                             Text('${citas[index]['servicio']}'),
                             Text(
                                 '${citas[index]['precio']} ${contextoPersonaliza.getPersonaliza['MONEDA']}')

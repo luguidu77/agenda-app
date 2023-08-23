@@ -219,6 +219,7 @@ class _CreacionServiciosListadoServiciosState
     return ServiciosScreenDraggable(
       servicios: listdataServicios,
       usuarioAPP: _emailSesionUsuario!,
+      procede: '',
     );
 
     /* ListView(

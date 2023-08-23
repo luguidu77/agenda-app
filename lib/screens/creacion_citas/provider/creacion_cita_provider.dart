@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class CreacionCitaProvider extends ChangeNotifier {
   // CONTEXTO servicioElegido ############################
 
-  Map<String, dynamic> _servicioElegido = {
+/*   Map<String, dynamic> _servicioElegido = {
     'ID': 0,
     'SERVICIO': '',
     'TIEMPO': '',
     'PRECIO': '',
     'DETALLE': '',
-  };
+  }; */
   List<Map<String, dynamic>> _listaServiciosElegidos = [];
 
   // Map<String, dynamic> get getServicioElegido => _servicioElegido;
@@ -58,6 +58,7 @@ class CreacionCitaProvider extends ChangeNotifier {
 
   // CONTEXTO clienteElegido ############################
   Map<String, dynamic> _clienteElegido = {
+    'ID':'',
     'NOMBRE': '',
     'TELEFONO': '',
     'EMAIL': '',

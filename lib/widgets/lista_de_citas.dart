@@ -158,18 +158,17 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           startTime: startTime,
           endTime: endTime,
           // DATOS QUE SE VISUALIZAN EN EL CALENDARIO DE LA CITA
-          subject: /* '$horaInicio - $horaFinal' */
-              ' ${cita['nombre']}'
-              '\n servicio: ${cita['servicio']}'
-              ' precio: ${cita['precio']}'
-              '\n nota: ${cita['comentario']}',
+          subject:
+              cita['idServicio'] != 999 ? textoCita(cita) : textoNoDisponible(),
 
           //location: 'es-ES',
-          color: fechaFinal.isBefore(DateTime.now())
-              ? const Color.fromARGB(255, 173, 73, 66)
-              : const Color.fromARGB(255, 100, 127, 172)));
+          color: cita['idServicio'] == 999
+              ? const Color.fromARGB(255, 143, 139, 138)
+              : fechaFinal.isBefore(DateTime.now())
+                  ? const Color.fromARGB(255, 173, 73, 66)
+                  : const Color.fromARGB(255, 100, 127, 172)));
     }
-    print(meetings);
+    debugPrint(meetings.toString());
     return meetings;
   }
 
@@ -181,6 +180,17 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
     int hours = difference.inHours;
     int minutes = difference.inMinutes % 60;
     return [hours, minutes];
+  }
+
+  String textoCita(cita) {
+    return ' 😀 ${cita['nombre']}'
+        '\n 🤝 ${cita['servicio']}'
+        '\n 📇 ${cita['comentario']}'
+        '\n 💰 ${cita['precio']}';
+  }
+
+  String textoNoDisponible() {
+    return ' NO DISPONIBLE PARA CITAR';
   }
 }
 

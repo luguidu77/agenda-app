@@ -3,6 +3,7 @@
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/appBar.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';
 import 'package:agendacitas/providers/cita_list_provider.dart';
@@ -16,6 +17,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
 import '../../mylogic_formularios/mylogic.dart';
+import '../../widgets/widgets.dart';
 import 'provider/creacion_cita_provider.dart';
 
 //import 'package:url_launcher/url_launcher_string.dart';
@@ -194,87 +196,86 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.only(top: 50.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              //BOTON CERRAR X
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 50.0),
-                    child: IconButton(
-                        onPressed: () {
-                          /*  Navigator.pushNamedAndRemoveUntil(
-                              context, '/', ModalRoute.withName('/')); */
-                          Navigator.pushReplacementNamed(context, '/');
-                          liberarMemoriaEditingController();
-                        },
-                        icon: const Icon(
-                          Icons.close,
-                          size: 50,
-                          color: Color.fromARGB(167, 114, 136, 150),
-                        )),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-
-              Flexible(
-                child: ListView.builder(
-                  itemCount: 1,
-                  itemBuilder: (context, index) {
-                    // para animar el sheck
-                    return servicioTexto == ''
-                        ? const Center(
-                            child: SizedBox(
-                                width: 100,
-                                height: 100,
-                                child: CircularProgressIndicator()))
-                        : Column(
-                            children: [
-                              SizedBox(
-                                width: 100,
-                                child: Image.asset(
-                                  './assets/images/cheque.png',
-                                  // width: 100,
+        appBar: appBarCreacionCita(
+          '✔️ Cita confirmada',
+          false,
+        ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            BarraProgreso().progreso(
+              context,
+              1.0,
+              const Color.fromARGB(255, 51, 156, 24),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Flexible(
+              child: ListView.builder(
+                itemCount: 1,
+                itemBuilder: (context, index) {
+                  // para animar el sheck
+                  return servicioTexto == ''
+                      ? const Center(
+                          child: SizedBox(
+                              width: 100,
+                              height: 100,
+                              child: CircularProgressIndicator()))
+                      : Column(
+                          children: [
+                            SizedBox(
+                              width: 100,
+                              child: Image.asset(
+                                './assets/images/cheque.png',
+                                // width: 100,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            /* Text(
+                              'Reservado $servicioTexto con $clientaTexto para el día $fechaTexto h',
+                              style: const TextStyle(
+                                  color: Colors.blueGrey,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ), */
+                            const Divider(),
+                            CompartirCitaConCliente(
+                                cliente: clientaTexto,
+                                telefono: telefono,
+                                email: email,
+                                fechaCita: fechaTexto,
+                                servicio: servicioTexto),
+                            const SizedBox(height: 50),
+                            ElevatedButton.icon(
+                                onPressed: () {
+                                  Navigator.pushReplacementNamed(context, '/');
+                                  liberarMemoriaEditingController();
+                                },
+                                icon: const Icon(
+                                  Icons.close_rounded,
+                                  size: 20,
+                                  color: Color.fromARGB(167, 224, 231, 235),
                                 ),
-                              ),
-                              const SizedBox(
-                                height: 15,
-                              ),
-                              Text(
-                                'Reservado $servicioTexto con $clientaTexto para el día $fechaTexto h',
-                                style: const TextStyle(
-                                    color: Colors.blueGrey,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 25),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              const Divider(),
-                              CompartirCitaConCliente(
-                                  cliente: clientaTexto,
-                                  telefono: telefono,
-                                  email: email,
-                                  fechaCita: fechaTexto,
-                                  servicio: servicioTexto)
-                            ],
-                          );
-                  },
-                ),
+                                label: const Text('TERMINAR')),
+                          ],
+                        );
+                },
               ),
-              const SizedBox(
-                height: 100,
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(
+              height: 100,
+            ),
+          ],
         ),
       ),
     );

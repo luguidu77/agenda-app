@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
+import '../../widgets/widgets.dart';
 import 'provider/creacion_cita_provider.dart';
 import 'style/.estilos_creacion_cita.dart';
 import 'utils/appBar.dart';
@@ -29,7 +30,7 @@ class _CreacionCitaServicioState extends State<CreacionCitaServicio> {
       child: Scaffold(
           appBar: appBarCreacionCita('Selecciona servicio', true),
           body: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(left: 8.0),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               // VISUALIZACION DEL CONTEXTO EN PRUEBAS
@@ -46,7 +47,14 @@ class _CreacionCitaServicioState extends State<CreacionCitaServicio> {
           Text('NOTA : ${contextoCreacionCita.getClienteElegido['NOTA']}'), */
 
               //
-
+              BarraProgreso().progreso(
+                context,
+                0.66,
+                Colors.amber,
+              ),
+              const SizedBox(
+                height: 20,
+              ),
               Text(
                 'Reservado por ${CapitalizaPalabras.capitalizeWords(cliente.nombre.toString())}',
                 style: const TextStyle(fontWeight: FontWeight.bold),

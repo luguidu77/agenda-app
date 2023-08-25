@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import '../../models/models.dart';
 import '../../providers/providers.dart';
 
+import '../../widgets/widgets.dart';
 import 'provider/creacion_cita_provider.dart';
 import 'utils/appBar.dart';
 
@@ -66,7 +67,14 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                   children: [
                     // VISUALIZACION DEL CONTEXTO EN PRUEBAS
                     //Text( 'SERVICIOS : ${contextoCreacionCita.getServiciosElegidos}'),
-
+                    BarraProgreso().progreso(
+                      context,
+                      0.90,
+                      Colors.amber,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     vercliente(context, cliente),
                     const SizedBox(
                       height: 15,

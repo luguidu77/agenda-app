@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-AppBar appBarCreacionCita(
-    String titulo, bool automaticallyImplyLeading, {Widget? action}) {
+AppBar appBarCreacionCita(String titulo, bool automaticallyImplyLeading,
+    {Widget? action}) {
   return AppBar(
+    centerTitle: true,
     automaticallyImplyLeading: automaticallyImplyLeading,
     elevation: 0,
     backgroundColor: Colors.transparent,

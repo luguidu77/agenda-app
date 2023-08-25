@@ -10,12 +10,15 @@ import 'package:agendacitas/screens/nuevo_actualizacion_cliente.dart';
 import 'package:agendacitas/widgets/botones/floating_action_buton_widget.dart';
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../mylogic_formularios/mylogic.dart';
+import 'creacion_citas/style/.estilos_creacion_cita.dart';
+import 'creacion_citas/utils/menu_config_cliente.dart';
 
 class ClientesScreen extends StatefulWidget {
   const ClientesScreen({Key? key}) : super(key: key);
@@ -67,7 +70,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
       //initState();
     } else {
       listaClientes = listaAux;
-     
+
       for (var element in listaClientes) {
         traeCitaPorCliente(element.id).then((value) {
           numCitas.add(value);
@@ -222,111 +225,69 @@ class _ClientesScreenState extends State<ClientesScreen> {
     return ListView.builder(
         itemCount: listaClientes.length,
         itemBuilder: (context, index) {
-          return Card(
-            child: ClipRect(
-              child: SizedBox(
-                //Banner aqui -----------------------------------------------
-                child: Column(
-                  children: [
-                    ListTile(
-                      leading: _iniciadaSesionUsuario &&
-                              listaClientes[index].foto! != ''
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(150.0),
-                              child: Image.network(
-                                listaClientes[index].foto!,
-                                width: 50,
-                                height: 50,
-                                fit: BoxFit.cover,
-                              ))
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(150.0),
-                              child: Image.asset(
-                                "./assets/images/nofoto.jpg",
-                                width: 50,
-                                height: 50,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                      title: Text(listaClientes[index].nombre.toString()),
-                      subtitle: Text(listaClientes[index].telefono.toString()),
-                      trailing: OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: colorbotones,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(2),
-                              ),
-                            ),
+          return GestureDetector(
+            onTap: () async {
+              await showModalBottomSheet(
+                isScrollControlled: true,
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    height: 300,
+                    color: Colors.white,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Text(
+                            listaClientes[index].nombre.toString(),
+                            style: titulo,
                           ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ClientaStep(
-                                      clienteParametro: ClienteModel(
-                                          nombre: listaClientes[index].nombre,
-                                          telefono:
-                                              listaClientes[index].telefono,
-                                          email: listaClientes[index].email,
-                                          nota: listaClientes[index].nota))),
-                            );
-                          },
-                          icon: const Icon(Icons.calendar_today_outlined),
-                          label: const Text('CITAR')),
+                          const Divider(),
+                          MenuConfigCliente(cliente: listaClientes[index]),
+
+                          //_opciones(context, cliente)
+                        ],
+                      ),
                     ),
-                    Row(
-                      children: [
-                        //? BOTON TELEFONO DE EDICION RAPIDA DE NOMBRE Y TELEFONO
-                        TextButton.icon(
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: colorbotones,
-                            ),
-                            onPressed: () => setState(() {
-                                  _cardConfigCliente(
-                                      context, listaClientes[index]);
-                                }),
-                            icon: const Icon(Icons.phonelink_setup_sharp),
-                            label: const Text('')),
-                        //? BOTON ACCESO A DATOS DEL CLIENTE Y SU HISTORIAL
-                        TextButton.icon(
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: colorbotones,
-                            ),
-                            onPressed: () {
-                              //1ºrefresco los datos cliente por si han sido editados
-                              datosClientes(_emailSesionUsuario);
-                              //2ºn navega a Ficha Cliente con sus datos
-                              Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                    pageBuilder: (BuildContext context,
-                                            Animation<double> animation,
-                                            Animation<double>
-                                                secondaryAnimation) =>
-                                        FichaClienteScreen(
-                                          clienteParametro: ClienteModel(
-                                              id: listaClientes[index]
-                                                  .id
-                                                  .toString(),
-                                              nombre:
-                                                  listaClientes[index].nombre,
-                                              telefono:
-                                                  listaClientes[index].telefono,
-                                              email: listaClientes[index].email,
-                                              foto: listaClientes[index].foto,
-                                              nota: listaClientes[index].nota),
-                                        ),
-                                    transitionDuration: // ? TIEMPO PARA QUE SE APRECIE EL HERO DE LA FOTO
-                                        const Duration(milliseconds: 600)),
-                              );
-                            },
-                            icon: const Icon(Icons.card_travel_outlined),
-                            label: const Text(''))
-                      ],
-                    )
-                  ],
+                  );
+                },
+              );
+
+              setState(() {});
+            },
+            child: Card(
+              child: ClipRect(
+                child: SizedBox(
+                  //Banner aqui -----------------------------------------------
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: _iniciadaSesionUsuario &&
+                                listaClientes[index].foto! != ''
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(150.0),
+                                child: Image.network(
+                                  listaClientes[index].foto!,
+                                  width: 50,
+                                  height: 50,
+                                  fit: BoxFit.cover,
+                                ))
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(150.0),
+                                child: Image.asset(
+                                  "./assets/images/nofoto.jpg",
+                                  width: 50,
+                                  height: 50,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                        title: Text(listaClientes[index].nombre.toString()),
+                        subtitle:
+                            Text(listaClientes[index].telefono.toString()),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

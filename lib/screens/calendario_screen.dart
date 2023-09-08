@@ -54,12 +54,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
 
   String noImagen = './assets/icon/icon.png';
 
-  //contenedor de calendario
-
   bool visibleCalendario = false;
-
-  //contenedor seleccion de fechas
-  int flexContenedorCitas = 9;
 
   // DIAS DISPONIBILIDAD SEMANAL
   Set<int> diasNoDisponibles =
@@ -142,36 +137,47 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
         child: Column(
           children: [
             // TARJETA DE NOVEDADES O MENSAJES A LOS USUARIOS
-            tarjetaNodades(),
-            selecionFechas(calendarioProvider),
-
-            Visibility(visible: visibleCalendario, child: calendario()),
+            /*   Expanded(
+              flex: 3,
+              child: tarjetaNodades(),
+            ), */
             Expanded(
-                flex: 1,
-                child: Visibility(
-                    visible: !visibleCalendario,
-                    child: _iniciadaSesionUsuario
-                        ? _fotoPerfil()
-                        : Column(
-                            children: [
-                              CircleAvatar(
-                                  backgroundColor: Colors.transparent,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(100.0),
-                                    child: Image.asset(
-                                      './assets/icon/icon.png',
-                                    ),
-                                  )),
-                              const Text(
-                                'agendadecitas',
-                                style: TextStyle(fontSize: 12),
-                              )
-                            ],
-                          ))),
+              flex: 1,
+              child: Visibility(
+                  visible: !visibleCalendario,
+                  child: selecionFechas(calendarioProvider)),
+            ),
+            Visibility(
+                visible: visibleCalendario,
+                child: Expanded(flex: 10, child: calendario())),
+
+            Visibility(
+                visible: !visibleCalendario,
+                child: _iniciadaSesionUsuario
+                    ? const SizedBox(
+                        height: 10,
+                        // child: _fotoPerfil(),
+                      )
+                    : Column(
+                        children: [
+                          CircleAvatar(
+                              backgroundColor: Colors.transparent,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(100.0),
+                                child: Image.asset(
+                                  './assets/icon/icon.png',
+                                ),
+                              )),
+                          const Text(
+                            'agendadecitas',
+                            style: TextStyle(fontSize: 12),
+                          )
+                        ],
+                      )),
             Visibility(
               visible: !visibleCalendario,
               child: Expanded(
-                flex: flexContenedorCitas,
+                flex: 8,
                 child: diasNoDisponibles.contains(fechaElegida.weekday)
                     ? Column(
                         children: [
@@ -208,12 +214,12 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                           /*  EnviosRecordatorios( 
                             usuarioAPP: _emailSesionUsuario,
                             fechaElegida: fechaElegida
-
+        
                            
                           ) */
                           ,
                           frontLayer: // ListaCitasNuevo(),
-
+        
                               ListaCitas(
                             emailusuario: _emailSesionUsuario,
                             fechaElegida: fechaElegida,
@@ -343,47 +349,44 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
   tarjetaNodades() {
     return Visibility(
       visible: novedadActivo,
-      child: Expanded(
-        flex: 3,
-        child: Column(
-          children: [
-            Card(
-                clipBehavior: Clip.antiAlias,
-                color: colorNovedad,
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: SizedBox(
-                    height: 100,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text(
-                          novedad.toString(),
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            IconButton(
-                                onPressed: () {
-                                  novedadActivo = false;
-                                  setState(() {});
-                                },
-                                icon: const Icon(
-                                  Icons.check_outlined,
-                                  color: Colors.white,
-                                )),
-                          ],
-                        )
-                      ],
-                    ),
+      child: Column(
+        children: [
+          Card(
+              clipBehavior: Clip.antiAlias,
+              color: colorNovedad,
+              child: Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: SizedBox(
+                  height: 100,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        novedad.toString(),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          IconButton(
+                              onPressed: () {
+                                novedadActivo = false;
+                                setState(() {});
+                              },
+                              icon: const Icon(
+                                Icons.check_outlined,
+                                color: Colors.white,
+                              )),
+                        ],
+                      )
+                    ],
                   ),
-                )),
-          ],
-        ),
+                ),
+              )),
+        ],
       ),
     );
   }
@@ -425,7 +428,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                   fechaElegida.weekday == DateTime.saturday
               ? const Color.fromARGB(255, 241, 184, 180)
               : Colors.white,
-      elevation: 8.0,
+      elevation: 5.0,
       child: SizedBox(
         width: MediaQuery.of(context).size.width - 150,
         height: 50,
@@ -433,40 +436,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
           padding: const EdgeInsets.only(left: 5.0, right: 5.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(
-                fechaTextoSemana,
-                style: const TextStyle(
-                    fontSize: 15,
-                    color: Colors.blueGrey,
-                    fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                fechaTextoDia,
-                style: const TextStyle(
-                    fontSize: 15,
-                    color: Colors.blueGrey,
-                    fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              const Text(
-                'de',
-                style: TextStyle(
-                    color: Color.fromARGB(176, 96, 125, 139),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15),
-              ),
-              Text(
-                fechaTextoMes,
-                style: const TextStyle(
-                    color: Color.fromARGB(176, 96, 125, 139),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15),
-                textAlign: TextAlign.center,
-              ),
-              const Icon(Icons.calendar_month_sharp)
-            ],
+            children: [_fecha(), const Icon(Icons.calendar_month_sharp)],
           ),
         ),
       ),
@@ -517,33 +487,45 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
 
   listaEmpleados(data) {
     String foto = data.foto == '' ? no_hay_foto : data!.foto.toString();
-    return Padding(
-      padding: const EdgeInsets.only(left: 18.0),
-      child: Center(
-        child: Expanded(
+    return Column(
+      children: [
+        Expanded(
           child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: 1, // TODO:  Nº DE EMPLEADOS
               itemBuilder: (BuildContext context, index) {
-                return Column(
-                  children: [
-                    CircleAvatar(
-                        backgroundColor: Colors.transparent,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(100.0),
-                          child: FadeInImage.assetNetwork(
-                              placeholder: './assets/icon/galeria-de-fotos.gif',
-                              image: foto,
-                              fit: BoxFit.cover,
-                              width: 100),
-                        )),
-                    denominacionNegocio(_emailSesionUsuario,
-                        color: Colors.black, size: 15.0),
-                  ],
+                return Padding(
+                  padding: const EdgeInsets.only(left: 12.0),
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                          backgroundColor: Colors.transparent,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(100.0),
+                            child: FadeInImage.assetNetwork(
+                                placeholder:
+                                    './assets/icon/galeria-de-fotos.gif',
+                                image: foto,
+                                fit: BoxFit.cover,
+                                width: 100),
+                          )),
+                      denominacionNegocio(_emailSesionUsuario,
+                          color: Colors.black, size: 12.0),
+                    ],
+                  ),
                 );
               }),
         ),
-      ),
+      ],
+    );
+  }
+
+  _fecha() {
+    return Text(
+      '$fechaTextoSemana $fechaTextoDia de $fechaTextoMes',
+      style: const TextStyle(
+          fontSize: 12, color: Colors.blueGrey, fontWeight: FontWeight.bold),
+      textAlign: TextAlign.center,
     );
   }
 }

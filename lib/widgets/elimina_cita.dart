@@ -7,6 +7,7 @@ import '../utils/utils.dart';
 
 mensajeAlerta(BuildContext context, int index, citas,
     bool iniciadaSesionUsuario, String emailusuario) async {
+  late String textoPregunta;
   bool respuesta = false;
   late String textoNombre;
   late dynamic idCita;
@@ -21,6 +22,10 @@ mensajeAlerta(BuildContext context, int index, citas,
     idCita = citas[index]['id'];
   } else {
     textoNombre = citas['nombre'].toString();
+    (textoNombre == 'null')
+        ? textoPregunta = '¿ Quieres eliminar esta indisponibilidad ?'
+        : textoPregunta = '¿ Quieres eliminar la cita de $textoNombre ?';
+
     idCita =
         iniciadaSesionUsuario ? citas['id'].toString() : int.parse(citas['id']);
   }
@@ -34,7 +39,7 @@ mensajeAlerta(BuildContext context, int index, citas,
               Icons.warning,
               color: Colors.red,
             ),
-            content: Text('¿ Quieres eliminar la cita de $textoNombre ?'),
+            content: Text(textoPregunta),
             actions: [
               ElevatedButton.icon(
                   onPressed: () {

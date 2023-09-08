@@ -1,5 +1,5 @@
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_resumen.dart';
-import 'package:agendacitas/screens/creacion_citas/serviciosCreacionCita.dart';
+import 'package:agendacitas/screens/creacion_citas/servicios_creacion_cita.dart';
 import 'package:agendacitas/screens/creacion_citas/style/.estilos_creacion_cita.dart';
 import 'package:agendacitas/utils/utils.dart';
 
@@ -25,9 +25,9 @@ class CreacionCitaConfirmar extends StatefulWidget {
 
 class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
   Duration sumaTiempos = Duration();
-  late DateTime horafinal;
+  DateTime horafinal = DateTime.now();
   late DateTime horainicio;
-  late String totalTiempo;
+  String totalTiempo = "0 h 0 m";
   var totalPrecio = 0.0;
   late PersonalizaProvider contextoPersonaliza;
   late CreacionCitaProvider contextoCreacionCita;
@@ -40,13 +40,18 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
 
   @override
   void initState() {
-    inicializacion();
-    contextoCita(); // añado duracion de los servicios y sumo los precios
     super.initState();
+    inicializacion();
+    // Llama a contextoCita al final de initState para poder utilizar dentro de contextoCita() el setState()
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      contextoCita(); // añado duracion de los servicios y sumo los precios
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    // LLEER MICONTEXTO DE CreacionCitaProvider
+    contextoCreacionCita = context.read<CreacionCitaProvider>();
     // TRAE CONTEXTO PERSONALIZA ( MONEDA )
     contextoPersonaliza = context.read<PersonalizaProvider>();
 
@@ -138,7 +143,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
     );
   }
 
-  servicios() {
+/*   servicios() {
     return SizedBox(
       height: contextoCreacionCita.getServiciosElegidos.length * 90,
       child: ListView.builder(
@@ -147,9 +152,18 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
             return card(index);
           })),
     );
+  } */
+  servicios() {
+    final servicios = contextoCreacionCita.getServiciosElegidos;
+    return Column(
+      children: servicios.map((servicio) {
+        final index = servicios.indexOf(servicio);
+        return card(index);
+      }).toList(),
+    );
   }
 
-  card(index) {
+  Widget card(index) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -350,11 +364,8 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
   }
 
   void contextoCita() {
-    // LLEER MICONTEXTO DE CreacionCitaProvider
-    contextoCreacionCita = context.read<CreacionCitaProvider>();
     List<String> tiempos = [];
     totalPrecio = 0.0;
-    totalTiempo = "0 h 0 m";
 
     for (var element in contextoCreacionCita.getServiciosElegidos) {
       totalPrecio = double.parse(element['PRECIO']) + totalPrecio;

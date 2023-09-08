@@ -61,10 +61,8 @@ class _CreacionCitaServicioState extends State<CreacionCitaServicio> {
               ),
               Expanded(
                 flex: 1,
-                child: Expanded(
-                  child: HistorialCitas(
-                    clienteParametro: cliente,
-                  ),
+                child: HistorialCitas(
+                  clienteParametro: cliente,
                 ),
               ),
               const Divider(),

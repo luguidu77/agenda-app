@@ -130,7 +130,7 @@ class _ListaCitasState extends State<ListaCitas> {
                 child: Center(
                     child: SkeletonParagraph(
               style: SkeletonParagraphStyle(
-                  lines: 20,
+                  lines: 10,
                   spacing: 6,
                   lineStyle: SkeletonLineStyle(
                     // randomLength: true,

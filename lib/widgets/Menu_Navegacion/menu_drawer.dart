@@ -1,7 +1,7 @@
 import 'package:agendacitas/models/perfil_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/config/config_personalizar_screen.dart';
-import 'package:agendacitas/screens/creacion_citas/serviciosCreacionCita.dart';
+import 'package:agendacitas/screens/creacion_citas/servicios_creacion_cita.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';

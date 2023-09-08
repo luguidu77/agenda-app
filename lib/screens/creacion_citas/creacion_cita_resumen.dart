@@ -116,8 +116,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     // '${DateTime.parse(citaFechaHora['FECHA']).day.toString().padLeft(2, '0')}/${DateTime.parse(citaFechaHora['FECHA']).month.toString().padLeft(2, '0')}';
 
     //todo: pasar por la clase formater hora y fecha
-    String textoHoraInicio = 'hora inicio';
-    '${DateTime.parse(citaFechaHora['HORAINICIO'].toString()).hour.toString().padLeft(2, '0')}:${DateTime.parse(citaFechaHora['HORAINICIO'].toString()).minute.toString().padLeft(2, '0')}';
+    String textoHoraInicio =
+        '${DateTime.parse(citaFechaHora['HORAINICIO'].toString()).hour.toString().padLeft(2, '0')}:${DateTime.parse(citaFechaHora['HORAINICIO'].toString()).minute.toString().padLeft(2, '0')}';
     String textoHoraFinal =
         '${DateTime.parse(citaFechaHora['HORAFINAL'].toString()).hour.toString().padLeft(2, '0')}:${DateTime.parse(citaFechaHora['HORAFINAL'].toString()).minute.toString().padLeft(2, '0')}';
 
@@ -168,7 +168,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
     // limpia la lista de servicios
     listaServicios.clear();
-
+   
+   
     setState(() {});
   }
 

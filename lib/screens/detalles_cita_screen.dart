@@ -120,11 +120,14 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(body: _formulario(context)),
+      child: Scaffold(
+          body: idCliente != '999'
+              ? _paginaDetalleCita(context)
+              : _paginaNoDisponible()),
     );
   }
 
-  _formulario(context) {
+  _paginaDetalleCita(context) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(18.0),
@@ -278,7 +281,9 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                 icon: const Icon(Icons.delete),
                 label: const Text('Eliminar'))
             : Container(),
-        visibleBotonFormulario
+
+        // HE QUITADO EL BOTON REPROGRAMAR
+        /*   visibleBotonFormulario
             ? ElevatedButton.icon(
                 onPressed: () {
                   setState(() {});
@@ -289,7 +294,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                 icon: Icon(visibleFormulario ? Icons.cancel : Icons.edit),
                 label:
                     Text(visibleFormulario ? 'Cancelar' : 'Reprogramar cita'))
-            : Container(),
+            : Container(), */
       ],
     );
   }
@@ -321,6 +326,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
   }
 
   _detalles() {
+     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -351,6 +357,38 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
           style: const TextStyle(fontSize: 14),
         ),
       ],
+    );
+  }
+
+  _paginaNoDisponible() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Column(
+          children: [
+            _botonCerrar(context),
+            const SizedBox(
+              height: 30,
+            ),
+            const Text(
+              'DETALLES INDISPONIBILIDAD',
+              style: TextStyle(fontSize: 28),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Text(
+              'Motivo: $comentario',
+              style: const TextStyle(fontSize: 14),
+            ),
+            const Divider(),
+            _botonesCita(),
+            const SizedBox(
+              height: 20,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

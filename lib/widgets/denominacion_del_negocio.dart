@@ -4,7 +4,7 @@ import '../models/models.dart';
 import '../providers/providers.dart';
 
 StreamBuilder<PerfilModel> denominacionNegocio(emailSesionUsuario,
-    {color = Colors.white, size = 20.0}) {
+    {color = Colors.white, size = 12.0}) {
   return StreamBuilder(
       stream: FirebaseProvider().cargarPerfilFB(emailSesionUsuario).asStream(),
       builder: ((context, AsyncSnapshot<PerfilModel> snapshot) {

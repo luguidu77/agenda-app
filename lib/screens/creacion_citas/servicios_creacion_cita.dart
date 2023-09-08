@@ -1,5 +1,4 @@
-import 'package:agendacitas/screens/creacion_citas/creacion_cita_confirmar.dart';
-import 'package:agendacitas/screens/creacion_citas/creacion_cita_listado_servicios.dart';
+
 
 import 'package:agendacitas/screens/servicios_screen_draggable.dart';
 import 'package:flutter/material.dart';
@@ -104,10 +103,10 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
                 child: Center(
                     child: SkeletonParagraph(
               style: SkeletonParagraphStyle(
-                  lines: 6,
+                  lines: 5,
                   spacing: 6,
                   lineStyle: SkeletonLineStyle(
-                    height: 80,
+                    height: 70,
                     borderRadius: BorderRadius.circular(5),
                     // minLength: MediaQuery.of(context).size.width,
                     // maxLength: MediaQuery.of(context).size.width,

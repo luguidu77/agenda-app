@@ -66,6 +66,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         //###### SI AL HACER CLIC EN EL CALENDARIO, EXISTE UNA CITA NAVEGA A LOS DETALLES DE LA CITA, SI NO HAY CITA NAVEGA A CREACION DE UNA NUEVA CITA-----------
         if (appointments != null) {
           Map<String, dynamic> cita = json.decode(appointments[0].notes);
+
           // print(cita);
           Navigator.push(
             context,
@@ -158,12 +159,11 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           startTime: startTime,
           endTime: endTime,
           // DATOS QUE SE VISUALIZAN EN EL CALENDARIO DE LA CITA
-          subject:
-              cita['idServicio'] != 999 ? textoCita(cita) : textoNoDisponible(),
+          subject: textoCita(cita),
 
           //location: 'es-ES',
-          color: cita['idServicio'] == 999
-              ? const Color.fromARGB(255, 143, 139, 138)
+          color: cita['idServicio'] == 999 || cita['idServicio'] == null
+              ? const Color.fromARGB(255, 113, 151, 102)
               : fechaFinal.isBefore(DateTime.now())
                   ? const Color.fromARGB(255, 173, 73, 66)
                   : const Color.fromARGB(255, 100, 127, 172)));
@@ -183,14 +183,12 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
   }
 
   String textoCita(cita) {
-    return ' 😀 ${cita['nombre']}'
-        '\n 🤝 ${cita['servicio']}'
-        '\n 📇 ${cita['comentario']}'
-        '\n 💰 ${cita['precio']}';
-  }
-
-  String textoNoDisponible() {
-    return ' NO DISPONIBLE PARA CITAR';
+    return (cita['nombre'] != null)
+        ? ' 😀 ${cita['nombre']}'
+            '\n 🤝 ${cita['servicio']}'
+            '\n 📇 ${cita['comentario']}'
+            '\n 💰 ${cita['precio']}'
+        : '🌴⛵🍍🦀 NO DISPONIBLE \n\n MOTIVO: ${cita['comentario']}';
   }
 }
 

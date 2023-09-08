@@ -51,10 +51,10 @@ class _HistorialCitasState extends State<HistorialCitas> {
             return SkeletonParagraph(
               style: SkeletonParagraphStyle(
                   lines: 1,
-                  spacing: 6,
+                  spacing: 5,
                   lineStyle: SkeletonLineStyle(
                     // randomLength: true,
-                    height: 80,
+                    height: 70,
                     borderRadius: BorderRadius.circular(5),
                     // minLength: MediaQuery.of(context).size.width,
                     // maxLength: MediaQuery.of(context).size.width,

@@ -1,17 +1,13 @@
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_resumen.dart';
 import 'package:agendacitas/screens/creacion_citas/servicios_creacion_cita.dart';
-import 'package:agendacitas/screens/creacion_citas/style/.estilos_creacion_cita.dart';
 import 'package:agendacitas/utils/utils.dart';
-
 import 'package:flutter/material.dart';
-
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
 import '../../providers/providers.dart';
-
 import '../../widgets/widgets.dart';
 import 'provider/creacion_cita_provider.dart';
 import 'utils/appBar.dart';

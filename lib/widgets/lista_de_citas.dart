@@ -83,10 +83,12 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
       },
 
       onDragEnd: (AppointmentDragEndDetails appointmentDragEndDetails) async {
-        //  print(appointmentDragEndDetails.appointment);
+        // cita seleccionada
+        dynamic appointment = appointmentDragEndDetails.appointment!;
 
         if (_iniciadaSesionUsuario) {
-          Map<String, dynamic> cita = json.decode(meetings.first.notes!);
+          // estraemos los datos de (notes) para obtener la cita
+          Map<String, dynamic> cita = json.decode(appointment.notes);
 
           // OBTENER LA DIFERENCIA ENTRE LA HORA DE INICIO Y LA FINAL PARA CONOCER EL TIEMPO DE LA CITA
           List<int> tiempoServicios =
@@ -106,13 +108,16 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
               '${DateTime.parse(textoFechaHoraInicio).year.toString()}-${DateTime.parse(textoFechaHoraInicio).month.toString().padLeft(2, '0')}-${DateTime.parse(textoFechaHoraInicio).day.toString().padLeft(2, '0')}';
           print(textoFechaHoraInicio);
 
+          print(cita);
+
           CitaModelFirebase newCita = CitaModelFirebase();
+
           newCita.id = cita['id'];
           newCita.dia = fecha;
           newCita.horaInicio = textoFechaHoraInicio;
-          newCita.horaFinal =
-              textoFechaHoraFinal; // no la obtengo real. le sumo 3 horas
-          newCita.comentario = cita['comentario'] + ' *cita reprogramada';
+          newCita.horaFinal = textoFechaHoraFinal;
+          newCita.comentario = cita['comentario'] +
+              ' ✍️​'; //todo añadir un nuevo campo REPROGRAMACION
           newCita.idcliente = cita['idCliente'];
           newCita.idservicio = cita['idServicio'];
           newCita.idEmpleado = cita['idEmpleado'];

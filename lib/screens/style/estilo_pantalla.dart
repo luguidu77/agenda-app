@@ -10,3 +10,6 @@ final subTituloEstilo = GoogleFonts.bebasNeue(
 final textoEstilo = GoogleFonts.bebasNeue(
     fontSize: 15,
     textStyle: const TextStyle(color: Color.fromARGB(255, 104, 103, 103)));
+final textoTelefonoEstilo = GoogleFonts.bebasNeue(
+    fontSize: 20,
+    textStyle: const TextStyle(color: Color.fromARGB(255, 104, 103, 103)));

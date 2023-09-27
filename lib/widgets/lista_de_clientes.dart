@@ -1,3 +1,4 @@
+import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -127,8 +128,6 @@ class _ListaClientesState extends State<ListaClientes> {
         ? listaAux = await cargaClientesFirebase(emailSesionUsuario)
         : listaAux = await CitaListProvider().cargarClientes();
 
-
-
     if (widget.busquedaController.length > 2) {
       listaClientes = listaClientes
           .where((element) => element.nombre!
@@ -142,11 +141,14 @@ class _ListaClientesState extends State<ListaClientes> {
     return listaClientes;
   }
 
-  verclientes(context, listaClientes, fechaCita) {
+  verclientes(context, List<ClienteModel> listaClientes, fechaCita) {
+    const double width = 80;
+    const double height = 80;
     return ListView.builder(
         itemCount: listaClientes.length,
         itemBuilder: (context, index) {
           return GestureDetector(
+            // SI SE ENCUENTRA EN LA PANTALLA DE CREACION DE CITAS => AÑADE CONTEXTO Y NAVEGA A SERVICIOS
             onTap: widget.pantalla == 'creacion_cita'
                 ? () {
                     contextoCreacionCita.setCitaElegida = {
@@ -165,35 +167,39 @@ class _ListaClientesState extends State<ListaClientes> {
                         arguments: listaClientes[index]);
                   }
                 : null,
+
+            // ==================TARJETA DE VISUALIZACION DE CLIENTES ==============================
             child: Card(
               child: ClipRect(
                 child: SizedBox(
-                  //Banner aqui -----------------------------------------------
                   child: Column(
                     children: [
                       ListTile(
-                          leading: widget.iniciadaSesionUsuario &&
-                                  listaClientes[index].foto! != ''
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(150.0),
-                                  child: Image.network(
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(5.0),
+                            child: widget.iniciadaSesionUsuario &&
+                                    listaClientes[index].foto! != ''
+                                ? Image.network(
                                     listaClientes[index].foto!,
-                                    width: 50,
-                                    height: 50,
+                                    width: width,
+                                    height: height,
                                     fit: BoxFit.cover,
-                                  ))
-                              : ClipRRect(
-                                  borderRadius: BorderRadius.circular(150.0),
-                                  child: Image.asset(
+                                  )
+                                : Image.asset(
                                     "./assets/images/nofoto.jpg",
-                                    width: 50,
-                                    height: 50,
+                                    width: width,
+                                    height: height,
                                     fit: BoxFit.cover,
                                   ),
-                                ),
-                          title: Text(listaClientes[index].nombre.toString()),
-                          subtitle:
-                              Text(listaClientes[index].telefono.toString()),
+                          ),
+                          title: Text(
+                            listaClientes[index].nombre.toString(),
+                            style: subTituloEstilo,
+                          ),
+                          subtitle: Text(
+                            listaClientes[index].telefono.toString(),
+                            style: textoTelefonoEstilo,
+                          ),
                           trailing: InkWell(
                               onTap: () async {
                                 await showModalBottomSheet(

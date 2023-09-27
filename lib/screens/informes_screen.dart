@@ -180,7 +180,6 @@ class _InformesScreenState extends State<InformesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -295,6 +294,7 @@ class _InformesScreenState extends State<InformesScreen> {
   }
 
   _tarjetasMensuales(index) {
+    double cantidad = datosInforme[index];
     return Card(
       color: const Color.fromARGB(87, 173, 247, 247),
       child: Padding(
@@ -308,7 +308,9 @@ class _InformesScreenState extends State<InformesScreen> {
               style: textoEstilo,
             ),
             Text(
-              '${datosInforme[index]}  ${personaliza.moneda}',
+              cantidad == 0
+                  ? '--'
+                  : '${datosInforme[index]}  ${personaliza.moneda}',
               style: textoEstilo,
             )
           ],

@@ -1,6 +1,7 @@
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:agendacitas/config/config_personalizar_screen.dart';
 import 'package:agendacitas/screens/home.dart';
+import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,7 +16,6 @@ class Bienvenida extends StatefulWidget {
 
 class _BienvenidaState extends State<Bienvenida> {
   final introKey = GlobalKey<IntroductionScreenState>();
-  
 
   void _irInicioSesion(context, String inicioCrear) {
     Navigator.of(context).push(
@@ -29,7 +29,10 @@ class _BienvenidaState extends State<Bienvenida> {
 
   void _irHomeScreen(context) {
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) =>  HomeScreen(index: 0,)),
+      MaterialPageRoute(
+          builder: (_) => HomeScreen(
+                index: 0,
+              )),
     );
   }
 
@@ -63,7 +66,7 @@ class _BienvenidaState extends State<Bienvenida> {
               40), //TextStyle(fontSize: 28.0, fontWeight: FontWeight.w700),
       bodyTextStyle: bodyStyle,
       bodyPadding: const EdgeInsets.fromLTRB(16.0, 10.0, 16.0, 16.0),
-      pageColor: Colors.grey[300],
+      pageColor: colorFondo,
       imagePadding: EdgeInsets.zero,
     );
 
@@ -72,7 +75,6 @@ class _BienvenidaState extends State<Bienvenida> {
       globalBackgroundColor: Colors.grey[300],
       allowImplicitScrolling: true,
       autoScrollDuration: 1,
-      
 
       /*  globalHeader: Align(
         alignment: Alignment.center,

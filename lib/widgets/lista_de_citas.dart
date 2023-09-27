@@ -6,7 +6,8 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../models/models.dart';
 import '../providers/providers.dart';
-import '../screens/screens.dart';
+
+import '../screens/detalles_cita_screen.dart';
 import '../utils/utils.dart';
 
 class ListaCitasNuevo extends StatefulWidget {
@@ -72,7 +73,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
             context,
             MaterialPageRoute(
               builder: (context) => DetallesCitaScreen(
-                  emailUsuario: _emailSesionUsuario, reserva: cita),
+                  emailUsuario: '_emailSesionUsuario', reserva: cita),
             ),
           );
         } else {

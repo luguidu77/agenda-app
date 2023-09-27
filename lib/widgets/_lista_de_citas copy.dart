@@ -198,9 +198,10 @@ class _ListaCitasState extends State<ListaCitas> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => DetallesCitaScreen(
-                                        emailUsuario: widget.emailusuario,
-                                        reserva: citas[index]),
+                                    builder: (context) =>
+                                        DetallesCitaScreenBorrar(
+                                            emailUsuario: widget.emailusuario,
+                                            reserva: citas[index]),
                                   ),
                                 );
                               } else {

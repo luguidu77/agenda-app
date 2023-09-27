@@ -1,6 +1,7 @@
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_cliente.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_confirmar.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_listado_servicios.dart';
+import 'package:agendacitas/screens/detalles_cita_screen.dart';
 
 import 'package:agendacitas/screens/servicios_screen%20copy.dart';
 import 'package:firebase_auth/firebase_auth.dart';

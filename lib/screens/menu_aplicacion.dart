@@ -123,7 +123,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
         //_pruebaEnvioEmail(context),
 
         //VALORAR LA APLICACION Y LA VERSION DISPONIBLE
-        _valoracionApp(),
+        // _valoracionApp(),
       ],
     );
   }

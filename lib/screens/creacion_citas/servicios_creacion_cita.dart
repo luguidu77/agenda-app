@@ -1,5 +1,3 @@
-
-
 import 'package:agendacitas/screens/servicios_screen_draggable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -138,7 +136,10 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
                       ),
                       ElevatedButton(
                           onPressed: () =>
-                              Navigator.pushNamed(context, 'Servicios'),
+                              Navigator.pushNamed(context, 'Servicios')
+                                  .then((value) {
+                                setState(() {});
+                              }),
                           child: const Text('AÑADE TU PRIMER SERVICIO')),
                     ],
                   ),

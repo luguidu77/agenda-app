@@ -1,24 +1,17 @@
 import 'package:agendacitas/models/cita_model.dart';
-import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
-import 'package:agendacitas/providers/Firebase/sincronizar_firebase.dart';
-import 'package:agendacitas/providers/cita_list_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
-import 'package:agendacitas/screens/citas/clienta_step.dart';
-import 'package:agendacitas/screens/ficha_cliente_screen.dart';
 import 'package:agendacitas/screens/nuevo_actualizacion_cliente.dart';
 import 'package:agendacitas/widgets/botones/floating_action_buton_widget.dart';
-
+import 'package:agendacitas/widgets/lista_de_clientes.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:skeletons/skeletons.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
-import '../mylogic_formularios/mylogic.dart';
-import 'creacion_citas/style/.estilos_creacion_cita.dart';
-import 'creacion_citas/utils/menu_config_cliente.dart';
+import '../providers/FormularioBusqueda/formulario_busqueda_provider.dart';
+import '../widgets/boton_agrega_cliente.dart';
+import '../widgets/formulario_busqueda.dart';
 
 class ClientesScreen extends StatefulWidget {
   const ClientesScreen({Key? key}) : super(key: key);
@@ -56,42 +49,6 @@ class _ClientesScreenState extends State<ClientesScreen> {
     _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
   }
 
-  datosClientes(String emailSesionUsuario) async {
-    _iniciadaSesionUsuario
-        ? listaAux = await cargaClientesFirebase(emailSesionUsuario)
-        : listaAux = await CitaListProvider().cargarClientes();
-
-    if (listaAux.isEmpty) {
-      //todo: quitar el + y espacios del nuemero de telefono porque no lo encuentra
-      // await CitaListProvider().nuevoCliente(
-      //    'María', '666333222', 'email@email.com', '', 'cliente ejemplo');
-
-      //mensajeCreacionCliente();
-      //initState();
-    } else {
-      listaClientes = listaAux;
-
-      for (var element in listaClientes) {
-        traeCitaPorCliente(element.id).then((value) {
-          numCitas.add(value);
-          // print('lista de las citas $numCitas');
-        });
-      }
-      // print('----------------lista clientes : $listaClientes');
-    }
-    // setState(() {}); actualizando no termina de cargar!!!
-
-    if (busquedaController.text.length > 2) {
-      listaClientes = listaClientes
-          .where((element) =>
-              element.nombre!.contains(busquedaController.text.toUpperCase()))
-          .toList();
-    } else {
-      // aux = listaClientes;
-    }
-    return listaClientes;
-  }
-
   void mensajeCreacionCliente() {
     showTopSnackBar(
       Overlay.of(context),
@@ -103,318 +60,40 @@ class _ClientesScreenState extends State<ClientesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Color colorTema = Theme.of(context).primaryColor;
-    datosClientes(_emailSesionUsuario);
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: FloatingActionButonWidget(
-        icono: const Icon(Icons.add),
-        texto: 'Cliente',
-        funcion: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => NuevoActualizacionCliente(
-                cliente: ClienteModel(),
-                pagado: pagado,
-                usuarioAPP: _emailSesionUsuario,
-              ),
-            ),
-          );
-        },
-      ),
+    // LEE FORMULARIO DE BUSQUEDA
+    final contextoFormularioBusqueda = context.watch<FormularioBusqueda>();
 
-      //drawer: const MenuDrawer(), //menuDrawer(context),
-      /*  appBar: AppBar(
-          backgroundColor: colorTema,
-          automaticallyImplyLeading: false,
-          title: const Text('Clientes'),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(20),
-            ),
-          ),
-          actions: const [ChangeThemeButtonWidget()]), */
+    return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  _textoBusqueda(),
-                ],
-              ),
-            ),
-            _listaClientes(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  _textoBusqueda() {
-    return Expanded(
-      flex: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Stack(
-          children: [
-            TextFormField(
-              decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.search),
-                  // labelText: 'Busqueda de cliente',
-                  helperText: 'Mínimo 3 letras'),
-              onChanged: (String value) {
-                setState(() {});
-                busquedaController.text = value;
-                busquedaController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: busquedaController.text.length));
-              },
-              controller: busquedaController,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  _listaClientes() {
-    return Expanded(
-        flex: 8,
-        child: FutureBuilder<dynamic>(
-          future: datosClientes(_emailSesionUsuario),
-          builder: (
-            BuildContext context,
-            AsyncSnapshot<dynamic> snapshot,
-          ) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return SizedBox(
-                  child: Center(
-                      child: SkeletonParagraph(
-                style: SkeletonParagraphStyle(
-                    lines: 4,
-                    spacing: 6,
-                    lineStyle: SkeletonLineStyle(
-                      // randomLength: true,
-                      height: 120,
-                      borderRadius: BorderRadius.circular(5),
-                      // minLength: MediaQuery.of(context).size.width,
-                      // maxLength: MediaQuery.of(context).size.width,
-                    )),
-              )));
-            } else if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasError) {
-                return Text(' error:  ${snapshot.error}');
-              } else if (snapshot.hasData) {
-                final data = snapshot.data;
-
-                // SI TENGO DATOS LOS VISUALIZO EN PANTALLA
-                return verclientes(context, data);
-              } else {
-                return const Text('Empty data');
-              }
-            } else {
-              return Text('State: ${snapshot.connectionState}');
-            }
-          },
-        ));
-  }
-
-  verclientes(context, listaClientes) {
-    return ListView.builder(
-        itemCount: listaClientes.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () async {
-              await showModalBottomSheet(
-                isScrollControlled: true,
-                context: context,
-                builder: (BuildContext context) {
-                  return Container(
-                    height: 300,
-                    color: Colors.white,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Text(
-                            listaClientes[index].nombre.toString(),
-                            style: titulo,
-                          ),
-                          const Divider(),
-                          MenuConfigCliente(cliente: listaClientes[index]),
-
-                          //_opciones(context, cliente)
-                        ],
+            const CuadroBusqueda(),
+            GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NuevoActualizacionCliente(
+                        cliente: ClienteModel(),
+                        pagado: pagado,
+                        usuarioAPP: _emailSesionUsuario,
                       ),
                     ),
-                  );
+                  ).then((value) {
+                    setState(() {});
+                  });
                 },
-              );
-
-              setState(() {});
-            },
-            child: Card(
-              child: ClipRect(
-                child: SizedBox(
-                  //Banner aqui -----------------------------------------------
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: _iniciadaSesionUsuario &&
-                                listaClientes[index].foto! != ''
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(150.0),
-                                child: Image.network(
-                                  listaClientes[index].foto!,
-                                  width: 50,
-                                  height: 50,
-                                  fit: BoxFit.cover,
-                                ))
-                            : ClipRRect(
-                                borderRadius: BorderRadius.circular(150.0),
-                                child: Image.asset(
-                                  "./assets/images/nofoto.jpg",
-                                  width: 50,
-                                  height: 50,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                        title: Text(listaClientes[index].nombre.toString()),
-                        subtitle:
-                            Text(listaClientes[index].telefono.toString()),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        });
+                child: const BotonAgregaCliente()),
+            const Divider(),
+            ListaClientes(
+                fecha: '',
+                iniciadaSesionUsuario: _iniciadaSesionUsuario,
+                emailSesionUsuario: _emailSesionUsuario,
+                busquedaController: contextoFormularioBusqueda.textoBusqueda,
+                pantalla: 'cliente_screen')
+          ],
+        ),
+      ),
+    );
   }
-
-  _cardConfigCliente(BuildContext context, ClienteModel cliente) {
-    MyLogicCliente myLogic = MyLogicCliente(cliente);
-    myLogic.init();
-
-    String idCliente = cliente.id!.toString();
-    print(idCliente);
-    return showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Edición Rápida'),
-                  Icon(
-                    Icons.edit_attributes,
-                    color: Colors.red,
-                  ),
-                ],
-              ),
-              //  content: Text('Edición clienta'),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.all(28.0),
-                  child: Column(
-                    children: [
-                      TextField(
-                        controller: myLogic.textControllerNombre,
-                        decoration: const InputDecoration(labelText: 'Nombre'),
-                      ),
-                      TextField(
-                        keyboardType: TextInputType.number,
-                        controller: myLogic.textControllerTelefono,
-                        decoration:
-                            const InputDecoration(labelText: 'Telefono'),
-                      ),
-                    ],
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    //HE DESHABILITADO LA ELIMINACION DE CLIENTES PARA NO TENER QUE ELIMINAR TODOAS SUS CITAS Y POR CONSIGUIENTE CAMBIE LA FACTURACION
-                    /*  TextButton(
-                        onPressed: () async {
-                          await _eliminar(idCliente);
-                          // ELIMINA CLIENTE DE FIREBASE
-                          await _eliminarClienteFB(usuarioAPP, cliente.id);
-                          datosClientes();
-                          Navigator.pop(context);
-                        },
-                        child: const Text(
-                          'ELIMINAR',
-                        )), */
-                    TextButton(
-                        onPressed: () async {
-                          cliente.id = idCliente;
-
-                          cliente.nombre = myLogic.textControllerNombre.text;
-                          cliente.telefono =
-                              myLogic.textControllerTelefono.text;
-                          await _actualizar(cliente);
-                          setState(() {});
-                          // ACTUALIZA CLIENTE DE FIREBASE
-                          await _actualizarClienteFB(
-                              _emailSesionUsuario, cliente);
-                          Navigator.pop(context);
-                        },
-                        child: const Text(
-                          'ACTUALIZAR',
-                        )),
-                  ],
-                ),
-              ],
-            ));
-  }
-
-  _actualizarClienteFB(usuarioAPP, cliente) {
-    SincronizarFirebase().actualizarCliente(usuarioAPP, cliente);
-  }
-
-  cargaClientesFirebase(String emailSesionUsuario) async {
-    List<ClienteModel> listaCliente = [];
-
-    listaClientes = await FirebaseProvider().cargarClientes(emailSesionUsuario);
-
-    return listaCliente;
-  }
-
-  Future<int> traeCitaPorCliente(idCliente) async {
-    int citas = 0;
-    //? TRAIGO _citas POR idCliente
-    try {
-      if (_iniciadaSesionUsuario) {
-        await FirebaseProvider()
-            .cargarCitasPorCliente(_emailSesionUsuario, idCliente);
-
-        debugPrint('citas firebase $citas');
-      } else {
-        final citas0 =
-            await CitaListProvider().cargarCitasPorCliente(idCliente);
-        citas = (citas0.length);
-        debugPrint('citas dispositivo $citas');
-      }
-    } catch (e) {
-      debugPrint('error: $e');
-    }
-
-    // retorno numero de citas del cliente
-    return citas;
-  }
-/* 
-  _eliminarClienteFB(usuarioAPP, id) {
-    SincronizarFirebase().eliminaClienteId(usuarioAPP, id.toString());
-  } */
 }
-
-_actualizar(ClienteModel cliente) {
-  CitaListProvider().acutalizarCliente(cliente);
-}
-
-/* _eliminar(int id) {
-  CitaListProvider().elimarCliente(id);
-} */

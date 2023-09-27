@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/models/perfil_model.dart';
 import 'package:agendacitas/providers/db_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -151,6 +152,18 @@ class FirebaseProvider extends ChangeNotifier {
         await _referenciaDocumento(emailUsuarioAPP, 'categoriaServicio');
 
     await docRef.doc().set(newCategoria);
+  }
+
+  nuevoPersonaliza(String emailUsuarioAPP, String mensaje) async {
+    final Map<String, dynamic> newPersonaliza = ({
+      'mensaje': mensaje,
+    });
+    //rinicializa Firebase
+    await _iniFirebase();
+    //referencia al documento
+    final docRef = await _referenciaDocumento(emailUsuarioAPP, 'personaliza');
+
+    await docRef.doc().set(newPersonaliza);
   }
 
   getCitasHoraOrdenadaPorFecha(emailUsuario, fecha) async {
@@ -564,6 +577,25 @@ class FirebaseProvider extends ChangeNotifier {
     return cliente;
   }
 
+  cargarPersonaliza(String emailUsuario) async {
+    Map<String, dynamic> personaliza = {};
+
+    await _iniFirebase();
+
+    final docRef = await _referenciaDocumento(emailUsuario, 'personaliza');
+    await docRef.get();
+    await docRef.get().then((QuerySnapshot snapshot) => {
+          for (var element in snapshot.docs)
+            personaliza = {
+              //AGREGA DATOS
+
+              'mensaje': element['mensaje'],
+            }
+        });
+
+    return personaliza; //retorna una lista de personaliza(PersonalizaModelFirebase)
+  }
+
   elimarCita(String emailUsuarioAPP, id) async {
     if (emailUsuarioAPP != '') {
       await _iniFirebase();
@@ -627,6 +659,16 @@ class FirebaseProvider extends ChangeNotifier {
     }).catchError((error) {
       print("Error updating field: $error");
     });
+  }
+
+  actualizarMensajeCita(String usuarioAPP, texto) async {
+    Map<String, Object?> newPersonaliza = {
+      'mensaje': texto,
+    };
+
+    await _iniFirebase();
+    final docRef = await _referenciaDocumento(usuarioAPP, 'personaliza');
+    await docRef.doc('mensajeCita').update(newPersonaliza);
   }
 
   buscarIndiceCategoria(emailUsuario, idCategoria) async {

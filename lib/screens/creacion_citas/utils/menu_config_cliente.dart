@@ -208,7 +208,7 @@ class _MenuConfigClienteState extends State<MenuConfigCliente> {
     myLogic.init();
 
     String idCliente = cliente.id!.toString();
-    print(idCliente);
+    //print(idCliente);
     return showDialog(
         context: context,
         builder: (context) => AlertDialog(

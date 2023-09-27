@@ -1,4 +1,3 @@
-import 'package:agendacitas/widgets/change_theme_button.dart';
 import 'package:agendacitas/widgets/line_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -6,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../models/personaliza_model.dart';
 import '../providers/providers.dart';
+import 'style/estilo_pantalla.dart';
 
 class InformesScreen extends StatefulWidget {
   const InformesScreen({Key? key}) : super(key: key);
@@ -20,7 +20,7 @@ class _InformesScreenState extends State<InformesScreen> {
   Color colorBotonFlecha = Colors.amber;
   List citas = [];
   //datosInforme son los datos para representarlos por meses
-  List datosInforme = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  List<double> datosInforme = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   //facturaMes son los datos que envio al grafico
   List facturaMes = [
     0.0,
@@ -180,25 +180,15 @@ class _InformesScreenState extends State<InformesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Color colorTema = Theme.of(context).primaryColor;
+    
     return Scaffold(
-      // drawer: const MenuDrawer(), //menuDrawer(context),
-      /*  appBar: AppBar(
-          backgroundColor: colorTema,
-          automaticallyImplyLeading: false,
-          title: const Text('Informes'),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(20),
-            ),
-          ),
-          actions: const [ChangeThemeButtonWidget()]), */
       body: SafeArea(
         child: Column(
           children: [
             _fecha(),
             _grafico(),
-            _facturaTotal(),
+            const Divider(),
+            Text('GANANCIAS MENSUALES', style: subTituloEstilo),
             _datos(),
           ],
         ),
@@ -273,38 +263,58 @@ class _InformesScreenState extends State<InformesScreen> {
 
   _grafico() {
     return Expanded(
-        flex: 3,
-        child: Padding(
-          padding: const EdgeInsets.all(22.0),
-          child: LineChartWidget(
-            data: facturaMes,
+        flex: 2,
+        child: Container(
+          decoration: BoxDecoration(
+              color: Color.fromARGB(255, 162, 238, 166),
+              borderRadius: BorderRadius.circular(20)),
+          child: Padding(
+            padding: const EdgeInsets.all(22.0),
+            child: SizedBox(
+              width: 200,
+              child: LineChartWidget(
+                data: facturaMes,
+              ),
+            ),
           ),
         ));
   }
 
-  _facturaTotal() {
-    return const Expanded(
-      flex: 1,
-      child: Text('GANANCIAS MENSUALES'),
-    );
-  }
-
   _datos() {
     return Expanded(
-        flex: 5,
+        flex: 7,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: ListView.builder(
             itemCount: datosInforme.length,
             itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(
-                    ' ${(DateFormat.LLLL('es_ES').format(DateTime(2017, index + 1, 1))).toUpperCase()}'),
-                trailing: Text('${datosInforme[index]} ${personaliza.moneda}'),
-              );
+              return _tarjetasMensuales(index);
             },
           ),
         ));
+  }
+
+  _tarjetasMensuales(index) {
+    return Card(
+      color: const Color.fromARGB(87, 173, 247, 247),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              ' ${(DateFormat.LLLL('es_ES').format(DateTime(2017, index + 1, 1))).toUpperCase()}',
+              style: textoEstilo,
+            ),
+            Text(
+              '${datosInforme[index]}  ${personaliza.moneda}',
+              style: textoEstilo,
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   void _resetListasDatos() {

@@ -1,4 +1,5 @@
 import 'package:agendacitas/models/personaliza_model.dart';
+import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/db_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +16,12 @@ class PersonalizaProvider extends ChangeNotifier {
 
   List<PersonalizaModel> _personalizaGuardado = [];
   Future<PersonalizaModel> nuevoPersonaliza(
-      int id, int codpais, String mensaje, String enlace, String moneda) async {
+    int id,
+    int codpais,
+    String mensaje,
+    String enlace,
+    String moneda,
+  ) async {
     final personaliza = PersonalizaModel(
       id: 0,
       codpais: codpais, //codigo pais para telefonos
@@ -43,5 +49,58 @@ class PersonalizaProvider extends ChangeNotifier {
 
   actualizarPersonaliza(PersonalizaModel personaliza) async {
     await DBProvider.db.actualizarPersonaliza(personaliza);
+  }
+}
+
+class PersonalizaProviderFirebase extends ChangeNotifier {
+  var _personaliza = {};
+
+  get getPersonaliza => _personaliza;
+
+  set setPersonaliza(Map<String, String> nuevoPersonaliza) {
+    _personaliza = nuevoPersonaliza;
+
+    notifyListeners();
+  }
+
+ 
+  Future<PersonalizaModelFirebase> nuevoPersonaliza(
+      String emailUsuarioAPP, String mensaje) async {
+    final personaliza = PersonalizaModelFirebase(
+        mensaje: mensaje // mensaje que se envia al confirmar las citas
+        );
+
+    // final id = await DBProvider.db.guardarPersonaliza(personaliza);
+
+    //asinar el ID de la base de datos al modelo
+    // personaliza.id = id;
+
+    await FirebaseProvider().nuevoPersonaliza(emailUsuarioAPP, mensaje);
+
+  
+
+    return personaliza;
+  }
+
+  Future<Map<String, dynamic>> cargarPersonaliza(String emailUsuarioAPP) async {
+    /*  final personalizaGuardado = await DBProvider.db.getPersonaliza();
+    _personalizaGuardado = [...personalizaGuardado];
+
+    return personalizaGuardado; */
+
+    final Map<String, dynamic> personalizaGuardado =
+        await FirebaseProvider().cargarPersonaliza(emailUsuarioAPP);
+
+    print(
+        'DATOS PERSONALIZA -----------------------${personalizaGuardado['mensaje']}');
+
+    return personalizaGuardado;
+  }
+
+  actualizarPersonaliza(String emailUsuario, msm) async {
+    
+
+    // guardo en Fierebase el mensaje a enviar acutalizado
+    await FirebaseProvider().actualizarMensajeCita(emailUsuario, msm);
   }
 }

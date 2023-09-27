@@ -1,4 +1,5 @@
 import 'package:agendacitas/.env.dart';
+import 'package:agendacitas/providers/FormularioBusqueda/formulario_busqueda_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
@@ -24,7 +25,7 @@ import 'widgets/formulariosSessionApp/registro_usuario_screen.dart'; //utilizado
 //?            version base de datos DB Provider.
 //?            quitar PAGADO DEL home.dart -->> PagoProvider().guardaPagado(true);
 //?            comprobar pago STRIPE en PRODUCTION google_pay_payment_profile.json y variables en wallet/ tarjetaPago.dart
-//?     flutter build appbundle
+//?   flutter build appbundle
 //?            - C:\ProyectosFutter\agenda3\build\app\outputs\bundle\release
 //      VER SOLUCIONES DE ERRORES README.md
 //! GITHUB :
@@ -144,7 +145,11 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(
             create: (BuildContext context) => CreacionCitaProvider()),
         ChangeNotifierProvider(
-            create: (BuildContext context) => PersonalizaProvider())
+            create: (BuildContext context) => PersonalizaProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => PersonalizaProviderFirebase()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => FormularioBusqueda())
       ],
       builder: (context, _) {
         return MaterialApp(

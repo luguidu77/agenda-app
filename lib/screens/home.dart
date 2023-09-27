@@ -27,6 +27,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // contextoPersonaliza es la variable para actuar con este contexto
   late PersonalizaProvider contextoPersonaliza;
+  late PersonalizaProviderFirebase contextoPersonalizaFirebase;
+
   //trae mediante funcion de BNavigator el index de la pagina menu de abajo , myBnB
   BNavigator? myBnB;
 
@@ -34,7 +36,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool temaDefecto = true;
 
+  bool _iniciadaSesionUsuario = false;
+  String _emailSesionUsuario = '';
+
   ThemeProvider themeProvider = ThemeProvider();
+
+  estadoPagoEmailApp() async {
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    //  _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
+  }
 
   cargarTema() async {
     // comprobamos si hay un color de tema guardado en sqlite, si lo hay cambia el tema con el color guardado
@@ -60,10 +71,11 @@ class _HomeScreenState extends State<HomeScreen> {
         widget.index = i;
       });
     });
-
+    estadoPagoEmailApp();
     cargarTema();
 
     personaliza();
+    personalizaFirebase();
 
     messangingFirebase();
 
@@ -73,6 +85,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     contextoPersonaliza = context.read<PersonalizaProvider>();
+    contextoPersonalizaFirebase = context.read<PersonalizaProviderFirebase>();
+
     print(contextoPersonaliza.getPersonaliza['CODPAIS']);
     themeProvider = context.watch<ThemeProvider>();
 
@@ -215,6 +229,22 @@ class _HomeScreenState extends State<HomeScreen> {
       // setState(() {});
     } else {
       await PersonalizaProvider().nuevoPersonaliza(0, 34, '', '', '€');
+      personaliza();
+    }
+  }
+
+  void personalizaFirebase() async {
+    Map<String, dynamic> data = await PersonalizaProviderFirebase()
+        .cargarPersonaliza(_emailSesionUsuario);
+
+    if (data.isNotEmpty) {
+      contextoPersonalizaFirebase.setPersonaliza = {
+        'MENSAJE_CITA': data['mensaje'],
+      };
+
+      //
+    } else {
+      //await PersonalizaProvider().nuevoPersonaliza(0, 34, '', '', '€');
       personaliza();
     }
   }

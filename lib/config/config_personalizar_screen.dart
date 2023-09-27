@@ -1,3 +1,4 @@
+import 'package:agendacitas/widgets/tarjeta_msm_citas.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/picker.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,6 +20,8 @@ class ConfigPersonalizar extends StatefulWidget {
 class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
   // contextoPersonaliza es la variable para actuar con este contexto
   late PersonalizaProvider contextoPersonaliza;
+  late PersonalizaProviderFirebase contextoPersonalizaFirebase;
+  late String textoActual;
 
   List<Color> colorsList = const [
     Colors.red,
@@ -42,6 +45,7 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
   @override
   void initState() {
     getPersonaliza();
+    getPersonalizaFirebase();
     super.initState();
   }
 
@@ -67,6 +71,14 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
   @override
   Widget build(BuildContext context) {
     contextoPersonaliza = context.read<PersonalizaProvider>();
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    String emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    bool iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
+    // rescat el texto par enviar a los clientes desde firebase
+    contextoPersonalizaFirebase = context.read<PersonalizaProviderFirebase>();
+    final personalizaprovider = contextoPersonalizaFirebase.getPersonaliza;
+    textoActual = personalizaprovider['MENSAJE_CITA'].toString();
+
     print(contextoPersonaliza.getPersonaliza['CODPAIS']);
     return SafeArea(
       child: Scaffold(
@@ -92,6 +104,9 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
                 _codigoPais(context),
                 const SizedBox(height: 30),
                 _monedaPais(context),
+                const SizedBox(height: 30),
+                _textoMensajes(context, contextoPersonalizaFirebase,
+                    emailSesionUsuario, iniciadaSesionUsuario)
               ],
             ),
           ),
@@ -253,6 +268,36 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
     );
   }
 
+  _textoMensajes(
+      context, contextoPersonalizaFirebase, emailSesionUsuario, inicioSesion) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text('Mensaje confirmación cita',
+            style: GoogleFonts.bebasNeue(fontSize: 18)),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            minimumSize: Size(MediaQuery.of(context).size.width / 4, 50),
+          ),
+          onPressed: inicioSesion
+              ? () async {
+                  await tarjetaModificarMsm(
+                          context,
+                          contextoPersonalizaFirebase,
+                          emailSesionUsuario,
+                          textoActual,
+                          'texto')
+                      .whenComplete(() => actualizar(context));
+                }
+              : () {
+                  mensajeError(context, 'No disponible en versión gratuita');
+                },
+          child: const Text('EDITAR'),
+        )
+      ],
+    );
+  }
+
   actualizar(context) {
     getPersonaliza();
   }
@@ -284,5 +329,9 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
         ],
       ),
     );
+  }
+
+  void getPersonalizaFirebase() {
+    print('pendiente de traer los datos de firebase personaliza');
   }
 }

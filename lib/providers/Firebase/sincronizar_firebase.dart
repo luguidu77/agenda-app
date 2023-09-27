@@ -36,6 +36,8 @@ class SincronizarFirebase {
 
     await _disponibilidadSemanal(usuarioAPP, 'UPLOAD');
 
+    await _personaliza(usuarioAPP, 'UPLOAD');
+
     debugPrint('FIN sincronizando SUBIENDO datos a firebase');
   }
 
@@ -116,6 +118,23 @@ class SincronizarFirebase {
             'Viernes': true,
             'Sabado': true,
             'Domingo': true,
+          });
+        }
+      });
+    } catch (e) {}
+  }
+
+  // CREA ESTRUCTURA DE PERSONALIZA (MENSAJES CONFIRMACION DE CITAS...)
+  _personaliza(String usuarioAPP, String updown) async {
+    //referencia al documento
+    final docRef = await _referenciaDocumento(usuarioAPP, 'personaliza');
+    try {
+      // si no existen perfilUsuarioApp lo crea con los campos correspondientes
+      await docRef.doc('perfilUsuarioApp').get().then((data) async {
+        if (data.data() == null) {
+          await docRef.doc('mensajeCita').set({
+            'mensaje':
+                '📢Hola \$cliente,%su cita ha sido reservada con \$denominacion para el día \$fecha h.%Servicio a realizar : \$servicio.%%🙏Si no pudieras asistir cancelala para que otra persona pueda aprovecharla.%%Telefono: \$telefono%Web: \$web%Facebook: \$facebook%Instagram: \$instagram%Dónde estamos: \$ubicacion%',
           });
         }
       });
@@ -413,7 +432,7 @@ class SincronizarFirebase {
     final docRef = await _referenciaDocumento(usuarioAPP, 'cliente');
 
     var data = {
-      'nombre': cliente.nombre.toString().toUpperCase(),
+      'nombre': cliente.nombre.toString(),
       'telefono': cliente.telefono,
       'email': cliente.email,
       'foto': cliente.foto,

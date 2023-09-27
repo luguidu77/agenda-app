@@ -40,19 +40,54 @@ class Comunicaciones {
     await launchUrl(emailLaunchUri);
   }
 
-  String textoCompartir(PerfilModel perfilUsuarioApp, String clienta,
-      String fecha, String servicio) {
+  String textoCompartir(PerfilModel perfilUsuarioApp, String textoActual,
+      String clienta, String fecha, String servicio) {
     //EL MENSAJE CAMBIA SI HAY INICIADO UN USUARIO DE APP
     if (perfilUsuarioApp.denominacion != '') {
-      return 'Hola $clienta,\n'
-          'su cita ha sido reservada con ${perfilUsuarioApp.denominacion} para el día $fecha h.\n'
-          'Servicio a realizar : $servicio.\n\n'
-          'Si no pudieras asistir cancelala para que otra persona pueda aprovecharla.\n\n'
-          'Telefono: ${perfilUsuarioApp.telefono}\n'
-          'Web: ${perfilUsuarioApp.website}\n'
-          'Facebook: ${perfilUsuarioApp.facebook}\n'
-          'Instagram: ${perfilUsuarioApp.instagram}\n'
-          'Dónde estamos: ${perfilUsuarioApp.ubicacion}\n';
+      RegExp regExp = RegExp(
+          r'\$(\w+)'); // Expresión regular para buscar palabras que comienzan con $
+      String resultado = textoActual.replaceAllMapped(regExp, (match) {
+        // match.group(1) contiene el texto después del $
+        String variable = match.group(1)!;
+        // Aquí puedes mapear las variables a sus valores
+        switch (variable) {
+          case 'denominacion':
+            return perfilUsuarioApp.denominacion!;
+          case 'telefono':
+            return perfilUsuarioApp.telefono!;
+          case 'web':
+            return perfilUsuarioApp.website!;
+          case 'facebook':
+            return perfilUsuarioApp.facebook!;
+          case 'instagram':
+            return perfilUsuarioApp.instagram!;
+          case 'ubicacion':
+            return perfilUsuarioApp.ubicacion!;
+
+          case 'cliente':
+            return clienta;
+          case 'fecha':
+            return fecha;
+          case 'servicio':
+            return servicio;
+
+          case 'salto':
+            return '\n';
+          default:
+            '';
+        }
+
+        if (variable == 'clienta') {
+          return clienta;
+        } else {
+          return ''; // Si no encuentras una variable, puedes dejarla en blanco o manejarla como desees
+        }
+      });
+
+      String textoResultado = resultado.replaceAll('%', '\n');
+      return textoResultado;
+/* 
+      Hola $cliente,%su cita ha sido reservada con $denominacion para el día $fecha h.%Servicio a realizar : $servicio.%%Si no pudieras asistir cancelala para que otra persona pueda aprovecharla.%%Telefono: $telefono%Web: $web%Facebook: $facebook%Instagram: $instagram%Dónde estamos: $ubicacion%;  */
     } else {
       return 'Hola $clienta,\n'
           'su cita ha sido reservada para el día $fecha h.\n'
@@ -61,11 +96,18 @@ class Comunicaciones {
     }
   }
 
-  void compartirCitaWhatsapp(PerfilModel perfilUsuarioApp, String clienta,
-      String telefono, String fecha, String servicio) async {
+  void compartirCitaWhatsapp(
+    PerfilModel perfilUsuarioApp,
+    String textoActual,
+    String clienta,
+    String telefono,
+    String fecha,
+    String servicio,
+  ) async {
     String telef = '+$telefono';
 
-    String texto = textoCompartir(perfilUsuarioApp, clienta, fecha, servicio);
+    String texto =
+        textoCompartir(perfilUsuarioApp, textoActual, clienta, fecha, servicio);
 
     final url = Uri.parse('whatsapp://send?phone=$telef&text=$texto');
     if (await launchUrl(url)) {
@@ -75,8 +117,8 @@ class Comunicaciones {
     }
   }
 
-  void compartirCitaEmail(PerfilModel perfilUsuarioApp, String clienta,
-      String email, String fecha, String servicio) async {
+  void compartirCitaEmail(PerfilModel perfilUsuarioApp, String textoActual,
+      String clienta, String email, String fecha, String servicio) async {
     String? encodeQueryParameters(Map<String, String> params) {
       return params.entries
           .map((MapEntry<String, String> e) =>
@@ -84,7 +126,8 @@ class Comunicaciones {
           .join('&');
     }
 
-    String texto = textoCompartir(perfilUsuarioApp, clienta, fecha, servicio);
+    String texto =
+        textoCompartir(perfilUsuarioApp, textoActual, clienta, fecha, servicio);
     final Uri emailLaunchUri = Uri(
       scheme: 'mailto',
       path: email,
@@ -96,9 +139,10 @@ class Comunicaciones {
     await launchUrl(emailLaunchUri);
   }
 
-  void compartirCitaSms(PerfilModel perfilUsuarioApp, String clienta,
-      String telefono, String fecha, String servicio) async {
-    String texto = textoCompartir(perfilUsuarioApp, clienta, fecha, servicio);
+  void compartirCitaSms(PerfilModel perfilUsuarioApp, String textoActual,
+      String clienta, String telefono, String fecha, String servicio) async {
+    String texto =
+        textoCompartir(perfilUsuarioApp, textoActual, clienta, fecha, servicio);
     final Uri smsLaunchUri = Uri(
       scheme: 'sms',
       path: telefono,

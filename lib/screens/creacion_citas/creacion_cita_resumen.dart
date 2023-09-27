@@ -168,8 +168,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
     // limpia la lista de servicios
     listaServicios.clear();
-   
-   
+
     setState(() {});
   }
 
@@ -256,18 +255,18 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
                                 email: email,
                                 fechaCita: fechaTexto,
                                 servicio: servicioTexto),
-                            const SizedBox(height: 50),
+                            const SizedBox(height: 20),
                             ElevatedButton.icon(
                                 onPressed: () {
                                   Navigator.pushReplacementNamed(context, '/');
                                   liberarMemoriaEditingController();
                                 },
                                 icon: const Icon(
-                                  Icons.close_rounded,
+                                  Icons.check,
                                   size: 20,
                                   color: Color.fromARGB(167, 224, 231, 235),
                                 ),
-                                label: const Text('TERMINAR')),
+                                label: const Text('ACEPTAR')),
                           ],
                         );
                 },

@@ -539,7 +539,8 @@ class DBProvider {
       'codpais': personaliza.codpais,
       'mensaje': personaliza.mensaje,
       'enlace': personaliza.enlace,
-      'moneda': personaliza.moneda
+      'moneda': personaliza.moneda,
+     
     };
     final db = await database;
 

@@ -4,9 +4,15 @@ class PersonalizaModel {
   String? mensaje;
   String? enlace;
   String? moneda;
+  
 
   PersonalizaModel(
-      {this.id, this.codpais, this.mensaje, this.enlace, this.moneda});
+      {this.id,
+      this.codpais,
+      this.mensaje,
+      this.enlace,
+      this.moneda,
+     });
 
   factory PersonalizaModel.fromJson(Map<String, dynamic> json) =>
       PersonalizaModel(
@@ -15,6 +21,7 @@ class PersonalizaModel {
         mensaje: json["mensaje"],
         enlace: json["enlace"],
         moneda: json["moneda"],
+       
       );
 
   Map<String, dynamic> toJson() => {
@@ -23,5 +30,28 @@ class PersonalizaModel {
         "mensaje": mensaje,
         "enlace": enlace,
         "moneda": moneda,
+       
       };
 }
+
+
+class PersonalizaModelFirebase {
+
+  String? mensaje;
+
+  PersonalizaModelFirebase(
+      {
+      this.mensaje});
+
+  factory PersonalizaModelFirebase.fromJson(Map<String, dynamic> json) =>
+      PersonalizaModelFirebase(
+       
+        mensaje: json["mensaje"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        
+        "mensaje": mensaje,
+      };
+}
+

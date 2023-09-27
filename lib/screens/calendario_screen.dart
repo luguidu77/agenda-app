@@ -40,9 +40,11 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
   DateFormat formatMes = DateFormat.MMMM('es_ES');
   DateFormat formatSemana = DateFormat.EEEE('es_ES');
   DateFormat formatDia = DateFormat.d('es_ES');
+  DateFormat formatAno = DateFormat.y('es_ES');
 
   //DateFormat('EEE dd-MM', 'es_ES');
   DateTime fechaElegida = DateTime.now();
+  String fechaTextoAno = '';
   String fechaTextoMes = '';
   String fechaTextoSemana = '';
   String fechaTextoDia = '';
@@ -66,7 +68,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
 
   @override
   void initState() {
-    //fechaTexto = formatDay.format(fechaElegida);
+    fechaTextoAno = formatAno.format(DateTime.parse(fechaElegida.toString()));
     fechaTextoMes = formatMes.format(DateTime.parse(fechaElegida.toString()));
     fechaTextoSemana =
         formatSemana.format(DateTime.parse(fechaElegida.toString()));
@@ -392,7 +394,8 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
   }
 
   selecionFechas(calendarioProvider) {
-    // DAR FORMATO A LA FECHA ELEGIDA (sabado 18 de febrero)
+    // DAR FORMATO A LA FECHA ELEGIDA (sabado 18 de febrero 2023)
+    fechaTextoAno = formatAno.format(DateTime.parse(fechaElegida.toString()));
     fechaTextoMes = formatMes.format(DateTime.parse(fechaElegida.toString()));
     fechaTextoSemana =
         formatSemana.format(DateTime.parse(fechaElegida.toString()));
@@ -401,43 +404,51 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
     return calendarioProvider.visibleCalendario
         // FECHA ELEGIDA CON SELECTORES AUMENTO/DECREMENTO DIAS(VISIBLE CUANDO NO SE VE EL CALENDARIO)
         ? Container()
-        : Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // BOTON DEL DIA ANTERIOR
-              _botonAnteriorDia(calendarioProvider),
-              // TARJETA PARA VER LA FECHA
-              GestureDetector(
-                onTap: () => setState(() {
-                  calendarioProvider.setVisibleCalendario = true;
-                }),
-                child: _tarjetadelafechaelegida(),
-              ),
-              // BOTON SIGUIENTE DIA
+        : Container(
+            width: MediaQuery.of(context).size.width,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // BOTON DEL DIA ANTERIOR
+                _botonAnteriorDia(calendarioProvider),
+                // TARJETA PARA VER LA FECHA
+                GestureDetector(
+                  onTap: () => setState(() {
+                    calendarioProvider.setVisibleCalendario = true;
+                  }),
+                  child: _tarjetadelafechaelegida(),
+                ),
+                // BOTON SIGUIENTE DIA
 
-              _botonSiguienteDia(calendarioProvider),
-            ],
+                _botonSiguienteDia(calendarioProvider),
+              ],
+            ),
           );
   }
 
   _tarjetadelafechaelegida() {
-    return Card(
-      color: (fechaElegida.day == DateTime.now().day)
-          ? const Color.fromARGB(255, 201, 223, 245)
-          : fechaElegida.weekday == DateTime.sunday ||
-                  fechaElegida.weekday == DateTime.saturday
-              ? const Color.fromARGB(255, 241, 184, 180)
-              : Colors.white,
-      elevation: 5.0,
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width - 150,
-        height: 50,
-        child: Padding(
-          padding: const EdgeInsets.only(left: 5.0, right: 5.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [_fecha(), const Icon(Icons.calendar_month_sharp)],
-          ),
+    // Convierte ambas fechas a la misma zona horaria (UTC) para comparar solo las fechas
+    DateTime fechaEspecificaSoloFecha =
+        DateTime.utc(fechaElegida.year, fechaElegida.month, fechaElegida.day);
+    DateTime fechaActualSoloFecha = DateTime.utc(
+        DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    return SizedBox(
+      // width: MediaQuery.of(context).size.width - 120,
+      height: 50,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _fecha(),
+            const SizedBox(
+              width: 5,
+            ),
+            fechaActualSoloFecha.isAtSameMomentAs(fechaEspecificaSoloFecha)
+                ? const Icon(Icons.today)
+                : const Icon(Icons.calendar_month),
+            
+          ],
         ),
       ),
     );
@@ -449,6 +460,8 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
         setState(() {
           calendarioProvider.setFechaSeleccionada =
               fechaElegida.add(const Duration(days: 1));
+          fechaTextoAno =
+              formatAno.format(fechaElegida.add(const Duration(days: 1)));
           fechaTextoMes =
               formatMes.format(fechaElegida.add(const Duration(days: 1)));
           fechaTextoSemana =
@@ -459,7 +472,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
         }),
       },
       icon: const Icon(Icons.arrow_right_outlined),
-      iconSize: 55,
+      iconSize: 50,
       color: colorBotonFlecha,
     );
   }
@@ -470,6 +483,8 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
         setState(() {
           calendarioProvider.setFechaSeleccionada =
               fechaElegida.subtract(const Duration(days: 1));
+          fechaTextoAno =
+              formatAno.format(fechaElegida.subtract(const Duration(days: 1)));
           fechaTextoMes =
               formatMes.format(fechaElegida.subtract(const Duration(days: 1)));
           fechaTextoSemana = formatSemana
@@ -480,7 +495,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
         }),
       },
       icon: const Icon(Icons.arrow_left_outlined),
-      iconSize: 55,
+      iconSize: 50,
       color: colorBotonFlecha,
     );
   }
@@ -522,7 +537,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
 
   _fecha() {
     return Text(
-      '$fechaTextoSemana $fechaTextoDia de $fechaTextoMes',
+      '$fechaTextoSemana $fechaTextoDia $fechaTextoMes $fechaTextoAno',
       style: const TextStyle(
           fontSize: 12, color: Colors.blueGrey, fontWeight: FontWeight.bold),
       textAlign: TextAlign.center,

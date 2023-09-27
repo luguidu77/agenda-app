@@ -36,6 +36,10 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
   String? telefonoCodpais;
 
   bool visible = true;
+
+  late PersonalizaProviderFirebase contextoPersonalizaFirebase;
+  late String textoActual;
+
   compruebaPago() async {
     //   PagoProvider para obtener pago y el email del usuarioAPP
     final providerPagoUsuarioAPP =
@@ -91,6 +95,11 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
   Widget build(BuildContext context) {
     print(perfilUsuarioApp.telefono);
 
+    // rescat el texto par enviar a los clientes desde firebase
+    contextoPersonalizaFirebase = context.read<PersonalizaProviderFirebase>();
+    final personalizaprovider = contextoPersonalizaFirebase.getPersonaliza;
+    textoActual = personalizaprovider['MENSAJE_CITA'].toString();
+
     return Column(
       children: [
         const Text(
@@ -118,11 +127,13 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
         GestureDetector(
           onTap: () {
             Comunicaciones().compartirCitaWhatsapp(
-                perfilUsuarioApp,
-                widget.cliente,
-                telefonoCodpais!,
-                widget.fechaCita,
-                widget.servicio);
+              perfilUsuarioApp,
+              textoActual,
+              widget.cliente,
+              telefonoCodpais!,
+              widget.fechaCita,
+              widget.servicio,
+            );
           },
           child: const Card(
             child: ListTile(
@@ -137,6 +148,7 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
                 ? (widget.email != '')
                     ? Comunicaciones().compartirCitaEmail(
                         perfilUsuarioApp,
+                        textoActual,
                         widget.cliente,
                         widget.email,
                         widget.fechaCita,
@@ -156,6 +168,7 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
             pagado
                 ? Comunicaciones().compartirCitaSms(
                     perfilUsuarioApp,
+                    textoActual,
                     widget.cliente,
                     widget.telefono,
                     widget.fechaCita,

@@ -151,7 +151,7 @@ class _CalendarioState extends State<Calendario> {
         selectedDayPredicate: (day) => isSameDay(day, today),
         focusedDay: today,
         firstDay: today.subtract(const Duration(days: 30)),
-        lastDay: today.add(const Duration(days: 30)),
+        lastDay: today.add(const Duration(days: 365)),
         onDaySelected: _diaSeleccionado,
         eventLoader: _getEventsForDay,
         calendarBuilders: CalendarBuilders(markerBuilder: (_, datetime, event) {

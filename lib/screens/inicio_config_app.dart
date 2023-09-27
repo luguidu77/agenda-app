@@ -37,6 +37,16 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     }
   }
 
+  getPersonalizaFirebase(emailSesionUsuario) async {
+    Map<String, dynamic> data =
+        await PersonalizaProviderFirebase().cargarPersonaliza(emailSesionUsuario);
+
+    if (data.isEmpty) {
+      await PersonalizaProviderFirebase()
+          .nuevoPersonaliza('prueba@a.es', 'texto inicial');
+    }
+  }
+
   getDisponibilidadSemanal(emailSesionUsuario) async {
     final disponibilidadSemanalProvider = await SincronizarFirebase()
         .getDisponibilidadSemanal(emailSesionUsuario);
@@ -47,7 +57,10 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
   @override
   void initState() {
     // inicializaProviderEstadoPagoEmail();
-    getPersonaliza();
+   // getPersonaliza(); 
+    //? no lo inicializo aqui porque primeramente me trael el usuario de la app vacio
+    //? tengo un poco de cacao aqui en las inicializaciones de la app
+    //getPersonalizaFirebase(widget.usuarioAPP);
 
     super.initState();
   }

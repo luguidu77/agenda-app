@@ -163,7 +163,7 @@ class FirebaseProvider extends ChangeNotifier {
     //referencia al documento
     final docRef = await _referenciaDocumento(emailUsuarioAPP, 'personaliza');
 
-    await docRef.doc().set(newPersonaliza);
+    await docRef.doc('mensajeCita').set(newPersonaliza);
   }
 
   getCitasHoraOrdenadaPorFecha(emailUsuario, fecha) async {

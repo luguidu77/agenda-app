@@ -1,6 +1,7 @@
 import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/db_provider.dart';
+import 'package:agendacitas/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class PersonalizaProvider extends ChangeNotifier {
@@ -63,7 +64,6 @@ class PersonalizaProviderFirebase extends ChangeNotifier {
     notifyListeners();
   }
 
- 
   Future<PersonalizaModelFirebase> nuevoPersonaliza(
       String emailUsuarioAPP, String mensaje) async {
     final personaliza = PersonalizaModelFirebase(
@@ -76,8 +76,6 @@ class PersonalizaProviderFirebase extends ChangeNotifier {
     // personaliza.id = id;
 
     await FirebaseProvider().nuevoPersonaliza(emailUsuarioAPP, mensaje);
-
-  
 
     return personaliza;
   }
@@ -97,10 +95,13 @@ class PersonalizaProviderFirebase extends ChangeNotifier {
     return personalizaGuardado;
   }
 
-  actualizarPersonaliza(String emailUsuario, msm) async {
-    
-
-    // guardo en Fierebase el mensaje a enviar acutalizado
-    await FirebaseProvider().actualizarMensajeCita(emailUsuario, msm);
+  actualizarPersonaliza(context, String emailUsuario, msm) async {
+    try {
+      // guardo en Fierebase el mensaje a enviar acutalizado
+      await FirebaseProvider().actualizarMensajeCita(emailUsuario, msm);
+    } catch (e) {
+      mensajeError(
+          context, 'Vaya!, algo salió mal, tal vez reiniciar puede ayudar');
+    }
   }
 }

@@ -101,7 +101,7 @@ class _ListaCitasState extends State<ListaCitas> {
               }
             }),
         Expanded(
-            // todo TARJETAS DE LAS CITAS CONCERTADAS ##############################
+            // ########## TARJETAS DE LAS CITAS CONCERTADAS ##############################
             child:
                 //  citas SYNCFUSION
                 ListaCitasNuevo(fechaElegida: widget.fechaElegida, citas: citas)

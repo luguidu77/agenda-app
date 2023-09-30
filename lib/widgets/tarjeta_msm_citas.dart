@@ -61,7 +61,7 @@ Future tarjetaModificarMsm(context, contextoPersonalizaFirebase, emailUsuario,
                                 },
                                 // modificaDato(),
                                 await PersonalizaProviderFirebase()
-                                    .actualizarPersonaliza(
+                                    .actualizarPersonaliza(context,
                                         emailUsuario, ctrl_1.text),
                                 Navigator.pop(context)
                               },
@@ -111,6 +111,9 @@ Future tarjetaModificarMsm(context, contextoPersonalizaFirebase, emailUsuario,
                           }
                           return null;
                         },
+                        onChanged: (value) {
+                          textoActual = value;
+                        },
                       ),
                     ),
                   ),
@@ -149,6 +152,10 @@ instrucciones(context) {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
+                  ),
+                  Text(
+                    '(deben escribirse tal cual están, sin tildes ni mayúsculas)',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     'Nombre del cliente: \$cliente \n'

@@ -235,7 +235,8 @@ class _ListaClientesState extends State<ListaClientes> {
 
                                 setState(() {});
                               },
-                              child: const Icon(FontAwesomeIcons.circleInfo))),
+                              child:
+                                  const Icon(FontAwesomeIcons.circleInfo))),
                     ],
                   ),
                 ),

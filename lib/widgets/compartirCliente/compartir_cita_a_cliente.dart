@@ -142,27 +142,29 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
             ),
           ),
         ),
-        GestureDetector(
-          onTap: () {
-            pagado
-                ? (widget.email != '')
-                    ? Comunicaciones().compartirCitaEmail(
-                        perfilUsuarioApp,
-                        textoActual,
-                        widget.cliente,
-                        widget.email,
-                        widget.fechaCita,
-                        widget.servicio)
-                    : alertaNoEmail(context)
-                : alerta(context);
-          },
-          child: const Card(
-            child: ListTile(
-              title: Text('Email'),
-              trailing: FaIcon(FontAwesomeIcons.envelope),
-            ),
-          ),
-        ),
+        // LA PANTALLA DETALLES DE LA CITA DEVUELVE UN ESPACIO CUANDO NO HAY EMAIL
+        // LA PANTALLA DE CITA CONFIRMADA NO TIENE ESPACIO EN EMAIL VACIO
+        widget.email != ' ' && widget.email != ''
+            ? GestureDetector(
+                onTap: () {
+                  pagado
+                      ? Comunicaciones().compartirCitaEmail(
+                          perfilUsuarioApp,
+                          textoActual,
+                          widget.cliente,
+                          widget.email,
+                          widget.fechaCita,
+                          widget.servicio)
+                      : alerta(context);
+                },
+                child: const Card(
+                  child: ListTile(
+                    title: Text('Email'),
+                    trailing: FaIcon(FontAwesomeIcons.envelope),
+                  ),
+                ),
+              )
+            : Container(),
         GestureDetector(
           onTap: () {
             pagado

@@ -1,3 +1,4 @@
+import 'package:agendacitas/screens/home.dart';
 import 'package:agendacitas/widgets/tarjeta_msm_citas.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/picker.dart';
@@ -45,7 +46,7 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
   @override
   void initState() {
     getPersonaliza();
-    getPersonalizaFirebase();
+    //  getPersonalizaFirebase(widget.emailSesionUsuario);
     super.initState();
   }
 
@@ -77,6 +78,15 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
     // rescat el texto par enviar a los clientes desde firebase
     contextoPersonalizaFirebase = context.read<PersonalizaProviderFirebase>();
     final personalizaprovider = contextoPersonalizaFirebase.getPersonaliza;
+    print(personalizaprovider['MENSAJE_CITA']);
+
+    // ESTA CONDICION SOLO SIRVE PARA LAS INSTALACIONES DE VERSIONES ANTERIORES A LA CREACION MODIFICACION DE TEXTO CONFIRMACION DE CITA
+    if (personalizaprovider['MENSAJE_CITA'] == null) {
+      // SI ES NULO EL MENSAJE => CREAMOS PERSONALIZA Y MENSAJE DE EJEMPLO EN FIREBASE
+      _creaPersonaliza(emailSesionUsuario, contextoPersonalizaFirebase);
+
+      setState(() {});
+    }
     textoActual = personalizaprovider['MENSAJE_CITA'].toString();
 
     print(contextoPersonaliza.getPersonaliza['CODPAIS']);
@@ -92,7 +102,6 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
                   height: 20,
                 ),
                 const Text(
-                  //todo: HACER CATEGORIAS DE SERVICIOS
                   'Personaliza',
                   style: TextStyle(fontSize: 28),
                 ),
@@ -318,8 +327,11 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
           ),
           IconButton(
               onPressed: () {
-                Navigator.pushNamedAndRemoveUntil(
-                    context, '/', ModalRoute.withName('/'));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => HomeScreen(index: 3, myBnB: 3),
+                    ));
               },
               icon: const Icon(
                 Icons.close,
@@ -331,7 +343,17 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
     );
   }
 
-  void getPersonalizaFirebase() {
-    print('pendiente de traer los datos de firebase personaliza');
+  void getPersonalizaFirebase(emailSesionUsuario, con) async {
+    await FirebaseProvider().cargarPersonaliza(emailSesionUsuario);
+  }
+
+  void _creaPersonaliza(emailSesionUsuario, contextoPersonalizaFirebase) async {
+    String mensaje =
+        '📢Hola \$cliente,%su cita ha sido reservada con \$denominacion para el día \$fecha h.%Servicio a realizar : \$servicio.%%🙏Si no pudieras asistir cancelala para que otra persona pueda aprovecharla.%%Telefono: \$telefono%Web: \$web%Facebook: \$facebook%Instagram: \$instagram%Dónde estamos: \$ubicacion%';
+    await FirebaseProvider().nuevoPersonaliza(emailSesionUsuario, mensaje);
+
+    contextoPersonalizaFirebase.setPersonaliza = {
+      'MENSAJE_CITA': mensaje,
+    };
   }
 }

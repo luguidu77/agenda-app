@@ -21,7 +21,7 @@ class DetallesCitaScreen extends StatefulWidget {
 
 class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
   PersonalizaModel personaliza = PersonalizaModel();
-  final padding = const EdgeInsets.all(28.0);
+  EdgeInsets miPadding = const EdgeInsets.all(18.0);
   late Map<String, dynamic> reserva;
 
   getPersonaliza() async {
@@ -67,10 +67,6 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
               // Detalles del cliente
               _cliente(reserva),
 
-              Text(
-                'CITA',
-                style: tituloEstilo,
-              ),
               // Detalle de la cita
               _detallesCita(reserva),
 
@@ -104,7 +100,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
             child: Card(
               // color: Colors.deepPurple[300],
               child: Padding(
-                padding: const EdgeInsets.all(18.0),
+                padding: miPadding,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -119,10 +115,10 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                       cita['servicio'].toString(),
                       style: subTituloEstilo,
                     ),
-                    Text(
+                    /* Text(
                       cita['detalle'].toString(),
                       style: subTituloEstilo,
-                    ),
+                    ), */
                     Text(
                       'PRECIO: ${cita['precio'].toString()} ${personaliza.moneda}',
                       style: subTituloEstilo,
@@ -139,36 +135,6 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
               ),
             ),
           ),
-          /* Positioned(
-              bottom: -125,
-              right: 10,
-              child: 
-      
-               Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                      width: 60,
-                      child: Image.asset('assets/images/whatsapp.png')),
-                ),
-                reserva['email'] != ' '
-                    ? Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SizedBox(
-                            width: 60,
-                            child: Image.asset('assets/images/email.png')),
-                      )
-                    : Container(),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                      width: 60, child: Image.asset('assets/images/sms.png')),
-                )
-              ],
-            ),
-              ), */
-
           CompartirCitaConCliente(
               cliente: reserva['nombre'],
               telefono: reserva['telefono']!,
@@ -186,17 +152,24 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
         child: Container(
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
             child: Card(
-              //color: Theme.of(context).primaryColor.withOpacity(0.5),
+              color: Theme.of(context).primaryColor.withOpacity(0.5),
               child: Padding(
-                padding: padding,
-                child: Column(
+                padding: miPadding,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _foto(reserva['foto']),
-                    const SizedBox(height: 30),
-                    Text(style: subTituloEstilo, reserva['nombre'].toString()),
-                    const SizedBox(height: 30),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    const SizedBox(height: 10),
+                    Column(
+                      children: [
+                        Text(style: textoEstilo, reserva['nombre'].toString()),
+                        Text(style: textoEstilo, reserva['nota'].toString()),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Column(
+                      //  mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         IconButton(
                           onPressed: () {
@@ -228,14 +201,14 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
         child: foto != ''
             ? Image.network(
                 foto,
-                width: 150,
-                height: 100,
+                width: 80,
+                height: 80,
                 fit: BoxFit.cover,
               )
             : Image.asset(
                 "./assets/images/nofoto.jpg",
-                width: 150,
-                height: 100,
+                width: 80,
+                height: 80,
                 fit: BoxFit.cover,
               ));
   }

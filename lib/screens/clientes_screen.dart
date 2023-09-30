@@ -28,8 +28,6 @@ class _ClientesScreenState extends State<ClientesScreen> {
     super.initState();
   }
 
-  Color colorbotones = const Color.fromARGB(255, 96, 125, 139);
-
   List<int> numCitas = [];
   TextEditingController busquedaController = TextEditingController();
   //String usuarioAPP = '';

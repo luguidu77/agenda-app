@@ -168,6 +168,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
                       // physics: ScrollPhysics(),
                       children: [
                         _datos(
+                          context,
                           widget.clienteParametro,
                           pagado,
                         ),
@@ -242,22 +243,19 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
       },
       icon: const Icon(
         Icons.edit,
-        color: Color.fromARGB(171, 231, 224, 224),
+        color: Color.fromARGB(171, 34, 3, 3),
       ),
     );
   }
 
-  _datos(ClienteModel cliente, bool pagado) {
-    var estiloNombre = const TextStyle(
-        fontSize: 18,
-        color: Color.fromARGB(171, 31, 6, 119),
-        fontWeight: FontWeight.bold);
-    var estiloTelEmail = const TextStyle(
-        fontSize: 18,
-        color: Color.fromARGB(171, 39, 7, 128),
-        fontWeight: FontWeight.bold);
-    var estiloNotas =
-        const TextStyle(fontSize: 18, color: Color.fromARGB(171, 39, 7, 128));
+  _datos(context, ClienteModel cliente, bool pagado) {
+    final color = Theme.of(context).primaryColor.withOpacity(0.8);
+
+    var estiloNombre =
+        TextStyle(fontSize: 18, color: color, fontWeight: FontWeight.bold);
+    var estiloTelEmail =
+        TextStyle(fontSize: 18, color: color, fontWeight: FontWeight.bold);
+    var estiloNotas = TextStyle(fontSize: 18, color: color);
     // int numCitas = citas.length;
 
     return Column(
@@ -265,7 +263,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
         SizedBox(
           height: 350,
           child: Card(
-            color: Color.fromARGB(253, 241, 241, 243),
+            color:const Color.fromARGB(253, 241, 241, 243),
             elevation: 4, // Elevación de la tarjeta
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10), // Bordes redondeados
@@ -290,9 +288,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
                   ),
                 ),
                 const SizedBox(width: 16), // Espacio entre las columnas
-                const Divider(
-                  color: Colors.white,
-                ),
+
                 Padding(
                   padding: const EdgeInsets.only(top: 50.0, left: 20),
                   child: Column(

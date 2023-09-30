@@ -1,5 +1,5 @@
 import 'package:agendacitas/firebase_options.dart';
-import 'package:agendacitas/screens/servicios_screen%20copy.dart';
+import 'package:agendacitas/screens/servicios_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

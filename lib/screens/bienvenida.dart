@@ -31,7 +31,7 @@ class _BienvenidaState extends State<Bienvenida> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
           builder: (_) => HomeScreen(
-                index: 0,
+                index: 0, myBnB: 0,
               )),
     );
   }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/models.dart';
 import '../mylogic_formularios/mylogic.dart';
 import '../providers/providers.dart';
+import '../screens/style/estilo_pantalla.dart';
 import '../utils/optiene_numero_mayor_index_firebase.dart';
 
 class ConfigServiciosScreen extends StatefulWidget {
@@ -203,7 +205,7 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
                       (agregaModificaFB)
                           ? "Agregar servicio "
                           : 'Editar servicio',
-                      style: const TextStyle(fontSize: 28),
+                      style: subTituloEstilo,
                     ),
                     const SizedBox(
                       height: 50,
@@ -274,8 +276,37 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
 
   TimeOfDay _time = const TimeOfDay(hour: 1, minute: 00);
 
+  //devuelva la hora seleccionada en el siguiente formato 00:00
+  String formatTimeOfDay(TimeOfDay time) {
+    final now = DateTime.now();
+    final dateTime =
+        DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    final formatter = DateFormat('HH:mm');
+    return formatter.format(dateTime);
+  }
+
   void _selectTime() async {
     final TimeOfDay? newTime = await showTimePicker(
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+              //useMaterial3: true,
+              materialTapTargetSize: MaterialTapTargetSize.padded),
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              /* El comportamiento del widget showTimePicker en Flutter depende del sistema operativo del dispositivo 
+              en el que se ejecute la aplicación. En algunos dispositivos y sistemas operativos, se mostrará un selector
+              de tiempo que permite elegir entre AM y PM, mientras que en otros dispositivos y sistemas operativos, no 
+              se mostrará esta opción. Esto es parte de la adaptabilidad de Flutter a las convenciones de diseño de cada plataforma.
+              Hemos utilizado MediaQuery para asegurarnos de que la opción de formato de 24 horas esté deshabilitada 
+             */
+
+              alwaysUse24HourFormat: false,
+            ),
+            child: child!,
+          ),
+        );
+      },
       context: context,
       helpText: 'INTRODUCE TIEMPO DE SERVICIO',
       initialEntryMode: TimePickerEntryMode.input,
@@ -287,8 +318,8 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
       setState(() {
         _time = newTime;
         print(newTime);
-        myLogic.textControllerTiempo.text = newTime.format(context);
-        myLogicFB.textControllerTiempo.text = newTime.format(context);
+        myLogic.textControllerTiempo.text = formatTimeOfDay(newTime);
+        myLogicFB.textControllerTiempo.text = formatTimeOfDay(newTime);
       });
     }
   }

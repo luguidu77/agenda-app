@@ -1,9 +1,12 @@
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
 import '../models/models.dart';
 import '../providers/providers.dart';
+import '../utils/utils.dart';
+import '../widgets/compartirCliente/compartir_cita_a_cliente.dart';
 
 class DetallesCitaScreen extends StatefulWidget {
   final String emailUsuario;
@@ -65,7 +68,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
               _cliente(reserva),
 
               Text(
-                'Detalles',
+                'CITA',
                 style: tituloEstilo,
               ),
               // Detalle de la cita
@@ -92,9 +95,9 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
         .add_Hm()
         .format(DateTime.parse(resFecha.toString()));
     return SizedBox(
-      height: 250,
-      child: Stack(
-        clipBehavior: Clip.none,
+      // height: 250,
+      child: Column(
+        // clipBehavior: Clip.none,
         children: [
           SizedBox(
             width: double.infinity,
@@ -136,10 +139,12 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
               ),
             ),
           ),
-          Positioned(
-            bottom: -25,
-            right: 10,
-            child: Row(
+          /* Positioned(
+              bottom: -125,
+              right: 10,
+              child: 
+      
+               Row(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -147,11 +152,14 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                       width: 60,
                       child: Image.asset('assets/images/whatsapp.png')),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                      width: 60, child: Image.asset('assets/images/email.png')),
-                ),
+                reserva['email'] != ' '
+                    ? Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                            width: 60,
+                            child: Image.asset('assets/images/email.png')),
+                      )
+                    : Container(),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SizedBox(
@@ -159,7 +167,14 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                 )
               ],
             ),
-          ),
+              ), */
+
+          CompartirCitaConCliente(
+              cliente: reserva['nombre'],
+              telefono: reserva['telefono']!,
+              email: reserva['email'],
+              fechaCita: fechaLarga,
+              servicio: reserva['servicio'])
         ],
       ),
     );
@@ -171,17 +186,36 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
         child: Container(
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
             child: Card(
-              color: const Color.fromARGB(255, 13, 182, 173),
+              //color: Theme.of(context).primaryColor.withOpacity(0.5),
               child: Padding(
                 padding: padding,
                 child: Column(
                   children: [
                     _foto(reserva['foto']),
-                    const SizedBox(height: 20),
-                    Text(style: textoEstilo, reserva['nombre']),
-                    SizedBox(
-                        width: 50,
-                        child: Image.asset('assets/images/phone-call.png'))
+                    const SizedBox(height: 30),
+                    Text(style: subTituloEstilo, reserva['nombre'].toString()),
+                    const SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Comunicaciones.hacerLlamadaTelefonica(
+                                reserva['telefono'].toString());
+                          },
+                          icon: const FaIcon(FontAwesomeIcons.phone),
+                        ),
+                        reserva['email'] != ' '
+                            ? IconButton(
+                                onPressed: () {
+                                  Comunicaciones.enviarEmail(
+                                      reserva['email'].toString());
+                                },
+                                icon: const FaIcon(
+                                    FontAwesomeIcons.solidEnvelope))
+                            : Container(),
+                      ],
+                    )
                   ],
                 ),
               ),
@@ -190,12 +224,19 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
 
   ClipRRect _foto(foto) {
     return ClipRRect(
-        borderRadius: BorderRadius.circular(150.0),
-        child: Image.network(
-          foto != '' ? foto : "./assets/images/nofoto.jpg",
-          width: 150,
-          height: 150,
-          fit: BoxFit.cover,
-        ));
+        borderRadius: BorderRadius.circular(10.0),
+        child: foto != ''
+            ? Image.network(
+                foto,
+                width: 150,
+                height: 100,
+                fit: BoxFit.cover,
+              )
+            : Image.asset(
+                "./assets/images/nofoto.jpg",
+                width: 150,
+                height: 100,
+                fit: BoxFit.cover,
+              ));
   }
 }

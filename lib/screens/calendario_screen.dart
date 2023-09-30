@@ -13,6 +13,7 @@ import '../providers/providers.dart';
 import '../screens/screens.dart';
 import '../utils/utils.dart';
 import '../widgets/widgets.dart';
+import 'creacion_citas/provider/creacion_cita_provider.dart';
 
 class CalendarioCitasScreen extends StatefulWidget {
   const CalendarioCitasScreen({Key? key}) : super(key: key);
@@ -23,6 +24,8 @@ class CalendarioCitasScreen extends StatefulWidget {
 
 class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+
+  late CreacionCitaProvider contextoCreacionCita;
   bool _iniciadaSesionUsuario =
       false; // ?  VARIABLE PARA VERIFICAR SI HAY USUARIO CON INCIO DE SESION
   Color colorBotonFlecha = Colors.blueGrey;
@@ -94,6 +97,12 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // LLEE MICONTEXTO DE CreacionCitaProvider
+    contextoCreacionCita = context.read<CreacionCitaProvider>();
+    // al cancelar, limpiamos el contexto de los servicios
+    contextoCreacionCita.getServiciosElegidos.clear();
+
+    // LLEE CONTEXTO ESTADO DE PAGO
     final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
 
     _estadoPagadaApp = estadoPagoProvider.estadoPagoApp;
@@ -447,7 +456,6 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
             fechaActualSoloFecha.isAtSameMomentAs(fechaEspecificaSoloFecha)
                 ? const Icon(Icons.today)
                 : const Icon(Icons.calendar_month),
-            
           ],
         ),
       ),

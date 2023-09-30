@@ -1,3 +1,4 @@
+import 'package:agendacitas/screens/home.dart';
 import 'package:agendacitas/screens/servicios_screen_draggable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +7,7 @@ import 'package:skeletons/skeletons.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
 import '../widgets/widgets.dart';
+import 'style/estilo_pantalla.dart';
 
 // ########### esta pagina pagina no esta en uso,
 //############ pagina actual : servicios_screen_draggable
@@ -92,9 +94,9 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
           body: Column(
             children: [
               _botonCerrar(),
-              const Text(
+              Text(
                 'Servicios',
-                style: TextStyle(fontSize: 28),
+                style: subTituloEstilo,
               ),
               const SizedBox(height: 20),
               _body(context),
@@ -481,7 +483,10 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
           ),
           IconButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => HomeScreen(index: 3, myBnB: 3)));
               },
               icon: const Icon(
                 Icons.close,

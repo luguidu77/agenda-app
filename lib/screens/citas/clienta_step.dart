@@ -186,7 +186,7 @@ class _ClientaStepState extends State<ClientaStep> {
                   context,
                   MaterialPageRoute(
                       builder: (BuildContext context) => HomeScreen(
-                            index: 2,
+                            index: 2, myBnB: 2,
                           ))),
               child: const Icon(Icons.favorite_border_outlined),
             ),

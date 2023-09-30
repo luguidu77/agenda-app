@@ -1,3 +1,4 @@
+import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -63,9 +64,9 @@ class _ConfigDisponibilidadState extends State<ConfigDisponibilidad> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const SizedBox(height: 10),
-                  const Text(
+                  Text(
                     'Disponibilidad para el servicio',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: subTituloEstilo,
                   ),
                   const SizedBox(height: 50),
                   Row(

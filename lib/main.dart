@@ -152,7 +152,7 @@ class _MyAppState extends State<MyApp> {
             create: (BuildContext context) => FormularioBusqueda())
       ],
       builder: (context, _) {
-        return MaterialApp(
+        return MaterialApp(theme: ThemeData(useMaterial3: true,),
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
@@ -186,7 +186,7 @@ class _MyAppState extends State<MyApp> {
                   RegistroUsuarioScreen(registroLogin: 'Login', usuarioAPP: ''),
               'Bienvenida': (context) => const Bienvenida(),
               'home': (BuildContext context) => HomeScreen(
-                    index: 0,
+                    index: 0, myBnB: 0,
                   ),
               'InicioConfigApp': (context) =>
                   const InicioConfigApp(usuarioAPP: ''),

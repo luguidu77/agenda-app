@@ -68,12 +68,12 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         if (appointments != null) {
           Map<String, dynamic> cita = json.decode(appointments[0].notes);
 
-          // print(cita);
+          print(cita);
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => DetallesCitaScreen(
-                  emailUsuario: '_emailSesionUsuario', reserva: cita),
+                  emailUsuario: _emailSesionUsuario, reserva: cita),
             ),
           );
         } else {

@@ -54,6 +54,9 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
     cliente.nombre = contextoCreacionCita.getClienteElegido['NOMBRE'];
     cliente.telefono = contextoCreacionCita.getClienteElegido['TELEFONO'];
     cliente.foto = contextoCreacionCita.getClienteElegido['FOTO'];
+
+    Color color = Theme.of(context).primaryColor;
+
     return WillPopScope(
       onWillPop: () async =>
           false, // inhabilita el regreso a la pagina anterior
@@ -61,7 +64,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
           child: Scaffold(
               appBar: appBarCreacionCita('Resumen de la cita', false,
                   action: botonCancelar()),
-              bottomNavigationBar: barraInferior(),
+              bottomNavigationBar: barraInferior(color),
               body: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,7 +174,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
             ),
           ),
         ),
-        height: 70,
+        height: 85,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
@@ -285,19 +288,9 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
     );
   }
 
-  barraInferior() {
-    /*  List<String> tiempos = [];
-
-    for (var element in contextoCreacionCita.getServiciosElegidos) {
-      totalPrecio = double.parse(element['PRECIO']) + totalPrecio;
-
-      tiempos.add(element['TIEMPO']);
-    }
-
-    final String totalTiempo = sumarTiempo(tiempos); */
-
+  barraInferior(Color color) {
     return Container(
-      color: const Color.fromARGB(141, 255, 193, 7),
+      color: color.withOpacity(0.5),
       height: 100,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -321,21 +314,34 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                 ),
               ],
             ),
-            ElevatedButton(
-                onPressed: totalPrecio != 0.0
-                    ? () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ConfirmarStep(),
-                            ));
+            InkWell(
+              onTap: totalPrecio != 0.0
+                  ? () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ConfirmarStep(),
+                          ));
 
-                        _iniciadaSesionUsuario
-                            ? null
-                            : Publicidad.publicidad(_iniciadaSesionUsuario);
-                      }
-                    : null,
-                child: const Text('Confirmar cita'))
+                      _iniciadaSesionUsuario
+                          ? null
+                          : Publicidad.publicidad(_iniciadaSesionUsuario);
+                    }
+                  : null,
+              child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.black, // Color del borde
+                      width: 2.0, // Ancho del borde
+                    ),
+                    borderRadius: BorderRadius.circular(5),
+                    color: color),
+                child: const Padding(
+                  padding: EdgeInsets.all(15.0),
+                  child: Text('Confirmar cita'),
+                ),
+              ),
+            )
           ],
         ),
       ),
@@ -389,8 +395,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
   Widget? botonCancelar() {
     return GestureDetector(
       onTap: () {
-        // al cancelar, limpiamos el contexto de los servicios
-        contextoCreacionCita.getServiciosElegidos.clear();
+       
 
         Navigator.pushNamed(context, '/');
 
@@ -398,9 +403,9 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
             ? null
             : Publicidad.publicidad(_iniciadaSesionUsuario);
       },
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Icon(FontAwesomeIcons.close),
+      child: const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Icon(FontAwesomeIcons.xmark),
       ),
     );
   }

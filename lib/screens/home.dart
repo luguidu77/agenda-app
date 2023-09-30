@@ -3,7 +3,7 @@ import 'package:agendacitas/screens/creacion_citas/creacion_cita_confirmar.dart'
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_listado_servicios.dart';
 import 'package:agendacitas/screens/detalles_cita_screen.dart';
 
-import 'package:agendacitas/screens/servicios_screen%20copy.dart';
+import 'package:agendacitas/screens/servicios_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +19,8 @@ import 'screens.dart';
 
 // ignore: must_be_immutable
 class HomeScreen extends StatefulWidget {
-  HomeScreen({Key? key, required this.index}) : super(key: key);
+  HomeScreen({Key? key, required this.index, required this.myBnB}) : super(key: key);
+  int myBnB = 0;
   int index = 0;
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -70,8 +71,9 @@ class _HomeScreenState extends State<HomeScreen> {
     myBnB = BNavigator(currentIndex: (i) {
       setState(() {
         widget.index = i;
+       
       });
-    });
+    }, index: widget.myBnB,);
     estadoPagoEmailApp();
     cargarTema();
 
@@ -97,9 +99,11 @@ class _HomeScreenState extends State<HomeScreen> {
         themeMode: themeProvider.themeMode,
         theme: temaDefecto
             ? ThemeData(
+                useMaterial3: true,
                 primarySwatch: Colors.teal,
               )
             : ThemeData(
+                useMaterial3: true,
                 primaryColor: themeProvider.mitemalight.primaryColor,
                 floatingActionButtonTheme: FloatingActionButtonThemeData(
                     backgroundColor: themeProvider.mitemalight.primaryColor),

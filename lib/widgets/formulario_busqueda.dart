@@ -17,13 +17,20 @@ class _CuadroBusquedaState extends State<CuadroBusqueda> {
   Widget build(BuildContext context) {
     final contextoFormularioBusqueda = context.watch<FormularioBusqueda>();
     final txtBusqueda = contextoFormularioBusqueda.textoBusqueda;
-    bool esVacio = txtBusqueda == '';
+    final color = Theme.of(context).primaryColor;
+    bool esVacio = txtBusqueda.isEmpty;
     return Padding(
       padding: const EdgeInsets.all(18.0),
       child: Stack(
         children: [
           TextFormField(
             decoration: InputDecoration(
+                iconColor: color,
+                suffixIconColor: color,
+                fillColor: color,
+                hoverColor: color,
+                prefixIconColor: color,
+                focusColor: color,
                 prefixIcon: const Icon(Icons.search),
                 hintText: esVacio ? 'Buscar cliente' : txtBusqueda,
                 helperText: 'Mínimo 3 letras',
@@ -34,7 +41,7 @@ class _CuadroBusquedaState extends State<CuadroBusqueda> {
                           contextoFormularioBusqueda.setTextoBusqueda = '';
                           busquedaController.text = '';
                         },
-                        icon: Icon(Icons.close))),
+                        icon: const Icon(Icons.close))),
             onChanged: (String value) =>
                 contextoFormularioBusqueda.setTextoBusqueda = value,
             controller: busquedaController,

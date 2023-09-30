@@ -16,8 +16,8 @@ class InformesScreen extends StatefulWidget {
 
 class _InformesScreenState extends State<InformesScreen> {
   PersonalizaModel personaliza = PersonalizaModel();
+  late Color colorBotonFlecha;
 
-  Color colorBotonFlecha = Colors.amber;
   List citas = [];
   //datosInforme son los datos para representarlos por meses
   List<double> datosInforme = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -180,6 +180,7 @@ class _InformesScreenState extends State<InformesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    colorBotonFlecha = Theme.of(context).primaryColor.withOpacity(0.5);
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -238,7 +239,10 @@ class _InformesScreenState extends State<InformesScreen> {
             },
             child: Text(
               fechaTexto,
-              style: const TextStyle(fontSize: 22.0),
+              style: TextStyle(
+                fontSize: 22.0,
+                color: colorBotonFlecha,
+              ),
             ),
           ),
           IconButton(
@@ -265,7 +269,7 @@ class _InformesScreenState extends State<InformesScreen> {
         flex: 2,
         child: Container(
           decoration: BoxDecoration(
-              color: Color.fromARGB(255, 162, 238, 166),
+              color: Theme.of(context).primaryColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(20)),
           child: Padding(
             padding: const EdgeInsets.all(22.0),
@@ -296,7 +300,7 @@ class _InformesScreenState extends State<InformesScreen> {
   _tarjetasMensuales(index) {
     double cantidad = datosInforme[index];
     return Card(
-      color: const Color.fromARGB(87, 173, 247, 247),
+      color: colorBotonFlecha.withOpacity(0.1),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(

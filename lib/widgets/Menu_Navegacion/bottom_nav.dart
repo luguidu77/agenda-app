@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
 class BNavigator extends StatefulWidget {
+  final int index;
   final Function currentIndex;
-  const BNavigator({Key? key, required this.currentIndex}) : super(key: key);
+  const BNavigator({Key? key, required this.currentIndex, required this.index})
+      : super(key: key);
 
   @override
   State<BNavigator> createState() => _BNavigatorState();
@@ -14,6 +16,7 @@ class _BNavigatorState extends State<BNavigator> {
 
   @override
   Widget build(BuildContext context) {
+    int index = widget.index;
     Color colorTema = Theme.of(context).primaryColor;
     return Container(
       decoration: BoxDecoration(
@@ -32,7 +35,7 @@ class _BNavigatorState extends State<BNavigator> {
             hoverColor: Colors.grey[100]!,
             backgroundColor: Colors.transparent,
             iconSize: 24,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
             gap: 8,
             duration: const Duration(milliseconds: 900),
             tabBackgroundColor: colorTema.withOpacity(0.3),

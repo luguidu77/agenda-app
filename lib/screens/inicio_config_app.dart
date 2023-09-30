@@ -95,7 +95,7 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
                 'inicio_config_app.dart ----------------> LOGEADO EN FIREBASE');
 
             return HomeScreen(
-              index: 0,
+              index: 0, myBnB: 0,
             );
           } else {
             // NO LOGUEADO EN FIREBASE

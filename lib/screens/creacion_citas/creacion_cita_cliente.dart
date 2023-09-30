@@ -58,6 +58,7 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
 
   @override
   Widget build(BuildContext context) {
+    
     final fecha = ModalRoute.of(context)?.settings.arguments;
     // LEER MICONTEXTO DE CreacionCitaProvider
     contextoCreacionCita = context.read<CreacionCitaProvider>();

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -42,6 +43,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
     return Scaffold(
         body: SfCalendar(
+      // appointmentBuilder: appointmentBuilder,//? ########### CUSTOMIZACION DE LAS TARJETAS
       // ················   Config calendario ······································
 
       // CONFIGURA VISTA TIEMPO
@@ -107,9 +109,9 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
           String fecha =
               '${DateTime.parse(textoFechaHoraInicio).year.toString()}-${DateTime.parse(textoFechaHoraInicio).month.toString().padLeft(2, '0')}-${DateTime.parse(textoFechaHoraInicio).day.toString().padLeft(2, '0')}';
-          print(textoFechaHoraInicio);
+          // print(textoFechaHoraInicio);
 
-          print(cita);
+          debugPrint(cita.toString()); // print cita
 
           CitaModelFirebase newCita = CitaModelFirebase();
 
@@ -118,7 +120,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           newCita.horaInicio = textoFechaHoraInicio;
           newCita.horaFinal = textoFechaHoraFinal;
           newCita.comentario = cita['comentario'] +
-              ' ✍️​'; //todo añadir un nuevo campo REPROGRAMACION
+              ' 🔃​'; //todo añadir un nuevo campo REPROGRAMACION
           newCita.idcliente = cita['idCliente'];
           newCita.idservicio = cita['idServicio'];
           newCita.idEmpleado = cita['idEmpleado'];
@@ -130,6 +132,8 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           // ignore: use_build_context_synchronously
           mensajeSuccess(context,
               'Cita reprogramada para las ${nuevaHora.hour.toString().padLeft(2, '0')}:${nuevaHora.minute.toString().padLeft(2, '0')}');
+
+          Navigator.pushNamed(context, '/');
         } else {
           setState(() {});
           mensajeError(context, 'No disponible para esta versión');
@@ -171,7 +175,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           color: cita['idServicio'] == 999 || cita['idServicio'] == null
               ? const Color.fromARGB(255, 113, 151, 102)
               : fechaFinal.isBefore(DateTime.now())
-                  ? const Color.fromARGB(255, 173, 73, 66)
+                  ? const Color.fromARGB(255, 247, 125, 116)
                   : const Color.fromARGB(255, 100, 127, 172)));
     }
     debugPrint(meetings.toString());
@@ -202,4 +206,37 @@ class MeetingDataSource extends CalendarDataSource {
   MeetingDataSource(List<Appointment> source) {
     appointments = source;
   }
+}
+
+//############ CUSTOMIZACION DE LA TARJETA DE CITAS ##################################################
+Widget appointmentBuilder(BuildContext context,
+    CalendarAppointmentDetails calendarAppointmentDetails) {
+  final Appointment appointment = calendarAppointmentDetails.appointments.first;
+  return Column(
+    children: [
+      Container(
+          width: calendarAppointmentDetails.bounds.width,
+          height: calendarAppointmentDetails.bounds.height / 2,
+          color: appointment.color,
+          child: Center(
+            child: Icon(
+              Icons.group,
+              color: Colors.black,
+            ),
+          )),
+      Container(
+        width: calendarAppointmentDetails.bounds.width,
+        height: calendarAppointmentDetails.bounds.height / 2,
+        color: appointment.color,
+        child: Text(
+          appointment.subject +
+              DateFormat(' (hh:mm a').format(appointment.startTime) +
+              '-' +
+              DateFormat('hh:mm a)').format(appointment.endTime),
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 10),
+        ),
+      )
+    ],
+  );
 }

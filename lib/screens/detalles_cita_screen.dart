@@ -6,7 +6,9 @@ import 'package:intl/intl.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
 import '../utils/utils.dart';
+import '../widgets/botones/form_reprogramar_reserva.dart';
 import '../widgets/compartirCliente/compartir_cita_a_cliente.dart';
+import '../widgets/elimina_cita.dart';
 
 class DetallesCitaScreen extends StatefulWidget {
   final String emailUsuario;
@@ -20,6 +22,7 @@ class DetallesCitaScreen extends StatefulWidget {
 }
 
 class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
+  bool visibleFormulario = false;
   PersonalizaModel personaliza = PersonalizaModel();
   EdgeInsets miPadding = const EdgeInsets.all(18.0);
   late Map<String, dynamic> reserva;
@@ -47,10 +50,17 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double altura = 400;
     // final cita = widget.reserva; //widget.reserva;
-
+    String? fechaLarga;
+    DateTime resFecha = DateTime.parse(
+        reserva['horaInicio']); // horaInicio trae 2022-12-05 20:27:00.000Z
+    //? FECHA LARGA EN ESPAÑOL
+    fechaLarga = DateFormat.MMMMEEEEd('es_ES')
+        .add_Hm()
+        .format(DateTime.parse(resFecha.toString()));
     return Scaffold(
-      // backgroundColor: colorFondo,
+      backgroundColor: colorFondo,
       appBar: AppBar(
         backgroundColor: colorFondo,
         elevation: 0,
@@ -59,44 +69,104 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
           style: subTituloEstilo,
         ),
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            // crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Detalles del cliente
-              _cliente(reserva),
-
-              // Detalle de la cita
-              _detallesCita(reserva),
-
-              const SizedBox(
-                height: 100,
-              ),
-
-              // compartir cita
-            ],
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.only(top: altura),
+              height: MediaQuery.of(context).size.height + altura,
+              child: Column(children: [
+                Visibility(
+                  visible: visibleFormulario,
+                  //  padding: EdgeInsets.only(top: altura),
+                  // height: altura,
+                  child: FormReprogramaReserva(
+                      idServicio: reserva['idServicio'].toString(),
+                      cita: reserva),
+                ),
+                CompartirCitaConCliente(
+                    cliente: reserva['nombre'],
+                    telefono: reserva['telefono']!,
+                    email: reserva['email'],
+                    fechaCita: fechaLarga,
+                    servicio: reserva['servicio'])
+              ]),
+            ),
           ),
-        ),
+          Positioned(
+            top: 0, // Alinea el widget en la parte superior.
+            left: 0, // Opcional: ajusta la posición horizontal.
+            right: 0,
+            child: Container(
+                color: colorFondo,
+                height: altura,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      // Detalles del cliente
+                      _cliente(reserva),
+                      // Detalle de la cita
+                      _detallesCita(reserva, fechaLarga)
+                    ],
+                  ),
+                )),
+          ),
+        ],
       ),
     );
   }
 
-  _detallesCita(cita) {
-    String? fechaLarga;
-    DateTime resFecha = DateTime.parse(
-        cita['horaInicio']); // horaInicio trae 2022-12-05 20:27:00.000Z
-    //? FECHA LARGA EN ESPAÑOL
-    fechaLarga = DateFormat.MMMMEEEEd('es_ES')
-        .add_Hm()
-        .format(DateTime.parse(resFecha.toString()));
+  _botonesCita() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        ElevatedButton.icon(
+            style: ButtonStyle(
+              backgroundColor:
+                  MaterialStateProperty.all<Color>(Colors.red.shade100),
+            ),
+            onPressed: () async {
+              final res = await mensajeAlerta(
+                  context,
+                  0,
+                  widget.reserva,
+                  (widget.emailUsuario == '') ? false : true,
+                  widget.emailUsuario);
+
+              if (res == true) {
+                // ignore: use_build_context_synchronously
+                Navigator.pushReplacementNamed(context, '/');
+              }
+            },
+            icon: const Icon(Icons.delete),
+            label: const Text('Elimina'))
+
+        // HE QUITADO EL BOTON REPROGRAMAR
+
+        ,
+        ElevatedButton.icon(
+            onPressed: () {
+              setState(() {});
+              visibleFormulario
+                  ? visibleFormulario = false
+                  : visibleFormulario = true;
+            },
+            icon: Icon(visibleFormulario
+                ? Icons.cancel
+                : Icons.change_circle_outlined),
+            label: Text(visibleFormulario ? 'Cancelar' : 'Reasignar'))
+      ],
+    );
+  }
+
+  _detallesCita(cita, fechaLarga) {
     return SizedBox(
-      // height: 250,
       child: Column(
         // clipBehavior: Clip.none,
         children: [
           SizedBox(
             width: double.infinity,
+            // height: 250,
             child: Card(
               // color: Colors.deepPurple[300],
               child: Padding(
@@ -130,17 +200,13 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                       'Notas de la cita: ${cita['comentario'].toString()}',
                       style: subTituloEstilo,
                     ),
+                    const SizedBox(height: 10),
+                    _botonesCita()
                   ],
                 ),
               ),
             ),
           ),
-          CompartirCitaConCliente(
-              cliente: reserva['nombre'],
-              telefono: reserva['telefono']!,
-              email: reserva['email'],
-              fechaCita: fechaLarga,
-              servicio: reserva['servicio'])
         ],
       ),
     );

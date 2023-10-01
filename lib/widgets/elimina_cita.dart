@@ -41,31 +41,37 @@ mensajeAlerta(BuildContext context, int index, citas,
             ),
             content: Text(textoPregunta),
             actions: [
-              ElevatedButton.icon(
-                  onPressed: () {
-                    iniciadaSesionUsuario
-                        //ELIMINA CITA EN FIREBASE
-                        ? _eliminarCitaFB(emailusuario, idCita)
-                        //ELIMINA CITA EN DISPOSITIVO
-                        : _eliminarCita(context, idCita, textoNombre);
+              Row(
+                children: [
+                  ElevatedButton.icon(
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.red.shade100)),
+                      onPressed: () {
+                        iniciadaSesionUsuario
+                            //ELIMINA CITA EN FIREBASE
+                            ? _eliminarCitaFB(emailusuario, idCita)
+                            //ELIMINA CITA EN DISPOSITIVO
+                            : _eliminarCita(context, idCita, textoNombre);
 
-                    respuesta = true;
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(Icons.delete_forever_outlined),
-                  label: const Text('Eliminar')),
-              const SizedBox(
-                width: 20,
+                        respuesta = true;
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.delete_forever_outlined),
+                      label: const Text('Eliminar')),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        //  setState(() {});
+                      },
+                      child: const Text(
+                        ' No ',
+                      ))
+                ],
               ),
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    //  setState(() {});
-                  },
-                  child: const Text(
-                    ' No ',
-                    style: TextStyle(fontSize: 18),
-                  )),
             ],
           ));
   return respuesta;

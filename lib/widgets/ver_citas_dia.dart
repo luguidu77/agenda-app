@@ -1,3 +1,4 @@
+import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/widgets/lista_de_citas.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -55,62 +56,70 @@ class _ListaCitasState extends State<ListaCitas> {
     }
   }
 
-  vercitas(context, citas) {
+  vercitas(context, List<Map<String, dynamic>> citas) {
+    final numCitas = citas.length;
     return Column(
       children: [
-        // TEXTO SUMA DE GANANCIAS DIARIAS
-        FutureBuilder<dynamic>(
-            future: widget.iniciadaSesionUsuario
-                ? FirebaseProvider().calculaGananciaDiariasFB(citas)
-                : CitaListProvider().calculaGananciasDiarias(citas),
-            builder: (
-              BuildContext context,
-              AsyncSnapshot<dynamic> snapshot,
-            ) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return SizedBox(
-                    width: 160,
-                    child: SkeletonParagraph(
-                      style: SkeletonParagraphStyle(
-                          lines: 1,
-                          spacing: 1,
-                          lineStyle: SkeletonLineStyle(
-                            // randomLength: true,
-                            height: 10,
-                            borderRadius: BorderRadius.circular(5),
-                            // minLength: MediaQuery.of(context).size.width,
-                            // maxLength: MediaQuery.of(context).size.width,
-                          )),
-                    ));
-              } else if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasError) {
-                  return const Text('');
-                } else if (snapshot.hasData) {
-                  final data = snapshot.data;
+        // ########## TEXTO SUMA DE GANANCIAS DIARIAS  ##############################
+        gananciaDiaria(citas, numCitas),
 
-                  // SI TENGO DATOS LOS VISUALIZO EN PANTALLA
-                  return Text(
-                    'GANANCIAS HOY $data ${contextoPersonaliza.getPersonaliza['MONEDA']}',
-                    style: const TextStyle(fontSize: 12),
-                  );
-                } else {
-                  return const Text('Empty data');
-                }
-              } else {
-                return const Text('fdfd');
-              }
-            }),
+        // ########## TARJETAS DE LAS CITAS CONCERTADAS ##############################
+        //  SYNCFUSION
         Expanded(
-            // ########## TARJETAS DE LAS CITAS CONCERTADAS ##############################
-            child:
-                //  citas SYNCFUSION
-                ListaCitasNuevo(fechaElegida: widget.fechaElegida, citas: citas)
-
-            //  citas tarjetas hechas por mi (sin usar)
-            // newMethod(citas),
-            ),
+            child: ListaCitasNuevo(
+                fechaElegida: widget.fechaElegida, citas: citas)),
       ],
     );
+  }
+
+  FutureBuilder<dynamic> gananciaDiaria(
+      List<Map<String, dynamic>> citas, int numCitas) {
+    return FutureBuilder<dynamic>(
+        future: widget.iniciadaSesionUsuario
+            ? FirebaseProvider().calculaGananciaDiariasFB(citas)
+            : CitaListProvider().calculaGananciasDiarias(citas),
+        builder: (
+          BuildContext context,
+          AsyncSnapshot<dynamic> snapshot,
+        ) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return SizedBox(
+                width: 160,
+                child: SkeletonParagraph(
+                  style: SkeletonParagraphStyle(
+                      lines: 1,
+                      spacing: 1,
+                      lineStyle: SkeletonLineStyle(
+                        // randomLength: true,
+                        height: 10,
+                        borderRadius: BorderRadius.circular(5),
+                        // minLength: MediaQuery.of(context).size.width,
+                        // maxLength: MediaQuery.of(context).size.width,
+                      )),
+                ));
+          } else if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasError) {
+              return const Text('');
+            } else if (snapshot.hasData) {
+              final data = snapshot.data;
+
+              // SI TENGO DATOS LOS VISUALIZO EN PANTALLA // TEXTO 3 CITAS - 75,00 €
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('${numCitas.toString()} citas', style: textoEstilo),
+                  Text(
+                      '- $data ${contextoPersonaliza.getPersonaliza['MONEDA']}',
+                      style: textoEstilo)
+                ],
+              );
+            } else {
+              return const Text('Empty data');
+            }
+          } else {
+            return const Text('fdfd');
+          }
+        });
   }
 
   todasLasCitas(fecha) {
@@ -130,7 +139,7 @@ class _ListaCitasState extends State<ListaCitas> {
                 child: Center(
                     child: SkeletonParagraph(
               style: SkeletonParagraphStyle(
-                  lines: 10,
+                  lines: 15,
                   spacing: 6,
                   lineStyle: SkeletonLineStyle(
                     // randomLength: true,

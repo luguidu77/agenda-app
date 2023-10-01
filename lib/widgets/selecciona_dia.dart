@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -75,86 +76,89 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
 
     return Form(
       key: _formKey,
-      child: Column(
-        children: [
-          //SELECCION DE DIA //////////////////////////////////
-          Container(
-            width: 300,
-            height: 80,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5.0),
-                border: Border.all(color: Colors.blue)),
-            child: Stack(alignment: Alignment.centerRight, children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                      hintStyle: TextStyle(color: Colors.black87),
-                      labelText: 'Día de la cita',
-                      border:
-                          UnderlineInputBorder(borderSide: BorderSide.none)),
-                  validator: (value) => _validacionFecha(value),
-                  enabled: false,
-                  controller: myLogic.textControllerDia,
-                  // decoration: const InputDecoration(labelText: 'Día de la cita'),
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          children: [
+            //SELECCION DE DIA //////////////////////////////////
+            Container(
+              width: 300,
+              height: 80,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5.0),
+                  border: Border.all(color: Colors.blue)),
+              child: Stack(alignment: Alignment.centerRight, children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                        hintStyle: TextStyle(color: Colors.black87),
+                        labelText: 'Día de la cita',
+                        border:
+                            UnderlineInputBorder(borderSide: BorderSide.none)),
+                    validator: (value) => _validacionFecha(value),
+                    enabled: false,
+                    controller: myLogic.textControllerDia,
+                    // decoration: const InputDecoration(labelText: 'Día de la cita'),
+                  ),
                 ),
-              ),
-              TextButton.icon(
-                  onPressed: () => funcionDia(context),
-                  icon: const Icon(Icons.date_range),
-                  label: const Text(''))
-            ]),
-          ),
-          //? hago esta validación porque no se ve TEXTO VALIDATOR si está inabilitado a la escritura
-          Text(
-            textoErrorValidacionFecha,
-            style: estilotextoErrorValidacion,
-          ),
-          //SELECCION DE HORA//////////////////////////////////
-          Column(
-            children: [
-              Container(
-                width: 300,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5.0),
-                    border: Border.all(color: Colors.blue)),
-                child: Stack(
-                  alignment: Alignment.centerRight,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: TextFormField(
-                        validator: (value) => _validacionHora(value),
-                        enabled: false,
-                        controller: myLogic.textControllerHora,
-                        decoration: const InputDecoration(
-                            labelText: 'Hora de la cita',
-                            border: UnderlineInputBorder(
-                                borderSide: BorderSide.none)),
+                TextButton.icon(
+                    onPressed: () => funcionDia(context),
+                    icon: const Icon(Icons.date_range),
+                    label: const Text(''))
+              ]),
+            ),
+            //? hago esta validación porque no se ve TEXTO VALIDATOR si está inabilitado a la escritura
+            Text(
+              textoErrorValidacionFecha,
+              style: estilotextoErrorValidacion,
+            ),
+            //SELECCION DE HORA//////////////////////////////////
+            Column(
+              children: [
+                Container(
+                  width: 300,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5.0),
+                      border: Border.all(color: Colors.blue)),
+                  child: Stack(
+                    alignment: Alignment.centerRight,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: TextFormField(
+                          validator: (value) => _validacionHora(value),
+                          enabled: false,
+                          controller: myLogic.textControllerHora,
+                          decoration: const InputDecoration(
+                              labelText: 'Hora de la cita',
+                              border: UnderlineInputBorder(
+                                  borderSide: BorderSide.none)),
+                        ),
                       ),
-                    ),
-                    TextButton.icon(
-                        onPressed: () => funcionHorarios(context),
-                        icon: const Icon(Icons.timer_sharp),
-                        label: const Text(''))
-                  ],
+                      TextButton.icon(
+                          onPressed: () => funcionHorarios(context),
+                          icon: const Icon(Icons.timer_sharp),
+                          label: const Text(''))
+                    ],
+                  ),
                 ),
-              ),
-              //? hago esta validación porque no se ve TEXTO VALIDATOR si está inabilitado a la escritura
-              Text(
-                textoErrorValidacionHora,
-                style: estilotextoErrorValidacion,
-              )
-            ],
-          ),
-          //boton reprogramar cita, es visible si viene llamado de formReprogramarReserva.dart
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              botonReprogramar(_emailSesionUsuario, _iniciadaSesionUsuario)
-            ],
-          )
-        ],
+                //? hago esta validación porque no se ve TEXTO VALIDATOR si está inabilitado a la escritura
+                Text(
+                  textoErrorValidacionHora,
+                  style: estilotextoErrorValidacion,
+                )
+              ],
+            ),
+            //boton reprogramar cita, es visible si viene llamado de formReprogramarReserva.dart
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                botonReprogramar(_emailSesionUsuario, _iniciadaSesionUsuario)
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -396,7 +400,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
 
   botonReprogramar(String usuarioAP, bool iniciadaSesionUsuario) {
     return ElevatedButton.icon(
-        icon: const Icon(Icons.rebase_edit),
+        icon: const Icon(FontAwesomeIcons.check),
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
             _disponible = await seleccionaCita(
@@ -421,7 +425,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
                 newCita.dia = fecha;
                 newCita.horaInicio = textoFechaHora;
                 newCita.horaFinal = textoHoraF;
-                newCita.comentario = oldCita['comentario'];
+                newCita.comentario = oldCita['comentario'] + '🔃'; //todo: AGREGAR CAMPO REPROGRAMACION O REASIGANACION
                 newCita.idcliente = oldCita['idCliente'];
                 newCita.idservicio = oldCita['idServicio'];
                 newCita.idEmpleado = oldCita['idEmpleado'];
@@ -457,9 +461,9 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
         },
         style: ButtonStyle(
           backgroundColor:
-              MaterialStateProperty.all<Color>(Color.fromARGB(255, 12, 4, 122)),
+              MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
         ),
-        label: const Text('Reprogramar'));
+        label: const Text('Validar'));
   }
 
   void alertaCitaNoDisponible() {
@@ -475,7 +479,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
                 TextButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      mensajeError(context, 'CINTA NO REPROGRAMADA');
+                      mensajeError(context, 'CITA NO REPROGRAMADA');
                     },
                     child: const Text('Modificar hora'))
               ],

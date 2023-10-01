@@ -130,8 +130,8 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
     visibleCalendario = calendarioProvider.visibleCalendario;
 
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
-      floatingActionButton: const BotonSpeedDial(),
+      //  floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
+      // floatingActionButton: const BotonSpeedDial(),
       key: _scaffoldKey,
       //drawer: const MenuDrawer(),
       onDrawerChanged: (isOpened) {

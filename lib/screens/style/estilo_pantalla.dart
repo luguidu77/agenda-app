@@ -15,3 +15,7 @@ final textoTelefonoEstilo = GoogleFonts.bebasNeue(
     textStyle: const TextStyle(color: Color.fromARGB(255, 49, 47, 47)));
 
 final colorFondo = Colors.grey[300];
+
+final textoPequenoEstilo = GoogleFonts.bebasNeue(
+    fontSize: 10,
+    textStyle: const TextStyle(color: Color.fromARGB(255, 104, 103, 103)));

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class BotonAgregaCliente extends StatelessWidget {
-  const BotonAgregaCliente({super.key});
+  const BotonAgregaCliente({super.key, required this.texto});
+  final String texto;
 
   @override
   Widget build(BuildContext context) {
@@ -10,17 +11,18 @@ class BotonAgregaCliente extends StatelessWidget {
       children: [
         CircleAvatar(
           backgroundColor: Theme.of(context).primaryColor.withOpacity(0.5),
-          radius: 25,
+          radius: 15,
           // backgroundImage: NetworkImage(                      'https://firebasestorage.googleapis.com/v0/b/flutter-varios-576e6.appspot.com/o/agendadecitas%2Fritagiove%40hotmail.com%2Fclientes%2F607545402%2Ffoto?alt=media&token=af2065c0-861d-4a3a-b0bc-a690a7ba063e'),
           child: const Icon(
             Icons.add, // Icono de suma
-            size: 40, // Tamaño del icono
+            size: 25, // Tamaño del icono
             color: Colors.white, // Color del icono
           ),
         ),
-        const Text(
-          'Añade un nuevo cliente',
-          style: TextStyle(
+        const SizedBox(width: 10),
+        Text(
+          texto,
+          style: const TextStyle(
               fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black54),
         ),
         const SizedBox(

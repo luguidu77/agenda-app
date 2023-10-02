@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/screens/nuevo_actualizacion_cliente.dart';
+import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +38,8 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
   List<bool> isSelected = [true, false];
   TabController? tabController;
 
+  bool floatExtended = false;
+
   getPersonaliza() async {
     List<PersonalizaModel> data =
         await PersonalizaProvider().cargarPersonaliza();
@@ -64,6 +67,16 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
     tabController = TabController(length: 2, vsync: this);
 
     super.initState();
+
+    // ANIMACION FLOATINGBUTTON
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      setState(() {
+        floatExtended = true;
+
+        // Here you can write your code for open new view
+      });
+    });
+    super.initState();
   }
 
   @override
@@ -75,11 +88,30 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
   @override
   Widget build(BuildContext context) {
     //FOTO CLIENTE
-
     String foto = widget.clienteParametro.foto!;
     print("foto de la cliente $foto");
 
+    Color colorTema = Theme.of(context).primaryColor;
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        label: const Text(
+          'EDITAR',
+        ),
+        isExtended: floatExtended,
+        icon: const Icon(Icons.edit),
+        onPressed: () async {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NuevoActualizacionCliente(
+                cliente: widget.clienteParametro,
+                pagado: pagado,
+                usuarioAPP: _emailSesionUsuario,
+              ),
+            ),
+          );
+        },
+      ),
       body: DefaultTabController(
         length: 2,
         child: CustomScrollView(
@@ -127,11 +159,11 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
                   alignment: AlignmentDirectional.center,
                   child: ToggleButtons(
                     color: Colors.black.withOpacity(0.60),
-                    selectedColor: const Color(0xFF6200EE),
-                    selectedBorderColor: const Color(0xFF6200EE),
-                    fillColor: const Color(0xFF6200EE).withOpacity(0.08),
-                    splashColor: const Color(0xFF6200EE).withOpacity(0.12),
-                    hoverColor: const Color(0xFF6200EE).withOpacity(0.04),
+                    selectedColor: colorTema,
+                    selectedBorderColor: colorTema,
+                    fillColor: colorTema.withOpacity(0.08),
+                    splashColor: colorTema.withOpacity(0.12),
+                    hoverColor: colorTema.withOpacity(0.04),
                     borderRadius: BorderRadius.circular(4.0),
                     isSelected: isSelected,
                     onPressed: (i) {
@@ -168,11 +200,15 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
                       // physics: ScrollPhysics(),
                       children: [
                         _datos(
-                          context,
+                          colorTema,
                           widget.clienteParametro,
                           pagado,
                         ),
-                        _historial(context, _citas, widget.clienteParametro.id),
+                        _historial(
+                          context,
+                          _citas,
+                          widget.clienteParametro.id,
+                        ),
                       ]),
                 ),
               ),
@@ -226,194 +262,86 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
     }
   }
 
-  iconoModificar() {
-    return IconButton(
-      iconSize: 30,
-      onPressed: () async {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => NuevoActualizacionCliente(
-              cliente: widget.clienteParametro,
-              pagado: pagado,
-              usuarioAPP: _emailSesionUsuario,
-            ),
-          ),
-        );
-      },
-      icon: const Icon(
-        Icons.edit,
-        color: Color.fromARGB(171, 34, 3, 3),
-      ),
-    );
-  }
-
-  _datos(context, ClienteModel cliente, bool pagado) {
-    final color = Theme.of(context).primaryColor.withOpacity(0.8);
-
-    var estiloNombre =
-        TextStyle(fontSize: 18, color: color, fontWeight: FontWeight.bold);
-    var estiloTelEmail =
-        TextStyle(fontSize: 18, color: color, fontWeight: FontWeight.bold);
-    var estiloNotas = TextStyle(fontSize: 18, color: color);
-    // int numCitas = citas.length;
-
+  _datos(colorTema, ClienteModel cliente, bool pagado) {
     return Column(
       children: [
         SizedBox(
           height: 350,
-          child: Card(
-            color:const Color.fromARGB(253, 241, 241, 243),
-            elevation: 4, // Elevación de la tarjeta
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10), // Bordes redondeados
-            ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      iconoModificar(),
-                    ],
-                  ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 00.0),
+                child: Text(
+                  '${cliente.nombre}',
+                  style: subTituloEstilo,
                 ),
+              ),
+              const SizedBox(width: 16), // Espacio entre las columnas
 
-                Padding(
-                  padding: const EdgeInsets.only(top: 00.0),
-                  child: Text(
-                    '${cliente.nombre}',
-                    style: estiloNombre,
-                  ),
-                ),
-                const SizedBox(width: 16), // Espacio entre las columnas
-
-                Padding(
-                  padding: const EdgeInsets.only(top: 50.0, left: 20),
-                  child: Column(
-                    children: [
-                      GestureDetector(
-                        onTap: () => Comunicaciones.hacerLlamadaTelefonica(
-                            cliente.telefono.toString()),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.phone), // Icono de teléfono
-                            const SizedBox(
-                                width: 8), // Espacio entre el icono y el texto
-                            Text(
-                              '${cliente.telefono}',
-                              style: estiloTelEmail,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      GestureDetector(
-                        onTap: () => Comunicaciones.enviarEmail(
-                            cliente.email.toString()),
-                        child: Row(
-                          children: [
-                            const Icon(
-                                Icons.email), // Icono de correo electrónico
-                            const SizedBox(
-                                width: 8), // Espacio entre el icono y el texto
-                            Text(
-                              cliente.email == '' ? 'Email' : cliente.email!,
-                              style: estiloTelEmail,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      Row(
+              Padding(
+                padding: const EdgeInsets.only(top: 50.0, left: 10),
+                child: Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () => Comunicaciones.hacerLlamadaTelefonica(
+                          cliente.telefono.toString()),
+                      child: Row(
                         children: [
-                          const Icon(Icons.notes), // Icono de notas
+                          Icon(Icons.phone,
+                              color: colorTema), // Icono de teléfono
                           const SizedBox(
                               width: 8), // Espacio entre el icono y el texto
                           Text(
-                            cliente.nota == '' ? 'Notas' : cliente.nota!,
-                            style: estiloNotas,
+                            '${cliente.telefono}',
+                            style: subTituloEstilo,
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            /* Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                //nivelCliente(iniciadaSesionUsuario, usuarioAPP, cliente),
-                Row(
-                  children: [
-                    Text(
-                      '${cliente.nombre}',
-                      style: estiloNombre,
                     ),
-                    iconoModificar(),
-                  ],
-                ),
-                const SizedBox(height: 50),
-                Row(
-                  children: [
-                    const Icon(Icons.phone),
                     const SizedBox(
-                      width: 20,
+                      height: 15,
                     ),
-                    Text(
-                      '${cliente.telefono}',
-                      style: estiloTelEmail,
+                    GestureDetector(
+                      onTap: () =>
+                          Comunicaciones.enviarEmail(cliente.email.toString()),
+                      child: Row(
+                        children: [
+                          Icon(Icons.email,
+                              color: colorTema), // Icono de correo electrónico
+                          const SizedBox(
+                              width: 8), // Espacio entre el icono y el texto
+                          Text(
+                            cliente.email == '' ? 'Email' : cliente.email!,
+                            style: subTituloEstilo,
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  children: [
-                    const Icon(Icons.mail),
                     const SizedBox(
-                      width: 20,
+                      height: 15,
                     ),
-                    Text(
-                      cliente.email ?? '---',
-                      style: estiloTelEmail,
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Column(
-                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Row(
+                    Wrap(
                       children: [
-                        Icon(Icons.info),
-                        SizedBox(
-                          width: 20,
+                        Icon(Icons.notes, color: colorTema), // Icono de notas
+                        const SizedBox(
+                            width: 8), // Espacio entre el icono y el texto
+                        Expanded(
+                          child: Text(
+                            cliente.nota == '' ? 'Notas' : cliente.nota!,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                            style: textoEstilo,
+                          ),
                         ),
-                        Text('Información:'),
                       ],
                     ),
-                    Text(
-                      cliente.nota ?? '---',
-                    ),
                   ],
                 ),
-              ],
-            ), */
+              ),
+            ],
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 100,
         )
       ],
@@ -458,9 +386,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text('${citas.length} citas concertadas ',
-                          style: const TextStyle(
-                              color: Color.fromARGB(255, 110, 108, 108),
-                              fontSize: 24)),
+                          style: subTituloEstilo),
                     ),
                   ),
                   Expanded(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class BotonAgregaCliente extends StatelessWidget {
-  const BotonAgregaCliente({super.key, required this.texto});
+class BotonAgrega extends StatelessWidget {
+  const BotonAgrega({super.key, required this.texto});
   final String texto;
 
   @override

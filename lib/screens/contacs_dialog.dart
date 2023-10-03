@@ -1,5 +1,10 @@
+import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/personaliza_provider.dart';
+import '../widgets/widgets.dart';
 
 /// selection dialog used for selection of the country code
 class SelectionDialogContacts extends StatefulWidget {
@@ -33,6 +38,8 @@ List<Contact> ordenadoFavoritos = [];
 class _SelectionDialogState extends State<SelectionDialogContacts> {
   /// this is useful for filtering purpose
   List<Contact> filteredElements = [];
+
+  late int codPais;
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +140,9 @@ class _SelectionDialogState extends State<SelectionDialogContacts> {
   @override
   void initState() {
     ordenar(widget.elements);
+    //LEE CODIGO PAIS PARA PODER QUITARLO DEL TELEFONO DE LA AGENDA
+    final contextoPersonaliza = context.read<PersonalizaProvider>();
+    codPais = contextoPersonaliza.getPersonaliza['CODPAIS'];
 
     // filteredElements = widget.elements;
     // Antes de construir los elementos del diálogo, ordena la lista por orden alfabético.
@@ -162,6 +172,7 @@ class _SelectionDialogState extends State<SelectionDialogContacts> {
     // quito los contactos con los primeros num. telefonos vacios
     final contactosQueTienenPrimerNumero =
         contactosSinTelefonosNulos.where((e) {
+      print(e.phones.first.number);
       return e.phones.first.number.isNotEmpty;
     }).toList();
 
@@ -185,7 +196,48 @@ class _SelectionDialogState extends State<SelectionDialogContacts> {
     });
   }
 
-  void _selectItem(Contact e) {
-    Navigator.pop(context, e);
+  void _selectItem(Contact e) async {
+    Contact contacto = e;
+    late List<String> listaTelefonos;
+    late List<String> listaEmails = [];
+
+    String nombre = contacto.displayName.toString();
+
+    print(contacto.phones.map((e) => e.number).toList());
+
+    listaTelefonos = contacto.phones.map((e) => e.number).toList();
+
+    listaEmails = contacto.emails.map((e) => e.address).toList();
+
+    if (listaEmails.isEmpty) {
+      listaEmails = ['vacio'];
+    }
+    if (listaTelefonos.isEmpty) {
+      listaTelefonos = ['vacio'];
+    }
+
+    // ABRE EL MENU INFERIOR PARA ELEGIR TELEFONO E EMAIL Y LOS DEVUELVE EN DATA {'nombre': nombre, 'telefono': telefono, 'email': email}
+    final data = await showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return DialogoContactoElegido(
+            nombre: nombre,
+            listaTelefonos: listaTelefonos,
+            listaEmails: listaEmails);
+      },
+    );
+
+    // TELEFONO CONTACTO quito el codigo pais
+    String telefono =
+        data['telefono'].replaceAll(' ', '').replaceFirst('+$codPais', '');
+
+    // EMAIL CONTACTO
+    String email = data['email'];
+
+    //########################### REGRESA DEVOLVIENDO EL CONTACTO ELEGIDO ####################################################
+    print(data);
+    Navigator.pop(
+        context, {'nombre': nombre, 'telefono': telefono, 'email': email});
   }
 }

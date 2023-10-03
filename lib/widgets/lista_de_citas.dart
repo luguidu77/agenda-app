@@ -70,7 +70,9 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         if (appointments != null) {
           Map<String, dynamic> cita = json.decode(appointments[0].notes);
 
-          print(cita);
+         // print(cita);
+          //############# DETALLE DE LA CITA                   ########################
+
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -80,6 +82,8 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           );
         } else {
           // print(details.date);
+
+          //############# CREACION DE CITA -- ELECCION DE CLIENTE ########################
           Navigator.pushNamed(context, 'creacionCitaCliente',
               arguments: details.date);
         }

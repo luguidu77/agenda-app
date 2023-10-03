@@ -14,3 +14,4 @@ export 'package:agendacitas/widgets/formulariosSessionApp/olvido_password.dart';
 export 'package:agendacitas/widgets/formulariosSessionApp/validaciones_form_inicio_session_registro.dart';
 export 'package:agendacitas/widgets/tarjeta_info_descartable.dart';
 export '../widgets/denominacion_del_negocio.dart';
+export '../widgets/dialogo_contacto_elegido_agenda.dart';

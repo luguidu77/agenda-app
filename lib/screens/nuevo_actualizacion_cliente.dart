@@ -14,6 +14,7 @@ import '../mylogic_formularios/mylogic.dart';
 import '../providers/providers.dart';
 import '../screens/screens.dart';
 import '../utils/utils.dart';
+import 'style/estilo_pantalla.dart';
 
 class NuevoActualizacionCliente extends StatefulWidget {
   /*  ClienteModel clienteParametro;
@@ -425,13 +426,17 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
     String foto = cliente.foto!;
     String nota = cliente.nota!;
     if (_iniciadaSesionUsuario) {
-      await FirebaseProvider()
-          .nuevoCliente(
-              _emailSesionUsuario, nombre, telefono, email, foto, nota)
-          .whenComplete(() {
-        debugPrint('cliente nuevo añadido en Firebase!!');
-        Navigator.pop(context);
-      });
+      try {
+        // COMPROBACION SI EL TELEFONO DEL CONTACTO YA EXISTE
+        final existe = await FirebaseProvider()
+            .cargarClientePorTelefono(_emailSesionUsuario, telefono);
+
+        existe.isNotEmpty
+            ? _alertaYaExiste(existe)
+            : _agregaContacto(nombre, telefono, email, foto, nota);
+      } catch (e) {
+        mensajeError(context, 'algo salió mal');
+      }
     } else {
       await CitaListProvider()
           .nuevoCliente(nombre, telefono, email, foto, nota)
@@ -464,5 +469,25 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
     if (value.isEmpty) {
       return 'Este campo no puede quedar vacío';
     }
+  }
+
+  void _agregaContacto(String nombre, String telefono, String email,
+      String foto, String nota) async {
+    await FirebaseProvider()
+        .nuevoCliente(_emailSesionUsuario, nombre, telefono, email, foto, nota)
+        .whenComplete(() {
+      debugPrint('cliente nuevo añadido en Firebase!!');
+      Navigator.pop(context);
+      _actualiza();
+    });
+  }
+
+  _actualiza() {
+    mensajeInfo(
+        context, 'Contacto Agregado, \nArrastra la lista para actualizar');
+  }
+
+  void _alertaYaExiste(existe) {
+    mensajeError(context, '$mensajeYaExisteCliente ${existe['nombre']}');
   }
 }

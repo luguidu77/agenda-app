@@ -1,4 +1,3 @@
-import 'package:agendacitas/screens/creacion_citas/creacion_cita_cliente.dart';
 import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -7,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../providers/providers.dart';
 import '../../../screens/contacs_dialog.dart';
 import '../../../screens/screens.dart';
+import '../../../screens/style/estilo_pantalla.dart';
 import '../../../utils/utils.dart';
 import '../boton_agrega.dart';
 
@@ -76,28 +76,50 @@ class _BotonNuevoDesdeContactoState extends State<BotonNuevoDesdeContacto> {
           searchDecoration: searchDecoration,
         ),
       ).then((e) async {
-        mensajeInfo(
-            context, 'Contacto ${e['nombre']} agregado ${e['telefono']} ');
-
         String nombre = e['nombre'];
         String telefono = e['telefono'];
         String email = e['email'];
 
         try {
-          await FirebaseProvider().nuevoCliente(_emailSesionUsuario, nombre,
-              telefono, email, '', 'Agregado de la agenda del teléfono');
+          // COMPROBACION SI EL TELEFONO DEL CONTACTO YA EXISTE
+          final existe = await FirebaseProvider()
+              .cargarClientePorTelefono(_emailSesionUsuario, e['telefono']);
+
+          existe.isNotEmpty
+              ? mensajeError(
+                  context, '$mensajeYaExisteCliente ${existe['nombre']}')
+              : agregaContacto(nombre, telefono, email);
         } catch (e) {
           mensajeError(context, 'algo salió mal');
         }
-
-        pantalla == 'cliente_screen'
-            ? Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => HomeScreen(index: 2, myBnB: 2)))
-            : _actualiza();
       });
     }
+  }
+
+  agregaContacto(String nombre, String telefono, String email) async {
+    // PROCESO DE GUARDADO EN FIREBASE DEL NUEVO CLIENTE
+
+    await FirebaseProvider().nuevoCliente(_emailSesionUsuario, nombre, telefono,
+        email, '', 'Agregado de la agenda del teléfono');
+
+    alerta(nombre, telefono);
+    pantalla == 'cliente_screen' ? _navegaPaginaClientes() : _actualiza();
+  }
+
+  void alerta(nombre, telefono) {
+    mensajeInfo(context, 'Contacto $nombre agregado $telefono ');
+  }
+
+  void _navegaPaginaClientes() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => HomeScreen(index: 2, myBnB: 2)));
+  }
+
+  _actualiza() {
+    mensajeInfo(
+        context, 'Contacto Agregado, \nArrastra la lista para actualizar');
   }
 
   // Getting list of contacts from AGENDA
@@ -135,9 +157,5 @@ class _BotonNuevoDesdeContactoState extends State<BotonNuevoDesdeContacto> {
           SnackBar(content: Text('Contact data not available on device'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
-  }
-
-  _actualiza() {
-    mensajeInfo(context, 'Arrastra hacia abajo la lista para actualizar');
   }
 }

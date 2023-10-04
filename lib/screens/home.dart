@@ -16,10 +16,12 @@ import '../providers/theme_provider.dart';
 import '../widgets/widgets.dart';
 import 'creacion_citas/creacion_cita_servicio.dart';
 import 'screens.dart';
+import 'style/estilo_pantalla.dart';
 
 // ignore: must_be_immutable
 class HomeScreen extends StatefulWidget {
-  HomeScreen({Key? key, required this.index, required this.myBnB}) : super(key: key);
+  HomeScreen({Key? key, required this.index, required this.myBnB})
+      : super(key: key);
   int myBnB = 0;
   int index = 0;
   @override
@@ -68,12 +70,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     //iniciamos myBnB(bottomNavigationBar) trayendo BNavigator
-    myBnB = BNavigator(currentIndex: (i) {
-      setState(() {
-        widget.index = i;
-       
-      });
-    }, index: widget.myBnB,);
+    myBnB = BNavigator(
+      currentIndex: (i) {
+        setState(() {
+          widget.index = i;
+        });
+      },
+      index: widget.myBnB,
+    );
     estadoPagoEmailApp();
     cargarTema();
 
@@ -112,32 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
         home: WillPopScope(
           onWillPop: () async {
             // Mostrar alerta antes de salir
-            return await showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('¿Quieres salir de la agenda?'),
-                    actions: <Widget>[
-                      ElevatedButton(
-                        style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.green)),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text('No'),
-                      ),
-                      ElevatedButton(
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                Colors.blueGrey)),
-                        onPressed: () {
-                          FirebaseAuth.instance.signOut();
-                          Navigator.of(context).pop(true);
-                        },
-                        child: const Text('Sí'),
-                      ),
-                    ],
-                  ),
-                ) ??
-                false;
+            return await tarjetaSalirAplicacion() ?? false;
           },
           child: Scaffold(
               bottomNavigationBar: myBnB,
@@ -252,5 +231,118 @@ class _HomeScreenState extends State<HomeScreen> {
       //await PersonalizaProvider().nuevoPersonaliza(0, 34, '', '', '€');
       personaliza();
     }
+  }
+
+  tarjetaSalirAplicacion() {
+    showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(50),
+                  )),
+              child: Image.asset(
+                'assets/icon/power-off.png',
+                width: 50,
+              ),
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 54, 54, 54),
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(50),
+                      topRight: Radius.circular(50))),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(58.0),
+                      child: Text(
+                        'Salir',
+                        style: tituloEstilo.copyWith(color: Colors.white),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(28.0),
+                      child: Text('¿Quieres cerrar la agenda?',
+                          style: subTituloEstilo),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.green)),
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: const Text('No'),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.blueGrey)),
+                            onPressed: () {
+                              FirebaseAuth.instance.signOut();
+                              Navigator.of(context).pop(true);
+                            },
+                            child: const Text('Sí',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 100,
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    /*  showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Quieres salir de la agenda?'),
+        actions: <Widget>[
+          ElevatedButton(
+            style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Colors.green)),
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('No'),
+          ),
+          ElevatedButton(
+            style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Colors.blueGrey)),
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+              Navigator.of(context).pop(true);
+            },
+            child: const Text('Sí'),
+          ),
+        ],
+      ),
+    ); */
   }
 }

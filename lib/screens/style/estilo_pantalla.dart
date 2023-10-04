@@ -19,3 +19,6 @@ final colorFondo = Colors.grey[300];
 final textoPequenoEstilo = GoogleFonts.bebasNeue(
     fontSize: 10,
     textStyle: const TextStyle(color: Color.fromARGB(255, 104, 103, 103)));
+
+const String mensajeYaExisteCliente =
+    'Ya existe el teléfono asociado al contacto:';

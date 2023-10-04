@@ -1,3 +1,4 @@
+import 'package:agendacitas/screens/screens.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -215,50 +216,92 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
   _cliente(reserva) {
     return SizedBox(
         width: double.infinity,
-        child: Container(
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-            child: Card(
-              color: Theme.of(context).primaryColor.withOpacity(0.5),
-              child: Padding(
-                padding: miPadding,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  // crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _foto(reserva['foto']),
-                    const SizedBox(height: 10),
-                    Column(
+        child: InkWell(
+          onTap: () => Navigator.push(
+            context,
+            PageRouteBuilder(
+                pageBuilder: (BuildContext context, Animation<double> animation,
+                        Animation<double> secondaryAnimation) =>
+                    FichaClienteScreen(
+                      clienteParametro: ClienteModel(
+                          id: reserva['idCliente'].toString(),
+                          nombre: reserva['nombre'],
+                          telefono: reserva['telefono'],
+                          email: reserva['email'],
+                          foto: reserva['foto'],
+                          nota: reserva['nota']),
+                    ),
+                transitionDuration: // ? TIEMPO PARA QUE SE APRECIE EL HERO DE LA FOTO
+                    const Duration(milliseconds: 600)),
+          ),
+          child: Container(
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(10)),
+              child: Card(
+                color: Theme.of(context).primaryColor.withOpacity(0.5),
+                child: Padding(
+                  padding: miPadding,
+                  child: Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(style: textoEstilo, reserva['nombre'].toString()),
-                        Text(style: textoEstilo, reserva['nota'].toString()),
+                        Expanded(
+                          flex: 3,
+                          child: _foto(reserva['foto']),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          flex: 5,
+                          child: Column(
+                            children: [
+                              Text(
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style: textoEstilo,
+                                  reserva['nombre'].toString()),
+                              Text(
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                reserva['nota'].toString() == ''
+                                    ? 'Notas'
+                                    : reserva['nota'].toString(),
+                                style: textoPequenoEstilo,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          flex: 2,
+                          child: Column(
+                            //  mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Comunicaciones.hacerLlamadaTelefonica(
+                                      reserva['telefono'].toString());
+                                },
+                                icon: const FaIcon(FontAwesomeIcons.phone),
+                              ),
+                              reserva['email'] != ' '
+                                  ? IconButton(
+                                      onPressed: () {
+                                        Comunicaciones.enviarEmail(
+                                            reserva['email'].toString());
+                                      },
+                                      icon: const FaIcon(
+                                          FontAwesomeIcons.solidEnvelope))
+                                  : Container(),
+                            ],
+                          ),
+                        )
                       ],
                     ),
-                    const SizedBox(height: 10),
-                    Column(
-                      //  mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            Comunicaciones.hacerLlamadaTelefonica(
-                                reserva['telefono'].toString());
-                          },
-                          icon: const FaIcon(FontAwesomeIcons.phone),
-                        ),
-                        reserva['email'] != ' '
-                            ? IconButton(
-                                onPressed: () {
-                                  Comunicaciones.enviarEmail(
-                                      reserva['email'].toString());
-                                },
-                                icon: const FaIcon(
-                                    FontAwesomeIcons.solidEnvelope))
-                            : Container(),
-                      ],
-                    )
-                  ],
+                  ),
                 ),
-              ),
-            )));
+              )),
+        ));
   }
 
   ClipRRect _foto(foto) {

@@ -87,12 +87,15 @@ class _ClientesScreenState extends State<ClientesScreen> {
         child: Column(
           children: [
             const CuadroBusqueda(),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                BotonNuevoClienteManual(),
-                BotonNuevoDesdeContacto(pantalla: 'cliente_screen')
-              ],
+            Container(
+              width: MediaQuery.of(context).size.width - 50,
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  BotonNuevoClienteManual(),
+                  BotonNuevoDesdeContacto(pantalla: 'cliente_screen')
+                ],
+              ),
             ),
             const Divider(),
             ListaClientes(

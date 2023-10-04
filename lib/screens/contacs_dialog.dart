@@ -239,5 +239,6 @@ class _SelectionDialogState extends State<SelectionDialogContacts> {
     print(data);
     Navigator.pop(
         context, {'nombre': nombre, 'telefono': telefono, 'email': email});
+
   }
 }

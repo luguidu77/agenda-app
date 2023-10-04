@@ -37,37 +37,8 @@ class _MenuConfigClienteState extends State<MenuConfigCliente> {
 
   @override
   Widget build(BuildContext context) {
-    print('meeeeeeeeeeeeeeeeeeeeeeeeee');
     return _opciones(context, widget.cliente);
   }
-
-  /*  menuInferior(BuildContext context, cliente) {
-    print('menu');
-    return showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          height: 300,
-          color: Colors.white,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(
-                  cliente.nombre,
-                  style: titulo,
-                ),
-                const Divider(),
-                _opciones(context, cliente)
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  } */
 
   Column _opciones(BuildContext context, cliente) {
     return Column(
@@ -243,32 +214,16 @@ class _MenuConfigClienteState extends State<MenuConfigCliente> {
   }
 
   Future<void> _eliminacion(idCliente) async {
-    Navigator.pop(context);
-    dialogoEspera();
-
+    mensajeInfo(context, 'ELIMINANDO CLIENTE...');
     await _eliminarCliente(_iniciadaSesionUsuario, idCliente);
 
     _alertaEliminacion();
   }
 
-  dialogoEspera() {
-    return showDialog(
-      context: context,
-      builder: (context) => const AlertDialog(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Eliminando...'),
-          ],
-        ),
-        //  content: Text('Edición clienta'),
-      ),
-    );
-  }
-
   void _alertaEliminacion() {
     mensajeSuccess(context, 'Cliente y todo su historial eliminado');
-    setState(() {});
+    Navigator.pop(context);
+    //setState(() {});
   }
 
   _eliminarCliente(bool iniciadaSesion, idCliente) async {
@@ -285,6 +240,7 @@ class _MenuConfigClienteState extends State<MenuConfigCliente> {
 
       SincronizarFirebase().eliminaClienteId(_emailSesionUsuario, idCliente);
     }
+
     //SI NO HAY INICIO DE SESION, NO HACE NADA, DESHABILITADA ESTA OPCION  ############
   }
 

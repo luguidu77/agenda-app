@@ -55,7 +55,7 @@ class _BotonNuevoDesdeContactoState extends State<BotonNuevoDesdeContacto> {
               : mensajeError(context, 'No disponible en versión gratuita');
         },
         child: const BotonAgrega(
-          texto: 'CONTACTO',
+          texto: 'TUS CONTACTOS',
         ));
   }
 
@@ -90,12 +90,12 @@ class _BotonNuevoDesdeContactoState extends State<BotonNuevoDesdeContacto> {
           mensajeError(context, 'algo salió mal');
         }
 
-        widget.pantalla == 'cliente_screen'
+        pantalla == 'cliente_screen'
             ? Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => HomeScreen(index: 2, myBnB: 2)))
-            : null;
+            : _actualiza();
       });
     }
   }
@@ -135,5 +135,9 @@ class _BotonNuevoDesdeContactoState extends State<BotonNuevoDesdeContacto> {
           SnackBar(content: Text('Contact data not available on device'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
+  }
+
+  _actualiza() {
+    mensajeInfo(context, 'Arrastra hacia abajo la lista para actualizar');
   }
 }

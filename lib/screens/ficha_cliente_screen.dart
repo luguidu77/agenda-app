@@ -325,13 +325,11 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
                         Icon(Icons.notes, color: colorTema), // Icono de notas
                         const SizedBox(
                             width: 8), // Espacio entre el icono y el texto
-                        Expanded(
-                          child: Text(
-                            cliente.nota == '' ? 'Notas' : cliente.nota!,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                            style: textoEstilo,
-                          ),
+                        Text(
+                          cliente.nota == '' ? 'Notas' : cliente.nota!,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          style: textoEstilo,
                         ),
                       ],
                     ),

@@ -100,95 +100,97 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
     final personalizaprovider = contextoPersonalizaFirebase.getPersonaliza;
     textoActual = personalizaprovider['MENSAJE_CITA'].toString();
 
-    return Column(
-      children: [
-        const Text(
-          'Comparte la cita con tu client@',
-          style: TextStyle(
-              color: Colors.blueGrey,
-              fontWeight: FontWeight.bold,
-              fontSize: 15),
-        ),
-        // VISIBLE UNA TARJETA INFO SI NO HAY DENOMINACION DEL PERFIL DE USUARIO
-        if (perfilUsuarioApp.denominacion == '')
-          TarjetaInfo(
-              colorTexto: Colors.white,
-              colorTarjeta: const Color.fromARGB(83, 64, 88, 226),
-              icono: const FaIcon(FontAwesomeIcons.exclamation),
-              titulo: 'SUGERENCIA',
-              texto: 'Edita tu perfil para que se comparta en las citas',
-              accion: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ConfigUsuarioApp()))),
-        const SizedBox(
-          height: 10,
-        ),
-        GestureDetector(
-          onTap: () {
-            Comunicaciones().compartirCitaWhatsapp(
-              perfilUsuarioApp,
-              textoActual,
-              widget.cliente,
-              telefonoCodpais!,
-              widget.fechaCita,
-              widget.servicio,
-            );
-          },
-          child: const Card(
-            child: ListTile(
-              title: Text('Whatsapp'),
-              trailing: FaIcon(FontAwesomeIcons.whatsapp),
-            ),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const Text(
+            'Comparte la cita con tu client@',
+            style: TextStyle(
+                color: Colors.blueGrey,
+                fontWeight: FontWeight.bold,
+                fontSize: 15),
           ),
-        ),
-        // LA PANTALLA DETALLES DE LA CITA DEVUELVE UN ESPACIO CUANDO NO HAY EMAIL
-        // LA PANTALLA DE CITA CONFIRMADA NO TIENE ESPACIO EN EMAIL VACIO
-        widget.email != ' ' && widget.email != ''
-            ? GestureDetector(
-                onTap: () {
-                  pagado
-                      ? Comunicaciones().compartirCitaEmail(
-                          perfilUsuarioApp,
-                          textoActual,
-                          widget.cliente,
-                          widget.email,
-                          widget.fechaCita,
-                          widget.servicio)
-                      : alerta(context);
-                },
-                child: const Card(
-                  child: ListTile(
-                    title: Text('Email'),
-                    trailing: FaIcon(FontAwesomeIcons.envelope),
-                  ),
-                ),
-              )
-            : Container(),
-        GestureDetector(
-          onTap: () {
-            pagado
-                ? Comunicaciones().compartirCitaSms(
-                    perfilUsuarioApp,
-                    textoActual,
-                    widget.cliente,
-                    widget.telefono,
-                    widget.fechaCita,
-                    widget.servicio)
-                : alerta(context); //  /utils/alertaNodisponible.dart
-          },
-          child: const Card(
-            child: ListTile(
-              title: Text('SMS'),
-              subtitle: Text(
-                'El coste de SMS dependerá de su operadora telefónica',
-                style: TextStyle(fontSize: 12, color: Colors.red),
+          // VISIBLE UNA TARJETA INFO SI NO HAY DENOMINACION DEL PERFIL DE USUARIO
+          if (perfilUsuarioApp.denominacion == '')
+            TarjetaInfo(
+                colorTexto: Colors.white,
+                colorTarjeta: const Color.fromARGB(83, 64, 88, 226),
+                icono: const FaIcon(FontAwesomeIcons.exclamation),
+                titulo: 'SUGERENCIA',
+                texto: 'Edita tu perfil para que se comparta en las citas',
+                accion: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ConfigUsuarioApp()))),
+          const SizedBox(
+            height: 10,
+          ),
+          GestureDetector(
+            onTap: () {
+              Comunicaciones().compartirCitaWhatsapp(
+                perfilUsuarioApp,
+                textoActual,
+                widget.cliente,
+                telefonoCodpais!,
+                widget.fechaCita,
+                widget.servicio,
+              );
+            },
+            child: const Card(
+              child: ListTile(
+                title: Text('Whatsapp'),
+                trailing: FaIcon(FontAwesomeIcons.whatsapp),
               ),
-              trailing: FaIcon(FontAwesomeIcons.commentSms),
             ),
           ),
-        ),
-      ],
+          // LA PANTALLA DETALLES DE LA CITA DEVUELVE UN ESPACIO CUANDO NO HAY EMAIL
+          // LA PANTALLA DE CITA CONFIRMADA NO TIENE ESPACIO EN EMAIL VACIO
+          widget.email != ' ' && widget.email != ''
+              ? GestureDetector(
+                  onTap: () {
+                    pagado
+                        ? Comunicaciones().compartirCitaEmail(
+                            perfilUsuarioApp,
+                            textoActual,
+                            widget.cliente,
+                            widget.email,
+                            widget.fechaCita,
+                            widget.servicio)
+                        : alerta(context);
+                  },
+                  child: const Card(
+                    child: ListTile(
+                      title: Text('Email'),
+                      trailing: FaIcon(FontAwesomeIcons.envelope),
+                    ),
+                  ),
+                )
+              : Container(),
+          GestureDetector(
+            onTap: () {
+              pagado
+                  ? Comunicaciones().compartirCitaSms(
+                      perfilUsuarioApp,
+                      textoActual,
+                      widget.cliente,
+                      widget.telefono,
+                      widget.fechaCita,
+                      widget.servicio)
+                  : alerta(context); //  /utils/alertaNodisponible.dart
+            },
+            child: const Card(
+              child: ListTile(
+                title: Text('SMS'),
+                subtitle: Text(
+                  'El coste de SMS dependerá de su operadora telefónica',
+                  style: TextStyle(fontSize: 12, color: Colors.red),
+                ),
+                trailing: FaIcon(FontAwesomeIcons.commentSms),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -27,6 +27,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
   PersonalizaModel personaliza = PersonalizaModel();
   EdgeInsets miPadding = const EdgeInsets.all(18.0);
   late Map<String, dynamic> reserva;
+  double altura = 300;
 
   getPersonaliza() async {
     List<PersonalizaModel> data =
@@ -51,7 +52,6 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double altura = 400;
     // final cita = widget.reserva; //widget.reserva;
     String? fechaLarga;
     DateTime resFecha = DateTime.parse(
@@ -61,60 +61,38 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
         .add_Hm()
         .format(DateTime.parse(resFecha.toString()));
     return Scaffold(
-      backgroundColor: colorFondo,
-      appBar: AppBar(
         backgroundColor: colorFondo,
-        elevation: 0,
-        title: Text(
-          'Detalle de la cita',
-          style: subTituloEstilo,
+        appBar: AppBar(
+          backgroundColor: colorFondo,
+          elevation: 0,
+          title: Text(
+            'Detalle de la cita',
+            style: subTituloEstilo,
+          ),
         ),
-      ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Container(
-              padding: EdgeInsets.only(top: altura),
-              height: MediaQuery.of(context).size.height + altura,
-              child: Column(children: [
-                Visibility(
-                  visible: visibleFormulario,
-                  //  padding: EdgeInsets.only(top: altura),
-                  // height: altura,
-                  child: FormReprogramaReserva(
-                      idServicio: reserva['idServicio'].toString(),
-                      cita: reserva),
-                ),
-                CompartirCitaConCliente(
-                    cliente: reserva['nombre'],
-                    telefono: reserva['telefono']!,
-                    email: reserva['email'],
-                    fechaCita: fechaLarga,
-                    servicio: reserva['servicio'])
-              ]),
-            ),
+        body: Column(children: [
+          // Detalles del cliente
+
+          _cliente(reserva),
+          // Detalle de la cita
+
+          _detallesCita(reserva, fechaLarga),
+
+          Visibility(
+            visible: visibleFormulario,
+            child: FormReprogramaReserva(
+                idServicio: reserva['idServicio'].toString(), cita: reserva),
           ),
-          Positioned(
-            top: 0, // Alinea el widget en la parte superior.
-            left: 0, // Opcional: ajusta la posición horizontal.
-            right: 0,
-            child: Container(
-                color: colorFondo,
-                height: altura,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      // Detalles del cliente
-                      _cliente(reserva),
-                      // Detalle de la cita
-                      _detallesCita(reserva, fechaLarga)
-                    ],
-                  ),
-                )),
+          SizedBox(
+            height: 300,
+            child: CompartirCitaConCliente(
+                cliente: reserva['nombre'],
+                telefono: reserva['telefono']!,
+                email: reserva['email'],
+                fechaCita: fechaLarga,
+                servicio: reserva['servicio']),
           ),
-        ],
-      ),
-    );
+        ]));
   }
 
   _botonesCita() {
@@ -215,93 +193,33 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
 
   _cliente(reserva) {
     return SizedBox(
-        width: double.infinity,
-        child: InkWell(
-          onTap: () => Navigator.push(
-            context,
-            PageRouteBuilder(
-                pageBuilder: (BuildContext context, Animation<double> animation,
-                        Animation<double> secondaryAnimation) =>
-                    FichaClienteScreen(
-                      clienteParametro: ClienteModel(
-                          id: reserva['idCliente'].toString(),
-                          nombre: reserva['nombre'],
-                          telefono: reserva['telefono'],
-                          email: reserva['email'],
-                          foto: reserva['foto'],
-                          nota: reserva['nota']),
-                    ),
-                transitionDuration: // ? TIEMPO PARA QUE SE APRECIE EL HERO DE LA FOTO
-                    const Duration(milliseconds: 600)),
-          ),
-          child: Container(
-              decoration:
-                  BoxDecoration(borderRadius: BorderRadius.circular(10)),
-              child: Card(
-                color: Theme.of(context).primaryColor.withOpacity(0.5),
-                child: Padding(
-                  padding: miPadding,
-                  child: Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      // crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: _foto(reserva['foto']),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          flex: 5,
-                          child: Column(
-                            children: [
-                              Text(
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style: textoEstilo,
-                                  reserva['nombre'].toString()),
-                              Text(
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                reserva['nota'].toString() == ''
-                                    ? 'Notas'
-                                    : reserva['nota'].toString(),
-                                style: textoPequenoEstilo,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 5),
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            //  mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  Comunicaciones.hacerLlamadaTelefonica(
-                                      reserva['telefono'].toString());
-                                },
-                                icon: const FaIcon(FontAwesomeIcons.phone),
-                              ),
-                              reserva['email'] != ' '
-                                  ? IconButton(
-                                      onPressed: () {
-                                        Comunicaciones.enviarEmail(
-                                            reserva['email'].toString());
-                                      },
-                                      icon: const FaIcon(
-                                          FontAwesomeIcons.solidEnvelope))
-                                  : Container(),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
+      width: double.infinity,
+      child: InkWell(
+        onTap: () => Navigator.push(
+          context,
+          PageRouteBuilder(
+              pageBuilder: (BuildContext context, Animation<double> animation,
+                      Animation<double> secondaryAnimation) =>
+                  FichaClienteScreen(
+                    clienteParametro: ClienteModel(
+                        id: reserva['idCliente'].toString(),
+                        nombre: reserva['nombre'],
+                        telefono: reserva['telefono'],
+                        email: reserva['email'],
+                        foto: reserva['foto'],
+                        nota: reserva['nota']),
                   ),
-                ),
-              )),
-        ));
+              transitionDuration: // ? TIEMPO PARA QUE SE APRECIE EL HERO DE LA FOTO
+                  const Duration(milliseconds: 600)),
+        ),
+        child: Container(
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+          child: Card(
+              color: Theme.of(context).primaryColor.withOpacity(0.5),
+              child: tarjetaCliente()),
+        ),
+      ),
+    );
   }
 
   ClipRRect _foto(foto) {
@@ -320,5 +238,65 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                 height: 80,
                 fit: BoxFit.cover,
               ));
+  }
+
+  tarjetaCliente() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 3,
+              child: _foto(reserva['foto']),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              flex: 5,
+              child: Column(
+                children: [
+                  Text(
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: textoEstilo,
+                      reserva['nombre'].toString()),
+                  Text(
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    reserva['nota'].toString() == ''
+                        ? 'Notas'
+                        : reserva['nota'].toString(),
+                    style: textoPequenoEstilo,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 5),
+            Expanded(
+              flex: 2,
+              child: Column(
+                //  mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Comunicaciones.hacerLlamadaTelefonica(
+                          reserva['telefono'].toString());
+                    },
+                    icon: const FaIcon(FontAwesomeIcons.phone),
+                  ),
+                  reserva['email'] != ' '
+                      ? IconButton(
+                          onPressed: () {
+                            Comunicaciones.enviarEmail(
+                                reserva['email'].toString());
+                          },
+                          icon: const FaIcon(FontAwesomeIcons.solidEnvelope))
+                      : Container(),
+                ],
+              ),
+            )
+          ]),
+    );
   }
 }

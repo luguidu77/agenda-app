@@ -70,29 +70,31 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
             style: subTituloEstilo,
           ),
         ),
-        body: Column(children: [
-          // Detalles del cliente
+        body: SingleChildScrollView(
+          child: Column(children: [
+            // Detalles del cliente
 
-          _cliente(reserva),
-          // Detalle de la cita
+            _cliente(reserva),
+            // Detalle de la cita
 
-          _detallesCita(reserva, fechaLarga),
+            _detallesCita(reserva, fechaLarga),
 
-          Visibility(
-            visible: visibleFormulario,
-            child: FormReprogramaReserva(
-                idServicio: reserva['idServicio'].toString(), cita: reserva),
-          ),
-          SizedBox(
-            height: 300,
-            child: CompartirCitaConCliente(
-                cliente: reserva['nombre'],
-                telefono: reserva['telefono']!,
-                email: reserva['email'],
-                fechaCita: fechaLarga,
-                servicio: reserva['servicio']),
-          ),
-        ]));
+            Visibility(
+              visible: visibleFormulario,
+              child: FormReprogramaReserva(
+                  idServicio: reserva['idServicio'].toString(), cita: reserva),
+            ),
+            SizedBox(
+              height: 300,
+              child: CompartirCitaConCliente(
+                  cliente: reserva['nombre'],
+                  telefono: reserva['telefono']!,
+                  email: reserva['email'],
+                  fechaCita: fechaLarga,
+                  servicio: reserva['servicio']),
+            ),
+          ]),
+        ));
   }
 
   _botonesCita() {
@@ -176,7 +178,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                       height: 10,
                     ),
                     Text(
-                      'Notas de la cita: ${cita['comentario'].toString()}',
+                      'Notas: ${cita['comentario'].toString()}',
                       style: subTituloEstilo,
                     ),
                     const SizedBox(height: 10),

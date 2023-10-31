@@ -71,74 +71,71 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                   children: [
                     // VISUALIZACION DEL CONTEXTO EN PRUEBAS
                     //Text( 'SERVICIOS : ${contextoCreacionCita.getServiciosElegidos}'),
-                    BarraProgreso().progreso(
-                      context,
-                      0.90,
-                      Colors.amber,
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    vercliente(context, cliente),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Column(
-                          children: [
-                            Text(DateFormat.MMMMEEEEd('es_ES').format(
-                                DateTime.parse(contextoCreacionCita
-                                    .getCitaElegida['FECHA']
-                                    .toString()))),
-                            Row(
-                              children: [
-                                Text(
-                                  DateFormat.Hm('es_ES').format(DateTime.parse(
-                                      contextoCreacionCita
-                                          .getCitaElegida['FECHA']
-                                          .toString())),
-                                  style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const Text(' - '),
-                                Text(
-                                  DateFormat.Hm('es_ES').format(
-                                      DateTime.parse(horafinal.toString())),
-                                  style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const ElevatedButton(
-                            onPressed: null, child: Text('Modificar'))
-                      ],
-                    ),
-                    servicios(),
-                    Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: GestureDetector(
-                          onTap: () => menuInferior(context),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              FaIcon(FontAwesomeIcons.circlePlus),
-                              Text('añade otro servicio'),
-                              SizedBox(
-                                width: 15,
-                              )
-                            ],
-                          )),
-                    ),
+                    _barraProgreso().progreso(context, 0.90, Colors.amber),
+                    const SizedBox(height: 20),
+                    _vercliente(context, cliente),
+                    const SizedBox(height: 15),
+                    _agregaNotas(),
+                    const SizedBox(height: 15),
+                    _fechaCita(),
+                    _servicios(),
+                    _botonAgregaServicio(context),
                     const Divider(),
                   ],
                 ),
               ))),
+    );
+  }
+
+  BarraProgreso _barraProgreso() => BarraProgreso();
+
+  Padding _botonAgregaServicio(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: GestureDetector(
+          onTap: () => menuInferior(context),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              FaIcon(FontAwesomeIcons.circlePlus),
+              Text('añade otro servicio'),
+              SizedBox(
+                width: 15,
+              )
+            ],
+          )),
+    );
+  }
+
+  Row _fechaCita() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Column(
+          children: [
+            Text(DateFormat.MMMMEEEEd('es_ES').format(DateTime.parse(
+                contextoCreacionCita.getCitaElegida['FECHA'].toString()))),
+            Row(
+              children: [
+                Text(
+                  DateFormat.Hm('es_ES').format(DateTime.parse(
+                      contextoCreacionCita.getCitaElegida['FECHA'].toString())),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const Text(' - '),
+                Text(
+                  DateFormat.Hm('es_ES')
+                      .format(DateTime.parse(horafinal.toString())),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const ElevatedButton(onPressed: null, child: Text('Modificar'))
+      ],
     );
   }
 
@@ -152,7 +149,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
           })),
     );
   } */
-  servicios() {
+  _servicios() {
     final servicios = contextoCreacionCita.getServiciosElegidos;
     return Column(
       children: servicios.map((servicio) {
@@ -220,7 +217,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
     );
   }
 
-  vercliente(context, ClienteModel cliente) {
+  _vercliente(context, ClienteModel cliente) {
     return Card(
       child: ClipRect(
         child: SizedBox(
@@ -395,8 +392,6 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
   Widget? botonCancelar() {
     return GestureDetector(
       onTap: () {
-       
-
         Navigator.pushNamed(context, '/');
 
         _iniciadaSesionUsuario
@@ -406,6 +401,70 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
       child: const Padding(
         padding: EdgeInsets.all(8.0),
         child: Icon(FontAwesomeIcons.xmark),
+      ),
+    );
+  }
+
+  TextEditingController comentarioController = TextEditingController();
+  bool _visible = false;
+  late String textoNotas = '';
+  _agregaNotas() {
+    // LLEER MICONTEXTO DE CreacionCitaProvider
+    contextoCreacionCita = context.read<CreacionCitaProvider>();
+
+    return Card(
+      child: ClipRect(
+        child: SizedBox(
+          //Banner aqui -----------------------------------------------
+          child: Column(
+            children: [
+              InkWell(
+                onTap: () => setState(() {
+                  _visible = !_visible;
+                }),
+                child: ListTile(
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(150.0),
+                    child: Image.asset(
+                      "./assets/icon/notas.png",
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  title: const Text('NOTAS'),
+                  subtitle: Text(textoNotas.toString()),
+                  trailing: _visible
+                      ? const FaIcon(Icons.keyboard_arrow_up)
+                      : const FaIcon(Icons.keyboard_arrow_down_sharp),
+                ),
+              ),
+              Visibility(
+                visible: _visible,
+                child: Card(
+                  child: TextFormField(
+                    onFieldSubmitted: (String value) {
+                      setState(() {
+                        _visible = false;
+                      });
+                    },
+                    onChanged: (value) {
+                      setState(() {
+                        textoNotas = comentarioController.text;
+                      });
+                      contextoCreacionCita.getCitaElegida['COMENTARIO'] =
+                          comentarioController.text;
+                    },
+                    controller: comentarioController,
+                    decoration: const InputDecoration(
+                      hintText: 'escribe aquí una nota...',
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
       ),
     );
   }

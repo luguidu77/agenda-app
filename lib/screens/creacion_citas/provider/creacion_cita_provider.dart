@@ -47,6 +47,7 @@ class CreacionCitaProvider extends ChangeNotifier {
     'FECHA': '',
     'HORAINICIO': '',
     'HORAFINAL': '',
+    'COMENTARIO': ''
   };
 
   Map<String, dynamic> get getCitaElegida => _citaElegida;
@@ -58,7 +59,7 @@ class CreacionCitaProvider extends ChangeNotifier {
 
   // CONTEXTO clienteElegido ############################
   Map<String, dynamic> _clienteElegido = {
-    'ID':'',
+    'ID': '',
     'NOMBRE': '',
     'TELEFONO': '',
     'EMAIL': '',

@@ -6,6 +6,7 @@ import 'package:agendacitas/main.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -46,6 +47,12 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
   PagoProvider? data;
   bool cargandoImagen = false;
   bool floatExtended = false;
+
+  bool isEmailValid = true;
+  String email = '';
+  String numtelefono = '';
+
+  bool isTelfValido = true;
 
   // ignore: prefer_typing_uninitialized_variables
   var myLogic;
@@ -96,6 +103,7 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
         'email cliente:${cliente.email} telefono cliente ${cliente.telefono}// pagado : $pagado // usuarioAPP: $_emailSesionUsuario ');
 
     return Scaffold(
+      appBar: AppBar(),
       floatingActionButton: FloatingActionButton.extended(
         label: Text(
           nuevoCliente ? 'NUEVO CLIENTE' : 'ACTUALIZAR CLIENTE',
@@ -120,11 +128,11 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
         },
       ),
       body: Padding(
-        padding: const EdgeInsets.all(58.0),
+        padding: const EdgeInsets.all(18.0),
         child: ListView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           children: [
-            Row(
+            /*   Row(
               //BOTON X PARA CERRAR FORMULARIO
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -153,32 +161,31 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
                       color: Color.fromARGB(167, 114, 136, 150),
                     )),
               ],
-            ),
-            const SizedBox(
+            ), */
+            /*  const SizedBox(
               height: 50,
-            ),
+            ), */
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 !cargandoImagen // espera a que la imagen se cargue
                     ? ClipRRect(
-                        borderRadius: BorderRadius.circular(150.0),
+                        borderRadius: BorderRadius.circular(10.0),
                         child:
                             // ##### si hay sesion y foto guadada la carga de firebase con al ruta de textControllerFoto.text(no visible al usuario) #####
                             _iniciadaSesionUsuario &&
                                     myLogic.textControllerFoto.text != ''
                                 ? Image.network(
                                     myLogic.textControllerFoto.text,
-                                    width: 150,
-                                    height: 150,
+                                    width: 100,
+                                    height: 100,
                                     fit: BoxFit.cover,
                                   )
                                 // ### si no hay foto  o  no hay usuario, muestra imagen nofoto.jpg
                                 : Image.asset(
                                     "./assets/images/nofoto.jpg",
-                                    width: 150,
-                                    height: 150,
+                                    width: 100,
+                                    height: 100,
                                     fit: BoxFit.cover,
                                   ),
                       )
@@ -186,9 +193,12 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
                         borderRadius: BorderRadius.circular(150.0),
                         child: const CircularProgressIndicator(),
                       ),
+                const SizedBox(width: 10),
                 Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    IconButton(
+                    ElevatedButton.icon(
+                        label: const Text('MI IMAGENES   '),
                         onPressed: () async {
                           if (_iniciadaSesionUsuario) {
                             setState(() {
@@ -214,7 +224,8 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
                           }
                         },
                         icon: const Icon(Icons.image)),
-                    IconButton(
+                    ElevatedButton.icon(
+                        label: const Text('HAZ UNA FOTO'),
                         onPressed: () async {
                           if (_iniciadaSesionUsuario) {
                             setState(() {
@@ -242,42 +253,77 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
                 )
               ],
             ),
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    validator: (value) => _validacion(value),
-                    controller: myLogic.textControllerNombre,
-                    decoration: const InputDecoration(labelText: 'Nombre'),
-                  ),
-                  TextFormField(
-                    validator: (value) => _validacion(value),
-                    keyboardType: TextInputType.number,
-                    controller: myLogic.textControllerTelefono,
-                    decoration: const InputDecoration(labelText: 'Telefono'),
-                  ),
-                  TextFormField(
-                    //validator: (value) => _validacion(value),
-                    keyboardType: TextInputType.emailAddress,
-                    controller: myLogic.textControllerEmail,
-                    decoration: const InputDecoration(labelText: 'Email'),
-                  ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      maxLength: 25,
+                      style: Theme.of(context).textTheme.titleMedium,
+                      validator: (value) => _validacion(value),
+                      controller: myLogic.textControllerNombre,
+                      decoration: InputDecoration(
+                          labelText: 'Nombre',
+                          labelStyle:
+                              TextStyle(color: Theme.of(context).primaryColor)),
+                    ),
+                    TextFormField(
+                      onChanged: (value) {
+                        setState(() {
+                          numtelefono = value;
+                          // Validar el formato del correo electrónico
+                          isTelfValido = isPhoneNumberValid(value);
+                        });
+                      },
+                      style: Theme.of(context).textTheme.titleLarge,
+                      validator: (value) => _validacion(value),
+                      keyboardType: TextInputType.number,
+                      controller: myLogic.textControllerTelefono,
+                      decoration: InputDecoration(
+                        labelText: 'Telefono',
+                        errorText: isTelfValido
+                            ? null
+                            : 'Formato de teléfono inválido',
+                      ),
+                    ),
+                    TextFormField(
+                      onChanged: (value) {
+                        setState(() {
+                          email = value;
+                          // Validar el formato del correo electrónico
+                          isEmailValid = isEmailValido(value);
+                        });
+                      },
+                      style: Theme.of(context).textTheme.titleLarge,
+                      //validator: (value) => _validacion(value),
+                      keyboardType: TextInputType.emailAddress,
+                      controller: myLogic.textControllerEmail,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        errorText:
+                            isEmailValid ? null : 'Formato de correo inválido',
+                      ),
+                    ),
 
-                  /*  TextField(
-              //todo: quitar en produccion
-              enabled: false,
-              controller: myLogic.textControllerFoto,
-              decoration: const InputDecoration(labelText: 'Foto'),
-            ), */
-                  TextFormField(
-                    controller: myLogic.textControllerNota,
-                    decoration: const InputDecoration(labelText: 'Notas'),
-                  ),
-                  const SizedBox(
-                    height: 200,
-                  ),
-                ],
+                    /*  TextField(
+                //todo: quitar en produccion
+                enabled: false,
+                controller: myLogic.textControllerFoto,
+                decoration: const InputDecoration(labelText: 'Foto'),
+              ), */
+                    TextFormField(
+                      maxLength: 25,
+                      style: Theme.of(context).textTheme.titleSmall,
+                      controller: myLogic.textControllerNota,
+                      decoration: const InputDecoration(labelText: 'Notas'),
+                    ),
+                    const SizedBox(
+                      height: 200,
+                    ),
+                  ],
+                ),
               ),
             )
           ],
@@ -425,7 +471,7 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
     String email = cliente.email!;
     String foto = cliente.foto!;
     String nota = cliente.nota!;
-    if (_iniciadaSesionUsuario) {
+    if (pagado) {
       try {
         // COMPROBACION SI EL TELEFONO DEL CONTACTO YA EXISTE
         final existe = await FirebaseProvider()
@@ -489,5 +535,18 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
 
   void _alertaYaExiste(existe) {
     mensajeError(context, '$mensajeYaExisteCliente ${existe['nombre']}');
+  }
+
+// funcion validar formatos email
+  bool isEmailValido(String email) {
+    final emailRegex =
+        RegExp(r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)*(\.[a-z]{2,})$');
+    return emailRegex.hasMatch(email);
+  }
+
+  // Función para validar el formato del número de teléfono sin símbolos no deseados
+  bool isPhoneNumberValid(String phoneNumber) {
+    final phoneRegex = RegExp(r'^[0-9]*$');
+    return phoneRegex.hasMatch(phoneNumber);
   }
 }

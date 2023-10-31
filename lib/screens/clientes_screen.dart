@@ -2,30 +2,18 @@ import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
-import 'package:agendacitas/providers/personaliza_provider.dart';
-import 'package:agendacitas/screens/home.dart';
-import 'package:agendacitas/screens/nuevo_actualizacion_cliente.dart';
 import 'package:agendacitas/widgets/botones/agregarNuevoCliente/boton_nuevo_cliente_manual.dart';
-
 import 'package:agendacitas/widgets/lista_de_clientes.dart';
 import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../mylogic_formularios/my_logic_cita.dart';
-
-import '../providers/Firebase/firebase_provider.dart';
 import '../providers/FormularioBusqueda/formulario_busqueda_provider.dart';
-
-import '../utils/utils.dart';
-import '../widgets/botones/boton_agrega.dart';
-
 import '../widgets/botones/agregarNuevoCliente/boton_nuevo_desde_contactos.dart';
 import '../widgets/formulario_busqueda.dart';
-import 'contacs_dialog.dart';
 
 class ClientesScreen extends StatefulWidget {
   const ClientesScreen({Key? key}) : super(key: key);
@@ -87,7 +75,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
         child: Column(
           children: [
             const CuadroBusqueda(),
-            Container(
+            SizedBox(
               width: MediaQuery.of(context).size.width - 50,
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,

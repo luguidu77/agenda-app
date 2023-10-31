@@ -1,6 +1,7 @@
 import 'package:agendacitas/widgets/dialogos/dialogo_linealpregessindicator.dart';
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -209,24 +210,28 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                         dialogoLinealProgressIndicator(
                             context, 'Comprobando credenciales');
 
-                        Future.delayed(const Duration(milliseconds: 500),
+                        /*  Future.delayed(const Duration(milliseconds: 2000),
                             () async {
                           Navigator.pop(context);
-                        });
+                        }); */
 
                         var res =
                             await validateLoginInput(context, email, password);
 
                         if (res == 'wrong-password') {
+                          _cierraDialogo();
                           mensaje('CONTRASEÑA ERRONEA');
                         } else if (res == 'user-not-found') {
+                          _cierraDialogo();
                           mensaje('USUARIO NO ENCONTRADO');
                         } else if (res == 'too-many-requests') {
+                          _cierraDialogo();
                           mensaje('USUARIO BLOQUEADO TEMPORALMENTE');
                         } else {
-                          print(
+                          debugPrint(
                               '--------iniciada sesion correctamente --------------------');
                           //_irPaginaIconoAnimacion();
+                          _cierraDialogo();
                           _irPaginaInicio();
                         }
                       } else {
@@ -548,6 +553,10 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
 
   void mensaje(String s) {
     mensajeError(context, s);
+  }
+
+  void _cierraDialogo() {
+    Navigator.pop(context);
   }
 }
 

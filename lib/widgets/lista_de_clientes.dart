@@ -32,8 +32,16 @@ class _ListaClientesState extends State<ListaClientes> {
   late CreacionCitaProvider contextoCreacionCita;
   final estilo = const TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
 
+  late bool _iniciadaSesionUsuario;
+  emailUsuario() async {
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
+  }
+
   @override
   void initState() {
+    emailUsuario();
     super.initState();
   }
 
@@ -45,7 +53,6 @@ class _ListaClientesState extends State<ListaClientes> {
   List<ClienteModel> listaClientes = [];
   List<ClienteModel> listaAux = [];
   List<ClienteModel> aux = [];
-  bool? pagado;
 
   String coincidencias = '';
 
@@ -124,21 +131,21 @@ class _ListaClientesState extends State<ListaClientes> {
   }
 
   datosClientes(String emailSesionUsuario) async {
-    widget.iniciadaSesionUsuario
+    _iniciadaSesionUsuario
         ? listaAux = await cargaClientesFirebase(emailSesionUsuario)
         : listaAux = await CitaListProvider().cargarClientes();
 
+    //####### filtro por busqueda de cliente
     if (widget.busquedaController.length > 2) {
-      listaClientes = listaClientes
+      listaAux = listaAux
           .where((element) => element.nombre!
               .toUpperCase()
               .contains(widget.busquedaController.toUpperCase()))
           .toList();
     } else {
       coincidencias = 'ninguna coincidencia';
-      // aux = listaClientes;
     }
-    return listaClientes;
+    return listaAux;
   }
 
   verclientes(context, List<ClienteModel> listaClientes, fechaCita) {
@@ -248,7 +255,7 @@ class _ListaClientesState extends State<ListaClientes> {
   cargaClientesFirebase(String emailSesionUsuario) async {
     List<ClienteModel> listaCliente = [];
 
-    listaClientes = await FirebaseProvider().cargarClientes(emailSesionUsuario);
+    listaCliente = await FirebaseProvider().cargarClientes(emailSesionUsuario);
 
     return listaCliente;
   }

@@ -425,7 +425,8 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
                 newCita.dia = fecha;
                 newCita.horaInicio = textoFechaHora;
                 newCita.horaFinal = textoHoraF;
-                newCita.comentario = oldCita['comentario'] + '🔃'; //todo: AGREGAR CAMPO REPROGRAMACION O REASIGANACION
+                newCita.comentario = oldCita['comentario'] +
+                    '🔃'; //todo: AGREGAR CAMPO REPROGRAMACION O REASIGANACION
                 newCita.idcliente = oldCita['idCliente'];
                 newCita.idservicio = oldCita['idServicio'];
                 newCita.idEmpleado = oldCita['idEmpleado'];
@@ -460,10 +461,14 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
           }
         },
         style: ButtonStyle(
+          iconColor: MaterialStateProperty.all<Color>(Colors.white),
           backgroundColor:
               MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
         ),
-        label: const Text('Validar'));
+        label: const Text(
+          'Validar',
+          style: TextStyle(color: Colors.white),
+        ));
   }
 
   void alertaCitaNoDisponible() {

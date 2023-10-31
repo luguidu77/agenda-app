@@ -190,7 +190,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
           child: Column(children: [
             const Image(
               image: AssetImage('assets/icon/icon.png'),
-              width: 100,
+              width: 80,
             ),
             Text('Agenda de citas', style: estilo),
             Text('versión gratuita $versionApp', style: estilo),

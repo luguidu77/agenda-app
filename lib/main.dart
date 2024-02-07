@@ -5,6 +5,7 @@ import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provid
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -40,7 +41,7 @@ git push
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
+  
   // initializeDateFormatting().then((_) {
 
   MobileAds.instance.initialize();

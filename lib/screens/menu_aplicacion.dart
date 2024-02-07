@@ -117,6 +117,9 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
         // PLAN AMIGO
         _estadopago == 'COMPRADA' ? const Text('') : _planAmigo(context),
 
+        //BLOG AGENDADECITAS.CLOUD
+        _blog(),
+
         // REPORTES Y SUGERENCIAS
         _reportes(),
 
@@ -242,6 +245,24 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
             MaterialPageRoute(
               builder: (context) => const DisponibilidadSemanalScreen(),
             ));
+      },
+    );
+  }
+
+  ListTile _blog() {
+    return ListTile(
+      leading: const Icon(Icons.wordpress),
+      title: Text(
+        'Blog',
+        style: estilo,
+      ),
+      onTap: () async {
+        const url = 'https://agendadecitas.cloud';
+        if (await canLaunch(url)) {
+          await launch(url);
+        } else {
+          throw 'No se pudo lanzar $url';
+        }
       },
     );
   }

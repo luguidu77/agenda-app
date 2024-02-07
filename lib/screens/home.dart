@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_cliente.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_confirmar.dart';
-import 'package:agendacitas/screens/creacion_citas/creacion_cita_listado_servicios.dart';
+
 import 'package:agendacitas/screens/detalles_cita_screen.dart';
+import 'package:agendacitas/screens/notificaciones_screen.dart';
 
 import 'package:agendacitas/screens/servicios_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,10 +12,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/cita_model.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
-import '../providers/theme_provider.dart';
+
 import '../widgets/widgets.dart';
 import 'creacion_citas/creacion_cita_servicio.dart';
 import 'screens.dart';
@@ -29,6 +31,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  final GlobalKey<ScaffoldMessengerState> scaffoldKey =
+      GlobalKey<ScaffoldMessengerState>();
+
   // contextoPersonaliza es la variable para actuar con este contexto
   late PersonalizaProvider contextoPersonaliza;
   late PersonalizaProviderFirebase contextoPersonalizaFirebase;
@@ -67,8 +73,30 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  //***********ESCUCHANDO NOTIFICACIONES Y ACTUACION */
+  void showFlutterNotification(RemoteMessage message) async {
+    debugPrint('A continuacion los datos que trae la notificacion:');
+    print(message.data);
+
+    Map<String, dynamic> nombreCliente = jsonDecode(message.data['cliente']);
+    Map<String, dynamic> cita = jsonDecode(message.data[
+        'fechaCita']); //{"horaFormateada":"11:00","fechaFormateada":"7 de febrero de 2024"}}
+
+    final snackBar = SnackBar(
+        content: Text(
+            'Nueva solicitud de cita de ${nombreCliente['nombre']}, para el ${cita['fechaFormateada']} - ${cita['horaFormateada']}'));
+    scaffoldKey.currentState?.showSnackBar(snackBar);
+    Future.delayed(
+      const  Duration(seconds: 3),
+        () => {
+              navigatorKey.currentState?.pushNamed('PaginaNotificacionesScreen')
+            });
+  }
+
   @override
   void initState() {
+    FirebaseMessaging.onMessage.listen(showFlutterNotification);
+
     //iniciamos myBnB(bottomNavigationBar) trayendo BNavigator
     myBnB = BNavigator(
       currentIndex: (i) {
@@ -98,6 +126,8 @@ class _HomeScreenState extends State<HomeScreen> {
     themeProvider = context.watch<ThemeProvider>();
 
     return MaterialApp(
+        scaffoldMessengerKey: scaffoldKey,
+        navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
         title: 'Agenda de citas',
         themeMode: themeProvider.themeMode,
@@ -125,6 +155,8 @@ class _HomeScreenState extends State<HomeScreen> {
               )),
         ),
         routes: {
+          'PaginaNotificacionesScreen': (context) =>
+              const PaginaNotificacionesScreen(),
           'MenuAplicacion': (context) => const MenuAplicacion(),
           //'Login': (context) => RegistroUsuarioScreen(registroLogin: 'Login'),
           'Personalizar': (_) => const ConfigPersonalizar(),

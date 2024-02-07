@@ -4,6 +4,7 @@
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 
@@ -64,7 +65,8 @@ class NotificationService {
 
     //initialize timezone package here
     tz.initializeTimeZones();
-     final String currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
+    final String currentTimeZone =
+        await FlutterNativeTimezone.getLocalTimezone();
     final location = tz.getLocation(currentTimeZone); //'Europe/Madrid'
 
     // VERIFICA LOS ID DE LAS VERIFICACIONES PENDIENTES Y LE SUMA 1
@@ -194,7 +196,10 @@ class NotificacionesFirebaseMessaging {
     isFlutterLocalNotificationsInitialized = true;
   }
 
-  void showFlutterNotification(  message) {
+  void showFlutterNotification(RemoteMessage message) {
+    /*  debugPrint('A continuacion los datos que trae la notificacion:');
+    print(message.data); */
+
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = message.notification?.android;
     if (notification != null &&

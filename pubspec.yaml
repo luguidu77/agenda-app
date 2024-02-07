@@ -73,8 +73,8 @@ dependencies:
   cupertino_icons: ^1.0.2
 
   # PAGOS CON STRIPE GOOGLE PAY
-  flutter_stripe: ^9.2.0
-  stripe_android: ^9.2.0
+  flutter_stripe: ^10.0.0
+  stripe_android: ^10.0.0
   # stripe_platform_interface: ^7.0.0
   pay: ^1.1.0
 
@@ -95,7 +95,7 @@ dependencies:
   skeletons: ^0.0.3
 
   # Bienvenida.dart introduccion a la app
-  introduction_screen: ^3.1.8
+  introduction_screen: ^3.1.12
   hooks_riverpod: ^2.3.6
   rive: ^0.11.2
   rive_splash_screen: ^0.1.1
@@ -107,10 +107,10 @@ dependencies:
   syncfusion_flutter_calendar: ^22.1.38
   twilio_flutter: ^0.0.9
   flutter_native_timezone: ^2.0.0
-  
-  
-  
-  
+
+  #riverpod con anotaciones:
+  flutter_riverpod: ^2.3.10
+  riverpod_annotation: ^2.1.4
 
 dev_dependencies:
   flutter_test:

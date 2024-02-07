@@ -31,7 +31,8 @@ class _BienvenidaState extends State<Bienvenida> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
           builder: (_) => HomeScreen(
-                index: 0, myBnB: 0,
+                index: 0,
+                myBnB: 0,
               )),
     );
   }
@@ -74,7 +75,7 @@ class _BienvenidaState extends State<Bienvenida> {
       key: introKey,
       globalBackgroundColor: Colors.grey[300],
       allowImplicitScrolling: true,
-      autoScrollDuration: 1,
+      //autoScrollDuration: 500, // este da error  PageController.page cannot be accessed before a PageView is built with it
 
       /*  globalHeader: Align(
         alignment: Alignment.center,

@@ -1,4 +1,5 @@
 import 'package:agendacitas/firebase_options.dart';
+import 'package:agendacitas/screens/notificaciones_screen.dart';
 import 'package:agendacitas/screens/servicios_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -116,6 +117,9 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
 
         // PLAN AMIGO
         _estadopago == 'COMPRADA' ? const Text('') : _planAmigo(context),
+
+        //NOTIFICACIONES
+        _notificaciones(),
 
         //BLOG AGENDADECITAS.CLOUD
         _blog(),
@@ -244,6 +248,23 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
             context,
             MaterialPageRoute(
               builder: (context) => const DisponibilidadSemanalScreen(),
+            ));
+      },
+    );
+  }
+
+  ListTile _notificaciones() {
+    return ListTile(
+      leading: const Icon(Icons.notification_important_outlined),
+      title: Text(
+        'Notificaciones',
+        style: estilo,
+      ),
+      onTap: () async {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const PaginaNotificacionesScreen(),
             ));
       },
     );

@@ -76,18 +76,20 @@ class _HomeScreenState extends State<HomeScreen> {
   //***********ESCUCHANDO NOTIFICACIONES Y ACTUACION */
   void showFlutterNotification(RemoteMessage message) async {
     debugPrint('A continuacion los datos que trae la notificacion:');
-    print(message.data);
+    print(message.data['notificacion']);
+    Map<String, dynamic> notificacion =
+        jsonDecode(message.data['notificacion']);
 
-    Map<String, dynamic> nombreCliente = jsonDecode(message.data['cliente']);
-    Map<String, dynamic> cita = jsonDecode(message.data[
-        'fechaCita']); //{"horaFormateada":"11:00","fechaFormateada":"7 de febrero de 2024"}}
+    Map<String, dynamic> nombreCliente = notificacion['cliente'];
+    Map<String, dynamic> cita = notificacion[
+        'fechaCita']; //{"horaFormateada":"11:00","fechaFormateada":"7 de febrero de 2024"}}
 
     final snackBar = SnackBar(
         content: Text(
             'Nueva solicitud de cita de ${nombreCliente['nombre']}, para el ${cita['fechaFormateada']} - ${cita['horaFormateada']}'));
     scaffoldKey.currentState?.showSnackBar(snackBar);
     Future.delayed(
-      const  Duration(seconds: 3),
+        const Duration(seconds: 5),
         () => {
               navigatorKey.currentState?.pushNamed('PaginaNotificacionesScreen')
             });

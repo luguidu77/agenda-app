@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/models/cita_model.dart';
@@ -879,5 +880,33 @@ class FirebaseProvider extends ChangeNotifier {
       pago = false;
     }
     return pago;
+  }
+
+  // ** NOTIFICACIONES *************************************************
+
+  getTodasLasNotificacionesCitas(emailUsuario) async {
+    List<Map<String, dynamic>> data = [];
+
+    await _iniFirebase();
+
+    final docRef = await _referenciaDocumento(emailUsuario, 'notificaciones');
+
+    await docRef.get().then((QuerySnapshot snapshot) => {
+          for (var element in snapshot.docs)
+            {
+              //SI LA CATEGORIA DE LA NOTIFICACION == CITA, AGREGA NOTIFICACION
+              if (element['categoria'] == 'cita')
+                {
+                  data.add({
+                    'categoria': element['categoria'],
+                    'id': element.id,
+                    'data': element['data'],
+                    'visto': element['visto'],
+                  })
+                }
+            }
+        });
+
+    return data; //retorna una lista de todas las citas(CitaModelFirebase)
   }
 }

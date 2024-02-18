@@ -84,6 +84,7 @@ class CitaModelFirebase {
   String? idservicio;
   String? idEmpleado;
   double? precio;
+  String? confirmada;
 
   CitaModelFirebase(
       {this.id,
@@ -94,7 +95,8 @@ class CitaModelFirebase {
       this.idcliente,
       this.idservicio,
       this.idEmpleado,
-      this.precio});
+      this.precio,
+      this.confirmada});
 
   factory CitaModelFirebase.fromJson(Map<String, dynamic> json) =>
       CitaModelFirebase(
@@ -107,6 +109,7 @@ class CitaModelFirebase {
         idservicio: json["id_servicio"],
         idEmpleado: json["id_empleado"],
         precio: json["precio"],
+        confirmada: json["confirmada"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -119,6 +122,7 @@ class CitaModelFirebase {
         "id_servicio": idservicio,
         "id_empleado": idEmpleado,
         "precio": precio,
+        "confirmada": confirmada,
       };
 }
 

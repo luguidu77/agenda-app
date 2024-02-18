@@ -73,14 +73,17 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  //***********ESCUCHANDO NOTIFICACIONES Y ACTUACION */
+  //***********ESCUCHANDO NOTIFICACIONES Y ACTUACION *************************************/
   void showFlutterNotification(RemoteMessage message) async {
     debugPrint('A continuacion los datos que trae la notificacion:');
     print(message.data['notificacion']);
-    Map<String, dynamic> notificacion =
+
+    navigatorKey.currentState?.pushNamed('PaginaNotificacionesScreen');
+
+    /*    Map<String, dynamic> notificacion =
         jsonDecode(message.data['notificacion']);
 
-    Map<String, dynamic> nombreCliente = notificacion['cliente'];
+   Map<String, dynamic> nombreCliente = notificacion['cliente'];
     Map<String, dynamic> cita = notificacion[
         'fechaCita']; //{"horaFormateada":"11:00","fechaFormateada":"7 de febrero de 2024"}}
 
@@ -93,6 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
         () => {
               navigatorKey.currentState?.pushNamed('PaginaNotificacionesScreen')
             });
+  */
   }
 
   @override
@@ -114,6 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
     personaliza();
     personalizaFirebase();
 
+    // ####### GUARDA EL TOKEN PARA ENVIOS DE NOTIFICACIONES
     messangingFirebase();
 
     super.initState();

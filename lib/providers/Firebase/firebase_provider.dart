@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../utils/utils.dart';
 
@@ -170,29 +171,53 @@ class FirebaseProvider extends ChangeNotifier {
   getCitasHoraOrdenadaPorFecha(emailUsuario, fecha) async {
     List<Map<String, dynamic>> data = [];
 
+    dynamic verifica;
     await _iniFirebase();
 
     final docRef = await _referenciaDocumento(emailUsuario, 'cita');
 
-    await docRef.get().then((QuerySnapshot snapshot) => {
-          for (var element in snapshot.docs)
-            {
-              //AGREGA LAS CITAS POR FECHA SELECCIONADA
-              if (element['dia'] == fecha)
-                {
-                  data.add({
-                    'id': element.id,
-                    'precio': element['precio'],
-                    'comentario': element['comentario'],
-                    'horaInicio': element['horaInicio'],
-                    'horaFinal': element['horaFinal'],
-                    'idCliente': element['idcliente'],
-                    'idServicio': element['idservicio'],
-                    'idEmpleado': element['idempleado'],
-                  })
-                }
-            }
-        });
+    try {
+      await docRef.get().then((QuerySnapshot snapshot) => {
+            for (var element in snapshot.docs)
+              {
+                verifica = element.data(),// Accede a los datos del documento como un mapa
+                //AGREGA LAS CITAS POR FECHA SELECCIONADA
+                if (element['dia'] == fecha)
+                  {
+                    if (verifica.containsKey('confirmada'))
+                      {
+                      // El campo 'confirmada' existe en el documento
+                      // Agrega los datos con el campo 'confirmada'
+                        data.add({
+                          'id': element.id,
+                          'precio': element['precio'],
+                          'comentario': element['comentario'],
+                          'horaInicio': element['horaInicio'],
+                          'horaFinal': element['horaFinal'],
+                          'idCliente': element['idcliente'],
+                          'idServicio': element['idservicio'],
+                          'idEmpleado': element['idempleado'],
+                          'confirmada': element['confirmada'],
+                          'tokenWebCliente': element['tokenWebCliente']
+                        })
+                      }
+                    else
+                      {
+                        data.add({
+                          'id': element.id,
+                          'precio': element['precio'],
+                          'comentario': element['comentario'],
+                          'horaInicio': element['horaInicio'],
+                          'horaFinal': element['horaFinal'],
+                          'idCliente': element['idcliente'],
+                          'idServicio': element['idservicio'],
+                          'idEmpleado': element['idempleado'],
+                        })
+                      }
+                  }
+              }
+          });
+    } catch (e) {}
 
     return data; //retorna una lista de citas(CitaModelFirebase) cuando el dia sea igual a la fecha
   }
@@ -825,6 +850,7 @@ class FirebaseProvider extends ChangeNotifier {
         'horaFinal': cita['horaFinal'],
         'comentario': cita['comentario'],
         'precio': cita['precio'],
+        'confirmada': cita['confirmada'],
         //cliente
         'idCliente': cita['idCliente'],
         'nombre': clienteFirebase['nombre'],
@@ -898,15 +924,56 @@ class FirebaseProvider extends ChangeNotifier {
               if (element['categoria'] == 'cita')
                 {
                   data.add({
-                    'categoria': element['categoria'],
                     'id': element.id,
+                    'categoria': element['categoria'],
                     'data': element['data'],
+                    'fechaNotificacion': element['fechaNotificacion'],
                     'visto': element['visto'],
                   })
                 }
             }
         });
+    // Ordena la lista de citas por hora de inicio
+    print('****************data : $data');
+    data.sort(
+        (a, b) => a['fechaNotificacion'].compareTo(b['fechaNotificacion']));
 
     return data; //retorna una lista de todas las citas(CitaModelFirebase)
+  }
+
+  eliminaLeidas(emailUsuario) async {
+    await _iniFirebase();
+
+    final docRef = await _referenciaDocumento(emailUsuario, 'notificaciones');
+
+    // Obtener todas las notificaciones
+    final snapshot = await docRef.get();
+
+    // Filtrar las notificaciones que tienen 'visto' igual a true
+    final notificacionesVistas =
+        snapshot.docs.where((doc) => doc.data()['visto'] == true);
+
+    // Eliminar las notificaciones filtradas
+    final batch = FirebaseFirestore.instance.batch();
+    notificacionesVistas.forEach((doc) {
+      batch.delete(doc.reference);
+    });
+    await batch.commit();
+    /* utilizamos un lote (batch) de Firestore para eliminar todas las notificaciones filtradas de una sola vez. Esto minimiza la cantidad de operaciones de escritura en Firestore. */
+  }
+
+  Future<void> cambiarEstadoVisto(
+      String emailUsuario, String notificacionId) async {
+    await _iniFirebase();
+    final docRef = await _referenciaDocumento(emailUsuario, 'notificaciones');
+
+    final snapshot = await docRef.get();
+
+    final notificacion =
+        snapshot.docs.firstWhere((doc) => doc.id == notificacionId);
+
+    final bool estadoActual = notificacion['visto'];
+
+    await docRef.doc(notificacionId).update({'visto': !estadoActual});
   }
 }

@@ -70,7 +70,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         if (appointments != null) {
           Map<String, dynamic> cita = json.decode(appointments[0].notes);
 
-         // print(cita);
+          // print(cita);
           //############# DETALLE DE LA CITA                   ########################
 
           Navigator.push(
@@ -128,6 +128,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           newCita.idcliente = cita['idCliente'];
           newCita.idservicio = cita['idServicio'];
           newCita.idEmpleado = cita['idEmpleado'];
+          newCita.confirmada = cita['confirmada'];
 
           debugPrint('$fecha  $textoFechaHoraInicio $textoFechaHoraFinal');
 
@@ -168,7 +169,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
       meetings.add(Appointment(
           // TRAEMOS TODOS LOS DATOS QUE NOS HARA FALTA PARA TRABAJAR CON ELLOS POSTERIORMENTE
           notes:
-              '{"id": "${cita['id']}","idCliente": "${cita['idCliente']}","idEmpleado": "${cita['idEmpleado']}","idServicio": "${cita['idServicio']}","nombre": "${cita['nombre']}","nota": "${cita['nota']}", "horaInicio": "${cita['horaInicio']}","horaFinal": "${cita['horaFinal']}", "telefono": " ${cita['telefono']}", "email":" ${cita['email']}", "servicio":" ${cita['servicio']}", "detalle":" ${cita['detalle'].toString()}" ,"precio":" ${cita['precio']}","foto" : "${cita['foto']}", "comentario":" ${cita['comentario']}"}',
+              '{"id": "${cita['id']}","idCliente": "${cita['idCliente']}","idEmpleado": "${cita['idEmpleado']}","idServicio": "${cita['idServicio']}","nombre": "${cita['nombre']}","nota": "${cita['nota']}", "horaInicio": "${cita['horaInicio']}","horaFinal": "${cita['horaFinal']}", "telefono": " ${cita['telefono']}", "email":" ${cita['email']}", "servicio":" ${cita['servicio']}", "detalle":" ${cita['detalle'].toString()}" ,"precio":" ${cita['precio']}","foto" : "${cita['foto']}", "comentario":" ${cita['comentario']}","confirmada":"${cita['confirmada'].toString()}"}',
           id: cita['id'],
           startTime: startTime,
           endTime: endTime,

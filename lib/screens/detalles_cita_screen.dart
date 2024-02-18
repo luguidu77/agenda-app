@@ -155,6 +155,21 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    ListTile(
+                      title: cita['confirmada'] == 'true'
+                          ? Text('CONFIRMADA')
+                          : Text(
+                              'NO CONFIRMADA',
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                      trailing: IconButton(
+                          onPressed: () {},
+                          icon: cita['confirmada'] == 'true'
+                              ? Text('ANULAR')
+                              : Text('CONFIRMAR')),
+                    ),
                     Text(
                         // fechaLarga!,
                         fechaLarga.toString(),

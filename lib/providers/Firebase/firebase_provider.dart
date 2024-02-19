@@ -40,6 +40,18 @@ class FirebaseProvider extends ChangeNotifier {
     return docRef;
   }
 
+  //? REFERENCIA DOCUMENTO AGENDO WEB ////////////////////////////////////////////
+  _referenciaDocumentoAgendoWeb(String usuarioAPP, String coleccion) async {
+    // creo una referencia al documento que contiene los clientes
+    final docRef = db!
+        .collection("agendacitasapp")
+        .doc(usuarioAPP) //email usuario
+        .collection(coleccion); // pago, servicio, cliente, perfil...
+    // .doc('SDAdSUSNrJhFpOdpuihs'); // ? id del cliente
+
+    return docRef;
+  }
+
   PerfilModel perfil = PerfilModel();
   Future<PerfilModel> cargarPerfilFB(usuarioAPP) async {
     await _iniFirebase();
@@ -180,40 +192,32 @@ class FirebaseProvider extends ChangeNotifier {
       await docRef.get().then((QuerySnapshot snapshot) => {
             for (var element in snapshot.docs)
               {
-                verifica = element.data(),// Accede a los datos del documento como un mapa
+                verifica = element
+                    .data(), // Accede a los datos del documento como un mapa
                 //AGREGA LAS CITAS POR FECHA SELECCIONADA
                 if (element['dia'] == fecha)
                   {
-                    if (verifica.containsKey('confirmada'))
-                      {
+                    {
                       // El campo 'confirmada' existe en el documento
                       // Agrega los datos con el campo 'confirmada'
-                        data.add({
-                          'id': element.id,
-                          'precio': element['precio'],
-                          'comentario': element['comentario'],
-                          'horaInicio': element['horaInicio'],
-                          'horaFinal': element['horaFinal'],
-                          'idCliente': element['idcliente'],
-                          'idServicio': element['idservicio'],
-                          'idEmpleado': element['idempleado'],
-                          'confirmada': element['confirmada'],
-                          'tokenWebCliente': element['tokenWebCliente']
-                        })
-                      }
-                    else
-                      {
-                        data.add({
-                          'id': element.id,
-                          'precio': element['precio'],
-                          'comentario': element['comentario'],
-                          'horaInicio': element['horaInicio'],
-                          'horaFinal': element['horaFinal'],
-                          'idCliente': element['idcliente'],
-                          'idServicio': element['idservicio'],
-                          'idEmpleado': element['idempleado'],
-                        })
-                      }
+                      data.add({
+                        'id': element.id,
+                        'precio': element['precio'],
+                        'comentario': element['comentario'],
+                        'horaInicio': element['horaInicio'],
+                        'horaFinal': element['horaFinal'],
+                        'idCliente': element['idcliente'],
+                        'idServicio': element['idservicio'],
+                        'idEmpleado': element['idempleado'],
+                        'confirmada': verifica.containsKey('confirmada')
+                            ? element['confirmada']
+                            : '',
+                        'tokenWebCliente':
+                            verifica.containsKey('tokenWebCliente')
+                                ? element['tokenWebCliente']
+                                : ''
+                      })
+                    }
                   }
               }
           });
@@ -851,6 +855,7 @@ class FirebaseProvider extends ChangeNotifier {
         'comentario': cita['comentario'],
         'precio': cita['precio'],
         'confirmada': cita['confirmada'],
+        'tokenWebCliente': cita['tokenWebCliente'],
         //cliente
         'idCliente': cita['idCliente'],
         'nombre': clienteFirebase['nombre'],
@@ -975,5 +980,19 @@ class FirebaseProvider extends ChangeNotifier {
     final bool estadoActual = notificacion['visto'];
 
     await docRef.doc(notificacionId).update({'visto': !estadoActual});
+  }
+
+  Future<void> cambiarEstadoConfirmacionCita(
+      String emailUsuario, String idCita) async {
+    await _iniFirebase();
+    final docRef = await _referenciaDocumento(emailUsuario, 'cita');
+
+    final snapshot = await docRef.get();
+
+    final confirmada = snapshot.docs.firstWhere((doc) => doc.id == idCita);
+
+    final bool estadoActual = confirmada['confirmada'];
+
+    await docRef.doc(idCita).update({'confirmada': !estadoActual});
   }
 }

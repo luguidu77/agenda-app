@@ -15,7 +15,7 @@ class ListaCitasNuevo extends StatefulWidget {
   const ListaCitasNuevo(
       {super.key, required this.fechaElegida, required this.citas});
   final DateTime fechaElegida;
-  final List<dynamic> citas;
+  final List<Map<String, dynamic>> citas;
   @override
   _ListaCitasNuevoState createState() => _ListaCitasNuevoState();
 }
@@ -129,7 +129,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           newCita.idservicio = cita['idServicio'];
           newCita.idEmpleado = cita['idEmpleado'];
           newCita.confirmada = cita['confirmada'];
-
+          newCita.tokenWebCliente = cita['tokenWebCliente'];
           debugPrint('$fecha  $textoFechaHoraInicio $textoFechaHoraFinal');
 
           await FirebaseProvider().actualizarCita(_emailSesionUsuario, newCita);
@@ -165,11 +165,12 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           fechaInicio.day, fechaInicio.hour, fechaInicio.minute, 0);
       final DateTime endTime = DateTime(fechaFinal.year, fechaFinal.month,
           fechaFinal.day, fechaFinal.hour, fechaFinal.minute, 0);
-
+      bool citaConfirmada =
+          cita['confirmada'].toString() == 'true' ? true : false;
       meetings.add(Appointment(
           // TRAEMOS TODOS LOS DATOS QUE NOS HARA FALTA PARA TRABAJAR CON ELLOS POSTERIORMENTE
           notes:
-              '{"id": "${cita['id']}","idCliente": "${cita['idCliente']}","idEmpleado": "${cita['idEmpleado']}","idServicio": "${cita['idServicio']}","nombre": "${cita['nombre']}","nota": "${cita['nota']}", "horaInicio": "${cita['horaInicio']}","horaFinal": "${cita['horaFinal']}", "telefono": " ${cita['telefono']}", "email":" ${cita['email']}", "servicio":" ${cita['servicio']}", "detalle":" ${cita['detalle'].toString()}" ,"precio":" ${cita['precio']}","foto" : "${cita['foto']}", "comentario":" ${cita['comentario']}","confirmada":"${cita['confirmada'].toString()}"}',
+              '{"id": "${cita['id']}","idCliente": "${cita['idCliente']}","idEmpleado": "${cita['idEmpleado']}","idServicio": "${cita['idServicio']}","nombre": "${cita['nombre']}","nota": "${cita['nota']}", "horaInicio": "${cita['horaInicio']}","horaFinal": "${cita['horaFinal']}", "telefono": " ${cita['telefono']}", "email":" ${cita['email']}", "servicio":" ${cita['servicio']}", "detalle":" ${cita['detalle'].toString()}" ,"precio":" ${cita['precio']}","foto" : "${cita['foto']}", "comentario":" ${cita['comentario']}","confirmada":"${cita['confirmada'].toString()}","tokenWebCliente":"${cita['tokenWebCliente'].toString()}"}',
           id: cita['id'],
           startTime: startTime,
           endTime: endTime,
@@ -179,9 +180,11 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           //location: 'es-ES',
           color: cita['idServicio'] == 999 || cita['idServicio'] == null
               ? const Color.fromARGB(255, 113, 151, 102)
-              : fechaFinal.isBefore(DateTime.now())
-                  ? const Color.fromARGB(255, 247, 125, 116)
-                  : const Color.fromARGB(255, 100, 127, 172)));
+              : !citaConfirmada
+                  ? const Color.fromARGB(255, 133, 130, 130)
+                  : fechaFinal.isBefore(DateTime.now())
+                      ? const Color.fromARGB(255, 247, 125, 116)
+                      : const Color.fromARGB(255, 100, 127, 172)));
     }
     debugPrint(meetings.toString());
     return meetings;
@@ -198,8 +201,13 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
   }
 
   String textoCita(cita) {
+    bool citaConfirmada =
+        cita['confirmada'].toString() == 'true' ? true : false;
+    String textoConfirmada =
+        citaConfirmada ? 'CONFIRMADA' : 'PENDIENTE CONFIRMAR';
     return (cita['nombre'] != null)
-        ? ' 😀 ${cita['nombre']}'
+        ? '${textoConfirmada.padLeft(60)}'
+            '\n😀 ${cita['nombre']}'
             '\n 🤝 ${cita['servicio']}'
             '\n 📇 ${cita['comentario']}'
             '\n 💰 ${cita['precio']}'
@@ -223,7 +231,7 @@ Widget appointmentBuilder(BuildContext context,
           width: calendarAppointmentDetails.bounds.width,
           height: calendarAppointmentDetails.bounds.height / 2,
           color: appointment.color,
-          child: Center(
+          child: const Center(
             child: Icon(
               Icons.group,
               color: Colors.black,
@@ -234,12 +242,9 @@ Widget appointmentBuilder(BuildContext context,
         height: calendarAppointmentDetails.bounds.height / 2,
         color: appointment.color,
         child: Text(
-          appointment.subject +
-              DateFormat(' (hh:mm a').format(appointment.startTime) +
-              '-' +
-              DateFormat('hh:mm a)').format(appointment.endTime),
+          '${appointment.subject}${DateFormat(' (hh:mm a').format(appointment.startTime)}-${DateFormat('hh:mm a)').format(appointment.endTime)}',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 10),
+          style: const TextStyle(fontSize: 10),
         ),
       )
     ],

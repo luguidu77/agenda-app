@@ -1,5 +1,6 @@
 import 'package:agendacitas/screens/screens.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
+import 'package:agendacitas/widgets/botones/boton_confirmar_cita.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -77,7 +78,10 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
             _cliente(reserva),
             // Detalle de la cita
 
-            _detallesCita(reserva, fechaLarga),
+            _detallesCita(
+              reserva,
+              fechaLarga,
+            ),
 
             Visibility(
               visible: visibleFormulario,
@@ -140,7 +144,9 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
     );
   }
 
-  _detallesCita(cita, fechaLarga) {
+  _detallesCita(Map<String, dynamic> cita, fechaLarga) {
+    print(
+        'cita actual **************************************************************** $cita');
     return SizedBox(
       child: Column(
         // clipBehavior: Clip.none,
@@ -155,21 +161,8 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ListTile(
-                      title: cita['confirmada'] == 'true'
-                          ? Text('CONFIRMADA')
-                          : Text(
-                              'NO CONFIRMADA',
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                      trailing: IconButton(
-                          onPressed: () {},
-                          icon: cita['confirmada'] == 'true'
-                              ? Text('ANULAR')
-                              : Text('CONFIRMAR')),
-                    ),
+                    BotonConfirmarCita(
+                        cita: cita, emailUsuario: widget.emailUsuario),
                     Text(
                         // fechaLarga!,
                         fechaLarga.toString(),

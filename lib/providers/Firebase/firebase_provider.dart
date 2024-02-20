@@ -1,16 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:agendacitas/firebase_options.dart';
-import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/models.dart';
-import 'package:agendacitas/models/perfil_model.dart';
 import 'package:agendacitas/providers/db_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../../utils/utils.dart';
 
@@ -113,7 +109,10 @@ class FirebaseProvider extends ChangeNotifier {
       'comentario': comentario,
       'idcliente': idCliente,
       'idservicio': idServicio,
-      'idempleado': idEmpleado
+      'idempleado': idEmpleado,
+      'confirmada': true,
+      'idCitaCliente': '',
+      'tokenWebCliente': '',
     });
     //rinicializa Firebase
     await _iniFirebase();
@@ -211,6 +210,9 @@ class FirebaseProvider extends ChangeNotifier {
                         'idEmpleado': element['idempleado'],
                         'confirmada': verifica.containsKey('confirmada')
                             ? element['confirmada']
+                            : '',
+                        'idCitaCliente': verifica.containsKey('idCitaCliente')
+                            ? element['idCitaCliente']
                             : '',
                         'tokenWebCliente':
                             verifica.containsKey('tokenWebCliente')
@@ -671,6 +673,9 @@ class FirebaseProvider extends ChangeNotifier {
       'idcliente': cita.idcliente,
       'idservicio': cita.idservicio,
       'idempleado': cita.idEmpleado,
+      'confirmada': cita.confirmada,
+      'idCitaCliente': cita.idCitaCliente,
+      'tokenWebCliente': cita.tokenWebCliente
     };
 
     await _iniFirebase();
@@ -855,6 +860,7 @@ class FirebaseProvider extends ChangeNotifier {
         'comentario': cita['comentario'],
         'precio': cita['precio'],
         'confirmada': cita['confirmada'],
+        'idCitaCliente': cita['idCitaCliente'],
         'tokenWebCliente': cita['tokenWebCliente'],
         //cliente
         'idCliente': cita['idCliente'],
@@ -982,17 +988,36 @@ class FirebaseProvider extends ChangeNotifier {
     await docRef.doc(notificacionId).update({'visto': !estadoActual});
   }
 
+  // estado confirmacion de la cita en agenda del negocio
   Future<void> cambiarEstadoConfirmacionCita(
       String emailUsuario, String idCita) async {
     await _iniFirebase();
     final docRef = await _referenciaDocumento(emailUsuario, 'cita');
-
+    // 1º VEO EL ESTADO DE LA VARIABLE ACUTAL
     final snapshot = await docRef.get();
-
     final confirmada = snapshot.docs.firstWhere((doc) => doc.id == idCita);
-
     final bool estadoActual = confirmada['confirmada'];
-
+    //2º ACTUALIAZO EL DATO
     await docRef.doc(idCita).update({'confirmada': !estadoActual});
+  }
+
+  // estado confirmacion de la cita en agenda del cliente
+  Future<void> cambiarEstadoConfirmacionCitaCliente(
+    String emailCliente,
+    String idCitaCliente,
+  ) async {
+    await _iniFirebase();
+    final collectionRef = db!
+        .collection("clientesAgendoWeb")
+        .doc(emailCliente) //email usuario
+        .collection('citas')
+        .doc(idCitaCliente);
+
+    // 1º VEO EL ESTADO DE LA VARIABLE ACUTAL
+    final docSnapshot = await collectionRef.get();
+    final confirmada = docSnapshot.data();
+    final bool estadoActual = confirmada!['confirmada'];
+    //2º ACTUALIAZO EL DATO
+    await collectionRef.update({'confirmada': !estadoActual});
   }
 }

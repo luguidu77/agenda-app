@@ -86,34 +86,37 @@ class CitaModelFirebase {
   double? precio;
   String? confirmada;
   String? tokenWebCliente;
+  String? idCitaCliente;
 
-  CitaModelFirebase(
-      {this.id,
-      this.dia,
-      this.horaInicio,
-      this.horaFinal,
-      this.comentario,
-      this.idcliente,
-      this.idservicio,
-      this.idEmpleado,
-      this.precio,
-      this.confirmada,
-      this.tokenWebCliente});
+  CitaModelFirebase({
+    this.id,
+    this.dia,
+    this.horaInicio,
+    this.horaFinal,
+    this.comentario,
+    this.idcliente,
+    this.idservicio,
+    this.idEmpleado,
+    this.precio,
+    this.confirmada,
+    this.tokenWebCliente,
+    this.idCitaCliente,
+  });
 
   factory CitaModelFirebase.fromJson(Map<String, dynamic> json) =>
       CitaModelFirebase(
-        id: json["id"],
-        dia: json["dia"],
-        horaInicio: json["horainicio"],
-        horaFinal: json["horafinal"],
-        comentario: json["comentario"],
-        idcliente: json["id_cliente"],
-        idservicio: json["id_servicio"],
-        idEmpleado: json["id_empleado"],
-        precio: json["precio"],
-        confirmada: json["confirmada"],
-        tokenWebCliente: json["tokenWebCliente"],
-      );
+          id: json["id"],
+          dia: json["dia"],
+          horaInicio: json["horainicio"],
+          horaFinal: json["horafinal"],
+          comentario: json["comentario"],
+          idcliente: json["id_cliente"],
+          idservicio: json["id_servicio"],
+          idEmpleado: json["id_empleado"],
+          precio: json["precio"],
+          confirmada: json["confirmada"],
+          tokenWebCliente: json["tokenWebCliente"],
+          idCitaCliente: json["idCitaCliente"]);
 
   Map<String, dynamic> toJson() => {
         "id": id,

@@ -94,7 +94,11 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         dynamic appointment = appointmentDragEndDetails.appointment!;
 
         if (_iniciadaSesionUsuario) {
-          // estraemos los datos de (notes) para obtener la cita
+          // * LOS DATOS SE TRAJERON DE FIREBASE AL SELECCIONAR EL DIA :
+          //*     lib\widgets\selecciona_dia.dart
+          //*     lib\providers\Firebase\firebase_provider.dart
+
+          // extraemos los datos de (notes) para obtener la cita
           Map<String, dynamic> cita = json.decode(appointment.notes);
 
           // OBTENER LA DIFERENCIA ENTRE LA HORA DE INICIO Y LA FINAL PARA CONOCER EL TIEMPO DE LA CITA
@@ -129,6 +133,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           newCita.idservicio = cita['idServicio'];
           newCita.idEmpleado = cita['idEmpleado'];
           newCita.confirmada = cita['confirmada'];
+          newCita.tokenWebCliente = cita['idCitaCliente'];
           newCita.tokenWebCliente = cita['tokenWebCliente'];
           debugPrint('$fecha  $textoFechaHoraInicio $textoFechaHoraFinal');
 
@@ -167,10 +172,32 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           fechaFinal.day, fechaFinal.hour, fechaFinal.minute, 0);
       bool citaConfirmada =
           cita['confirmada'].toString() == 'true' ? true : false;
+
+      // **** DONDE CREAMOS LA NOTA QUE TRAE TODOS LOS DATOS NECESARIOS PARA LA GESTION DE CITA ****************
       meetings.add(Appointment(
           // TRAEMOS TODOS LOS DATOS QUE NOS HARA FALTA PARA TRABAJAR CON ELLOS POSTERIORMENTE
-          notes:
-              '{"id": "${cita['id']}","idCliente": "${cita['idCliente']}","idEmpleado": "${cita['idEmpleado']}","idServicio": "${cita['idServicio']}","nombre": "${cita['nombre']}","nota": "${cita['nota']}", "horaInicio": "${cita['horaInicio']}","horaFinal": "${cita['horaFinal']}", "telefono": " ${cita['telefono']}", "email":" ${cita['email']}", "servicio":" ${cita['servicio']}", "detalle":" ${cita['detalle'].toString()}" ,"precio":" ${cita['precio']}","foto" : "${cita['foto']}", "comentario":" ${cita['comentario']}","confirmada":"${cita['confirmada'].toString()}","tokenWebCliente":"${cita['tokenWebCliente'].toString()}"}',
+          notes: '''
+{
+  "id": "${cita['id']}",
+  "idCliente": "${cita['idCliente']}",
+  "idEmpleado": "${cita['idEmpleado']}",
+  "idServicio": "${cita['idServicio']}",
+  "nombre": "${cita['nombre']}",
+  "nota": "${cita['nota']}",
+  "horaInicio": "${cita['horaInicio']}",
+  "horaFinal": "${cita['horaFinal']}",
+  "telefono": "${cita['telefono']}",
+  "email": "${cita['email']}",
+  "servicio": "${cita['servicio']}",
+  "detalle": "${cita['detalle'].toString()}",
+  "precio": "${cita['precio']}",
+  "foto": "${cita['foto']}",
+  "comentario": "${cita['comentario']}",
+  "confirmada": "${cita['confirmada'].toString()}",
+  "idCitaCliente": "${cita['idCitaCliente'].toString()}",
+  "tokenWebCliente": "${cita['tokenWebCliente'].toString()}"
+}
+''',
           id: cita['id'],
           startTime: startTime,
           endTime: endTime,

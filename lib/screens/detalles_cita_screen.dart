@@ -1,6 +1,6 @@
 import 'package:agendacitas/screens/screens.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
-import 'package:agendacitas/widgets/botones/boton_confirmar_cita.dart';
+import 'package:agendacitas/widgets/botones/boton_confirmar_cita_reserva_web.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -161,8 +161,12 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    BotonConfirmarCita(
+                    BotonConfirmarCitaWeb(
                         cita: cita, emailUsuario: widget.emailUsuario),
+                   const Divider(),
+                    const SizedBox(
+                      height: 10,
+                    ),
                     Text(
                         // fechaLarga!,
                         fechaLarga.toString(),
@@ -225,7 +229,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
         child: Container(
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
           child: Card(
-              color: Theme.of(context).primaryColor.withOpacity(0.5),
+              color: Theme.of(context).primaryColor.withOpacity(0.2),
               child: tarjetaCliente()),
         ),
       ),

@@ -406,11 +406,16 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
   }
 
   TextEditingController comentarioController = TextEditingController();
+
   bool _visible = false;
   late String textoNotas = '';
+
   _agregaNotas() {
     // LLEER MICONTEXTO DE CreacionCitaProvider
     contextoCreacionCita = context.read<CreacionCitaProvider>();
+    // inicializo COMENTARIO A '' PARA QUE NO QUEDE EN NULL
+    contextoCreacionCita.getCitaElegida['COMENTARIO'] =
+        comentarioController.text;
 
     return Card(
       child: ClipRect(

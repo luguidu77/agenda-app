@@ -55,6 +55,7 @@ class _NuevoAcutalizacionUsuarioAppState
     PerfilModel perfilUsuarioApp = PerfilModel();
 
     return Scaffold(
+      appBar: AppBar(),
       floatingActionButton: FloatingActionButton.extended(
         label: const Text(
           'ACTUALIZAR',
@@ -73,41 +74,27 @@ class _NuevoAcutalizacionUsuarioAppState
           perfilUsuarioApp.instagram = myLogic.textControllerInstagram.text;
           perfilUsuarioApp.website = myLogic.textControllerWebsite.text;
           perfilUsuarioApp.ubicacion = myLogic.textControllerUbicacion.text;
+
+          /*  perfilUsuarioApp.moneda = myLogic.textControllerMoneda.text;
+          perfilUsuarioApp.servicios = myLogic.textControllerServicios.text;
+          perfilUsuarioApp.ciudad = myLogic.textControllerCiudad.text;
+          perfilUsuarioApp.horarios = myLogic.textControllerHorarios.text;
+          perfilUsuarioApp.informacion = myLogic.textControllerInformacion.text;
+          perfilUsuarioApp.normas = myLogic.textControllerNormas.text;
+          perfilUsuarioApp.latitud = myLogic.textControllerLatitudtext;
+          perfilUsuarioApp.longitud = myLogic.textControllerLongitud.text; */
+
           setState(() {});
 
           _refrescaFicha(perfilUsuarioApp, usuarioAPP, myLogic);
         },
       ),
       body: Padding(
-        padding: const EdgeInsets.all(58.0),
+        padding: const EdgeInsets.all(10.0),
         child: SingleChildScrollView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Column(
             children: [
-              Row(
-                //BOTON X PARA CERRAR FORMULARIO
-
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SizedBox(
-                    width: 50,
-                  ),
-                  IconButton(
-                      onPressed: () => Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const ConfigUsuarioApp()),
-                          ),
-                      icon: const Icon(
-                        Icons.close,
-                        size: 50,
-                        color: Color.fromARGB(167, 114, 136, 150),
-                      )),
-                ],
-              ),
-              const SizedBox(
-                height: 10,
-              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -184,14 +171,14 @@ class _NuevoAcutalizacionUsuarioAppState
                 controller: textControllerEmail,
                 decoration: const InputDecoration(labelText: 'Email'),
               ),
-              TextField(
+              /*  TextField(
                 keyboardType: TextInputType.multiline,
                 maxLines: 20,
                 controller: myLogic.textControllerDescripcion,
                 decoration:
                     const InputDecoration(labelText: 'Describe tu negocio'),
               ),
-
+ */
               TextField(
                 enabled: false,
                 controller: myLogic.textControllerFoto,
@@ -215,6 +202,58 @@ class _NuevoAcutalizacionUsuarioAppState
                 controller: myLogic.textControllerUbicacion,
                 decoration: const InputDecoration(labelText: 'Ubicación'),
               ),
+              /*        TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: 2,
+                controller: myLogic.textControllerCiudad,
+                decoration: const InputDecoration(labelText: 'Ciudad'),
+              ),
+              TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: 2,
+                controller: myLogic.textControllerLatitud,
+                decoration: const InputDecoration(labelText: 'Latitud'),
+              ),
+              TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: 2,
+                controller: myLogic.textControllerLongitud,
+                decoration: const InputDecoration(labelText: 'Longitud'),
+              ),
+              TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: 2,
+                controller: myLogic.textControllerMoneda,
+                decoration: const InputDecoration(labelText: 'Moneda'),
+              ),
+              TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: 3,
+                controller: myLogic.textControllerServicios,
+                decoration: const InputDecoration(
+                    labelText:
+                        'Escribe 5 servicios se parados por comas (Se utilizarán para las busquedas)'),
+              ),
+              TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: 2,
+                controller: myLogic.textControllerHorarios,
+                decoration: const InputDecoration(labelText: 'Horario'),
+              ),
+              TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: 2,
+                controller: myLogic.textControllerInformacion,
+                decoration: const InputDecoration(
+                    labelText: 'Información adicional (Confiramación de cita)'),
+              ),
+              TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: 2,
+                controller: myLogic.textControllerNormas,
+                decoration: const InputDecoration(
+                    labelText: 'Normas de reserva de cita'),
+              ), */
 
               const SizedBox(
                 height: 50,

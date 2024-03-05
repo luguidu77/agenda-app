@@ -146,13 +146,14 @@ class MyLogicCita {
   }
 }
 
+
+
 class MyLogicUsuarioAPP {
   MyLogicUsuarioAPP(this.perfilUsuarioApp);
   final PerfilModel? perfilUsuarioApp;
 
   final textControllerDenominacion = TextEditingController();
   final textControllerTelefono = TextEditingController();
-  //final textControllerEmail = TextEditingController(); // el email ya esta establecido y no se puede modificar
   final textControllerFoto = TextEditingController();
   final textControllerDescripcion = TextEditingController();
   final textControllerFacebook = TextEditingController();
@@ -160,13 +161,21 @@ class MyLogicUsuarioAPP {
   final textControllerWebsite = TextEditingController();
   final textControllerUbicacion = TextEditingController();
 
+  final textControllerMoneda = TextEditingController();
+  final textControllerServicios = TextEditingController();
+  final textControllerCiudad = TextEditingController();
+  final textControllerHorarios = TextEditingController();
+  final textControllerInformacion = TextEditingController();
+  final textControllerNormas = TextEditingController();
+  final textControllerLatitud = TextEditingController();
+  final textControllerLongitud = TextEditingController();
+
   void save() {}
 
   void init() {
     if (perfilUsuarioApp!.denominacion == null) {
       textControllerDenominacion.text = '';
       textControllerTelefono.text = '';
-      // textControllerEmail.text = '';
       textControllerFoto.text = '';
       textControllerDescripcion.text = '';
       textControllerFacebook.text = '';
@@ -177,7 +186,6 @@ class MyLogicUsuarioAPP {
       textControllerDenominacion.text =
           perfilUsuarioApp!.denominacion.toString();
       textControllerTelefono.text = perfilUsuarioApp!.telefono.toString();
-      //textControllerEmail.text = perfilUsuarioApp!..toString();
       textControllerFoto.text = perfilUsuarioApp!.foto.toString();
       textControllerDescripcion.text = perfilUsuarioApp!.descripcion.toString();
       textControllerFacebook.text = perfilUsuarioApp!.facebook.toString();
@@ -187,6 +195,7 @@ class MyLogicUsuarioAPP {
     }
   }
 }
+
 
 class MyLogicServicioFB {
   MyLogicServicioFB(this.servicioFB);

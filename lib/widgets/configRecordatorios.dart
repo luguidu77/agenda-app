@@ -21,6 +21,7 @@ class _ConfigRecordatoriosState extends State<ConfigRecordatorios> {
 
   String textoDia = '';
   String textoFechaHora = '';
+  String medida = '';
   tiempo() async {
     final tiempoEstablecido = await RecordatoriosProvider().cargarTiempo();
 
@@ -33,8 +34,16 @@ class _ConfigRecordatoriosState extends State<ConfigRecordatorios> {
 
       //  print( 'se ha establecido tiempo establecido recordatorio $tiempoEstablecido');
     } else {
-      tGuardado =
-          '${tRecordatorioGuardado[0].tiempo[3]}${tRecordatorioGuardado[0].tiempo[4]}';
+      // **  SI LOS MINUTOS SON CEROS DEBE SER 24:00
+      if (tRecordatorioGuardado[0].tiempo[3] == '0') {
+        tGuardado =
+            '${tRecordatorioGuardado[0].tiempo[0]}${tRecordatorioGuardado[0].tiempo[1]}';
+        medida = 'h';
+      } else {
+        tGuardado =
+            '${tRecordatorioGuardado[0].tiempo[3]}${tRecordatorioGuardado[0].tiempo[4]}';
+        medida = 'min';
+      }
     }
 
     setState(() {});
@@ -58,7 +67,7 @@ class _ConfigRecordatoriosState extends State<ConfigRecordatorios> {
                 return actualizar(context);
               })
             },
-        child: Text('$tGuardado min'));
+        child: Text('$tGuardado $medida'));
   }
 
   actualizar(context) {

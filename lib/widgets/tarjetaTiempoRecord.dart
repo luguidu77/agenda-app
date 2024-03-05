@@ -23,10 +23,15 @@ tarjetaTiempoRecord(context, String tGuardado) {
                 const SizedBox(width: 10),
                 DropdownButton<String>(
                   hint: Text('$tGuardado min'),
-                  items: <String>['10', '20', '30', '40'].map((String value) {
+                  items: <String>['10', '20', '30', '60', '24']
+                      .map((String value) {
+                    String medida = 'min';
+                    if (value == '24') {
+                      medida = 'h';
+                    }
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: Text('$value min'),
+                      child: Text('$value $medida'),
                     );
                   }).toList(),
                   onChanged: (value) {
@@ -45,6 +50,10 @@ tarjetaTiempoRecord(context, String tGuardado) {
 
 botonActualizarRecordatorio(context, String minutos) async {
   String nuevahora = '00:$minutos';
+  if (minutos == '24') {
+    nuevahora = '24:00';
+  }
+  
   nuevoRecordatorio.id = 0;
   nuevoRecordatorio.tiempo = nuevahora;
 

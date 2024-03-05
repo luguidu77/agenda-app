@@ -1,4 +1,5 @@
 import 'package:agendacitas/firebase_options.dart';
+import 'package:agendacitas/providers/Firebase/firebase_publicacion_online.dart';
 import 'package:agendacitas/screens/notificaciones_screen.dart';
 import 'package:agendacitas/screens/servicios_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -101,6 +102,10 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
             // CABECERA CUANDO ES APP GRATUITA
             : _cabeceraGratuita(),
 
+        // MENSAJE PARA LA PUBLICACION EN AGENDADECITAS.ONLINE
+
+        _mensajePublicacionOnline(context, _emailSesionUsuario),
+
         // CONFIGURA LOS SERVICIOS QUE OFRECEN A CLIENTES
         _serviciosQueOfrece(context),
 
@@ -116,7 +121,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
         _estadopago == 'COMPRADA' ? const Text('') : _comprarAPP(context),
 
         // PLAN AMIGO
-        _estadopago == 'COMPRADA' ? const Text('') : _planAmigo(context),
+        // _estadopago == 'COMPRADA' ? const Text('') : _planAmigo(context),
 
         //NOTIFICACIONES
         _notificaciones(),
@@ -205,6 +210,31 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
         )));
   }
 
+  _mensajePublicacionOnline(BuildContext context, String emailUsuario) {
+    return FutureBuilder(
+        future: FirebasePublicacionOnlineAgendoWeb()
+            .verEstadoPublicacion(emailUsuario),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const SizedBox();
+          }
+          if (!snapshot.hasData || snapshot.data == 'PUBLICADO') {
+            return Container();
+          }
+          return Container(
+            color: Colors.blue,
+            child:  ListTile(
+              leading: const Icon(Icons.edit_square),
+              subtitle:const  Text(
+                  style: TextStyle(color: Colors.white),
+                  'En tu perfil hemos agreado un enlace que te lleva al formulario de solicitud para publicar tu actividad en la web agendadecitas.online'),
+              onTap:  () =>
+                  {Navigator.pushNamed(context, 'ConfigUsuarioApp')},
+            ),
+          );
+        });
+  }
+
   ListTile _serviciosQueOfrece(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.home_repair_service_outlined),
@@ -260,13 +290,15 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
         'Notificaciones',
         style: estilo,
       ),
-      onTap: () async {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const PaginaNotificacionesScreen(),
-            ));
-      },
+      onTap: _iniciadaSesionUsuario
+          ? () async {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PaginaNotificacionesScreen(),
+                  ));
+            }
+          : () => mensajeError(context, 'Necesita iniciar sesión'),
     );
   }
 
@@ -322,7 +354,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
     );
   }
 
-  ListTile _planAmigo(BuildContext context) {
+/*   ListTile _planAmigo(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.face_retouching_natural),
       title: Text(
@@ -334,7 +366,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
         //  _quitarPublicidad(context, enviosugerencia);
       },
     );
-  }
+  } */
 
   ListTile _pruebaEnvioEmail(BuildContext context) {
     return ListTile(

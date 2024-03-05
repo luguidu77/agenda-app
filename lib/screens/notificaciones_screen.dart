@@ -134,7 +134,10 @@ class _PaginaNotificacionesScreenState
         ListTile(
           // Contenido de la tarjeta de notificación
           leading: Column(
-            children: [_obtieneIcono(notificacion['categoria'])],
+            children: [
+              _obtieneIcono(notificacion['categoria']),
+              _obtieneTextoCategoria(notificacion['categoria'])
+            ],
           ),
           title: Text(nombre),
           subtitle: Column(
@@ -174,8 +177,17 @@ class _PaginaNotificacionesScreenState
 
 Icon _obtieneIcono(String categoria) {
   return switch (categoria) {
-    'cita' => const Icon(Icons.calendar_today_rounded),
-    _ => const Icon(Icons.no_crash_outlined),
+    'cita' => const Icon(Icons.offline_share_outlined),
+    'citaweb' => const Icon(Icons.cloud_done),
+    _ => const Icon(Icons.data_array_rounded),
+  };
+}
+
+Text _obtieneTextoCategoria(String categoria) {
+  return switch (categoria) {
+    'cita' => const Text('CITA', style: TextStyle(fontSize: 8)),
+    'citaweb' => const Text('CITA', style: TextStyle(fontSize: 8)),
+    _ => const Text('N/A', style: TextStyle(fontSize: 8)),
   };
 }
 

@@ -7,6 +7,18 @@ class PerfilModel {
   String? telefono;
   String? ubicacion;
   String? website;
+  String? moneda;
+  List<String>? servicios;
+  String? tokenMessaging;
+  String? ciudad;
+  List<Map<String, dynamic>>? horarios;
+  String? informacion;
+  String? normas;
+  double? latitud;
+  double? longitud;
+  DateTime? fechaRegistro;
+  bool? appPagada;
+  String? email; // Nuevo campo
 
   PerfilModel({
     this.denominacion,
@@ -17,6 +29,18 @@ class PerfilModel {
     this.telefono,
     this.ubicacion,
     this.website,
+    this.moneda,
+    this.servicios,
+    this.tokenMessaging,
+    this.ciudad,
+    this.horarios,
+    this.informacion,
+    this.normas,
+    this.latitud,
+    this.longitud,
+    this.fechaRegistro,
+    this.appPagada,
+    this.email, // Nuevo campo
   });
 
   factory PerfilModel.fromJson(Map<String, dynamic> json) => PerfilModel(
@@ -28,6 +52,21 @@ class PerfilModel {
         telefono: json["telefono"],
         ubicacion: json["ubicacion"],
         website: json["website"],
+        moneda: json["moneda"],
+        servicios: List<String>.from(json["servicios"].map((x) => x)),
+        tokenMessaging: json["tokenMessaging"],
+        ciudad: json["ciudad"],
+        horarios:
+            List<Map<String, dynamic>>.from(json["horarios"].map((x) => x)),
+        informacion: json["informacion"],
+        normas: json["normas"],
+        latitud: json["latitud"],
+        longitud: json["longitud"],
+        fechaRegistro: json["fechaRegistro"] != null
+            ? DateTime.parse(json["fechaRegistro"])
+            : null,
+        appPagada: json["appPagada"],
+        email: json["email"], // Nuevo campo
       );
 
   Map<String, dynamic> toJson() => {
@@ -39,5 +78,18 @@ class PerfilModel {
         "telefono": telefono,
         "ubicacion": ubicacion,
         "website": website,
+        "moneda": moneda,
+        "servicios": servicios,
+        "tokenMessaging": tokenMessaging,
+        "ciudad": ciudad,
+        "horarios": horarios,
+        "informacion": informacion,
+        "normas": normas,
+        "latitud": latitud,
+        "longitud": longitud,
+        "fechaRegistro":
+            fechaRegistro != null ? fechaRegistro!.toIso8601String() : null,
+        "appPagada": appPagada,
+        "email": email, // Nuevo campo
       };
 }

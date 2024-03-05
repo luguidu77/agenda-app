@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:agendacitas/providers/cita_list_provider.dart';
 import 'package:agendacitas/providers/recordatorios_provider.dart';
 import 'package:agendacitas/widgets/compartirCliente/compartir_cita_a_cliente.dart';
-import 'package:agendacitas/widgets/configRecordatorios.dart';
+
 import 'package:agendacitas/utils/notificaciones/recordatorio_local/recordatorio_local.dart';
 
 import 'package:intl/intl.dart';
@@ -100,20 +100,33 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
       citaElegida['HORAINICIO'].toString(),
     );
 
-    String tiempoAux =
-        '${cita.year.toString()}-${cita.month.toString().padLeft(2, '0')}-${cita.day.toString().padLeft(2, '0')} $tiempoTextoRecord';
-
     if (tiempoTextoRecord != '') {
+      String tiempoAux =
+          '${cita.year.toString()}-${cita.month.toString().padLeft(2, '0')}-${cita.day.toString().padLeft(2, '0')} $tiempoTextoRecord';
       DateTime tiempoRecordatorio = DateTime.parse(tiempoAux);
-      horaRecordatorio = cita
-          .subtract(Duration(
-              hours: tiempoRecordatorio.hour,
-              minutes: tiempoRecordatorio.minute))
-          .toString();
+
+      // si tiempo a restar es '24:00' , resto un día
+      if (tiempoTextoRecord[0] == '2') {
+        horaRecordatorio = cita
+            .subtract(Duration(
+              days: 1,
+            ))
+            .toString();
+      } else {
+        String tiempoAux =
+            '${cita.year.toString()}-${cita.month.toString().padLeft(2, '0')}-${cita.day.toString().padLeft(2, '0')} $tiempoTextoRecord';
+        DateTime tiempoRecordatorio = DateTime.parse(tiempoAux);
+
+        horaRecordatorio = cita
+            .subtract(Duration(
+                hours: tiempoRecordatorio.hour,
+                minutes: tiempoRecordatorio.minute))
+            .toString();
+      }
     }
 
-    String fecha = 'dia / mes';
-    // '${DateTime.parse(citaFechaHora['FECHA']).day.toString().padLeft(2, '0')}/${DateTime.parse(citaFechaHora['FECHA']).month.toString().padLeft(2, '0')}';
+    String fecha =
+        '${DateTime.parse(citaElegida['HORAINICIO'].toString()).day.toString().padLeft(2, '0')}/${DateTime.parse(citaElegida['HORAINICIO'].toString()).month.toString().padLeft(2, '0')}';
 
     //todo: pasar por la clase formater hora y fecha
     String textoHoraInicio =
@@ -305,7 +318,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
       String nombreCliente,
       String nombreServicio,
       String precio) async {
-    String title = '🙋‍♀️ Tienes cita a las $horaIniciotexto horas ';
+    String title = 'Tienes cita $fechaTexto-$horaIniciotexto h';
     String body =
         '$nombreCliente se va a hacer $nombreServicio ¡ganarás $precio ! 🤑';
     debugPrint('hora recordatorio $horaRecordatorio');

@@ -3,8 +3,10 @@
 
 import 'dart:io';
 
+import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 
@@ -69,6 +71,8 @@ class NotificationService {
         await FlutterNativeTimezone.getLocalTimezone();
     final location = tz.getLocation(currentTimeZone); //'Europe/Madrid'
 
+
+
     // VERIFICA LOS ID DE LAS VERIFICACIONES PENDIENTES Y LE SUMA 1
 
     await visualizaNotificaciones(pendientes);
@@ -132,6 +136,12 @@ class NotificationService {
     }));
   }
 
+  void onSelectNotification( String? payload)  {
+    // Aquí puedes manejar la notificación recibida, por ejemplo, mostrar un diálogo
+     print('mensaje recibido por notificacion local ------------------------------------ Payload: $payload' );
+   
+  }
+
   visualizaNotificaciones(List<PendingNotificationRequest> pendientes) async {
     for (var e in pendientes) {
       listId.add((e.id));
@@ -148,7 +158,7 @@ class NotificationService {
 }
 
 void datapayload(data) async {
-  // print(data);
+  print(data);
 }
 
 class NotificacionesFirebaseMessaging {

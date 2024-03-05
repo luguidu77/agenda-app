@@ -36,17 +36,7 @@ class FirebaseProvider extends ChangeNotifier {
     return docRef;
   }
 
-  //? REFERENCIA DOCUMENTO AGENDO WEB ////////////////////////////////////////////
-  _referenciaDocumentoAgendoWeb(String usuarioAPP, String coleccion) async {
-    // creo una referencia al documento que contiene los clientes
-    final docRef = db!
-        .collection("agendacitasapp")
-        .doc(usuarioAPP) //email usuario
-        .collection(coleccion); // pago, servicio, cliente, perfil...
-    // .doc('SDAdSUSNrJhFpOdpuihs'); // ? id del cliente
-
-    return docRef;
-  }
+ 
 
   PerfilModel perfil = PerfilModel();
   Future<PerfilModel> cargarPerfilFB(usuarioAPP) async {
@@ -57,7 +47,8 @@ class FirebaseProvider extends ChangeNotifier {
       //? TRAIGO LOS DATOS DE FIREBASE
       await docRef.doc('perfilUsuarioApp').get().then((res) {
         var data = res.data();
-
+        
+        perfil.email = data['email'];
         perfil.foto = data['foto'];
         perfil.denominacion = data['denominacion'];
         perfil.descripcion = data['descripcion'];
@@ -931,8 +922,9 @@ class FirebaseProvider extends ChangeNotifier {
     await docRef.get().then((QuerySnapshot snapshot) => {
           for (var element in snapshot.docs)
             {
-              //SI LA CATEGORIA DE LA NOTIFICACION == CITA, AGREGA NOTIFICACION
-              if (element['categoria'] == 'cita')
+              //SI LA CATEGORIA DE LA NOTIFICACION == CITA o CITAWEB, AGREGA NOTIFICACION 
+              if (element['categoria'] == 'cita' ||
+                  element['categoria'] == 'citaweb')
                 {
                   data.add({
                     'id': element.id,

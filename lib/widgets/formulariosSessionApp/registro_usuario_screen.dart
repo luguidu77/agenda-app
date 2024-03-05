@@ -301,7 +301,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
             GestureDetector(
               onTap: () async {
                 const url =
-                    'https://pages.flycricket.io/agenda-de-citas/privacy.html';
+                    'https://agendadecitas.cloud/politica-de-privacidad-de-la-agenda-de-citas';
                 if (await launchUrl(Uri.parse(url))) {
                   await launchUrl(Uri.parse(url));
                 } else {
@@ -345,7 +345,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
         //TEXTO QUE INFORMA DE LOS DIAS DE PRUEBA
         TextoDiasDePrueba(diasDePrueba: diasDePrueba),
 
-        const SizedBox(height: 50),
+        const SizedBox(height: 10),
         Form(
             key: formKeyCrearCuenta,
             autovalidateMode: AutovalidateMode.always,
@@ -451,7 +451,35 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                 ),
                 const SizedBox(height: 10),
 
-                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Accediendo das tu consentimiento a la ',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        const url =
+                            'https://agendadecitas.cloud/politica-de-privacidad-de-la-agenda-de-citas';
+                        // ignore: deprecated_member_use
+                        if (await launchUrl(Uri.parse(url))) {
+                          await launchUrl(Uri.parse(url));
+                        } else {
+                          throw 'Could not launch $url';
+                        }
+                      },
+                      child: const Text(
+                        'política de privacidad ',
+                        style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10),
+                      ),
+                    )
+                  ],
+                ),
                 //BOTON CREAR CUENTA ------------------------------------------------
 
                 Padding(
@@ -494,35 +522,6 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
         const SizedBox(height: 25),
 
         //https://pages.flycricket.io/agenda-de-citas/privacy.html
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Accediendo das tu consentimiento a la ',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
-            ),
-            GestureDetector(
-              onTap: () async {
-                const url =
-                    'https://pages.flycricket.io/agenda-de-citas/privacy.html';
-                // ignore: deprecated_member_use
-                if (await launchUrl(Uri.parse(url))) {
-                  await launchUrl(Uri.parse(url));
-                } else {
-                  throw 'Could not launch $url';
-                }
-              },
-              child: const Text(
-                'política de privacidad ',
-                style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 10),
-              ),
-            )
-          ],
-        ),
       ],
     );
   }
@@ -571,44 +570,68 @@ class TextoDiasDePrueba extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: RichText(
-          textAlign: TextAlign.justify,
-          text: TextSpan(
-              style: const TextStyle(fontSize: 14, color: Colors.black),
-              children: <TextSpan>[
-                const TextSpan(
-                  text: 'Prueba durante ',
-                  style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
-                ),
-                TextSpan(
-                  text: '$diasDePrueba días',
-                  style: const TextStyle(
-                      color: Color.fromARGB(255, 41, 22, 151),
-                      fontWeight: FontWeight.bold),
-                ),
-                const TextSpan(
-                  text:
-                      ', todas las opciones y funcionalidades sin publicidad, sólo necesitas un email y una contraseña, puedes cancelar en cualquier momento. ',
-                  style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
-                ),
-                const TextSpan(
-                  text:
-                      'Una vez finalizado el periodo de prueba, tendrás la opción de continuar por ',
-                  style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
-                ),
-                const TextSpan(
-                  text: ' un sólo pago sin suscripción ',
-                  style: TextStyle(
-                      color: Color.fromARGB(255, 41, 22, 151),
-                      fontWeight: FontWeight.bold),
-                ),
-                /*  const TextSpan(
-                  text: '(precio de lanzamiento)',
-                  style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
-                ), */
-              ]),
-        ));
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Column(
+        children: [
+          RichText(
+            textAlign: TextAlign.justify,
+            text: TextSpan(
+                style: const TextStyle(fontSize: 14, color: Colors.black),
+                children: <TextSpan>[
+                  const TextSpan(
+                    text: 'Prueba durante ',
+                    style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
+                  ),
+                  TextSpan(
+                    text: '$diasDePrueba días',
+                    style: const TextStyle(
+                        color: Color.fromARGB(255, 41, 22, 151),
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const TextSpan(
+                    text:
+                        ', todas las opciones y funcionalidades sin publicidad, sólo necesitas un email y una contraseña, puedes cancelar en cualquier momento. ',
+                    style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
+                  ),
+                  const TextSpan(
+                    text:
+                        'Una vez finalizado el periodo de prueba, tendrás la opción de continuar por ',
+                    style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
+                  ),
+                  const TextSpan(
+                    text: ' un sólo pago sin suscripción ',
+                    style: TextStyle(
+                        color: Color.fromARGB(255, 41, 22, 151),
+                        fontWeight: FontWeight.bold),
+                  ),
+                  /*  const TextSpan(
+                    text: '(precio de lanzamiento)',
+                    style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
+                  ), */
+                ]),
+          ),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () async {
+              const url =
+                  'https://agendadecitas.cloud/pasos-a-seguir-para-la-eliminacion-de-su-cuenta';
+              if (await launchUrl(Uri.parse(url))) {
+                await launchUrl(Uri.parse(url));
+              } else {
+                throw 'Could not launch $url';
+              }
+            },
+            child: const Text(
+              'CÓMO ELIMINAR SU CUENTA Y/O SUS DATOS',
+              style: TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12),
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
 

@@ -49,7 +49,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
       // CONFIGURA VISTA TIEMPO
       timeSlotViewSettings: const TimeSlotViewSettings(
         timeFormat: 'HH:mm', // FORMATO 24H
-        startHour: 8, // INICIO LABORAL
+        startHour: 7, // INICIO LABORAL
         endHour: 22, // FINAL LABORAL
         timeInterval: Duration(minutes: 15), //INTERVALOS DE TIEMPO
         timeIntervalHeight: 20, // tamaño de las casillas
@@ -170,8 +170,11 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           fechaInicio.day, fechaInicio.hour, fechaInicio.minute, 0);
       final DateTime endTime = DateTime(fechaFinal.year, fechaFinal.month,
           fechaFinal.day, fechaFinal.hour, fechaFinal.minute, 0);
-      bool citaConfirmada =
-          cita['confirmada'].toString() == 'true' ? true : false;
+      bool citaConfirmada = _iniciadaSesionUsuario
+          ? cita['confirmada'].toString() == 'true'
+              ? true
+              : false
+          : true;
 
       // **** DONDE CREAMOS LA NOTA QUE TRAE TODOS LOS DATOS NECESARIOS PARA LA GESTION DE CITA ****************
       meetings.add(Appointment(
@@ -228,8 +231,13 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
   }
 
   String textoCita(cita) {
-    bool citaConfirmada =
-        cita['confirmada'].toString() == 'true' ? true : false;
+    bool citaConfirmada = _iniciadaSesionUsuario
+        ? cita['confirmada'].toString() == 'true'
+            ? true
+            : false
+        : true;
+
+    print('$citaConfirmada ---- $_iniciadaSesionUsuario');
     String textoConfirmada =
         citaConfirmada ? 'CONFIRMADA' : 'PENDIENTE CONFIRMAR';
     return (cita['nombre'] != null)

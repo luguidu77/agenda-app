@@ -4,6 +4,7 @@ import 'package:agendacitas/widgets/botones/boton_confirmar_cita_reserva_web.dar
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../models/models.dart';
 import '../providers/providers.dart';
@@ -29,6 +30,9 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
   EdgeInsets miPadding = const EdgeInsets.all(18.0);
   late Map<String, dynamic> reserva;
   double altura = 300;
+  String _emailSesionUsuario = '';
+
+  bool _iniciadaSesionUsuario = false;
 
   getPersonaliza() async {
     List<PersonalizaModel> data =
@@ -40,6 +44,12 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
 
       setState(() {});
     }
+  }
+
+  emailUsuario() async {
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
   }
 
   @override
@@ -161,9 +171,11 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    BotonConfirmarCitaWeb(
-                        cita: cita, emailUsuario: widget.emailUsuario),
-                   const Divider(),
+                    _iniciadaSesionUsuario
+                        ? BotonConfirmarCitaWeb(
+                            cita: cita, emailUsuario: widget.emailUsuario)
+                        : const Text('Cita confirmada'),
+                    const Divider(),
                     const SizedBox(
                       height: 10,
                     ),

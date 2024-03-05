@@ -75,224 +75,229 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(15),
-            child: Column(
-              //mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                visible
-                    ? Column(
-                        children: [
-                          const Text(
-                            'Mejoras versión PRO: \n\n',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const Text(
-                              'Sin publicidad para ahorrar tiempo a tus clientes. \n\n'
-                              'Con nuevas características \n\n'
-                              'Crea una cuenta en la nube y accede desde otro dispositivo. \n\n'),
+            child: SingleChildScrollView(
+              child: Column(
+                //mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  visible
+                      ? Column(
+                          children: [
+                            const Text(
+                              'Mejoras versión PRO: \n\n',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const Text(
+                                'Sin publicidad para ahorrar tiempo a tus clientes. \n\n'
+                                'Con nuevas características \n\n'
+                                'Crea una cuenta en la nube y accede desde otro dispositivo. \n\n'),
 
-                          const Padding(
-                            padding: EdgeInsets.all(8.0),
+                            const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text.rich(
+                                    TextSpan(
+                                        text:
+                                            'En el formulario de pago introduce el',
+                                        style: TextStyle(
+                                            color: Color.fromARGB(
+                                                255, 136, 133, 133))),
+                                  ),
+                                  Text.rich(
+                                    TextSpan(
+                                        text:
+                                            'mismo email de sesión de la aplicación'),
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                  Text.rich(
+                                    TextSpan(
+                                        text:
+                                            'para una vez comprobado el pago poder activar tu cuenta como pagada. (Un sólo pago, sin suscripción)'),
+                                    style: TextStyle(
+                                        color:
+                                            Color.fromARGB(255, 136, 133, 133)),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            //botonGPAY(context), ############## BOTON GOOGLE PAY -------------------------------------
+                            ElevatedButton.icon(
+                                onPressed: () async {
+                                  // 5,45€ https://buy.stripe.com/7sIcPEclB53EbCwfYY
+                                  const url =
+                                      'https://buy.stripe.com/7sIcPEclB53EbCwfYY';
+                                  if (await launchUrl(Uri.parse(url))) {
+                                    await launchUrl(Uri.parse(url));
+                                  } else {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                icon:
+                                    const Icon(Icons.app_registration_rounded),
+                                label: const Text('Comprar')),
+                            const SizedBox(
+                              height: 50,
+                            ),
+                            const Divider(),
+                            const Text(
+                              'En proyecto versión PREMIUM: \n\n',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const Text(
+                                'Creación App para tus clientes, con opción a coger cita desde su app. \n\n'
+                                'Marketplace App de profesionales como tú que ofrecen diferentes servicios" \n\n'),
+                            /*  ElevatedButton.icon(
+                                style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                        const Color.fromARGB(
+                                            255, 171, 172, 173))),
+                                onPressed: () => {},
+                                icon: const Icon(Icons.app_registration_rounded),
+                                label: const Text('Pago de la aplicación')), */
+                          ],
+                        )
+                      : const Text('Pago de la aplicación'),
+
+                  //? FORMULARIO REGISTRO
+                  visibleFormulario
+                      ? Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SizedBox(
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text.rich(
-                                  TextSpan(
-                                      text:
-                                          'En el formulario de pago introduce el',
-                                      style: TextStyle(
-                                          color: Color.fromARGB(
-                                              255, 136, 133, 133))),
+                                const TextField(
+                                  controller: null,
+                                  decoration:
+                                      InputDecoration(labelText: 'Email'),
                                 ),
-                                Text.rich(
-                                  TextSpan(
-                                      text:
-                                          'mismo email de sesión de la aplicación'),
-                                  style: TextStyle(color: Colors.red),
+                                const TextField(
+                                  keyboardType: TextInputType.number,
+                                  controller: null,
+                                  decoration:
+                                      InputDecoration(labelText: 'Contraseña'),
                                 ),
-                                Text.rich(
-                                  TextSpan(
-                                      text:
-                                          'para una vez comprobado el pago poder activar tu cuenta como pagada. (Un sólo pago, sin suscripción)'),
-                                  style: TextStyle(
-                                      color:
-                                          Color.fromARGB(255, 136, 133, 133)),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          //botonGPAY(context), ############## BOTON GOOGLE PAY -------------------------------------
-                          ElevatedButton.icon(
-                              onPressed: () async {
-                                // 5,45€ https://buy.stripe.com/7sIcPEclB53EbCwfYY
-                                const url =
-                                    'https://buy.stripe.com/7sIcPEclB53EbCwfYY';
-                                if (await launchUrl(Uri.parse(url))) {
-                                  await launchUrl(Uri.parse(url));
-                                } else {
-                                  throw 'Could not launch $url';
-                                }
-                              },
-                              icon: const Icon(Icons.app_registration_rounded),
-                              label: const Text('Comprar')),
-                          const SizedBox(
-                            height: 50,
-                          ),
-                          const Divider(),
-                          const Text(
-                            'En proyecto versión PREMIUM: \n\n',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const Text(
-                              'Creación App para tus clientes, con opción a coger cita desde su app. \n\n'
-                              'Marketplace App de profesionales como tú que ofrecen diferentes servicios" \n\n'),
-                          /*  ElevatedButton.icon(
-                              style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
-                                      const Color.fromARGB(
-                                          255, 171, 172, 173))),
-                              onPressed: () => {},
-                              icon: const Icon(Icons.app_registration_rounded),
-                              label: const Text('Pago de la aplicación')), */
-                        ],
-                      )
-                    : const Text('Pago de la aplicación'),
-
-                //? FORMULARIO REGISTRO
-                visibleFormulario
-                    ? Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          child: Column(
-                            children: [
-                              const TextField(
-                                controller: null,
-                                decoration: InputDecoration(labelText: 'Email'),
-                              ),
-                              const TextField(
-                                keyboardType: TextInputType.number,
-                                controller: null,
-                                decoration:
-                                    InputDecoration(labelText: 'Contraseña'),
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              ElevatedButton.icon(
-                                  onPressed: () => {
-                                        update(),
-                                        //  visibleIndicator = false,
-
-                                        visibleBotonGPAY = true
-                                      },
-                                  icon: const Icon(
-                                      Icons.app_registration_rounded),
-                                  label: const Text('REGISTRAR'))
-                            ],
-                          ),
-                        ),
-                      )
-                    : Container(),
-                const SizedBox(
-                  height: 20,
-                ),
-                //?BOTON PAGA CON GOOGLEPAY
-                visibleBotonGPAY ? botonGPAY(context) : Container(),
-                //? INDICATOR ESPERA...
-
-                visibleIndicator
-                    ? Column(
-                        children: [
-                          configuracionFinalizada
-                              ? Container()
-                              : LinearProgressIndicator(
-                                  value: valorindicator,
-                                  color: Colors.greenAccent,
-                                  backgroundColor: Colors.green,
-                                ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                visiblePagoRealizado
-                                    ? const Icon(Icons.check)
-                                    : const SizedBox(
-                                        width: 10,
-                                        height: 10,
-                                        child: CircularProgressIndicator()),
                                 const SizedBox(
-                                  width: 10,
+                                  height: 20,
                                 ),
-                                const Text('Pago app Pro')
+                                ElevatedButton.icon(
+                                    onPressed: () => {
+                                          update(),
+                                          //  visibleIndicator = false,
+
+                                          visibleBotonGPAY = true
+                                        },
+                                    icon: const Icon(
+                                        Icons.app_registration_rounded),
+                                    label: const Text('REGISTRAR'))
                               ],
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                visibleGuardarPagoRealizado
-                                    ? const Icon(Icons.check)
-                                    : const SizedBox(
-                                        width: 10,
-                                        height: 10,
-                                        child: CircularProgressIndicator()),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                const Text('Guardado de pago')
-                              ],
+                        )
+                      : Container(),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  //?BOTON PAGA CON GOOGLEPAY
+                  visibleBotonGPAY ? botonGPAY(context) : Container(),
+                  //? INDICATOR ESPERA...
+
+                  visibleIndicator
+                      ? Column(
+                          children: [
+                            configuracionFinalizada
+                                ? Container()
+                                : LinearProgressIndicator(
+                                    value: valorindicator,
+                                    color: Colors.greenAccent,
+                                    backgroundColor: Colors.green,
+                                  ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  visiblePagoRealizado
+                                      ? const Icon(Icons.check)
+                                      : const SizedBox(
+                                          width: 10,
+                                          height: 10,
+                                          child: CircularProgressIndicator()),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  const Text('Pago app Pro')
+                                ],
+                              ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                visibleRespaldoRealizado
-                                    ? const Icon(Icons.check)
-                                    : const SizedBox(
-                                        width: 10,
-                                        height: 10,
-                                        child: CircularProgressIndicator()),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                const Text('Respaldo en la nube')
-                              ],
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  visibleGuardarPagoRealizado
+                                      ? const Icon(Icons.check)
+                                      : const SizedBox(
+                                          width: 10,
+                                          height: 10,
+                                          child: CircularProgressIndicator()),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  const Text('Guardado de pago')
+                                ],
+                              ),
                             ),
-                          ),
-                          configuracionFinalizada
-                              ? Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    color: const Color.fromARGB(
-                                        255, 172, 240, 174),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                              '¡ Configuración realizada con exito !'),
-                                          Text(
-                                              'Reinicia la App e inicia sesión')
-                                        ],
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  visibleRespaldoRealizado
+                                      ? const Icon(Icons.check)
+                                      : const SizedBox(
+                                          width: 10,
+                                          height: 10,
+                                          child: CircularProgressIndicator()),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  const Text('Respaldo en la nube')
+                                ],
+                              ),
+                            ),
+                            configuracionFinalizada
+                                ? Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      color: const Color.fromARGB(
+                                          255, 172, 240, 174),
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                                '¡ Configuración realizada con exito !'),
+                                            Text(
+                                                'Reinicia la App e inicia sesión')
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                )
-                              : Container(
-                                  color: Colors.red,
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text('NO CIERRE LA APLICACIÓN',
-                                        style: TextStyle(color: Colors.white)),
-                                  ))
-                        ],
-                      )
-                    : Container(),
+                                  )
+                                : Container(
+                                    color: Colors.red,
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text('NO CIERRE LA APLICACIÓN',
+                                          style:
+                                              TextStyle(color: Colors.white)),
+                                    ))
+                          ],
+                        )
+                      : Container(),
 
-                //  visiblePagoRealizado
-              ],
+                  //  visiblePagoRealizado
+                ],
+              ),
             ),
           ),
         ),

@@ -36,19 +36,34 @@ class FirebaseProvider extends ChangeNotifier {
     return docRef;
   }
 
- 
-
   PerfilModel perfil = PerfilModel();
   Future<PerfilModel> cargarPerfilFB(usuarioAPP) async {
     await _iniFirebase();
 
     try {
-      final docRef = await _referenciaDocumento(usuarioAPP, 'perfil');
+      /*   final docRef = await _referenciaDocumento(
+          usuarioAPP, 'perfil'); //! referencia antigua a extinguir
+
       //? TRAIGO LOS DATOS DE FIREBASE
       await docRef.doc('perfilUsuarioApp').get().then((res) {
         var data = res.data();
-        
+
         perfil.email = data['email'];
+        perfil.foto = data['foto'];
+        perfil.denominacion = data['denominacion'];
+        perfil.descripcion = data['descripcion'];
+        perfil.facebook = data['facebook'];
+        perfil.instagram = data['instagram'];
+        perfil.telefono = data['telefono'];
+        perfil.ubicacion = data['ubicacion'];
+        perfil.website = data['website'];
+      }); */
+
+      //? TRAIGO LOS DATOS DE FIREBASE
+      await db!.collection("agendacitasapp").doc(usuarioAPP).get().then((res) {
+        var data = res.data();
+
+        perfil.email = data!['email'];
         perfil.foto = data['foto'];
         perfil.denominacion = data['denominacion'];
         perfil.descripcion = data['descripcion'];
@@ -169,6 +184,7 @@ class FirebaseProvider extends ChangeNotifier {
 
     await docRef.doc('mensajeCita').set(newPersonaliza);
   }
+ 
 
   getCitasHoraOrdenadaPorFecha(emailUsuario, fecha) async {
     List<Map<String, dynamic>> data = [];
@@ -676,11 +692,22 @@ class FirebaseProvider extends ChangeNotifier {
 
   actualizaTokenMessaging(String usuarioAPP, String token) async {
     await _iniFirebase();
-    final docRef = await _referenciaDocumento(usuarioAPP, 'perfil');
+
+    final docRef = await _referenciaDocumento(
+        usuarioAPP, 'perfil'); //!antigua refencia a extinguir
     // Update a single field
     docRef
         .doc('perfilUsuarioApp')
         .update({'tokenMessaging': token}).then((value) {
+      print("Field updated successfully!");
+    }).catchError((error) {
+      print("Error updating field: $error");
+    });
+
+    //** nueva ubicacion del token */
+    /// NUEVA UBICACION DEL PERFIL DE USUARIO
+    final docRefNuevo = db!.collection("agendacitasapp").doc(usuarioAPP);
+    docRefNuevo.update({'tokenMessaging': token}).then((value) {
       print("Field updated successfully!");
     }).catchError((error) {
       print("Error updating field: $error");
@@ -922,7 +949,7 @@ class FirebaseProvider extends ChangeNotifier {
     await docRef.get().then((QuerySnapshot snapshot) => {
           for (var element in snapshot.docs)
             {
-              //SI LA CATEGORIA DE LA NOTIFICACION == CITA o CITAWEB, AGREGA NOTIFICACION 
+              //SI LA CATEGORIA DE LA NOTIFICACION == CITA o CITAWEB, AGREGA NOTIFICACION
               if (element['categoria'] == 'cita' ||
                   element['categoria'] == 'citaweb')
                 {

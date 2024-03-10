@@ -99,6 +99,24 @@ class SincronizarFirebase {
           });
         }
       });
+
+      ///* NUEVA UBICACION DEL PERFIL DE USUARIO
+      final docRefNuevo = db!.collection("agendacitasapp").doc(usuarioAPP);
+      await docRefNuevo.get().then((data) async {
+        if (data.data() == null) {
+          await docRef.doc('perfilUsuarioApp').set({
+            'foto': '',
+            'denominacion': '',
+            'descripcion': '',
+            'telefono': '',
+            'website': '',
+            'facebook': '',
+            'instagram': '',
+            'ubicacion': '',
+            'email': usuarioAPP
+          });
+        }
+      });
     } catch (e) {}
   }
 
@@ -386,12 +404,18 @@ class SincronizarFirebase {
 
   //? SINCRONIZA PAGO ////////////////////////////////////////////
   _actualizaPago(String usuarioAPP, String updown) async {
-    final docRef = await _referenciaDocumento(usuarioAPP, 'pago');
-
+    final docRef = await _referenciaDocumento(
+        usuarioAPP, 'pago'); // antigua referencia a extinguir
+    final docRefNuevo =
+        db!.collection("agendacitasapp").doc(usuarioAPP); //* nueva referencia
     if (updown == 'UPLOAD') {
+      //*antigua localizacion del pago ( a extinguir )
       var data = {'id': 0, 'pago': false, 'email': usuarioAPP};
-
       await docRef.doc(data['id'].toString()).set(data);
+
+      //* nueva localizacion del pago
+      var dataNueva = {'pago': false};
+      await docRefNuevo.set(dataNueva);
     } else {
       //GUARDA EN DISPOSITIVO PAGO: FALSE, EMAIL: EMAIL DE USUARIO
       await PagoProvider().guardaPagado(false, usuarioAPP);
@@ -468,12 +492,28 @@ class SincronizarFirebase {
   actualizarUsuarioApp(
       PerfilModel perfilUsuarioApp, String emailUsuario) async {
     await _iniFirebase();
-    final docRef = await _referenciaDocumento(emailUsuario, 'perfil');
+    final docRef = await _referenciaDocumento(
+        emailUsuario, 'perfil'); //!antigua referencia a exitinguir
 
+    // * nueva referencia *************************
+    final docRefNuevo = db!.collection("agendacitasapp").doc(emailUsuario);
     try {
       // si no existen perfilUsuarioApp lo crea con los campos correspondientes
 
       await docRef.doc('perfilUsuarioApp').update({
+        'foto': perfilUsuarioApp.foto,
+        'denominacion': perfilUsuarioApp.denominacion.toString(),
+        'descripcion': perfilUsuarioApp.descripcion.toString(),
+        'telefono': perfilUsuarioApp.telefono.toString(),
+        'website': perfilUsuarioApp.website.toString(),
+        'facebook': perfilUsuarioApp.facebook.toString(),
+        'instagram': perfilUsuarioApp.instagram.toString(),
+        'ubicacion': perfilUsuarioApp.ubicacion.toString(),
+        'email': emailUsuario
+      });
+
+      //* nueva localizacion del perfil de usuario
+      await docRefNuevo.update({
         'foto': perfilUsuarioApp.foto,
         'denominacion': perfilUsuarioApp.denominacion.toString(),
         'descripcion': perfilUsuarioApp.descripcion.toString(),

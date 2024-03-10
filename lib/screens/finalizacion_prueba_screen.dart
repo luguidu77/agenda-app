@@ -1,4 +1,5 @@
 import 'package:agendacitas/screens/comprar_aplicacion.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,7 @@ class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
   @override
   Widget build(BuildContext context) {
     // final parametros = ModalRoute.of(context)?.settings.arguments;
-  final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
     return SafeArea(
       child: Scaffold(
         body: Center(
@@ -32,22 +33,25 @@ class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
                   onPressed: () async => {
                         // GUARDA EN EL PROVIDER Y LIMPIA VARIABLES PARA QUE SE PUEDA INICIAR SESION CON OTRO EMAIL
                         await PagoProvider().guardaPagado(false, ''),
-                      
-                        
-                        //FirebaseAuth.instance.signOut()
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ComprarAplicacion(
-                                  // usuarioAPP: email,
-                                  )),
-                        )
+                        await FirebaseAuth.instance.signOut(),
+
+                        _irPaginaCompra()
                       },
                   child: const Text('ok'))
             ],
           ),
         ),
       ),
+    );
+  }
+
+  _irPaginaCompra() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (context) => const ComprarAplicacion(
+              // usuarioAPP: email,
+              )),
     );
   }
 }

@@ -92,6 +92,7 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
               ListTile(
                 onTap: () async {
                   _alertaCerrado();
+
                   await PagoProvider().guardaPagado(
                       _iniciadaSesionUsuario!, _emailSesionUsuario!);
                 },
@@ -411,7 +412,13 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
 
   void _alertaCerrado() async {
     mensajeInfo(context, 'CERRANDO SESION...');
-    await Future.delayed(
-        const Duration(seconds: 2), (() => FirebaseAuth.instance.signOut()));
+    await Future.delayed(const Duration(seconds: 2), (() async {
+      await FirebaseAuth.instance.signOut();
+      _irHome();
+    }));
+  }
+
+  void _irHome() {
+    Navigator.pushNamed(context, '/');
   }
 }

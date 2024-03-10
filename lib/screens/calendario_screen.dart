@@ -1,3 +1,4 @@
+import 'package:agendacitas/config/mantenimientos/mantenimientos.dart';
 import 'package:agendacitas/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -81,7 +82,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
 
     novedades();
 
-    Publicidad.publicidad(_iniciadaSesionUsuario);
+    // Publicidad.publicidad(_iniciadaSesionUsuario);
     super.initState();
   }
 
@@ -152,6 +153,13 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
               flex: 3,
               child: tarjetaNodades(),
             ), */
+            //****  activacion de mantenimientos ********* */
+            Visibility(
+              visible: true,
+              child: Mantenimientos(
+                emailSesionUsuario: _emailSesionUsuario,
+              ),
+            ),
             Expanded(
               flex: 1,
               child: Visibility(

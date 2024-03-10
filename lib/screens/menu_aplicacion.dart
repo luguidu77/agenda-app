@@ -1,7 +1,10 @@
+import 'package:agendacitas/config/mantenimientos/mantenimientos.dart';
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/providers/Firebase/firebase_publicacion_online.dart';
 import 'package:agendacitas/screens/notificaciones_screen.dart';
 import 'package:agendacitas/screens/servicios_screen.dart';
+import 'package:agendacitas/screens/style/estilo_pantalla.dart';
+import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -84,6 +87,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
   void initState() {
     // leerBasedatos();
     emailUsuario();
+
     version();
 
     super.initState();
@@ -117,6 +121,10 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
 
         const Divider(),
 
+        _estadopago == 'INITIAL' || _estadopago == 'GRATUITA'
+            ? _creaCuentaPruebas()
+            : const Text(''),
+
         // COMPRAR LA APLICACION
         _estadopago == 'COMPRADA' ? const Text('') : _comprarAPP(context),
 
@@ -136,6 +144,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
 
         //VALORAR LA APLICACION Y LA VERSION DISPONIBLE
         // _valoracionApp(),
+      
       ],
     );
   }
@@ -223,13 +232,12 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
           }
           return Container(
             color: Colors.blue,
-            child:  ListTile(
+            child: ListTile(
               leading: const Icon(Icons.edit_square),
-              subtitle:const  Text(
+              subtitle: const Text(
                   style: TextStyle(color: Colors.white),
                   'En tu perfil hemos agreado un enlace que te lleva al formulario de solicitud para publicar tu actividad en la web agendadecitas.online'),
-              onTap:  () =>
-                  {Navigator.pushNamed(context, 'ConfigUsuarioApp')},
+              onTap: () => {Navigator.pushNamed(context, 'ConfigUsuarioApp')},
             ),
           );
         });
@@ -405,5 +413,29 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
             throw 'Could not launch $url';
           }
         });
+  }
+
+  _creaCuentaPruebas() {
+    return Container(
+      color: const Color.fromARGB(255, 101, 176, 238),
+      child: ListTile(
+        leading: const Icon(Icons.face_retouching_natural),
+        title: Text(
+          'Crea cuenta de prueba online',
+          style: textoEstilo,
+        ),
+        subtitle: const Text('Pública tu actividad en la placemarket'),
+        onTap: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => RegistroUsuarioScreen(
+                      registroLogin: 'Registro',
+                      usuarioAPP: '',
+                    )),
+          );
+        },
+      ),
+    );
   }
 }

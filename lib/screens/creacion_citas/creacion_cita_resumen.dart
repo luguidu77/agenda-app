@@ -369,10 +369,56 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         await NotificationService()
             .notificacion(idCita, title, body, 'citapayload', horaRecordatorio);
       } catch (e) {
-        mensajeInfo(context, 'No recordaremos esta cita');
         debugPrint(e.toString());
+
+        // Mostrar el diálogo al hacer clic en el botón
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return const BackgroundPermissionDialog();
+          },
+        );
+        mensajeInfo(context, 'No recordaremos esta cita');
       }
       // }
     }
+  }
+
+  void _mensajeActivarSegundoPlano() {}
+}
+
+class BackgroundPermissionDialog extends StatelessWidget {
+  const BackgroundPermissionDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Habilitar ejecución en segundo plano'),
+      content: const Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Para proporcionar la mejor experiencia de usuario, la aplicación necesite ejecutarse en segundo plano para realizar ciertas tareas, como enviar notificaciones importantes o actualizar datos automáticamente.',
+          ),
+          SizedBox(height: 10),
+          Text(
+            'AJUSTE-BATERIA-USO DE BATERIA POR APLICACION-AGENDA DE CITAS-PERMITIR ACTIVIDAD EN SEGUNDO PLANO.',
+          ),
+          SizedBox(height: 10),
+          Text(
+            'Siempre puedes cambiar esta configuración más tarde en la sección de ajustes de la aplicación.',
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Aceptar'),
+        ),
+      ],
+    );
   }
 }

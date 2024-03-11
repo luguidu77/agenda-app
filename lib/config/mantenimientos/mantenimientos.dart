@@ -2,6 +2,7 @@ import 'package:agendacitas/config/mantenimientos/firebase_manteninimientos.dart
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 class Mantenimientos extends StatefulWidget {
   final String? emailSesionUsuario;
@@ -41,19 +42,22 @@ class _MantenimientosState extends State<Mantenimientos> {
 
       // Mostrar un diálogo de mantenimiento si el campo 'a' existe y es verdadero
       if (fieldValue == true) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return DialogoMantenimiento(
-                emailUsuaio: widget.emailSesionUsuario!);
-          },
-        );
+        _dialogoMantenimiento();
       }
     } catch (error) {
       // Manejar errores
       print('Error al verificar el mantenimiento: $error');
     }
+  }
+
+  void _dialogoMantenimiento() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return DialogoMantenimiento(emailUsuaio: widget.emailSesionUsuario!);
+      },
+    );
   }
 }
 
@@ -66,14 +70,20 @@ class DialogoMantenimiento extends StatefulWidget {
   State<DialogoMantenimiento> createState() => _DialogoMantenimientoState();
 }
 
+//* DIALOGO MANTENIMIENTO REALIZANDOSE********************** */
 class _DialogoMantenimientoState extends State<DialogoMantenimiento> {
-  //**** TEXTOS TRABAJO REALIZADO */
+  //**** TEXTOS TRABAJO REALIZADO *******************************************************************/
   String textoTrabajosRealizados = 'Cambio de ubicacion del perfil y pago';
+  //***********************************************************************************************/
 
   bool _finalizado = false;
+  bool _error = false;
 
   @override
   Widget build(BuildContext context) {
+    if (!_finalizado) {
+      ejecucionTrabajos(widget.emailUsuaio);
+    }
     return AlertDialog(
       title: const Row(
         children: [
@@ -88,22 +98,32 @@ class _DialogoMantenimientoState extends State<DialogoMantenimiento> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _finalizado
-              ? const Icon(Icons.check)
-              : const CircularProgressIndicator(),
+          _error
+              ? const Icon(Icons.cancel)
+              : _finalizado
+                  ? const Icon(Icons.check)
+                  : const CircularProgressIndicator(),
           const SizedBox(height: 10),
-          Text(_finalizado ? 'TRABAJO FINALIZADO' : 'ESPERE...'),
+          _error
+              ? const Column(
+                  children: [
+                    Text('OCURRIÓ UN ERROR'),
+                    Text('Contacta con soporte')
+                  ],
+                )
+              : Text(_finalizado ? 'TRABAJO FINALIZADO' : 'ESPERE...'),
         ],
       ),
       actions: [
         Visibility(
-          visible: _finalizado,
+          visible: _finalizado && !_error,
           child: TextButton(
             onPressed: () {
+              // Para mostrar el diálogo, simplemente llama a showDialog:
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return MaintenanceDialog();
+                  return const MaintenanceDialog();
                 },
               ); // Cerrar el diálogo
             },
@@ -115,8 +135,10 @@ class _DialogoMantenimientoState extends State<DialogoMantenimiento> {
           child: TextButton(
             onPressed: () {
               Navigator.pop(context); // Cerrar el diálogo
-              MantenimientosFirebase.nuevoMantenimiento(
-                  widget.emailUsuaio, textoTrabajosRealizados);
+
+              //**** FUNCION PARA REGISTRAR EL TRABAJO EN COLECCION MANTENIMIENTOAPP *******************************************************************/
+              MantenimientosFirebase.nuevoRegistroMantenimiento(
+                  widget.emailUsuaio, textoTrabajosRealizados, !_error);
             },
             child: const Text('Cerrar'),
           ),
@@ -128,16 +150,40 @@ class _DialogoMantenimientoState extends State<DialogoMantenimiento> {
   @override
   void initState() {
     super.initState();
-    // Simular un retraso para el mantenimiento
+    /*  //******************* */ Simular un retraso para el mantenimiento
     Future.delayed(Duration(seconds: 3), () {
       setState(() {
         _finalizado = true;
       });
-    });
+    }); */
+  }
+
+  void ejecucionTrabajos(String emailUsuario) async {
+    final resultado =
+        await MantenimientosFirebase.ejecucionMantenimiento(emailUsuario);
+
+    switch (resultado) {
+      case true:
+        setState(() {
+          _finalizado = true;
+        });
+      case false:
+        textoTrabajosRealizados = 'Error de mantenimiento';
+        break;
+      default:
+        setState(() {
+          _finalizado = true;
+          _error = true;
+        });
+        textoTrabajosRealizados = resultado.toString();
+    }
   }
 }
 
+//* DIALOGO INFOMACION AL USUARIO********************** */
 class MaintenanceDialog extends StatelessWidget {
+  const MaintenanceDialog({super.key});
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -167,11 +213,9 @@ class MaintenanceDialog extends StatelessWidget {
           onPressed: () {
             Navigator.of(context).pop(); // Cerrar el diálogo
           },
-          child: Text('Cerrar'),
+          child: const Text('Cerrar'),
         ),
       ],
     );
   }
 }
-// Para mostrar el diálogo, simplemente llama a showDialog:
- 

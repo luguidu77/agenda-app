@@ -56,7 +56,7 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          title: const Text('Versión PRO'),
+          title: const Text(''),
           actions: [
             IconButton(
                 onPressed: () => Navigator.pushReplacement(
@@ -83,13 +83,14 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
                       ? Column(
                           children: [
                             const Text(
-                              'Mejoras versión PRO: \n\n',
+                              'Mejoras versión de pago:\n',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             const Text(
-                                'Sin publicidad para ahorrar tiempo a tus clientes. \n\n'
-                                'Con nuevas características \n\n'
-                                'Crea una cuenta en la nube y accede desde otro dispositivo. \n\n'),
+                                '👉 Sin publicidad para ahorrar tiempo a tus clientes.\n'
+                                '👉 Con nuevas características.\n'
+                                '👉 Crea una cuenta en la nube y accede desde otro dispositivo.\n'
+                                '🌍 Publicamos tu actividad en agendadecitas.online, marketplace de profesionales como tú que ofrecen diferentes servicios y desde la que futuros clientes podrán reservar contigo.\n'),
 
                             const Padding(
                               padding: EdgeInsets.all(8.0),
@@ -99,7 +100,7 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
                                   Text.rich(
                                     TextSpan(
                                         text:
-                                            'En el formulario de pago introduce el',
+                                            '🧐 En el formulario de pago introduce el',
                                         style: TextStyle(
                                             color: Color.fromARGB(
                                                 255, 136, 133, 133))),
@@ -121,24 +122,27 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
                                 ],
                               ),
                             ),
-
+                            const SizedBox(height: 10),
                             //botonGPAY(context), ############## BOTON GOOGLE PAY -------------------------------------
-                            ElevatedButton.icon(
-                                onPressed: () async {
-                                  // 5,45€ https://buy.stripe.com/7sIcPEclB53EbCwfYY
-                                  const url =
-                                      'https://buy.stripe.com/7sIcPEclB53EbCwfYY';
-                                  if (await launchUrl(Uri.parse(url))) {
-                                    await launchUrl(Uri.parse(url));
-                                  } else {
-                                    throw 'Could not launch $url';
-                                  }
-                                },
-                                icon:
-                                    const Icon(Icons.app_registration_rounded),
-                                label: const Text('Comprar')),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                  onPressed: () async {
+                                    // 5,45€ https://buy.stripe.com/7sIcPEclB53EbCwfYY
+                                    const url =
+                                        'https://buy.stripe.com/7sIcPEclB53EbCwfYY';
+                                    if (await launchUrl(Uri.parse(url))) {
+                                      await launchUrl(Uri.parse(url));
+                                    } else {
+                                      throw 'Could not launch $url';
+                                    }
+                                  },
+                                  icon: const Icon(
+                                      Icons.app_registration_rounded),
+                                  label: const Text('Comprar')),
+                            ),
                             const SizedBox(
-                              height: 50,
+                              height: 20,
                             ),
                             const Divider(),
                             const Text(
@@ -146,8 +150,7 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             const Text(
-                                'Creación App para tus clientes, con opción a coger cita desde su app. \n\n'
-                                'Marketplace App de profesionales como tú que ofrecen diferentes servicios" \n\n'),
+                                'Creación App para tus clientes, con opción a coger cita desde su app.\n'),
                             /*  ElevatedButton.icon(
                                 style: ButtonStyle(
                                     backgroundColor: MaterialStateProperty.all(

@@ -71,8 +71,6 @@ class NotificationService {
         await FlutterNativeTimezone.getLocalTimezone();
     final location = tz.getLocation(currentTimeZone); //'Europe/Madrid'
 
-
-
     // VERIFICA LOS ID DE LAS VERIFICACIONES PENDIENTES Y LE SUMA 1
 
     await visualizaNotificaciones(pendientes);
@@ -110,11 +108,13 @@ class NotificationService {
     // print('$year,  $month , $day,  $hour, $minute');
     // print(horaInicio);
     //TZDateTime(location, 2022, 8, 14, 21, 30, 0, 0, 0),
+
     await flutterLocalNotificationsPlugin.zonedSchedule(
         id,
         title,
         body,
-        tz.TZDateTime(location, year, month, day, hour, minute, 0, 0, 0),
+        tz.TZDateTime(location, year, month, day, hour, minute, 0, 0, 0)
+            .add(Duration(minutes: 1)),
         NotificationDetails(
             android: AndroidNotificationDetails(channel.id, channel.name,
                 channelDescription: channel.description)),
@@ -136,10 +136,10 @@ class NotificationService {
     }));
   }
 
-  void onSelectNotification( String? payload)  {
+  void onSelectNotification(String? payload) {
     // Aquí puedes manejar la notificación recibida, por ejemplo, mostrar un diálogo
-     print('mensaje recibido por notificacion local ------------------------------------ Payload: $payload' );
-   
+    print(
+        'mensaje recibido por notificacion local ------------------------------------ Payload: $payload');
   }
 
   visualizaNotificaciones(List<PendingNotificationRequest> pendientes) async {

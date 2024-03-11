@@ -69,40 +69,51 @@ class _PaginaNotificacionesScreenState
                       ],
                     ),
                   ),
-                  Expanded(
-                    child: ListView.separated(
-                      itemCount: snapshot.data!.length,
-                      separatorBuilder: (context, index) =>
-                          const Divider(), // Separador entre grupos de notificaciones
-                      itemBuilder: (context, index) {
-                        final notificacion = snapshot.data![index];
-                        final notificacionModelo = NotificacionModel(
-                            id: notificacion['id'],
-                            fechaNotificacion:
-                                notificacion['fechaNotificacion'],
-                            iconoCategoria: notificacion['categoria'],
-                            visto: notificacion['visto'],
-                            data: notificacion['data']);
+                  const Divider(),
+                  (snapshot.data.length < 1)
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 58.0),
+                          child: SizedBox(
+                              height: 200,
+                              width: 200,
+                              child:
+                                  Image.asset('assets/images/caja-vacia.png')),
+                        )
+                      : Expanded(
+                          child: ListView.separated(
+                            itemCount: snapshot.data!.length,
+                            separatorBuilder: (context, index) =>
+                                const Divider(), // Separador entre grupos de notificaciones
+                            itemBuilder: (context, index) {
+                              final notificacion = snapshot.data![index];
+                              final notificacionModelo = NotificacionModel(
+                                  id: notificacion['id'],
+                                  fechaNotificacion:
+                                      notificacion['fechaNotificacion'],
+                                  iconoCategoria: notificacion['categoria'],
+                                  visto: notificacion['visto'],
+                                  data: notificacion['data']);
 
-                        String fechaNotificacion = _formateaFecha(
-                            notificacionModelo.fechaNotificacion);
-                        Map<String, dynamic> data =
-                            jsonDecode(notificacionModelo.data);
-                        final (:nombre, :telefono) = _obtieneCliente(data);
-                        final (:fecha, :hora) = _obtieneCita(data);
+                              String fechaNotificacion = _formateaFecha(
+                                  notificacionModelo.fechaNotificacion);
+                              Map<String, dynamic> data =
+                                  jsonDecode(notificacionModelo.data);
+                              final (:nombre, :telefono) =
+                                  _obtieneCliente(data);
+                              final (:fecha, :hora) = _obtieneCita(data);
 
-                        // Tarjeta de notificación
-                        return _tarjetasNotificaciones(
-                            _emailSesionUsuario,
-                            fechaNotificacion,
-                            notificacion,
-                            fecha,
-                            hora,
-                            nombre,
-                            telefono);
-                      },
-                    ),
-                  ),
+                              // Tarjeta de notificación
+                              return _tarjetasNotificaciones(
+                                  _emailSesionUsuario,
+                                  fechaNotificacion,
+                                  notificacion,
+                                  fecha,
+                                  hora,
+                                  nombre,
+                                  telefono);
+                            },
+                          ),
+                        ),
                 ],
               );
             } else {

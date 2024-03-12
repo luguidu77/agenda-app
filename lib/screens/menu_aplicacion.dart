@@ -144,7 +144,6 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
 
         //VALORAR LA APLICACION Y LA VERSION DISPONIBLE
         // _valoracionApp(),
-      
       ],
     );
   }
@@ -224,9 +223,6 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
         future: FirebasePublicacionOnlineAgendoWeb()
             .verEstadoPublicacion(emailUsuario),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const SizedBox();
-          }
           if (!snapshot.hasData || snapshot.data == 'PUBLICADO') {
             return Container();
           }

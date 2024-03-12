@@ -90,7 +90,7 @@ class FirebasePublicacionOnlineAgendoWeb {
   }
 
   // SWICHT PUBLICADO / DESPUBLICADO
-   swicthPublicado(PerfilModel negocio, bool value) async {
+  swicthPublicado(PerfilModel negocio, bool value) async {
     DocumentReference<Map<String, dynamic>>? docRef;
     FirebaseFirestore db = await inicializaFirebase();
     docRef = referenciaDocumento(db, negocio.email!);
@@ -104,10 +104,16 @@ class FirebasePublicacionOnlineAgendoWeb {
     DocumentReference<Map<String, dynamic>>? docRef;
     FirebaseFirestore db = await inicializaFirebase();
     docRef = referenciaDocumento(db, email);
-    final data = await docRef!.get();
-    if (data['publicado']) {
-      return 'PUBLICADO';
-    } else {
+
+    try {
+      dynamic data = await docRef!.get();
+
+      if (data['publicado']) {
+        return 'PUBLICADO';
+      } else {
+        return 'NO PUBLICADO';
+      }
+    } catch (e) {
       return 'NO PUBLICADO';
     }
   }

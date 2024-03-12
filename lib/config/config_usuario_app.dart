@@ -1,4 +1,5 @@
 import 'package:agendacitas/providers/Firebase/firebase_publicacion_online.dart';
+import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -38,13 +39,13 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
 
   @override
   void initState() {
-    Future.delayed(const Duration(milliseconds: 1000), () {
+    /*  Future.delayed(const Duration(milliseconds: 1000), () {
       setState(() {
         floatExtended = true;
 
         // Here you can write your code for open new view
       });
-    });
+    }); */
 
     emailUsuarioApp();
 
@@ -55,7 +56,7 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-      appBar: AppBar(),
+      // appBar: AppBar(),
       floatingActionButton: FloatingActionButton.extended(
         label: const Text(
           'EDITAR PERFIL',
@@ -88,22 +89,8 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
               const SizedBox(
                 height: 10,
               ),
-              const Divider(),
-              ListTile(
-                onTap: () async {
-                  _alertaCerrado();
+              // const Divider(),
 
-                  await PagoProvider().guardaPagado(
-                      _iniciadaSesionUsuario!, _emailSesionUsuario!);
-                },
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(color: Colors.black, width: 1),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                iconColor: Colors.blue,
-                title: const Text('CERRAR SESION'),
-                leading: const Icon(Icons.exit_to_app),
-              ),
               const SizedBox(
                 height: 20,
               ),
@@ -145,170 +132,198 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
 
   StreamBuilder<PerfilModel> _fichaPerfilUsuario() {
     return StreamBuilder(
-        stream:
-            FirebaseProvider().cargarPerfilFB(_emailSesionUsuario).asStream(),
-        builder: ((context, AsyncSnapshot<PerfilModel> snapshot) {
-          if (snapshot.hasData) {
-            final data = snapshot.data;
-            //cargo los datos del usuario en esta variable para enviarla a NuevoActualizacionUsuarioApp.dart
+      stream: FirebaseProvider().cargarPerfilFB(_emailSesionUsuario).asStream(),
+      builder: (context, AsyncSnapshot<PerfilModel> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: LinearProgressIndicator(), // Indicador de carga centrado
+          );
+        }
+        if (snapshot.hasData) {
+          final data = snapshot.data;
+          perfilUsuarioApp = snapshot.data;
 
-            perfilUsuarioApp = snapshot.data;
-
-            return Column(
+          return SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                data!.foto != '' && data.foto != null
-                    ? FadeInImage.assetNetwork(
-                        width: 250,
-                        height: 150,
-                        placeholder: './assets/icon/galeria-de-fotos.gif',
-                        image: data.foto.toString(),
-                      )
-                    : SizedBox(
-                        child: Image.asset(
-                          "./assets/images/nofoto.jpg",
-                          width: 250,
-                          height: 150,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  data.denominacion.toString(),
-                  style: const TextStyle(fontSize: 22),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  height: 100,
-                  child: FutureBuilder(
-                    future: FirebasePublicacionOnlineAgendoWeb()
-                        .verEstadoPublicacion(perfilUsuarioApp!.email!),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const SizedBox();
-                      }
-                      bool estaPublicado =
-                          snapshot.data! == 'PUBLICADO' ? true : false;
-
-                      return Container(
-                        color: !estaPublicado ? Colors.red : Colors.blue,
-                        child: ListTile(
-                            onTap: () => launchUrl(!estaPublicado
-                                ? Uri.parse(
-                                    'https://forms.gle/Rfa17eav1icv37QN6')
-                                : Uri.parse('https://agendadecitas.online')),
-                            leading: Icon(
-                              !estaPublicado ? Icons.public_off : Icons.public,
-                              color: Colors.white,
-                            ),
-                            title: Text(
-                              !estaPublicado
-                                  ? 'SOLICITUD PUBLICACIÓN EN AGENDADECITAS.ONLINE'
-                                  : 'SU ACTIVIDAD ESTÁ PUBLICADA EN:',
-                              style: const TextStyle(
-                                  fontSize: 10, color: Colors.white),
-                            ),
-                            subtitle: Text(
-                              !estaPublicado
-                                  ? 'ENVIAR FORMULARIO  📝 '
-                                  : 'agendadecitas.online',
-                              style: const TextStyle(
-                                  fontSize: 10, color: Colors.white),
-                            ),
-                            trailing: SizedBox(
-                                height: 65,
-                                width: 115,
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      snapshot.data!,
-                                      style: const TextStyle(
-                                          fontSize: 12, color: Colors.white),
-                                    ),
-                                    SizedBox(
-                                      height: 35,
-                                      child: Switch(
-                                          value: estaPublicado,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              publicado = estaPublicado;
-                                            });
-
-                                            if (value) {
-                                              //* envia el tokenMessaging, imagen,el usuario(email) y publicado == false a  Firebase agendoWeb,
-                                              _instruccionesPublicacion(
-                                                  context);
-                                              FirebasePublicacionOnlineAgendoWeb()
-                                                  .creaEstructuraNegocio(
-                                                      perfilUsuarioApp!,
-                                                      estaPublicado);
-                                            } else {
-                                              //* pasar la publicado == false en Firebase agendoWeb
-                                              _instruccionesDespublicacionPublicacion(
-                                                  context);
-                                            }
-                                          }),
-                                    ),
-                                  ],
-                                ))),
-                      );
-                    },
+                _fotoEncabezado(data),
+                const SizedBox(height: 10),
+                _etiquetaPublicacionWeb(),
+                const SizedBox(height: 10),
+                ListTile(
+                  title: Text(
+                    data!.denominacion.toString(),
+                    style: tituloEstilo,
                   ),
                 ),
-                /*  Text(
-                  data.descripcion.toString(),
-                  style: const TextStyle(fontSize: 12),
-                ), */
                 ListTile(
                   leading: const Icon(Icons.phone),
                   title: Text(
                     data.telefono.toString(),
-                    //   style: const TextStyle(fontSize: 20),
                   ),
                 ),
                 ListTile(
                   leading: const Icon(Icons.email),
                   title: Text(
                     _emailSesionUsuario.toString(),
-                    // style: const TextStyle(fontSize: 20),
                   ),
                 ),
                 ListTile(
                   leading: const Icon(Icons.web),
                   title: Text(
                     data.website.toString(),
-                    // style: const TextStyle(fontSize: 20),
                   ),
                 ),
                 ListTile(
                   leading: const Icon(Icons.photo),
                   title: Text(
                     data.instagram.toString(),
-                    // style: const TextStyle(fontSize: 20),
                   ),
                 ),
                 ListTile(
                   leading: const Icon(Icons.facebook),
                   title: Text(
                     data.facebook.toString(),
-                    //  style: const TextStyle(fontSize: 20),
                   ),
                 ),
                 ListTile(
                   leading: const Icon(Icons.location_city),
                   title: Text(
                     data.ubicacion.toString(),
-                    //style: const TextStyle(fontSize: 20),
                   ),
                 ),
+                const Divider(),
+                ListTile(
+                  onTap: () async {
+                    _alertaCerrado();
+                    await PagoProvider().guardaPagado(
+                        _iniciadaSesionUsuario!, _emailSesionUsuario!);
+                    await FirebaseAuth.instance.signOut();
+                    _irHome();
+                  },
+                  /* shape: RoundedRectangleBorder(
+                    side: const BorderSide(color: Colors.black, width: 1),
+                    borderRadius: BorderRadius.circular(5),
+                  ), */
+                  iconColor: Colors.blue,
+                  title: const Text('CERRAR SESION'),
+                  leading: const Icon(Icons.exit_to_app),
+                ),
               ],
-            );
+            ),
+          );
+        }
+        return SizedBox(); // Retornar un SizedBox si no hay datos
+      },
+    );
+  }
+
+  SizedBox _fotoEncabezado(PerfilModel? data) {
+    return SizedBox(
+      width: double.infinity,
+      height: 150,
+      child: Stack(
+        children: [
+          data!.foto != '' && data.foto != null
+              ? Image.network(
+                  data.foto.toString(),
+                  width: double.infinity, // Para que ocupe todo el ancho
+                  height: 150,
+                  fit: BoxFit.cover,
+                )
+              : Image.asset(
+                  "./assets/images/nofoto.jpg",
+                  width: double.infinity, // Para que ocupe todo el ancho
+                  height: 150,
+                  fit: BoxFit.cover,
+                ),
+          Positioned(
+            top: 10,
+            left: 10,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  SizedBox _etiquetaPublicacionWeb() {
+    return SizedBox(
+      height: 100,
+      child: FutureBuilder(
+        future: FirebasePublicacionOnlineAgendoWeb()
+            .verEstadoPublicacion(perfilUsuarioApp!.email!),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const SizedBox();
           }
-          return const SizedBox();
-        }));
+          bool estaPublicado = snapshot.data! == 'PUBLICADO' ? true : false;
+
+          return Container(
+              color: !estaPublicado ? Colors.red : Colors.blue,
+              child: ListTile(
+                  onTap: () => launchUrl(!estaPublicado
+                      ? Uri.parse('https://forms.gle/Rfa17eav1icv37QN6')
+                      : Uri.parse('https://agendadecitas.online')),
+                  leading: Icon(
+                    !estaPublicado ? Icons.public_off : Icons.public,
+                    color: Colors.white,
+                  ),
+                  title: Text(
+                    !estaPublicado
+                        ? 'SOLICITUD PUBLICACIÓN EN AGENDADECITAS.ONLINE'
+                        : 'SU ACTIVIDAD ESTÁ PUBLICADA EN:',
+                    style: const TextStyle(fontSize: 10, color: Colors.white),
+                  ),
+                  subtitle: Text(
+                    !estaPublicado
+                        ? 'ENVIAR FORMULARIO 📝 '
+                        : 'agendadecitas.online',
+                    style: const TextStyle(fontSize: 10, color: Colors.white),
+                  ),
+                  trailing: SizedBox(
+                      height: 65,
+                      width: 115,
+                      child: Column(
+                        children: [
+                          Text(
+                            snapshot.data!,
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.white),
+                          ),
+                          SizedBox(
+                              height: 35,
+                              child: Switch(
+                                  value: estaPublicado,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      publicado = estaPublicado;
+                                    });
+
+                                    if (value) {
+                                      //* envia el tokenMessaging, imagen,el usuario(email) y publicado == false a  Firebase agendoWeb,
+                                      _instruccionesPublicacion(context);
+                                      FirebasePublicacionOnlineAgendoWeb()
+                                          .creaEstructuraNegocio(
+                                              perfilUsuarioApp!, estaPublicado);
+                                    } else {
+                                      //* pasar la publicado == false en Firebase agendoWeb
+                                      _instruccionesDespublicacionPublicacion(
+                                          context);
+                                    }
+                                  })),
+                        ],
+                      ))));
+        },
+      ),
+    );
   }
 
   Future<dynamic> _instruccionesPublicacion(BuildContext context) {
@@ -412,10 +427,7 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
 
   void _alertaCerrado() async {
     mensajeInfo(context, 'CERRANDO SESION...');
-    await Future.delayed(const Duration(seconds: 2), (() async {
-      await FirebaseAuth.instance.signOut();
-      _irHome();
-    }));
+    await Future.delayed(Duration(seconds: 4));
   }
 
   void _irHome() {

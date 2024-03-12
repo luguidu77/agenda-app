@@ -113,7 +113,8 @@ class SincronizarFirebase {
             'facebook': '',
             'instagram': '',
             'ubicacion': '',
-            'email': usuarioAPP
+            'email': usuarioAPP,
+            'registro': DateTime.now()
           });
         }
       });
@@ -405,13 +406,13 @@ class SincronizarFirebase {
   //? SINCRONIZA PAGO ////////////////////////////////////////////
   _actualizaPago(String usuarioAPP, String updown) async {
     /* final docRef = await _referenciaDocumento(
-        usuarioAPP, 'pago');  */// antigua referencia a extinguir
+        usuarioAPP, 'pago');  */ // antigua referencia a extinguir
     final docRefNuevo =
         db!.collection("agendacitasapp").doc(usuarioAPP); //* nueva referencia
     if (updown == 'UPLOAD') {
       //*antigua localizacion del pago ( a extinguir )
-     // var data = {'id': 0, 'pago': false, 'email': usuarioAPP};
-    //  await docRef.doc(data['id'].toString()).set(data);
+      // var data = {'id': 0, 'pago': false, 'email': usuarioAPP};
+      //  await docRef.doc(data['id'].toString()).set(data);
 
       //* nueva localizacion del pago
       var dataNueva = {'pago': false};
@@ -500,7 +501,7 @@ class SincronizarFirebase {
     try {
       // si no existen perfilUsuarioApp lo crea con los campos correspondientes
 
-     /*  await docRef.doc('perfilUsuarioApp').update({
+      /*  await docRef.doc('perfilUsuarioApp').update({
         'foto': perfilUsuarioApp.foto,
         'denominacion': perfilUsuarioApp.denominacion.toString(),
         'descripcion': perfilUsuarioApp.descripcion.toString(),

@@ -184,7 +184,6 @@ class FirebaseProvider extends ChangeNotifier {
 
     await docRef.doc('mensajeCita').set(newPersonaliza);
   }
- 
 
   getCitasHoraOrdenadaPorFecha(emailUsuario, fecha) async {
     List<Map<String, dynamic>> data = [];
@@ -922,13 +921,14 @@ class FirebaseProvider extends ChangeNotifier {
   Future<bool> compruebaPagoFB(usuarioAPP) async {
     late bool pago;
     await _iniFirebase();
+    final docRef = db!.collection("agendacitasapp").doc(usuarioAPP);
     try {
-      final collecRef = await _referenciaDocumento(usuarioAPP, 'pago');
+      // final collecRef = await _referenciaDocumento(usuarioAPP, 'pago');
 
-      await collecRef.doc('0').get().then((res) {
+      await docRef.get().then((res) {
         var data = res.data();
 
-        pago = data['pago'];
+        pago = data!['pago'];
       });
     } catch (e) {
       debugPrint(e.toString());

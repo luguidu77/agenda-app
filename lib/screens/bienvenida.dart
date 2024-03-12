@@ -176,7 +176,11 @@ class _BienvenidaState extends State<Bienvenida> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Checkbox(value: leidoPrivacidad, onChanged: null),
+                Checkbox(
+                    value: leidoPrivacidad,
+                    onChanged: (value) => setState(() {
+                          leidoPrivacidad = !leidoPrivacidad;
+                        })),
                 CheckConsentimiento(
                   onPolicyAccepted: (accepted) {
                     setState(() {});

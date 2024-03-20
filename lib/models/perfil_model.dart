@@ -1,4 +1,5 @@
 class PerfilModel {
+  String? id; // Nuevo campo
   String? denominacion;
   String? descripcion;
   String? facebook;
@@ -21,6 +22,7 @@ class PerfilModel {
   String? email; // Nuevo campo
 
   PerfilModel({
+    this.id, // Nuevo campo
     this.denominacion,
     this.descripcion,
     this.facebook,
@@ -44,6 +46,7 @@ class PerfilModel {
   });
 
   factory PerfilModel.fromJson(Map<String, dynamic> json) => PerfilModel(
+        id: json["id"], // Nuevo campo
         denominacion: json["denominacion"],
         descripcion: json["descripcion"],
         facebook: json["facebook"],
@@ -70,6 +73,7 @@ class PerfilModel {
       );
 
   Map<String, dynamic> toJson() => {
+        "id": id, // Nuevo campo
         "denominacion": denominacion,
         "descripcion": descripcion,
         "facebook": facebook,

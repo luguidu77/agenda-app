@@ -83,6 +83,7 @@ dependencies:
   firebase_auth: ^4.6.0
   firebase_storage: ^11.2.0
   cloud_firestore: ^4.7.0
+  recaptcha_enterprise_flutter: ^18.4.2
   # NOTIFICACIONES FIREBASE
   firebase_messaging: ^14.6.5
 

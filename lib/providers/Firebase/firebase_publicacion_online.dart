@@ -21,8 +21,8 @@ class FirebasePublicacionOnlineAgendoWeb {
   }
 
   //? REFERENCIA DOCUMENTO ////////////////////////////////////////////
-  referenciaDocumento(FirebaseFirestore db, String email) {
-    final docRef = db.collection("agendoWeb").doc(email); //email usuario
+  referenciaDocumento(FirebaseFirestore db) {
+    final docRef = db.collection("agendoWeb"); //email usuario
     // .collection(coleccion); // citas, favoritos, perfil...
     // .doc('SDAdSUSNrJhFpOdpuihs'); // ? id del cliente
 
@@ -56,65 +56,195 @@ class FirebasePublicacionOnlineAgendoWeb {
 
   List<NegocioModel> listaNegocios = [];
   late NegocioModel negocio;
+  List<Map<String, dynamic>> horarios = [
+    {
+      //LUNES
+      'primerTramo': {
+        'apertura': '2023-08-16 10:00:00.000Z',
+        'cierre': '2023-08-16 13:00:00.000Z'
+      },
+      'segundoTramo': {
+        'apertura': '2023-08-16 16:00:00.000Z',
+        'cierre': '2023-08-16 20:00:00.000Z'
+      }
+    },
+    {
+      //MARTES
+      'primerTramo': {
+        'apertura': '2023-08-16 10:00:00.000Z',
+        'cierre': '2023-08-16 13:00:00.000Z'
+      },
+      'segundoTramo': {
+        'apertura': '2023-08-16 16:00:00.000Z',
+        'cierre': '2023-08-16 20:00:00.000Z'
+      }
+    },
+    {
+      //MIERCOLES
+      'primerTramo': {
+        'apertura': '2023-08-16 10:00:00.000Z',
+        'cierre': '2023-08-16 20:00:00.000Z'
+      },
+      'segundoTramo': {
+        'apertura': '2023-08-16 16:00:00.000Z',
+        'cierre': '2023-08-16 20:00:00.000Z'
+      }
+    },
+    {
+      //JUEVES
+      'primerTramo': {
+        'apertura': '2023-08-16 10:00:00.000Z',
+        'cierre': '2023-08-16 13:00:00.000Z'
+      },
+      'segundoTramo': {
+        'apertura': '2023-08-16 16:00:00.000Z',
+        'cierre': '2023-08-16 20:00:00.000Z'
+      }
+    },
+    {
+      //VIERNES
+      'primerTramo': {
+        'apertura': '2023-08-16 10:00:00.000Z',
+        'cierre': '2023-08-16 13:00:00.000Z'
+      },
+      'segundoTramo': {
+        'apertura': '2023-08-16 16:00:00.000Z',
+        'cierre': '2023-08-16 20:00:00.000Z'
+      }
+    },
+    {
+      //SABADO
+      'primerTramo': {
+        'apertura': '2023-08-16 10:00:00.000Z',
+        'cierre': '2023-08-16 13:00:00.000Z'
+      },
+      'segundoTramo': {
+        'apertura': '2023-08-16 16:00:00.000Z',
+        'cierre': '2023-08-16 20:00:00.000Z'
+      }
+    },
+    {
+      //DOMINGO
+      'primerTramo': {
+        'apertura': '2023-08-16 10:00:00.000Z',
+        'cierre': '2023-08-16 13:00:00.000Z'
+      },
+      'segundoTramo': {
+        'apertura': '2023-08-16 16:00:00.000Z',
+        'cierre': '2023-08-16 20:00:00.000Z'
+      }
+    }
+
+    // Agrega más horarios aquí si es necesario
+  ];
 
   // GUARDA  FOTO, tokenMessaging, imagen,el usuario(email) y publicado == false
   void creaEstructuraNegocio(PerfilModel negocio, bool estadoPublicado) async {
     DocumentReference<Map<String, dynamic>>? docRef;
     FirebaseFirestore db = await inicializaFirebase();
-    docRef = referenciaDocumento(db, negocio.email!);
+    // docRef = referenciaDocumento(db, negocio.email!);
     final fcmToken = await FirebaseMessaging.instance.getToken();
 
-    await docRef!.set({
-      //docRef.id: negocio.email,
-      'imagen': negocio.foto,
-      'usuario': negocio.email,
-      'denominacion': negocio.denominacion,
-      'tokenMessaging': fcmToken,
-      'publicado': estadoPublicado,
+    String? idUsuario =
+        await buscarIdUsuario("agendoWeb", "usuario", negocio.email);
+    print(idUsuario);
+    //
+    //si el usario no existe crea estructura y si ya existe no hace nada
+    if (idUsuario == null) {
+      try {
+        await db.collection("agendoWeb").doc().set({
+          'imagen': negocio.foto,
+          'usuario': negocio.email,
+          'denominacion': negocio.denominacion,
+          'tokenMessaging': fcmToken,
+          'publicado': estadoPublicado,
 
-      /* //** sin datos */
-      'Latitud': 0,
-      'Longitud': 0,
-      'categoria': '',
-      'descripcion': '',
-      'destacado': false,
-      'direccion': '',
-      'servicios': [],
-      'telefono': '',
-      'valoracion': '⭐⭐⭐⭐⭐',
+          //** sin datos */
+          'Latitud': 0,
+          'Longitud': 0,
+          'categoria': '',
+          'horarios': horarios,
+          'moneda': '€',
+          'descripcion': '',
+          'destacado': false,
+          'direccion': '',
+          'servicios': ["servicio1", "servicio2"],
+          'telefono': '',
+          'ubicacion': '',
+          'valoracion': '⭐⭐⭐⭐⭐',
 
-      /****** registro */ */
+          /****** registro */
 
-      'registro': DateTime.now(),
-    });
+          'registro': DateTime.now(),
+        });
+      } catch (e) {}
+    }
+  }
+
+  Future<String?> buscarIdUsuario(
+      String coleccion, String campo, dynamic valor) async {
+    try {
+      // Obtener una referencia a la colección en Firestore
+      CollectionReference<Map<String, dynamic>> coleccionRef =
+          FirebaseFirestore.instance.collection(coleccion);
+
+      // Realizar la consulta para buscar documentos que tengan el campo deseado igual al valor proporcionado
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await coleccionRef.where(campo, isEqualTo: valor).get();
+
+      // Si hay al menos un documento que cumple con la condición, devolver el ID del primer documento encontrado
+      if (querySnapshot.docs.isNotEmpty) {
+        return querySnapshot.docs.first.id;
+      } else {
+        // Si no se encuentra ningún documento que cumpla con la condición, devolver null
+        return null;
+      }
+    } catch (e) {
+      // Manejar el error según sea necesario
+      print('Error al buscar el documento por campo: $e');
+      return null;
+    }
   }
 
   // SWICHT PUBLICADO / DESPUBLICADO
   swicthPublicado(PerfilModel negocio, bool value) async {
-    DocumentReference<Map<String, dynamic>>? docRef;
+    final idUsuario =
+        await buscarIdUsuario("agendoWeb", "usuario", negocio.email);
     FirebaseFirestore db = await inicializaFirebase();
-    docRef = referenciaDocumento(db, negocio.email!);
+    dynamic docRef = db.collection("agendoWeb").doc(idUsuario);
+
     await docRef!.update({
       'publicado': value,
     });
   }
 
   //VER ESTADO PUBLICACION EN SWICHT
+  // Future<String> verEstadoPublicacion(String email) async {
   Future<String> verEstadoPublicacion(String email) async {
-    DocumentReference<Map<String, dynamic>>? docRef;
-    FirebaseFirestore db = await inicializaFirebase();
-    docRef = referenciaDocumento(db, email);
-
+    String coleccion = "agendoWeb";
+    final idUsuario = await buscarIdUsuario("agendoWeb", "usuario", email);
     try {
-      dynamic data = await docRef!.get();
+      // Obtener una referencia al documento en Firestore
+      DocumentReference<Map<String, dynamic>> docRef =
+          FirebaseFirestore.instance.collection(coleccion).doc(idUsuario);
 
-      if (data['publicado']) {
-        return 'PUBLICADO';
+      // Obtener el documento
+      DocumentSnapshot<Map<String, dynamic>> snapshot = await docRef.get();
+
+      // Verificar si el campo 'publicado' existe y su valor
+      if (snapshot.exists && snapshot.data()!.containsKey('publicado')) {
+        bool publicado = snapshot.data()!['publicado'];
+
+        // Devolver 'PUBLICADO' si el valor es true, 'NO PUBLICADO' si es false
+        return publicado ? 'PUBLICADO' : 'NO PUBLICADO';
       } else {
+        // Si el campo 'publicado' no existe en el documento, devolver 'NO PUBLICADO'
         return 'NO PUBLICADO';
       }
     } catch (e) {
-      return 'NO PUBLICADO';
+      // Manejar el error según sea necesario
+      print('Error al obtener el estado de publicación: $e');
+      return 'ERROR';
     }
   }
 }

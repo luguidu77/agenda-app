@@ -54,6 +54,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
 
   @override
   void initState() {
+    emailUsuario();
     getPersonaliza();
     reserva = widget.reserva;
 
@@ -111,7 +112,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
         ));
   }
 
-  _botonesCita() {
+  _botonesCita(reserva) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
@@ -129,8 +130,14 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                   widget.emailUsuario);
 
               if (res == true) {
+                print('${reserva}');
+                print('${reserva['email']}');
+                print('${reserva['idCitaCliente']}');
+                await FirebaseProvider().cancelacionCitaCliente(
+                    reserva['email'], reserva['idCitaCliente'].toString());
                 // ignore: use_build_context_synchronously
-                Navigator.pushReplacementNamed(context, '/');
+                //  Navigator.pushReplacementNamed(context, '/');
+                // Cambiar estado en Firebase
               }
             },
             icon: const Icon(Icons.delete),
@@ -206,7 +213,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                       style: subTituloEstilo,
                     ),
                     const SizedBox(height: 10),
-                    _botonesCita()
+                    _botonesCita(reserva)
                   ],
                 ),
               ),

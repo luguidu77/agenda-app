@@ -1,4 +1,4 @@
-import 'package:agendacitas/config/mantenimientos/mantenimientos.dart';
+
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/providers/Firebase/firebase_publicacion_online.dart';
 import 'package:agendacitas/screens/notificaciones_screen.dart';

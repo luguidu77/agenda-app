@@ -1039,4 +1039,20 @@ class FirebaseProvider extends ChangeNotifier {
     //2º ACTUALIAZO EL DATO
     await collectionRef.update({'confirmada': !estadoActual});
   }
+
+  // estado confirmacion de la cita en agenda del cliente
+  Future<void> cancelacionCitaCliente(
+    String emailCliente,
+    String idCitaCliente,
+  ) async {
+    await _iniFirebase();
+    final collectionRef = db!
+        .collection("clientesAgendoWeb")
+        .doc(emailCliente) //email usuario
+        .collection('citas')
+        .doc(idCitaCliente);
+
+    //1º ACTUALIAZO EL DATO
+    await collectionRef.update({'notas': 'CITA CANCELADA POR EL NEGOCIO'});
+  }
 }

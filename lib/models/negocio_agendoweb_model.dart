@@ -6,7 +6,6 @@ class NegocioModel {
   final String email;
   final String telefono;
   final String imagen;
-
   final String moneda;
   final double latitud;
   final double longitud;
@@ -18,26 +17,29 @@ class NegocioModel {
   final dynamic horarios;
   final bool destacado; // Propiedad booleana
   final bool publicado; // Propiedad booleana
+  final Map<String, dynamic> blog; // Nuevo campo
 
-  NegocioModel(
-      {required this.id,
-      required this.denominacion,
-      required this.direccion,
-      required this.ubicacion,
-      required this.email,
-      required this.telefono,
-      required this.imagen,
-      required this.moneda,
-      required this.latitud,
-      required this.longitud,
-      required this.valoracion,
-      required this.categoria,
-      required this.servicios,
-      required this.tokenMessaging,
-      required this.descripcion,
-      required this.horarios,
-      required this.destacado,
-      required this.publicado});
+  NegocioModel({
+    required this.id,
+    required this.denominacion,
+    required this.direccion,
+    required this.ubicacion,
+    required this.email,
+    required this.telefono,
+    required this.imagen,
+    required this.moneda,
+    required this.latitud,
+    required this.longitud,
+    required this.valoracion,
+    required this.categoria,
+    required this.servicios,
+    required this.tokenMessaging,
+    required this.descripcion,
+    required this.horarios,
+    required this.destacado,
+    required this.publicado,
+    required this.blog, // Agregamos el nuevo campo al constructor
+  });
 
   // Constructor de fábrica para crear una instancia de NegocioModel a partir de un mapa
   factory NegocioModel.fromMap(Map<String, dynamic> map) {
@@ -60,6 +62,7 @@ class NegocioModel {
       horarios: map['horarios'],
       destacado: map['destacado'] ?? false,
       publicado: map['publicado'] ?? false,
+      blog: map['blog'], // Agregamos el nuevo campo al constructor
     );
   }
 }

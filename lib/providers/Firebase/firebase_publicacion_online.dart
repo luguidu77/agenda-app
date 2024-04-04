@@ -51,6 +51,8 @@ class FirebasePublicacionOnlineAgendoWeb {
       //
       destacado: doc['destacado'],
       publicado: doc['publicado'],
+      //
+      blog: doc['blog'],
     );
   }
 
@@ -139,7 +141,7 @@ class FirebasePublicacionOnlineAgendoWeb {
   ];
 
   // GUARDA  FOTO, tokenMessaging, imagen,el usuario(email) y publicado == false
-  void creaEstructuraNegocio(PerfilModel negocio, bool estadoPublicado) async {
+  void creaEstructuraNegocio(PerfilModel negocio) async {
     DocumentReference<Map<String, dynamic>>? docRef;
     FirebaseFirestore db = await inicializaFirebase();
     // docRef = referenciaDocumento(db, negocio.email!);
@@ -157,7 +159,7 @@ class FirebasePublicacionOnlineAgendoWeb {
           'usuario': negocio.email,
           'denominacion': negocio.denominacion,
           'tokenMessaging': fcmToken,
-          'publicado': estadoPublicado,
+          'publicado': false,
 
           //** sin datos */
           'Latitud': 0,
@@ -172,6 +174,7 @@ class FirebasePublicacionOnlineAgendoWeb {
           'telefono': '',
           'ubicacion': '',
           'valoracion': '⭐⭐⭐⭐⭐',
+          'blog': {'link': negocio.denominacion, 'publicado': false},
 
           /****** registro */
 
@@ -236,11 +239,24 @@ class FirebasePublicacionOnlineAgendoWeb {
         bool publicado = snapshot.data()!['publicado'];
 
         // Devolver 'PUBLICADO' si el valor es true, 'NO PUBLICADO' si es false
-        return publicado ? 'PUBLICADO' : 'NO PUBLICADO';
-      } else {
-        // Si el campo 'publicado' no existe en el documento, devolver 'NO PUBLICADO'
-        return 'NO PUBLICADO';
+        if (publicado) {
+          return snapshot.id;
+        } else {
+          // Verificar si el campo 'formularioEnviado' existe y su valor
+          if (snapshot.exists &&
+              snapshot.data()!.containsKey('formularioEnviado')) {
+            bool formularioEnviado = snapshot.data()!['formularioEnviado'];
+            if (formularioEnviado) {
+              return 'PROCESANDO';
+            } else {
+              // Si el campo 'formularioEnviado' no existe en el documento, devolver 'NO PUBLICADO'
+              return 'NO PUBLICADO';
+            }
+          }
+        }
       }
+      // Si el campo 'publicado' no existe en el documento, devolver 'NO PUBLICADO'
+      return 'NO PUBLICADO';
     } catch (e) {
       // Manejar el error según sea necesario
       print('Error al obtener el estado de publicación: $e');

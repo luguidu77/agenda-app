@@ -255,64 +255,91 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
   }
 
   SizedBox _etiquetaPublicacionWeb() {
+    Color color = Colors.red;
+    bool publicado = false;
+
     return SizedBox(
-      height: 100,
+      height: 80,
       child: FutureBuilder(
         future: FirebasePublicacionOnlineAgendoWeb()
             .verEstadoPublicacion(perfilUsuarioApp!.email!),
         builder: (context, snapshot) {
+          // comprueba que hay datos del estado de la publicacion
           if (!snapshot.hasData) {
             return const SizedBox();
           }
-          bool estaPublicado = snapshot.data! == 'PUBLICADO' ? true : false;
+
+          // bool estaPublicado = snapshot.data! == 'PUBLICADO' ? true : false;
+          String estadoPublicado = snapshot.data!;
+          switch (estadoPublicado) {
+            case 'NO PUBLICADO':
+              color = Colors.red;
+              publicado = false;
+
+            case 'PROCESANDO':
+              color = Colors.green;
+              publicado = false;
+            default:
+              color = Colors.blue;
+              publicado = true;
+          }
 
           return Container(
-              color: !estaPublicado ? Colors.red : Colors.blue,
+              color: color,
               child: ListTile(
-                  onTap: () => launchUrl(!estaPublicado
-                      ? Uri.parse('https://forms.gle/Rfa17eav1icv37QN6')
-                      : Uri.parse('https://agendadecitas.online')),
-                  leading: Icon(
+                  onTap: () {
+                    !publicado
+                        ? _instruccionesPublicacion(context)
+                        : launchUrl(Uri.parse(
+                            'https://agendadecitas.online/negocio/$estadoPublicado'));
+                  },
+                  /*  leading: Icon(
                     !estaPublicado ? Icons.public_off : Icons.public,
                     color: Colors.white,
-                  ),
+                  ), */
                   title: Text(
-                    !estaPublicado
-                        ? 'SOLICITUD PUBLICACIÓN EN AGENDADECITAS.ONLINE'
-                        : 'SU ACTIVIDAD ESTÁ PUBLICADA EN:',
-                    style: const TextStyle(fontSize: 10, color: Colors.white),
+                    !publicado
+                        ? estadoPublicado == 'PROCESANDO'
+                            ? 'ESTADO: EN ESTUDIO'
+                            : 'PUBLICA MI ACTIVIDAD'
+                        : 'ESTADO: PUBLICADO',
+                    style: const TextStyle(fontSize: 12, color: Colors.white),
                   ),
-                  subtitle: Text(
-                    !estaPublicado
-                        ? 'ENVIAR FORMULARIO 📝 '
-                        : 'agendadecitas.online',
-                    style: const TextStyle(fontSize: 10, color: Colors.white),
-                  ),
+                  subtitle: !publicado
+                      ? Text(
+                          estadoPublicado == 'PROCESANDO'
+                              ? '✔️ FORMULARIO ENVIADO '
+                              : '➡️ ENVIAR FORMULARIO  ',
+                          style: const TextStyle(
+                              fontSize: 10, color: Colors.white),
+                        )
+                      : Text('Id: $estadoPublicado',
+                          style: const TextStyle(
+                              fontSize: 10, color: Colors.white)),
                   trailing: SizedBox(
                       height: 65,
                       width: 115,
                       child: Column(
                         children: [
                           Text(
-                            snapshot.data!,
+                            (estadoPublicado != 'PROCESANDO' ||
+                                    estadoPublicado != 'NO PUBLICADO')
+                                ? 'ONLINE'
+                                : estadoPublicado,
                             style: const TextStyle(
                                 fontSize: 12, color: Colors.white),
                           ),
                           SizedBox(
                               height: 35,
                               child: Switch(
-                                  value: estaPublicado,
+                                  value: publicado,
                                   onChanged: (value) {
                                     setState(() {
-                                      publicado = estaPublicado;
+                                      publicado = publicado;
                                     });
 
                                     if (value) {
                                       //* envia el tokenMessaging, imagen,el usuario(email) y publicado == false a  Firebase agendoWeb,
-                                      _instruccionesPublicacion(context);
-                                      FirebasePublicacionOnlineAgendoWeb()
-                                          .creaEstructuraNegocio(
-                                              perfilUsuarioApp!, estaPublicado);
                                     } else {
                                       //* pasar la publicado == false en Firebase agendoWeb
                                       _instruccionesDespublicacionPublicacion(
@@ -331,16 +358,29 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: const Text(
-              textAlign: TextAlign.justify,
-              'Cuando su solicitud haya sido completada, publicaremos tu actividad en la web agendadecitas.online.\n\nEnvíanos el formulario y deja esta opción en ON para mantenerla publicada, si la pasas a OFF, tu actividad dejará de estar publicada en la web automáticamente.'),
+          content: const Column(
+            children: [
+              Text(
+                'Proceso de publicación en agendadecitas.online :',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                  textAlign: TextAlign.start,
+                  '\n\n📝 Cumplimenta el formulario.\n\n🖥️ Una vez lo hayamos recibido, lo procesaremos para adecuarlo a la web.\n\n💲La publicación de tu actividad es gratuita'),
+            ],
+          ),
           actions: [
-            TextButton(
+            ElevatedButton(
               onPressed: () {
+                FirebasePublicacionOnlineAgendoWeb()
+                    .creaEstructuraNegocio(perfilUsuarioApp!);
                 // Cerrar el diálogo
+
+                launchUrl(Uri.parse('https://forms.gle/Rfa17eav1icv37QN6'));
                 Navigator.of(context).pop();
+                Navigator.pushNamed(context, '/');
               },
-              child: const Text('Cerrar'),
+              child: const Text('Ir al formulario'),
             ),
           ],
         );
@@ -355,7 +395,7 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
       builder: (BuildContext context) {
         return AlertDialog(
           content: const Text(
-              textAlign: TextAlign.justify,
+              textAlign: TextAlign.start,
               'Su actividad dejará de estar publicada en agendadecitas.online.\n\nPara volver a publicar tu actividad contacta con soporte.'),
           actions: [
             TextButton(
@@ -427,7 +467,7 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
 
   void _alertaCerrado() async {
     mensajeInfo(context, 'CERRANDO SESION...');
-    await Future.delayed(Duration(seconds: 4));
+    await Future.delayed(const Duration(seconds: 4));
   }
 
   void _irHome() {

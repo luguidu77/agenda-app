@@ -289,7 +289,9 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
               child: ListTile(
                   onTap: () {
                     !publicado
-                        ? _instruccionesPublicacion(context)
+                        ? estadoPublicado != 'PROCESANDO'
+                            ? _instruccionesPublicacion(context)
+                            : null
                         : launchUrl(Uri.parse(
                             'https://agendadecitas.online/negocio/$estadoPublicado'));
                   },
@@ -322,10 +324,10 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
                       child: Column(
                         children: [
                           Text(
-                            (estadoPublicado != 'PROCESANDO' ||
-                                    estadoPublicado != 'NO PUBLICADO')
-                                ? 'ONLINE'
-                                : estadoPublicado,
+                            (estadoPublicado == 'PROCESANDO' ||
+                                    estadoPublicado == 'NO PUBLICADO')
+                                ? estadoPublicado
+                                : 'ONLINE',
                             style: const TextStyle(
                                 fontSize: 12, color: Colors.white),
                           ),

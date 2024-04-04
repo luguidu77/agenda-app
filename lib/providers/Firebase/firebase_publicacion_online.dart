@@ -217,7 +217,7 @@ class FirebasePublicacionOnlineAgendoWeb {
     dynamic docRef = db.collection("agendoWeb").doc(idUsuario);
 
     await docRef!.update({
-      'publicado': value,
+      'publicado': false,
     });
   }
 

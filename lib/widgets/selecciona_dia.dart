@@ -427,13 +427,20 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
                 newCita.horaFinal = textoHoraF;
                 newCita.comentario = oldCita['comentario'] +
                     '🔃'; //todo: AGREGAR CAMPO REPROGRAMACION O REASIGANACION
+                newCita.email = oldCita['email'];
                 newCita.idcliente = oldCita['idCliente'];
                 newCita.idservicio = oldCita['idServicio'];
                 newCita.idEmpleado = oldCita['idEmpleado'];
+                newCita.confirmada = true;
+                //  oldCita['confirmada'] ;
+                newCita.idCitaCliente = oldCita['idCitaCliente'];
+                newCita.tokenWebCliente = oldCita['tokenWebCliente'];
 
                 debugPrint('$fecha  $textoFechaHora $textoHoraF');
 
-                FirebaseProvider().actualizarCita(usuarioAP, newCita);
+                //* ACUTALIZA LAS BASE DE DATOS DE agandadecitaspp y clienteAgendoWeb
+                await FirebaseProvider().actualizarCita(usuarioAP, newCita);
+                await FirebaseProvider().actualizaCitareasignada(newCita);
 
                 snackbar();
               } else {

@@ -1055,4 +1055,21 @@ class FirebaseProvider extends ChangeNotifier {
     //1º ACTUALIAZO EL DATO
     await collectionRef.update({'notas': 'CITA CANCELADA POR EL NEGOCIO'});
   }
+
+  Future<void> actualizaCitareasignada(CitaModelFirebase cita) async {
+    await _iniFirebase();
+    final collectionRef = db!
+        .collection("clientesAgendoWeb")
+        .doc(cita.email) //email usuario
+        .collection('citas')
+        .doc(cita.idCitaCliente);
+
+    //2º ACTUALIAZO EL DATO CITA EN AGENDO WEB DEL CLIENTE
+    await collectionRef.update({
+      'confirmada': cita.confirmada,
+      'fechaHora': cita.horaInicio,
+      'fecha': cita.dia,
+      'hora': 'hora'
+    });
+  }
 }

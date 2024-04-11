@@ -74,7 +74,9 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
         .format(DateTime.parse(resFecha.toString()));
     return Scaffold(
         backgroundColor: colorFondo,
-        appBar: AppBar(
+        appBar: AppBar(leading: IconButton(icon: Icon(Icons.arrow_back_ios_new), onPressed: (){
+          Navigator.pushNamed(context, '/');
+        },),
           backgroundColor: colorFondo,
           elevation: 0,
           title: Text(

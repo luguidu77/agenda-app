@@ -122,7 +122,8 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           debugPrint(cita.toString()); // print cita
 
           CitaModelFirebase newCita = CitaModelFirebase();
-
+          
+          newCita.email = cita['email'];
           newCita.id = cita['id'];
           newCita.dia = fecha;
           newCita.horaInicio = textoFechaHoraInicio;
@@ -132,12 +133,16 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           newCita.idcliente = cita['idCliente'];
           newCita.idservicio = cita['idServicio'];
           newCita.idEmpleado = cita['idEmpleado'];
-          newCita.confirmada = cita['confirmada'];
-          newCita.tokenWebCliente = cita['idCitaCliente'];
+          newCita.confirmada =
+              cita['confirmada'] == 'true'; // Convertir cadena a booleano
+
+          newCita.idCitaCliente = cita['idCitaCliente'];
           newCita.tokenWebCliente = cita['tokenWebCliente'];
           debugPrint('$fecha  $textoFechaHoraInicio $textoFechaHoraFinal');
-
+           
+           //* ACUTALIZA LAS BASE DE DATOS DE agandadecitaspp y clienteAgendoWeb
           await FirebaseProvider().actualizarCita(_emailSesionUsuario, newCita);
+          await FirebaseProvider().actualizaCitareasignada(newCita);
 
           // ignore: use_build_context_synchronously
           mensajeSuccess(context,

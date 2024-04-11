@@ -80,11 +80,12 @@ class CitaModelFirebase {
   String? horaInicio;
   String? horaFinal;
   String? comentario;
+  String? email;
   String? idcliente;
   String? idservicio;
   String? idEmpleado;
   double? precio;
-  String? confirmada;
+  bool? confirmada;
   String? tokenWebCliente;
   String? idCitaCliente;
 
@@ -94,6 +95,7 @@ class CitaModelFirebase {
     this.horaInicio,
     this.horaFinal,
     this.comentario,
+    this.email,
     this.idcliente,
     this.idservicio,
     this.idEmpleado,
@@ -110,6 +112,7 @@ class CitaModelFirebase {
           horaInicio: json["horainicio"],
           horaFinal: json["horafinal"],
           comentario: json["comentario"],
+          email: json["email"],
           idcliente: json["id_cliente"],
           idservicio: json["id_servicio"],
           idEmpleado: json["id_empleado"],
@@ -124,6 +127,7 @@ class CitaModelFirebase {
         "horainicio": horaInicio,
         "horafinal": horaFinal,
         "comentario": comentario,
+        "email": email,
         "id_cliente": idcliente,
         "id_servicio": idservicio,
         "id_empleado": idEmpleado,

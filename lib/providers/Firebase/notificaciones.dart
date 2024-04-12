@@ -1,8 +1,10 @@
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/models/models.dart';
+import 'package:agendacitas/providers/Firebase/emailHtml/emails_html.dart';
 import 'package:agendacitas/providers/providers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 
 FirebaseFirestore? db;
 
@@ -106,9 +108,10 @@ emailCitaConfirmada(cita, emailnegocio) async {
     'to': cita['email'],
     'message': {
       'subject': 'Confirmación de cita',
-      'html': '${negocio.denominacion}',
+      'html': citaConfirmada( negocio, cita),
     },
   });
+ 
 }
   
 

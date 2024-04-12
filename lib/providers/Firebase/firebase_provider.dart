@@ -938,8 +938,6 @@ class FirebaseProvider extends ChangeNotifier {
     return pago;
   }
 
-  
-
   Future<void> cambiarEstadoVisto(
       String emailUsuario, String notificacionId) async {
     await _iniFirebase();
@@ -969,10 +967,7 @@ class FirebaseProvider extends ChangeNotifier {
   }
 
   // estado confirmacion de la cita en agenda del cliente
-  Future<void> cambiarEstadoConfirmacionCitaCliente(
-     cita, emailnegocio
-   
-  ) async {
+  Future<void> cambiarEstadoConfirmacionCitaCliente(cita, emailnegocio) async {
     await _iniFirebase();
     final collectionRef = db!
         .collection("clientesAgendoWeb")
@@ -991,10 +986,10 @@ class FirebaseProvider extends ChangeNotifier {
       nota = 'CANCELADA POR EL NEGOCIO';
     }
 
-    
     //2ª envia notificacion al cliente agendo web*/
     // necesito del cliente su email,  idCitaCliente y tokenclienteweb
-    await emailCitaConfirmada(cita , emailnegocio);
+    //! comprobar si el cliente tiene activado en su perfil, autorizacion para recibir emails
+    await emailCitaConfirmada(cita, emailnegocio); 
 
     //3º ACTUALIAZO EL DATO
 

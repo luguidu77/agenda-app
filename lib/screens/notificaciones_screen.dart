@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:agendacitas/providers/Firebase/notificaciones.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -39,8 +40,7 @@ class _PaginaNotificacionesScreenState
           title: const Text('Notificaciones'),
         ),
         body: FutureBuilder(
-          future: FirebaseProvider()
-              .getTodasLasNotificacionesCitas(_emailSesionUsuario),
+          future: getTodasLasNotificacionesCitas(_emailSesionUsuario),
           builder: (context, AsyncSnapshot<dynamic> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const LinearProgressIndicator();
@@ -181,7 +181,7 @@ class _PaginaNotificacionesScreenState
   }
 
   _eliminaLedidas(emailSesionUsuario) async {
-    await FirebaseProvider().eliminaLeidas(emailSesionUsuario);
+    await eliminaLeidas(emailSesionUsuario);
     setState(() {});
   }
 }

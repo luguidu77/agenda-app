@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/models/models.dart';
+import 'package:agendacitas/providers/Firebase/notificaciones.dart';
 import 'package:agendacitas/providers/db_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -937,60 +938,7 @@ class FirebaseProvider extends ChangeNotifier {
     return pago;
   }
 
-  // ** NOTIFICACIONES *************************************************
-
-  getTodasLasNotificacionesCitas(emailUsuario) async {
-    List<Map<String, dynamic>> data = [];
-
-    await _iniFirebase();
-
-    final docRef = await _referenciaDocumento(emailUsuario, 'notificaciones');
-
-    await docRef.get().then((QuerySnapshot snapshot) => {
-          for (var element in snapshot.docs)
-            {
-              //SI LA CATEGORIA DE LA NOTIFICACION == CITA o CITAWEB, AGREGA NOTIFICACION
-              if (element['categoria'] == 'cita' ||
-                  element['categoria'] == 'citaweb')
-                {
-                  data.add({
-                    'id': element.id,
-                    'categoria': element['categoria'],
-                    'data': element['data'],
-                    'fechaNotificacion': element['fechaNotificacion'],
-                    'visto': element['visto'],
-                  })
-                }
-            }
-        });
-    // Ordena la lista de citas por hora de inicio
-    print('****************data : $data');
-    data.sort(
-        (a, b) => a['fechaNotificacion'].compareTo(b['fechaNotificacion']));
-
-    return data; //retorna una lista de todas las citas(CitaModelFirebase)
-  }
-
-  eliminaLeidas(emailUsuario) async {
-    await _iniFirebase();
-
-    final docRef = await _referenciaDocumento(emailUsuario, 'notificaciones');
-
-    // Obtener todas las notificaciones
-    final snapshot = await docRef.get();
-
-    // Filtrar las notificaciones que tienen 'visto' igual a true
-    final notificacionesVistas =
-        snapshot.docs.where((doc) => doc.data()['visto'] == true);
-
-    // Eliminar las notificaciones filtradas
-    final batch = FirebaseFirestore.instance.batch();
-    notificacionesVistas.forEach((doc) {
-      batch.delete(doc.reference);
-    });
-    await batch.commit();
-    /* utilizamos un lote (batch) de Firestore para eliminar todas las notificaciones filtradas de una sola vez. Esto minimiza la cantidad de operaciones de escritura en Firestore. */
-  }
+  
 
   Future<void> cambiarEstadoVisto(
       String emailUsuario, String notificacionId) async {
@@ -1022,22 +970,35 @@ class FirebaseProvider extends ChangeNotifier {
 
   // estado confirmacion de la cita en agenda del cliente
   Future<void> cambiarEstadoConfirmacionCitaCliente(
-    String emailCliente,
-    String idCitaCliente,
+     cita, emailnegocio
+   
   ) async {
     await _iniFirebase();
     final collectionRef = db!
         .collection("clientesAgendoWeb")
-        .doc(emailCliente) //email usuario
+        .doc(cita['email']) //email usuario
         .collection('citas')
-        .doc(idCitaCliente);
+        .doc(cita['idCitaCliente']);
 
     // 1º VEO EL ESTADO DE LA VARIABLE ACUTAL
     final docSnapshot = await collectionRef.get();
     final confirmada = docSnapshot.data();
     final bool estadoActual = confirmada!['confirmada'];
-    //2º ACTUALIAZO EL DATO
-    await collectionRef.update({'confirmada': !estadoActual});
+
+    // si es cancelada crea la nota CANCELADA POR EL NEGOCIO
+    String nota = '';
+    if (!estadoActual == false) {
+      nota = 'CANCELADA POR EL NEGOCIO';
+    }
+
+    
+    //2ª envia notificacion al cliente agendo web*/
+    // necesito del cliente su email,  idCitaCliente y tokenclienteweb
+    await emailCitaConfirmada(cita , emailnegocio);
+
+    //3º ACTUALIAZO EL DATO
+
+    await collectionRef.update({'confirmada': !estadoActual, 'notas': nota});
   }
 
   // estado confirmacion de la cita en agenda del cliente
@@ -1057,6 +1018,14 @@ class FirebaseProvider extends ChangeNotifier {
   }
 
   Future<void> actualizaCitareasignada(CitaModelFirebase cita) async {
+    DateTime horaInicio = DateTime.parse(cita.horaInicio!);
+
+    Map<String, dynamic> formateo =
+        FormatearFechaHora.formatearFechaYHora(horaInicio);
+
+    String fechaFormateada = formateo['fechaFormateada'];
+    String horaFormateada = formateo['horaFormateada'];
+
     await _iniFirebase();
     final collectionRef = db!
         .collection("clientesAgendoWeb")
@@ -1067,9 +1036,9 @@ class FirebaseProvider extends ChangeNotifier {
     //2º ACTUALIAZO EL DATO CITA EN AGENDO WEB DEL CLIENTE
     await collectionRef.update({
       'confirmada': cita.confirmada,
-      'fechaHora': cita.horaInicio,
-      'fecha': cita.dia,
-      'hora': 'hora'
+      'fechaHora': horaInicio,
+      'fecha': fechaFormateada,
+      'hora': horaFormateada
     });
   }
 }

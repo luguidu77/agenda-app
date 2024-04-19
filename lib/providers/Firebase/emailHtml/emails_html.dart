@@ -1,10 +1,11 @@
 import 'package:agendacitas/models/models.dart';
 
-String citaConfirmada(PerfilModel negocio, cita) {
+String textoHTML(
+    String estadoCita, PerfilModel negocio, CitaModelFirebase cita) {
   String negocioNombre = negocio.denominacion!;
   String negocioDireccion = '${negocio.ubicacion} - ${negocio.ciudad}';
-  String fechaCita = cita['horaInicio'];
-  String horaCita = cita['horaInicio'];
+  String fechaCita = cita.horaInicio!;
+  String horaCita = cita.horaFinal!;
 
   return '''<!DOCTYPE html>
 
@@ -109,7 +110,7 @@ String citaConfirmada(PerfilModel negocio, cita) {
 <tr>
 <td class="pad">
 <div style="color:#444a5b;direction:ltr;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:center;mso-line-height-alt:19.2px;">
-<p style="margin: 0;">¡ Cita confirmada ! 😃</p>
+<p style="margin: 0;"> $estadoCita </p>
 </div>
 </td>
 </tr>

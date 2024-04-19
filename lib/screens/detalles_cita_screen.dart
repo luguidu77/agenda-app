@@ -74,9 +74,13 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
         .format(DateTime.parse(resFecha.toString()));
     return Scaffold(
         backgroundColor: colorFondo,
-        appBar: AppBar(leading: IconButton(icon: Icon(Icons.arrow_back_ios_new), onPressed: (){
-          Navigator.pushNamed(context, '/');
-        },),
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_new),
+            onPressed: () {
+              Navigator.pushNamed(context, '/');
+            },
+          ),
           backgroundColor: colorFondo,
           elevation: 0,
           title: Text(
@@ -132,13 +136,13 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                   widget.emailUsuario);
 
               if (res == true) {
-                print('${reserva}');
+                /*   print('${reserva}');
                 print('${reserva['email']}');
-                print('${reserva['idCitaCliente']}');
-                await FirebaseProvider().cancelacionCitaCliente(
-                    reserva['email'], reserva['idCitaCliente'].toString());
+                print('${reserva['idCitaCliente']}'); */
+                await FirebaseProvider()
+                    .cancelacionCitaCliente(reserva, widget.emailUsuario);
                 // ignore: use_build_context_synchronously
-                //  Navigator.pushReplacementNamed(context, '/');
+                Navigator.pushReplacementNamed(context, '/');
                 // Cambiar estado en Firebase
               }
             },

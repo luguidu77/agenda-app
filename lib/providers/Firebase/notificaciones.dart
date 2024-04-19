@@ -98,7 +98,22 @@ eliminaLeidas(emailUsuario) async {
 
 //? NOTIFICACIONES EMAILS ***************************************
 // Usando la extensión Trigger Email  de Firebase
-emailCitaConfirmada(cita, emailnegocio) async {
+emailEstadoCita(String estado, CitaModelFirebase cita, emailnegocio) async {
+  // obtengo el perfil del negocio
+  PerfilModel negocio = await FirebaseProvider().cargarPerfilFB(emailnegocio);
+  await _iniFirebase();
+  final collectionRef = db!.collection("mail");
+
+  collectionRef.add({
+    'to': cita.email,
+    'message': {
+      'subject': estado,
+      'html': textoHTML(estado, negocio, cita),
+    },
+  });
+}
+
+emailCitaCancelada(cita, emailnegocio) async {
   // obtengo el perfil del negocio
   PerfilModel negocio = await FirebaseProvider().cargarPerfilFB(emailnegocio);
   await _iniFirebase();
@@ -107,14 +122,11 @@ emailCitaConfirmada(cita, emailnegocio) async {
   collectionRef.add({
     'to': cita['email'],
     'message': {
-      'subject': 'Confirmación de cita',
-      'html': citaConfirmada( negocio, cita),
+      'subject': 'Cita cancelada',
+      'html': textoHTML('Su cita ha sido cancelada', negocio, cita),
     },
   });
- 
 }
-  
-
 
 
   //? NOTIFICACIONES PUSH ***************************************

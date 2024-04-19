@@ -1,3 +1,4 @@
+import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/Firebase/notificaciones.dart';
 
@@ -5,7 +6,7 @@ import 'package:agendacitas/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class BotonConfirmarCitaWeb extends StatefulWidget {
-  final Map<String, dynamic> cita;
+  final dynamic cita;
   final String emailUsuario;
 
   const BotonConfirmarCitaWeb({
@@ -59,9 +60,9 @@ class _BotonConfirmarCitaWebState extends State<BotonConfirmarCitaWeb> {
     });
 
     //** 1 modifica el estado de confirmada en perfil  del cliente (clienteAgendoWeb)*/
-   
-    FirebaseProvider().cambiarEstadoConfirmacionCitaCliente(
-        widget.cita,widget.emailUsuario); 
+
+    FirebaseProvider()
+        .cambiarEstadoConfirmacionCitaCliente(widget.cita, widget.emailUsuario);
     //
     //** cambian el estado de confirmada la cita en agendadecitas */
 

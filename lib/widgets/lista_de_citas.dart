@@ -142,7 +142,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
            
            //* ACUTALIZA LAS BASE DE DATOS DE agandadecitaspp y clienteAgendoWeb
           await FirebaseProvider().actualizarCita(_emailSesionUsuario, newCita);
-          await FirebaseProvider().actualizaCitareasignada(newCita);
+          await FirebaseProvider().actualizaCitareasignada(_emailSesionUsuario,newCita);
 
           // ignore: use_build_context_synchronously
           mensajeSuccess(context,

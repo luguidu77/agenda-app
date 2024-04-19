@@ -440,7 +440,8 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
 
                 //* ACUTALIZA LAS BASE DE DATOS DE agandadecitaspp y clienteAgendoWeb
                 await FirebaseProvider().actualizarCita(usuarioAP, newCita);
-                await FirebaseProvider().actualizaCitareasignada(newCita);
+                await FirebaseProvider()
+                    .actualizaCitareasignada(usuarioAP, newCita);
 
                 snackbar();
               } else {

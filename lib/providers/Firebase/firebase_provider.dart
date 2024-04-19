@@ -966,53 +966,99 @@ class FirebaseProvider extends ChangeNotifier {
     await docRef.doc(idCita).update({'confirmada': !estadoActual});
   }
 
-  // estado confirmacion de la cita en agenda del cliente
-  Future<void> cambiarEstadoConfirmacionCitaCliente(cita, emailnegocio) async {
+  // estado confirmacion de la cita en agenda del cliente (BOTON CONFIRMAR/ANULAR)
+  Future<void> cambiarEstadoConfirmacionCitaCliente(
+      Map<String, dynamic> citaMap, String emailnegocio) async {
+    String nota = '';
+    CitaModelFirebase cita = CitaModelFirebase();
+    cita.email = citaMap['email'];
+    cita.idCitaCliente = citaMap['idCitaCliente'];
+    cita.id = citaMap['id'];
+    cita.dia = citaMap['dia'];
+    cita.horaInicio = citaMap['horaInicio'];
+    cita.horaFinal = citaMap['horaFinal'];
+    cita.comentario = citaMap['comentario'];
+    cita.idcliente = citaMap['idcliente'];
+    cita.idservicio = citaMap['idservicio'];
+    cita.idEmpleado = citaMap['idEmpleado'];
+    cita.precio = double.parse(citaMap['precio']);
+    cita.confirmada = citaMap['confirmada'] == 'true' ? true : false;
+    cita.tokenWebCliente = citaMap['tokenWebCliente'];
+
     await _iniFirebase();
     final collectionRef = db!
         .collection("clientesAgendoWeb")
-        .doc(cita['email']) //email usuario
+        .doc(cita.email) //email usuario
         .collection('citas')
-        .doc(cita['idCitaCliente']);
+        .doc(cita.idCitaCliente);
 
     // 1º VEO EL ESTADO DE LA VARIABLE ACUTAL
     final docSnapshot = await collectionRef.get();
     final confirmada = docSnapshot.data();
-    final bool estadoActual = confirmada!['confirmada'];
+    bool estadoActual = confirmada!['confirmada'];
 
-    // si es cancelada crea la nota CANCELADA POR EL NEGOCIO
-    String nota = '';
-    if (!estadoActual == false) {
-      nota = 'CANCELADA POR EL NEGOCIO';
+    // cambia el estado
+    estadoActual = !estadoActual;
+
+    //******    email al cliente del estado de la cita ****** */
+    if (estadoActual == true) {
+      nota = '';
+      // envia notificacion al cliente agendo web*/
+      // necesito del cliente su email,  idCitaCliente y tokenclienteweb
+      await emailEstadoCita('Cita confirmada', cita, emailnegocio);
+    } else {
+      nota =
+          'CANCELADA POR EL NEGOCIO'; // si es cancelada crea la nota CANCELADA POR EL NEGOCIO
+      // envia notificacion al cliente agendo web*/
+      // necesito del cliente su email,  idCitaCliente y tokenclienteweb
+      //! comprobar si el cliente tiene activado en su perfil, autorizacion para recibir emails
+      await emailEstadoCita('Cita cancelada', cita, emailnegocio);
     }
-
-    //2ª envia notificacion al cliente agendo web*/
-    // necesito del cliente su email,  idCitaCliente y tokenclienteweb
-    //! comprobar si el cliente tiene activado en su perfil, autorizacion para recibir emails
-    await emailCitaConfirmada(cita, emailnegocio); 
 
     //3º ACTUALIAZO EL DATO
 
-    await collectionRef.update({'confirmada': !estadoActual, 'notas': nota});
+    await collectionRef.update({'confirmada': estadoActual, 'notas': nota});
   }
 
   // estado confirmacion de la cita en agenda del cliente
   Future<void> cancelacionCitaCliente(
-    String emailCliente,
-    String idCitaCliente,
-  ) async {
+      //reserva['email'], reserva['idCitaCliente'].toString()
+      Map<String, dynamic> citaMap,
+      emailnegocio) async {
+    CitaModelFirebase cita = CitaModelFirebase();
+    cita.email = citaMap['email'];
+    cita.idCitaCliente = citaMap['idCitaCliente'];
+    cita.id = citaMap['id'];
+    cita.dia = citaMap['dia'];
+    cita.horaInicio = citaMap['horaInicio'];
+    cita.horaFinal = citaMap['horaFinal'];
+    cita.comentario = citaMap['comentario'];
+    cita.idcliente = citaMap['idcliente'];
+    cita.idservicio = citaMap['idservicio'];
+    cita.idEmpleado = citaMap['idEmpleado'];
+    cita.precio = double.parse(citaMap['precio']);
+    cita.confirmada = citaMap['confirmada'] == 'true' ? true : false;
+    cita.tokenWebCliente = citaMap['tokenWebCliente'];
     await _iniFirebase();
     final collectionRef = db!
         .collection("clientesAgendoWeb")
-        .doc(emailCliente) //email usuario
+        .doc(cita.email) //email usuario
         .collection('citas')
-        .doc(idCitaCliente);
+        .doc(cita.idCitaCliente);
 
-    //1º ACTUALIAZO EL DATO
+    //1ª envia notificacion al cliente agendo web*/
+    // necesito del cliente su email,  idCitaCliente y tokenclienteweb
+    //! comprobar si el cliente tiene activado en su perfil, autorizacion para recibir emails
+    await emailEstadoCita('Cita cancelada', cita, emailnegocio);
+
+    //2º ACTUALIAZO EL DATO
     await collectionRef.update({'notas': 'CITA CANCELADA POR EL NEGOCIO'});
   }
 
-  Future<void> actualizaCitareasignada(CitaModelFirebase cita) async {
+  Future<void> actualizaCitareasignada(
+    String emailnegocio,
+    CitaModelFirebase cita,
+  ) async {
     DateTime horaInicio = DateTime.parse(cita.horaInicio!);
 
     Map<String, dynamic> formateo =
@@ -1028,9 +1074,10 @@ class FirebaseProvider extends ChangeNotifier {
         .collection('citas')
         .doc(cita.idCitaCliente);
 
+    await emailEstadoCita('Cita modificada', cita, emailnegocio);
     //2º ACTUALIAZO EL DATO CITA EN AGENDO WEB DEL CLIENTE
     await collectionRef.update({
-      'confirmada': cita.confirmada,
+      'confirmada': true,
       'fechaHora': horaInicio,
       'fecha': fechaFormateada,
       'hora': horaFormateada

@@ -1,4 +1,3 @@
-
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/providers/Firebase/firebase_publicacion_online.dart';
 import 'package:agendacitas/screens/notificaciones_screen.dart';
@@ -119,6 +118,9 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
         // DISPONIBILIDAD SEMANAL
         _disponiblidadSemanal(context),
 
+        // INFORMES GANANCIAS
+        _informes(context),
+
         const Divider(),
 
         _estadopago == 'INITIAL' || _estadopago == 'GRATUITA'
@@ -223,7 +225,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
         future: FirebasePublicacionOnlineAgendoWeb()
             .verEstadoPublicacion(emailUsuario),
         builder: (context, snapshot) {
-          if (!snapshot.hasData || snapshot.data == 'PUBLICADO') {
+          if (!snapshot.hasData || snapshot.data != 'NO PUBLICADO') {
             return Container();
           }
           return Container(
@@ -299,7 +301,10 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const PaginaNotificacionesScreen(),
+                    builder: (context) => HomeScreen(
+                      index: 1,
+                      myBnB: 1,
+                    ),
                   ));
             }
           : () => mensajeError(context, 'Necesita iniciar sesión'),
@@ -353,6 +358,24 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
                   // usuarioAPP: email,
                   )),
         );
+        //  _quitarPublicidad(context, enviosugerencia);
+      },
+    );
+  }
+
+  ListTile _informes(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.bar_chart_rounded),
+      title: Text(
+        'Informes',
+        style: estilo,
+      ),
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>const  InformesScreen(),
+            ));
         //  _quitarPublicidad(context, enviosugerencia);
       },
     );

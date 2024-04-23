@@ -182,11 +182,12 @@ class _InformesScreenState extends State<InformesScreen> {
   Widget build(BuildContext context) {
     colorBotonFlecha = Theme.of(context).primaryColor.withOpacity(0.5);
     return Scaffold(
+      appBar: AppBar(),
       body: SafeArea(
         child: Column(
           children: [
-            _fecha(),
             _grafico(),
+            _fecha(),
             const Divider(),
             Text('GANANCIAS MENSUALES', style: subTituloEstilo),
             _datos(),

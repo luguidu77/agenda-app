@@ -37,7 +37,7 @@ class _PaginaNotificacionesScreenState
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Notificaciones'),
+          title: const Text('BUZÓN DE NOTIFICACIONES'),
         ),
         body: FutureBuilder(
           future: getTodasLasNotificacionesCitas(_emailSesionUsuario),

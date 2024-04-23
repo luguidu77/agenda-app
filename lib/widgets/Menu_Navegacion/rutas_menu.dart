@@ -2,6 +2,7 @@ import 'package:agendacitas/screens/calendario_screen.dart';
 import 'package:agendacitas/screens/clientes_screen.dart';
 import 'package:agendacitas/screens/informes_screen.dart';
 import 'package:agendacitas/screens/menu_aplicacion.dart';
+import 'package:agendacitas/screens/notificaciones_screen.dart';
 import 'package:flutter/material.dart';
 
 class RutasNav extends StatelessWidget {
@@ -12,8 +13,9 @@ class RutasNav extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> myList = const [
       CalendarioCitasScreen(),
-      InformesScreen(),
-      ClientesScreen(),
+      PaginaNotificacionesScreen(),
+      //* InformesScreen(),
+      ClientesScreen(), 
       MenuAplicacion(),
     ];
     return myList[index];

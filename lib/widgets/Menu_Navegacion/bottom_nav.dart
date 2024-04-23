@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/Firebase/notificaciones.dart';
+import '../../providers/providers.dart';
 
 class BNavigator extends StatefulWidget {
   final int index;
@@ -14,8 +18,25 @@ class BNavigator extends StatefulWidget {
 class _BNavigatorState extends State<BNavigator> {
   int index = 0;
 
+  IconData iconoNotificaciones = Icons.notification_important_outlined;
+  String textoNotificaciones = '';
+  Color colorIconoNotificaciones = Colors.red;
+  late String _emailSesionUsuario;
+
+  inicializacion() async {
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+  }
+
+  @override
+  void initState() {
+    inicializacion();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    hayNorificacionesNoleidas(_emailSesionUsuario);
     int index = widget.index;
     Color colorTema = Theme.of(context).primaryColor;
     return Container(
@@ -45,20 +66,21 @@ class _BNavigatorState extends State<BNavigator> {
             tabBorderRadius: 15,
 
             //tabMargin: EdgeInsets.zero,
-            tabs: const [
-              GButton(
+            tabs: [
+              const GButton(
                 icon: Icons.calendar_month_outlined,
                 text: 'Citas',
               ),
               GButton(
-                icon: Icons.bar_chart,
-                text: 'Informe',
+                iconColor: colorIconoNotificaciones,
+                icon: iconoNotificaciones,
+                text: textoNotificaciones,
               ),
-              GButton(
+              const GButton(
                 icon: Icons.people_alt,
                 text: 'Clientes',
               ),
-              GButton(
+              const GButton(
                 icon: Icons.menu,
                 text: 'Menu',
               ),
@@ -72,5 +94,25 @@ class _BNavigatorState extends State<BNavigator> {
             }),
       ),
     );
+  }
+
+  hayNorificacionesNoleidas(email) async {
+    final res = await hayNotificacionesCitasNoLeidas(email);
+    print(
+        '**************************************hay notificaciones no leidas ?   ${res}');
+
+    res != 0
+        ? iconoNotificaciones = Icons.notifications_active_outlined
+        : iconoNotificaciones = Icons.notifications_none;
+
+    res != 0
+        ? textoNotificaciones = 'Buzón🔸$res'
+        : textoNotificaciones = 'Buzón';
+
+    res != 0
+        ? colorIconoNotificaciones = Colors.red
+        : colorIconoNotificaciones = Colors.grey;
+
+    setState(() {});
   }
 }

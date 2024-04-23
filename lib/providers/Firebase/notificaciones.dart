@@ -42,7 +42,8 @@ _referenciaDocumentoClienteAgendoWeb(
 
 // ** NOTIFICACIONES RECIBIDAS A LA APP *************************************************
 //******************************************************************************************** */
-getTodasLasNotificacionesCitas(emailUsuario) async {
+Future<List<Map<String, dynamic>>> getTodasLasNotificacionesCitas(
+    emailUsuario) async {
   List<Map<String, dynamic>> data = [];
 
   await _iniFirebase();
@@ -128,10 +129,23 @@ emailCitaCancelada(cita, emailnegocio) async {
   });
 }
 
+//? NOTIFICACIONES PUSH ***************************************
 
-  //? NOTIFICACIONES PUSH ***************************************
+//******************************************************************************************** */
+Future<int> hayNotificacionesCitasNoLeidas(String emailUsuario) async {
+  bool hayNoleidas = false;
+  int cantidad = 0;
+  List<Map<String, dynamic>> notificacionesCitas =
+      await getTodasLasNotificacionesCitas(emailUsuario);
 
+  for (var element in notificacionesCitas) {
+    if (element['visto'] == false) {
+      hayNoleidas = true;
+      cantidad++;
+    }
+  }
 
-  //******************************************************************************************** */
+  print(notificacionesCitas.map((e) => e));
 
-   
+  return cantidad;
+}

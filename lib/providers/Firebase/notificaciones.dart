@@ -4,7 +4,11 @@ import 'package:agendacitas/providers/Firebase/emailHtml/emails_html.dart';
 import 'package:agendacitas/providers/providers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../buttom_nav_notificaciones_provider.dart';
 
 FirebaseFirestore? db;
 
@@ -40,6 +44,23 @@ _referenciaDocumentoClienteAgendoWeb(
   return collectionRef;
 }
 
+void guardaNotificacionPorFirebaseMessaging(
+    emailUsuario, RemoteMessage message) async {
+  print(
+      '************GUARDA  mensaje notificacion recibida *******(notificaciones.dart)******************************');
+  print(message.data);
+  await _iniFirebase();
+
+  final docRef = await _referenciaDocumentoAPP(emailUsuario, 'notificaciones');
+
+  await docRef.add({
+    'categoria': message.data['categoria'],
+    'data': message.data['data'],
+    'fechaNotificacion': DateTime.now(),
+    'visto': false,
+  });
+}
+
 // ** NOTIFICACIONES RECIBIDAS A LA APP *************************************************
 //******************************************************************************************** */
 Future<List<Map<String, dynamic>>> getTodasLasNotificacionesCitas(
@@ -55,7 +76,8 @@ Future<List<Map<String, dynamic>>> getTodasLasNotificacionesCitas(
           {
             //SI LA CATEGORIA DE LA NOTIFICACION == CITA o CITAWEB, AGREGA NOTIFICACION
             if (element['categoria'] == 'cita' ||
-                element['categoria'] == 'citaweb')
+                element['categoria'] == 'citaweb' ||
+                element['categoria'] == 'administrador')
               {
                 data.add({
                   'id': element.id,
@@ -132,20 +154,21 @@ emailCitaCancelada(cita, emailnegocio) async {
 //? NOTIFICACIONES PUSH ***************************************
 
 //******************************************************************************************** */
-Future<int> hayNotificacionesCitasNoLeidas(String emailUsuario) async {
-  bool hayNoleidas = false;
+contadorNotificacionesCitasNoLeidas(
+    BuildContext context, String emailUsuario) async {
   int cantidad = 0;
-  List<Map<String, dynamic>> notificacionesCitas =
-      await getTodasLasNotificacionesCitas(emailUsuario);
-
-  for (var element in notificacionesCitas) {
-    if (element['visto'] == false) {
-      hayNoleidas = true;
-      cantidad++;
+  // List<Map<String, dynamic>> notificacionesCitas =
+  await getTodasLasNotificacionesCitas(emailUsuario)
+      .then((notificacionesCitas) {
+    for (var element in notificacionesCitas) {
+      if (element['visto'] == false) {
+        cantidad++;
+      }
     }
-  }
 
-  print(notificacionesCitas.map((e) => e));
-
-  return cantidad;
+    // * setea el contador de las notificaciones
+    context
+        .read<ButtomNavNotificacionesProvider>()
+        .setContadorNotificaciones(cantidad);
+  });
 }

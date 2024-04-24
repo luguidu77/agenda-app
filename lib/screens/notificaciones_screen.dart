@@ -37,7 +37,10 @@ class _PaginaNotificacionesScreenState
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: Container(),
           title: const Text('BUZÓN DE NOTIFICACIONES'),
+          centerTitle: true,
+          titleTextStyle: TextStyle(fontSize: 13, color: Colors.black),
         ),
         body: FutureBuilder(
           future: getTodasLasNotificacionesCitas(_emailSesionUsuario),
@@ -86,6 +89,7 @@ class _PaginaNotificacionesScreenState
                                 const Divider(), // Separador entre grupos de notificaciones
                             itemBuilder: (context, index) {
                               final notificacion = snapshot.data![index];
+
                               final notificacionModelo = NotificacionModel(
                                   id: notificacion['id'],
                                   fechaNotificacion:
@@ -96,21 +100,34 @@ class _PaginaNotificacionesScreenState
 
                               String fechaNotificacion = _formateaFecha(
                                   notificacionModelo.fechaNotificacion);
-                              Map<String, dynamic> data =
-                                  jsonDecode(notificacionModelo.data);
-                              final (:nombre, :telefono) =
-                                  _obtieneCliente(data);
-                              final (:fecha, :hora) = _obtieneCita(data);
+
+                              String fechacita = '';
+                              String horacita = '';
+                              String nombreCliente = '';
+                              String telefonoCliente = '';
+
+                              if (notificacion['categoria'] == 'citaweb') {
+                                Map<String, dynamic> data =
+                                    jsonDecode(notificacionModelo.data);
+                                final (:nombre, :telefono) =
+                                    _obtieneCliente(data);
+                                final (:fecha, :hora) = _obtieneCita(data);
+
+                                fechacita = fecha;
+                                horacita = hora;
+                                nombreCliente = nombre;
+                                telefonoCliente = telefono;
+                              }
 
                               // Tarjeta de notificación
                               return _tarjetasNotificaciones(
                                   _emailSesionUsuario,
                                   fechaNotificacion,
                                   notificacion,
-                                  fecha,
-                                  hora,
-                                  nombre,
-                                  telefono);
+                                  fechacita,
+                                  horacita,
+                                  nombreCliente,
+                                  telefonoCliente);
                             },
                           ),
                         ),
@@ -126,6 +143,7 @@ class _PaginaNotificacionesScreenState
         ));
   }
 
+  String categoriaNotificacion = '';
   // *** tarjetas de las notificaciones ***************************************
   Widget _tarjetasNotificaciones(
       emailSesionUsuario,
@@ -135,35 +153,74 @@ class _PaginaNotificacionesScreenState
       String hora,
       String nombre,
       String telefono) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextButton(
-          onPressed: () {}, // Aquí puedes agregar la acción deseada
-          child: Text(fechaNotificacion),
-        ),
-        ListTile(
-          // Contenido de la tarjeta de notificación
-          leading: Column(
-            children: [
-              _obtieneIcono(notificacion['categoria']),
-              _obtieneTextoCategoria(notificacion['categoria'])
-            ],
-          ),
-          title: Text(nombre),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("$fecha-$hora"),
-              Text('Teléfono: $telefono'),
-            ],
-          ),
-          trailing: BotonLedido(
-              notificacion: notificacion,
-              emailSesionUsuario: emailSesionUsuario),
-        ),
-      ],
-    );
+    //** diferenciar segun CATEGORIA de la notificacion********************************** */
+    // citaweb, administrador
+
+    switch (notificacion['categoria']) {
+      case 'citaweb':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextButton(
+              onPressed: () {}, // Aquí puedes agregar la acción deseada
+              child: Text(fechaNotificacion),
+            ),
+            ListTile(
+              // Contenido de la tarjeta de notificación
+              leading: Column(
+                children: [
+                  _obtieneIcono(notificacion['categoria']),
+                  _obtieneTextoCategoria(notificacion['categoria'])
+                ],
+              ),
+              title: Text(nombre),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("$fecha-$hora"),
+                  Text('Teléfono: $telefono'),
+                ],
+              ),
+              trailing: BotonLedido(
+                  notificacion: notificacion,
+                  emailSesionUsuario: emailSesionUsuario),
+            ),
+          ],
+        );
+
+      case 'administrador':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextButton(
+              onPressed: () {}, // Aquí puedes agregar la acción deseada
+              child: Text(fechaNotificacion),
+            ),
+            ListTile(
+              // Contenido de la tarjeta de notificación
+              leading: Column(
+                children: [
+                  _obtieneIcono(notificacion['categoria']),
+                  _obtieneTextoCategoria(notificacion['categoria'])
+                ],
+              ),
+              title: const Text('AGENDA DE CITAS'),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("${notificacion['data']}"),
+                  //  Text('Teléfono: $telefono'),
+                ],
+              ),
+              trailing: BotonLedido(
+                  notificacion: notificacion,
+                  emailSesionUsuario: emailSesionUsuario),
+            ),
+          ],
+        );
+    }
+
+    return Container();
   }
 
   // ***************************************************************************
@@ -190,6 +247,7 @@ Icon _obtieneIcono(String categoria) {
   return switch (categoria) {
     'cita' => const Icon(Icons.offline_share_outlined),
     'citaweb' => const Icon(Icons.cloud_done),
+    'administrador' => const Icon(Icons.admin_panel_settings_sharp),
     _ => const Icon(Icons.data_array_rounded),
   };
 }
@@ -198,6 +256,7 @@ Text _obtieneTextoCategoria(String categoria) {
   return switch (categoria) {
     'cita' => const Text('CITA', style: TextStyle(fontSize: 8)),
     'citaweb' => const Text('CITA', style: TextStyle(fontSize: 8)),
+    'administrador' => const Text('ADMIN', style: TextStyle(fontSize: 8)),
     _ => const Text('N/A', style: TextStyle(fontSize: 8)),
   };
 }

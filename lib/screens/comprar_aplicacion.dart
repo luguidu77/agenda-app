@@ -114,7 +114,7 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
                                   Text.rich(
                                     TextSpan(
                                         text:
-                                            'para una vez comprobado el pago poder activar tu cuenta como pagada. (Un sólo pago, sin suscripción)'),
+                                            'para una vez comprobado el pago poder activar tu cuenta como pagada.(ES UN PROCESO MANUAL)'),
                                     style: TextStyle(
                                         color:
                                             Color.fromARGB(255, 136, 133, 133)),
@@ -123,6 +123,10 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
                               ),
                             ),
                             const SizedBox(height: 10),
+                            const Text(
+                              'UN SÓLO PAGO !!!, NO HAY SUSCRIPCIONES',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                             //botonGPAY(context), ############## BOTON GOOGLE PAY -------------------------------------
                             SizedBox(
                               width: double.infinity,
@@ -141,6 +145,7 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
                                       Icons.app_registration_rounded),
                                   label: const Text('Comprar')),
                             ),
+
                             const SizedBox(
                               height: 20,
                             ),

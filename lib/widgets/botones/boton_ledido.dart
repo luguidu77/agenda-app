@@ -3,6 +3,8 @@ import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/utils/utils.dart';
 import 'package:flutter/material.dart';
 
+import '../../providers/Firebase/notificaciones.dart';
+
 class BotonLedido extends StatefulWidget {
   final Map<String, dynamic> notificacion;
   final String emailSesionUsuario;
@@ -44,6 +46,8 @@ class _BotonLedidoState extends State<BotonLedido> {
         setState(() {
           _visto = !_visto;
           _cargando = false; // Oculta el indicador de carga
+          contadorNotificacionesCitasNoLeidas(
+              context, widget.emailSesionUsuario);
         });
         // Mostrar mensaje
         mensaje(_visto
@@ -54,9 +58,7 @@ class _BotonLedidoState extends State<BotonLedido> {
           ? const SizedBox(
               width: 15, height: 15, child: LinearProgressIndicator())
           : Icon(
-              _visto
-                  ? Icons.mark_chat_read_outlined
-                  : Icons.mark_chat_unread_outlined,
+              _visto ? Icons.circle_outlined : Icons.circle,
             ),
     );
   }

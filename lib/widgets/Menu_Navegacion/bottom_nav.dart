@@ -3,6 +3,7 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/Firebase/notificaciones.dart';
+import '../../providers/buttom_nav_notificaciones_provider.dart';
 import '../../providers/providers.dart';
 
 class BNavigator extends StatefulWidget {
@@ -31,6 +32,7 @@ class _BNavigatorState extends State<BNavigator> {
   @override
   void initState() {
     inicializacion();
+    contadorNotificacionesCitasNoLeidas(context, _emailSesionUsuario);
     super.initState();
   }
 
@@ -52,67 +54,67 @@ class _BNavigatorState extends State<BNavigator> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
         child: GNav(
-            rippleColor: Colors.grey[300]!,
-            hoverColor: Colors.grey[100]!,
-            backgroundColor: Colors.transparent,
-            iconSize: 24,
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
-            gap: 8,
-            duration: const Duration(milliseconds: 900),
-            tabBackgroundColor: colorTema.withOpacity(0.3),
-            color: Colors.grey,
-            activeColor: Colors.white,
-            curve: Curves.easeInCubic,
-            tabBorderRadius: 15,
-
-            //tabMargin: EdgeInsets.zero,
-            tabs: [
-              const GButton(
-                icon: Icons.calendar_month_outlined,
-                text: 'Citas',
-              ),
-              GButton(
-                iconColor: colorIconoNotificaciones,
-                icon: iconoNotificaciones,
-                text: textoNotificaciones,
-              ),
-              const GButton(
-                icon: Icons.people_alt,
-                text: 'Clientes',
-              ),
-              const GButton(
-                icon: Icons.menu,
-                text: 'Menu',
-              ),
-            ],
-            selectedIndex: index,
-            onTabChange: (i) {
-              setState(() {
-                index = i;
-                widget.currentIndex(i);
-              });
-            }),
+          rippleColor: Colors.grey[300]!,
+          hoverColor: Colors.grey[100]!,
+          backgroundColor: Colors.transparent,
+          iconSize: 24,
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+          gap: 8,
+          duration: const Duration(milliseconds: 900),
+          tabBackgroundColor: colorTema.withOpacity(0.3),
+          color: Colors.grey,
+          activeColor: Colors.white,
+          curve: Curves.easeInCubic,
+          tabBorderRadius: 15,
+          tabs: [
+            const GButton(
+              icon: Icons.calendar_month_outlined,
+              text: 'Citas',
+            ),
+            GButton(
+              iconColor: colorIconoNotificaciones,
+              icon: iconoNotificaciones,
+              text: textoNotificaciones,
+            ),
+            const GButton(
+              icon: Icons.people_alt,
+              text: 'Clientes',
+            ),
+            const GButton(
+              icon: Icons.menu,
+              text: 'Menu',
+            ),
+          ],
+          selectedIndex: index,
+          onTabChange: (i) {
+            setState(() {
+              index = i;
+              widget.currentIndex(i);
+            });
+          },
+        ),
       ),
     );
   }
 
   hayNorificacionesNoleidas(email) async {
-    final res = await hayNotificacionesCitasNoLeidas(email);
-    print(
-        '**************************************hay notificaciones no leidas ?   ${res}');
+    final contadorNotificaciones =
+        context.watch<ButtomNavNotificacionesProvider>();
+    int contNotif = contadorNotificaciones.contadorNotificaciones;
 
-    res != 0
+    print(
+        '**************************************hay notificaciones no leidas ?   ${contadorNotificaciones}');
+
+    contNotif != 0
         ? iconoNotificaciones = Icons.notifications_active_outlined
         : iconoNotificaciones = Icons.notifications_none;
 
-    res != 0
-        ? textoNotificaciones = 'Buzón🔸$res'
+    contNotif != 0
+        ? textoNotificaciones = 'Buzón🔸$contNotif'
         : textoNotificaciones = 'Buzón';
 
-    res != 0
+    contNotif != 0
         ? colorIconoNotificaciones = Colors.red
         : colorIconoNotificaciones = Colors.grey;
-
-    setState(() {});
   }
 }

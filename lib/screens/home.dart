@@ -7,12 +7,14 @@ import 'package:agendacitas/screens/detalles_cita_screen.dart';
 import 'package:agendacitas/screens/notificaciones_screen.dart';
 
 import 'package:agendacitas/screens/servicios_screen.dart';
+import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/models.dart';
+import '../providers/Firebase/notificaciones.dart';
 import '../providers/providers.dart';
 
 import '../widgets/widgets.dart';
@@ -76,9 +78,31 @@ class _HomeScreenState extends State<HomeScreen> {
   //***********ESCUCHANDO NOTIFICACIONES Y ACTUACION *************************************/
   void showFlutterNotification(RemoteMessage message) async {
     debugPrint('A continuacion los datos que trae la notificacion:');
-    print(message.data['notificacion']);
+    print(
+        '************ mensaje notificacion recibida *************************************');
+    print(message.data);
 
-    navigatorKey.currentState?.pushNamed('PaginaNotificacionesScreen');
+    //*GUARDA LA NOTIFICACION EN FIRESTORE agendadecitasapp->notificaciones
+    guardaNotificacionPorFirebaseMessaging(_emailSesionUsuario, message);
+    //  navigatorKey.currentState?.pushNamed('PaginaNotificacionesScreen');
+
+    //mensajeInfo(context, 'Nueva notificación');
+    // final notificacion = message.data;
+    //final cita = notificacion['notificacion'];
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+              title: const Text('📣'), // 'citaweb'
+              content: const Text('Has recibido una nueva notificación'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/');
+                  },
+                  child: const Text('Aceptar'),
+                ),
+              ],
+            ));
 
     /*    Map<String, dynamic> notificacion =
         jsonDecode(message.data['notificacion']);
@@ -126,6 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
     contextoPersonaliza = context.read<PersonalizaProvider>();
     contextoPersonalizaFirebase = context.read<PersonalizaProviderFirebase>();
 

@@ -1,10 +1,10 @@
 import 'package:agendacitas/.env.dart';
 import 'package:agendacitas/providers/FormularioBusqueda/formulario_busqueda_provider.dart';
+import 'package:agendacitas/providers/buttom_nav_notificaciones_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,7 +41,7 @@ git push
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  
+
   // initializeDateFormatting().then((_) {
 
   MobileAds.instance.initialize();
@@ -150,7 +150,10 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(
             create: (BuildContext context) => PersonalizaProviderFirebase()),
         ChangeNotifierProvider(
-            create: (BuildContext context) => FormularioBusqueda())
+            create: (BuildContext context) => FormularioBusqueda()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) =>
+                ButtomNavNotificacionesProvider()),
       ],
       builder: (context, _) {
         return MaterialApp(

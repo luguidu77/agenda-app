@@ -1,11 +1,36 @@
 import 'package:agendacitas/models/models.dart';
 
+String formatearFecha(String fechaOriginal) {
+  // Parsear la cadena en un objeto DateTime
+  DateTime dateTime = DateTime.parse(fechaOriginal);
+
+  // Obtener los componentes de la fecha
+  int dia = dateTime.day;
+  int mes = dateTime.month;
+  int ano = dateTime.year;
+
+  // Formatear la fecha en el formato deseado
+  return "$dia-$mes-$ano";
+}
+
+String formatearHora(String horaOriginal) {
+  // Parsear la cadena en un objeto DateTime
+  DateTime dateTime = DateTime.parse(horaOriginal);
+
+  // Obtener la hora y los minutos
+  int hora = dateTime.hour;
+  int minutos = dateTime.minute;
+
+  // Formatear la hora en el formato deseado
+  return "$hora:${minutos.toString().padLeft(2, '0')}";
+}
+
 String textoHTML(
     String estadoCita, PerfilModel negocio, CitaModelFirebase cita) {
   String negocioNombre = negocio.denominacion!;
-  String negocioDireccion = '${negocio.ubicacion} - ${negocio.ciudad}';
-  String fechaCita = cita.horaInicio!;
-  String horaCita = cita.horaFinal!;
+  String negocioDireccion = '${negocio.ubicacion} '; /* - ${negocio.ciudad} */
+  String fechaCita = formatearFecha(cita.horaInicio!);
+  String horaCita = formatearHora(cita.horaFinal!);
 
   return '''<!DOCTYPE html>
 

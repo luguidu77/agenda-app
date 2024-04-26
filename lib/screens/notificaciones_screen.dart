@@ -120,14 +120,43 @@ class _PaginaNotificacionesScreenState
                               }
 
                               // Tarjeta de notificación
-                              return _tarjetasNotificaciones(
-                                  _emailSesionUsuario,
-                                  fechaNotificacion,
-                                  notificacion,
-                                  fechacita,
-                                  horacita,
-                                  nombreCliente,
-                                  telefonoCliente);
+                              return GestureDetector(
+                                onTap: () async {
+                                  await showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return Container(
+                                        height: 300,
+                                        color: Colors.white,
+                                        child: Center(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                              Text('texto'),
+                                              const Divider(),
+                                              /*  MenuConfigCliente(
+                                                cliente: listaClientes[index]), */
+
+                                              //_opciones(context, cliente)
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                                child: _tarjetasNotificaciones(
+                                    _emailSesionUsuario,
+                                    fechaNotificacion,
+                                    notificacion,
+                                    fechacita,
+                                    horacita,
+                                    nombreCliente,
+                                    telefonoCliente),
+                              );
                             },
                           ),
                         ),

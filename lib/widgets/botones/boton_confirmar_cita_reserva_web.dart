@@ -76,7 +76,9 @@ class _BotonConfirmarCitaWebState extends State<BotonConfirmarCitaWeb> {
       _cargando = false; // Oculta el indicador de carga
     });
     // Mostrar mensaje
-    mensaje(_visto ? 'Cita confirmada' : 'Cita anulada');
+    mensaje(_visto
+        ? 'Hemos envíado un email al cliente confirmando la cita'
+        : 'Hemos envíado un email al cliente anulando la cita');
   }
 
   void mensaje(texto) {

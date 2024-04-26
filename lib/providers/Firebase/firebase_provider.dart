@@ -257,6 +257,7 @@ class FirebaseProvider extends ChangeNotifier {
                 'idCliente': element['idcliente'],
                 'idServicio': element['idservicio'],
                 'idEmpleado': element['idempleado'],
+                'confirmada': element['confirmada'],
               })
             }
         });
@@ -313,11 +314,15 @@ class FirebaseProvider extends ChangeNotifier {
 
         double precio =
             (cita['precio'] != '') ? double.parse(cita['precio']) : 0;
-        data.add({
-          'id': cita['id'],
-          'fecha': fecha,
-          'precio': precio,
-        });
+
+        if (cita['confirmada']) {
+          // la ganancia mensual solo tiene en cuenta las citas CONFIRMADAS
+          data.add({
+            'id': cita['id'],
+            'fecha': fecha,
+            'precio': precio,
+          });
+        }
       }
     }
 

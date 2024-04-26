@@ -56,7 +56,7 @@ class _BotonLedidoState extends State<BotonLedido> {
       },
       icon: _cargando
           ? const SizedBox(
-              width: 15, height: 15, child: LinearProgressIndicator())
+              width: 15, height: 15, child: CircularProgressIndicator())
           : Icon(
               _visto ? Icons.circle_outlined : Icons.circle,
             ),

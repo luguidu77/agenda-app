@@ -45,6 +45,8 @@ class FirebasePublicacionOnlineAgendoWeb {
       categoria: doc['categoria'],
       servicios: doc['servicios'],
       tokenMessaging: doc['tokenMessaging'],
+      facebook: doc['facebook'],
+      instagram: doc['instagram'],
       //
       descripcion: doc['descripcion'],
       horarios: doc['horarios'],
@@ -160,8 +162,10 @@ class FirebasePublicacionOnlineAgendoWeb {
           'denominacion': negocio.denominacion,
           'tokenMessaging': fcmToken,
           'publicado': false,
-
+          'facebook': negocio.facebook,
+          'instagram': negocio.instagram,
           //** sin datos */
+
           'Latitud': 0,
           'Longitud': 0,
           'categoria': '',

@@ -120,43 +120,15 @@ class _PaginaNotificacionesScreenState
                               }
 
                               // Tarjeta de notificación
-                              return GestureDetector(
-                                onTap: () async {
-                                  await showModalBottomSheet(
-                                    isScrollControlled: true,
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return Container(
-                                        height: 300,
-                                        color: Colors.white,
-                                        child: Center(
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              Text('texto'),
-                                              const Divider(),
-                                              /*  MenuConfigCliente(
-                                                cliente: listaClientes[index]), */
-
-                                              //_opciones(context, cliente)
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                                child: _tarjetasNotificaciones(
-                                    _emailSesionUsuario,
-                                    fechaNotificacion,
-                                    notificacion,
-                                    fechacita,
-                                    horacita,
-                                    nombreCliente,
-                                    telefonoCliente),
-                              );
+                              return dialogoDescripcionNotificacion(
+                                  context,
+                                  fechaNotificacion,
+                                  notificacion,
+                                  fechacita,
+                                  horacita,
+                                  nombreCliente,
+                                  telefonoCliente,
+                                  notificacionModelo.data);
                             },
                           ),
                         ),
@@ -170,6 +142,105 @@ class _PaginaNotificacionesScreenState
             }
           },
         ));
+  }
+
+  GestureDetector dialogoDescripcionNotificacion(
+      BuildContext context,
+      String fechaNotificacion,
+      notificacion,
+      String fechacita,
+      String horacita,
+      String nombreCliente,
+      String telefonoCliente,
+      data) {
+    return GestureDetector(
+      onTap: () async {
+        print(notificacion);
+        // final categoria = _obtieneTextoCategoria(notificacion['categoria'], 12);
+        await showModalBottomSheet(
+          isScrollControlled: true,
+          context: context,
+          builder: (BuildContext context) {
+            return Container(
+              height: 300,
+              color: Colors.white,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const SizedBox(
+                    height: 35,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(fechaNotificacion),
+                      const SizedBox(
+                        width: 50,
+                      ),
+                      _obtieneIcono(notificacion['categoria']),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      _obtieneTextoCategoria(notificacion['categoria'], 12),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 35,
+                  ),
+                  notificacion['categoria'] == 'cita' ||
+                          notificacion['categoria'] == 'citaweb'
+                      //* NOTIFICACIONES CITAS ****************************
+                      ? Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                // mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text('FECHA: '),
+                                  Text(fechacita),
+                                ],
+                              ),
+                              Row(
+                                //  mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text('HORA: '),
+                                  Text(horacita),
+                                ],
+                              ),
+                              Text(nombreCliente),
+                              Text(telefonoCliente),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text('SERVICIO: '),
+                                  Text(''),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                      //** NOTIFICACIONES FIREBASE MESSAGING ******************/
+                      : Container(
+                          child: Text(data),
+                        ),
+
+                  Container(),
+                  /*  MenuConfigCliente(
+                                            cliente: listaClientes[index]), */
+
+                  //_opciones(context, cliente)
+                ],
+              ),
+            );
+          },
+        );
+      },
+      child: _tarjetasNotificaciones(_emailSesionUsuario, fechaNotificacion,
+          notificacion, fechacita, horacita, nombreCliente, telefonoCliente),
+    );
   }
 
   String categoriaNotificacion = '';
@@ -199,7 +270,7 @@ class _PaginaNotificacionesScreenState
               leading: Column(
                 children: [
                   _obtieneIcono(notificacion['categoria']),
-                  _obtieneTextoCategoria(notificacion['categoria'])
+                  _obtieneTextoCategoria(notificacion['categoria'], 8)
                 ],
               ),
               title: Text(nombre),
@@ -230,7 +301,7 @@ class _PaginaNotificacionesScreenState
               leading: Column(
                 children: [
                   _obtieneIcono(notificacion['categoria']),
-                  _obtieneTextoCategoria(notificacion['categoria'])
+                  _obtieneTextoCategoria(notificacion['categoria'], 8)
                 ],
               ),
               title: const Text('AGENDA DE CITAS'),
@@ -281,12 +352,12 @@ Icon _obtieneIcono(String categoria) {
   };
 }
 
-Text _obtieneTextoCategoria(String categoria) {
+Text _obtieneTextoCategoria(String categoria, double size) {
   return switch (categoria) {
-    'cita' => const Text('CITA', style: TextStyle(fontSize: 8)),
-    'citaweb' => const Text('CITA', style: TextStyle(fontSize: 8)),
-    'administrador' => const Text('ADMIN', style: TextStyle(fontSize: 8)),
-    _ => const Text('N/A', style: TextStyle(fontSize: 8)),
+    'cita' => Text('CITA', style: TextStyle(fontSize: size)),
+    'citaweb' => Text('CITA', style: TextStyle(fontSize: size)),
+    'administrador' => Text('ADMIN', style: TextStyle(fontSize: size)),
+    _ => Text('N/A', style: TextStyle(fontSize: size)),
   };
 }
 

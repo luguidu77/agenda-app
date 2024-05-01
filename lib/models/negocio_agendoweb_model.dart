@@ -14,6 +14,8 @@ class NegocioModel {
   final dynamic servicios;
   final String tokenMessaging;
   final String descripcion;
+  final String facebook;
+  final String instagram;
   final dynamic horarios;
   final bool destacado; // Propiedad booleana
   final bool publicado; // Propiedad booleana
@@ -35,6 +37,8 @@ class NegocioModel {
     required this.servicios,
     required this.tokenMessaging,
     required this.descripcion,
+    required this.facebook,
+    required this.instagram,
     required this.horarios,
     required this.destacado,
     required this.publicado,
@@ -59,6 +63,8 @@ class NegocioModel {
       servicios: map['servicios'],
       tokenMessaging: map['tokenMessaging'],
       descripcion: map['descripcion'],
+      facebook: map['facebook'],
+      instagram: map['instagram'],
       horarios: map['horarios'],
       destacado: map['destacado'] ?? false,
       publicado: map['publicado'] ?? false,

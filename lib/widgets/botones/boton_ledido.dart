@@ -40,7 +40,7 @@ class _BotonLedidoState extends State<BotonLedido> {
 
         // Cambiar estado en Firebase
         await FirebaseProvider().cambiarEstadoVisto(
-            widget.emailSesionUsuario, widget.notificacion['id']);
+            widget.emailSesionUsuario, widget.notificacion['id'], true);
 
         // Cambiar estado local
         setState(() {

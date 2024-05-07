@@ -30,7 +30,7 @@ String textoHTML(
   String negocioNombre = negocio.denominacion!;
   String negocioDireccion = '${negocio.ubicacion} '; /* - ${negocio.ciudad} */
   String fechaCita = formatearFecha(cita.horaInicio!);
-  String horaCita = formatearHora(cita.horaFinal!);
+  String horaCita = formatearHora(cita.horaInicio!);
 
   return '''<!DOCTYPE html>
 

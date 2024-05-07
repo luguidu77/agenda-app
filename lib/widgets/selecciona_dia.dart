@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../models/models.dart';
 import '../mylogic_formularios/mylogic.dart';
 import '../providers/providers.dart';
+import '../utils/extraerServicios.dart';
 import '../utils/publicidad.dart';
 import '../utils/utils.dart';
 
@@ -262,8 +263,8 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
     ServicioModel resServicio = ServicioModel();
     //TRAE SERVICIO DE FIREBASE O DE DISPOSITIVO
     if (iniciadaSesionUsuario) {
-      Map<String, dynamic> resServicioFB =
-          await FirebaseProvider().cargarServicioPorId(usuarioAPP, idServicio);
+      Map<String, dynamic> resServicioFB = await FirebaseProvider()
+          .cargarServicioPorId(usuarioAPP, idServicio.first);
       //TIEMPO DEL SERVICIO
       resServicio.tiempo = resServicioFB['tiempo'];
     } else {
@@ -420,6 +421,9 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
               var idCitaOld = oldCita['id'];
 
               if (iniciadaSesionUsuario) {
+                //? la funcion extraerServicios, resuelve el problema de que el json no tiene comillas en sus claves: [{idServicio: QF3o14RyJ5KbSSb0d6bB, activo: true, servicio: Semiperman
+                List<String> idServicios =
+                    extraerServicios(oldCita['idServicio']);
                 CitaModelFirebase newCita = CitaModelFirebase();
                 newCita.id = idCitaOld;
                 newCita.dia = fecha;
@@ -429,7 +433,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
                     '🔃'; //todo: AGREGAR CAMPO REPROGRAMACION O REASIGANACION
                 newCita.email = oldCita['email'];
                 newCita.idcliente = oldCita['idCliente'];
-                newCita.idservicio = oldCita['idServicio'];
+                newCita.idservicio = idServicios;
                 newCita.idEmpleado = oldCita['idEmpleado'];
                 newCita.confirmada = true;
                 //  oldCita['confirmada'] ;

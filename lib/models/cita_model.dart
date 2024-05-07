@@ -82,7 +82,7 @@ class CitaModelFirebase {
   String? comentario;
   String? email;
   String? idcliente;
-  String? idservicio;
+  List<String>? idservicio;
   String? idEmpleado;
   double? precio;
   bool? confirmada;

@@ -361,6 +361,7 @@ class FirebaseProvider extends ChangeNotifier {
 
   cargarServicioPorId(String email, idservicio) async {
     Map<String, dynamic> servicio = {};
+
     await _iniFirebase();
 
     final docRef = await _referenciaDocumento(email, 'servicio');
@@ -848,7 +849,7 @@ class FirebaseProvider extends ChangeNotifier {
     print(fecha);
     List<Map<String, dynamic>> citasFirebase = [];
     Map<String, dynamic> clienteFirebase = {};
-    Map<String, dynamic> servicioFirebase = {};
+
     //?TRAE LAS CITAS POR FECHA ELEGIDA ///////////////////////////////////////
     List<Map<String, dynamic>> citas = await FirebaseProvider()
         .getCitasHoraOrdenadaPorFecha(emailUsuarioApp, fecha);
@@ -856,20 +857,25 @@ class FirebaseProvider extends ChangeNotifier {
     debugPrint('citas traidas de firebase : ${citas.toString()}');
 
     for (var cita in citas) {
-      if (cita['idServicio'] != '999') {
+      List<Map<String, dynamic>> servicioFirebase = []; //reseteo de la lista
+      if (cita['idServicio'].first != '999') {
         //? TRAE CLIENTE POR SU IDCLIENTE //////////////////////////////////////
         var cliente0 = await FirebaseProvider()
             .getClientePorId(emailUsuarioApp, cita['idCliente']);
         clienteFirebase = cliente0;
         print('clientes ------------------------------$clienteFirebase');
-        //? TRAE SERVICIO POR SU IDSERVICIOS
-        var servicio = await FirebaseProvider()
-            .cargarServicioPorId(emailUsuarioApp, cita['idServicio']);
-        servicioFirebase = servicio;
-        debugPrint('servicio traidas de firebase : ${servicio.toString()}');
+        //? TRAE SERVICIO POR SU IDSERVICIOS ////////////////////////////////////
+        for (var servicio in cita['idServicio']) {
+          var servicioID = await FirebaseProvider()
+              .cargarServicioPorId(emailUsuarioApp, servicio);
+          servicioFirebase.add(servicioID);
+        }
+
+        debugPrint(
+            'servicio traidas de firebase : ${servicioFirebase.toString()}');
       } else {
         // EN EL CASO QUE SEA UN NO DISPONIBLE, ASIGNAMOS NULL A LOS ID SERVICIO Y ID CLIENTE
-        servicioFirebase['idServicio'] = null;
+        servicioFirebase.first['idServicio'] = null;
         clienteFirebase['idCliente'] = null;
       }
 
@@ -893,10 +899,9 @@ class FirebaseProvider extends ChangeNotifier {
         'email': clienteFirebase['email'],
         'nota': clienteFirebase['nota'],
         //servicio
-        'idServicio': servicioFirebase['idServicio'],
-        'servicio': servicioFirebase['servicio'],
-        'detalle': servicioFirebase['detalle'],
-        //  'precio': servicioFirebase['precio'],
+        'idServicio': servicioFirebase,
+        // 'servicio': servicioFirebase.first['servicio'],
+        // 'detalle': servicioFirebase.first['detalle'],
       });
     }
 
@@ -944,7 +949,8 @@ class FirebaseProvider extends ChangeNotifier {
   }
 
   Future<void> cambiarEstadoVisto(
-      String emailUsuario, String notificacionId) async {
+      String emailUsuario, String notificacionId, bool visto) async {
+    //si viene del boton visto = true // si viene de descripcion de la notificacion ,visto = false
     await _iniFirebase();
     final docRef = await _referenciaDocumento(emailUsuario, 'notificaciones');
 
@@ -953,9 +959,15 @@ class FirebaseProvider extends ChangeNotifier {
     final notificacion =
         snapshot.docs.firstWhere((doc) => doc.id == notificacionId);
 
-    final bool estadoActual = notificacion['visto'];
-
-    await docRef.doc(notificacionId).update({'visto': !estadoActual});
+    if (visto) {
+      // compruebo el estado actual de visto en Firebase
+      bool estadoActual = notificacion['visto'];
+      // cambio al contrario del estado actual
+      await docRef.doc(notificacionId).update({'visto': !estadoActual});
+    } else {
+      // viene del dialogo de descripcion de la notificacion, por lo que siempre se cambiara a visto= true
+      await docRef.doc(notificacionId).update({'visto': true});
+    }
   }
 
   // estado confirmacion de la cita en agenda del negocio

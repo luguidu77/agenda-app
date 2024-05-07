@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:agendacitas/utils/extraerServicios.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -89,6 +90,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         }
       },
 
+      // ****** reasiganacion de cita**********************************************
       onDragEnd: (AppointmentDragEndDetails appointmentDragEndDetails) async {
         // cita seleccionada
         dynamic appointment = appointmentDragEndDetails.appointment!;
@@ -121,8 +123,11 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
           debugPrint(cita.toString()); // print cita
 
+          //? la funcion extraerServicios, resuelve el problema de que el json no tiene comillas en sus claves: [{idServicio: QF3o14RyJ5KbSSb0d6bB, activo: true, servicio: Semiperman
+          List<String> idServicios = extraerServicios(cita['idServicio']);
+
           CitaModelFirebase newCita = CitaModelFirebase();
-          
+
           newCita.email = cita['email'];
           newCita.id = cita['id'];
           newCita.dia = fecha;
@@ -131,18 +136,19 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           newCita.comentario = cita['comentario'] +
               ' 🔃​'; //todo añadir un nuevo campo REPROGRAMACION
           newCita.idcliente = cita['idCliente'];
-          newCita.idservicio = cita['idServicio'];
+          newCita.idservicio = idServicios;
           newCita.idEmpleado = cita['idEmpleado'];
           newCita.confirmada =
               cita['confirmada'] == 'true'; // Convertir cadena a booleano
 
-          newCita.idCitaCliente = cita['idCitaCliente'];
+         // newCita.idCitaCliente = cita['idCitaCliente'];
           newCita.tokenWebCliente = cita['tokenWebCliente'];
           debugPrint('$fecha  $textoFechaHoraInicio $textoFechaHoraFinal');
-           
-           //* ACUTALIZA LAS BASE DE DATOS DE agandadecitaspp y clienteAgendoWeb
+
+          //* ACUTALIZA LAS BASE DE DATOS DE agandadecitaspp y clienteAgendoWeb
           await FirebaseProvider().actualizarCita(_emailSesionUsuario, newCita);
-          await FirebaseProvider().actualizaCitareasignada(_emailSesionUsuario,newCita);
+          await FirebaseProvider()
+              .actualizaCitareasignada(_emailSesionUsuario, newCita);
 
           // ignore: use_build_context_synchronously
           mensajeSuccess(context,
@@ -182,8 +188,10 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           : true;
 
       // **** DONDE CREAMOS LA NOTA QUE TRAE TODOS LOS DATOS NECESARIOS PARA LA GESTION DE CITA ****************
+      //
+
       meetings.add(Appointment(
-          // TRAEMOS TODOS LOS DATOS QUE NOS HARA FALTA PARA TRABAJAR CON ELLOS POSTERIORMENTE
+          // TRAEMOS TODOS LOS DATOS QUE NOS HARA FALTA PARA TRABAJAR CON ELLOS POSTERIORMENTE en Detalles de la cita
           notes: '''
 {
   "id": "${cita['id']}",
@@ -196,7 +204,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
   "horaFinal": "${cita['horaFinal']}",
   "telefono": "${cita['telefono']}",
   "email": "${cita['email']}",
-  "servicio": "${cita['servicio']}",
+  "servicio": "${cita['idServicio'].map((serv) => serv['servicio']).join(', ')}",
   "detalle": "${cita['detalle'].toString()}",
   "precio": "${cita['precio']}",
   "foto": "${cita['foto']}",
@@ -213,7 +221,9 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           subject: textoCita(cita),
 
           //location: 'es-ES',
-          color: cita['idServicio'] == 999 || cita['idServicio'] == null
+          color: cita['idServicio'].first == 999 ||
+                  cita['idServicio'] ==
+                      null //todo: comprueba solo el primer servicio de la lista
               ? const Color.fromARGB(255, 113, 151, 102)
               : !citaConfirmada
                   ? const Color.fromARGB(255, 133, 130, 130)
@@ -248,7 +258,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
     return (cita['nombre'] != null)
         ? '${textoConfirmada.padLeft(60)}'
             '\n😀 ${cita['nombre']}'
-            '\n 🤝 ${cita['servicio']}'
+            '\n 🤝 ${cita['idServicio'].map((serv) => serv['servicio']).join(', ')}' //.join(', ') => para que no quitar los ()
             '\n 📇 ${cita['comentario']}'
             '\n 💰 ${cita['precio']}'
         : '🌴⛵🍍🦀 NO DISPONIBLE \n\n MOTIVO: ${cita['comentario']}';

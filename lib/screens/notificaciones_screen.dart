@@ -105,11 +105,12 @@ class _PaginaNotificacionesScreenState
                               String horacita = '';
                               String nombreCliente = '';
                               String telefonoCliente = '';
+                              String emailCliente = '';
 
                               if (notificacion['categoria'] == 'citaweb') {
                                 Map<String, dynamic> data =
                                     jsonDecode(notificacionModelo.data);
-                                final (:nombre, :telefono) =
+                                final (:nombre, :telefono, :email) =
                                     _obtieneCliente(data);
                                 final (:fecha, :hora) = _obtieneCita(data);
 
@@ -117,6 +118,7 @@ class _PaginaNotificacionesScreenState
                                 horacita = hora;
                                 nombreCliente = nombre;
                                 telefonoCliente = telefono;
+                                emailCliente = email;
                               }
 
                               // Tarjeta de notificación
@@ -128,6 +130,8 @@ class _PaginaNotificacionesScreenState
                                   horacita,
                                   nombreCliente,
                                   telefonoCliente,
+                                  _emailSesionUsuario,
+                                  emailCliente,
                                   notificacionModelo.data);
                             },
                           ),
@@ -152,10 +156,16 @@ class _PaginaNotificacionesScreenState
       String horacita,
       String nombreCliente,
       String telefonoCliente,
+      String emailSesionUsuario,
+      String emailCliente,
       data) {
     return GestureDetector(
       onTap: () async {
-        print(notificacion);
+        // setState(() {});
+        // Cambiar estado en Firebase
+
+        print(emailSesionUsuario);
+        print(notificacion['id']);
         // final categoria = _obtieneTextoCategoria(notificacion['categoria'], 12);
         await showModalBottomSheet(
           isScrollControlled: true,
@@ -212,6 +222,7 @@ class _PaginaNotificacionesScreenState
                               ),
                               Text(nombreCliente),
                               Text(telefonoCliente),
+                              Text(emailCliente),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -236,7 +247,13 @@ class _PaginaNotificacionesScreenState
               ),
             );
           },
-        );
+        ).then((value) async {
+          await FirebaseProvider().cambiarEstadoVisto(
+              emailSesionUsuario, notificacion['id'], false);
+
+          setState(() {
+           });
+        });
       },
       child: _tarjetasNotificaciones(_emailSesionUsuario, fechaNotificacion,
           notificacion, fechacita, horacita, nombreCliente, telefonoCliente),
@@ -262,7 +279,7 @@ class _PaginaNotificacionesScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextButton(
-              onPressed: () {}, // Aquí puedes agregar la acción deseada
+              onPressed: () async {}, // Aquí puedes agregar la acción deseada
               child: Text(fechaNotificacion),
             ),
             ListTile(
@@ -368,9 +385,14 @@ Text _obtieneTextoCategoria(String categoria, double size) {
   return (fecha: fechaCita, hora: horaCita);
 }
 
-({String nombre, String telefono}) _obtieneCliente(data) {
+({String nombre, String telefono, String email}) _obtieneCliente(data) {
   String nombreCliente = data['cliente']['nombre'];
   String telefonoCliente = data['cliente']['telefono'];
+  String emailCliente = data['cliente']['email'];
 
-  return (nombre: nombreCliente, telefono: telefonoCliente);
+  return (
+    nombre: nombreCliente,
+    telefono: telefonoCliente,
+    email: emailCliente
+  );
 }

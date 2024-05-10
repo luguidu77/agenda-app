@@ -301,10 +301,16 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                       style: textoEstilo,
                       reserva['nombre'].toString()),
                   Text(
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: textoEstilo,
+                      reserva['telefono'].toString()),
+                  Text(
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    reserva['nota'].toString() == ''
-                        ? 'Notas'
+                    reserva['nota'].toString() == '' ||
+                            reserva['nota'].toString() == 'null'
+                        ? ''
                         : reserva['nota'].toString(),
                     style: textoPequenoEstilo,
                   ),
@@ -324,7 +330,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                     },
                     icon: const FaIcon(FontAwesomeIcons.phone),
                   ),
-                  reserva['email'] != ' '
+                  reserva['email'] != ''
                       ? IconButton(
                           onPressed: () {
                             Comunicaciones.enviarEmail(

@@ -141,7 +141,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           newCita.confirmada =
               cita['confirmada'] == 'true'; // Convertir cadena a booleano
 
-         // newCita.idCitaCliente = cita['idCitaCliente'];
+          newCita.idCitaCliente = cita['idCitaCliente'];
           newCita.tokenWebCliente = cita['tokenWebCliente'];
           debugPrint('$fecha  $textoFechaHoraInicio $textoFechaHoraFinal');
 
@@ -187,6 +187,11 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
               : false
           : true;
 
+      //SERVICIOS DEPENDENRA DE SI ES CON SESION O EN DISPOSITIVO
+      var servicios = _iniciadaSesionUsuario
+          ? cita['idServicio'].map((serv) => serv['servicio']).join(', ')
+          : cita['idServicio'];
+
       // **** DONDE CREAMOS LA NOTA QUE TRAE TODOS LOS DATOS NECESARIOS PARA LA GESTION DE CITA ****************
       //
 
@@ -204,7 +209,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
   "horaFinal": "${cita['horaFinal']}",
   "telefono": "${cita['telefono']}",
   "email": "${cita['email']}",
-  "servicio": "${cita['idServicio'].map((serv) => serv['servicio']).join(', ')}",
+  "servicio": "$servicios",
   "detalle": "${cita['detalle'].toString()}",
   "precio": "${cita['precio']}",
   "foto": "${cita['foto']}",
@@ -221,7 +226,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           subject: textoCita(cita),
 
           //location: 'es-ES',
-          color: cita['idServicio'].first == 999 ||
+          color: cita['idServicio'] == 999 ||
                   cita['idServicio'] ==
                       null //todo: comprueba solo el primer servicio de la lista
               ? const Color.fromARGB(255, 113, 151, 102)
@@ -255,10 +260,13 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
     print('$citaConfirmada ---- $_iniciadaSesionUsuario');
     String textoConfirmada =
         citaConfirmada ? 'CONFIRMADA' : 'PENDIENTE CONFIRMAR';
+    var servicios = _iniciadaSesionUsuario
+        ? cita['idServicio'].map((serv) => serv['servicio']).join(', ')
+        : cita['idServicio'];
     return (cita['nombre'] != null)
         ? '${textoConfirmada.padLeft(60)}'
             '\n😀 ${cita['nombre']}'
-            '\n 🤝 ${cita['idServicio'].map((serv) => serv['servicio']).join(', ')}' //.join(', ') => para que no quitar los ()
+            '\n 🤝 $servicios' //.join(', ') => para que no quitar los ()
             '\n 📇 ${cita['comentario']}'
             '\n 💰 ${cita['precio']}'
         : '🌴⛵🍍🦀 NO DISPONIBLE \n\n MOTIVO: ${cita['comentario']}';

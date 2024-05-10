@@ -106,8 +106,9 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
             : _cabeceraGratuita(),
 
         // MENSAJE PARA LA PUBLICACION EN AGENDADECITAS.ONLINE
-
-        _mensajePublicacionOnline(context, _emailSesionUsuario),
+        _iniciadaSesionUsuario
+            ? _mensajePublicacionOnline(context, _emailSesionUsuario)
+            : Container(),
 
         // CONFIGURA LOS SERVICIOS QUE OFRECEN A CLIENTES
         _serviciosQueOfrece(context),
@@ -374,7 +375,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>const  InformesScreen(),
+              builder: (context) => const InformesScreen(),
             ));
         //  _quitarPublicidad(context, enviosugerencia);
       },

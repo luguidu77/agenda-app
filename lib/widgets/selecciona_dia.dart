@@ -258,49 +258,89 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
 // traer horas y minutos de trabajo para sumarlas
   seleccionaCita(BuildContext context, idServicio, usuarioAPP,
       iniciadaSesionUsuario) async {
+    DateTime fechaInicio = DateTime.parse(textoFechaHora);
+    DateTime fechaFinal;
+    DateTime tiempoTotal = fechaInicio;
+    int totalTiempoHoras = int.parse('00');
+    int totalTiempoMinutos = int.parse('00');
     print('idservicio  = $idServicio');
     //COMPRUEBO EL TIEMPO DEL SERVICIO A PRESTAR
     ServicioModel resServicio = ServicioModel();
     //TRAE SERVICIO DE FIREBASE O DE DISPOSITIVO
     if (iniciadaSesionUsuario) {
-      Map<String, dynamic> resServicioFB = await FirebaseProvider()
-          .cargarServicioPorId(usuarioAPP, idServicio.first);
-      //TIEMPO DEL SERVICIO
-      resServicio.tiempo = resServicioFB['tiempo'];
+      Map<String, dynamic> resServicioFB = {};
+      //idServicio VIENE COMO UN TEXTO [{idServicio: QF3o14RyJ5KbSSb0d6bB, activo: true, servicio: Semipermanente con refuerzo, detalle: , precio: 20, tiempo: 01:00}]
+      List<String> idServicios = extraerServicios(idServicio);
+      for (var idservicio in idServicios) {
+        resServicioFB = await FirebaseProvider()
+            .cargarServicioPorId(usuarioAPP, idservicio);
+
+        //TIEMPO DEL SERVICIO
+        resServicio.tiempo = resServicioFB['tiempo'];
+        print('tiempo del Servicio  = ${resServicio.tiempo}');
+        // DateTime fechaInicio = DateTime.parse(textoFechaHora);
+
+        // String tiempoServicio = servicio['TIEMPO'];
+        var tiempoServicio = resServicio.tiempo!;
+        // tiempo servicio en horas
+        int tiempoServicioHoras =
+            int.parse('${tiempoServicio[0]}${tiempoServicio[1]}');
+        // tiempo servicio en minutos
+        int tiempoServicioMinutos =
+            int.parse('${tiempoServicio[3]}${tiempoServicio[4]}');
+        // la hora final se obtiene sumandole a la de inicio el tiempo del servicio
+        tiempoTotal = tiempoTotal.add(Duration(
+            hours: tiempoServicioHoras, minutes: tiempoServicioMinutos));
+
+        totalTiempoHoras = totalTiempoHoras + tiempoServicioHoras;
+        totalTiempoMinutos = totalTiempoMinutos + tiempoServicioMinutos;
+        /*  fechaFinal = fechaInicio.add(Duration(
+            hours: tiempoServicioHoras, minutes: tiempoServicioMinutos)); */
+        // HORA FINAL
+      }
+      fechaFinal = tiempoTotal;
+      textoHoraF = fechaFinal.toString();
+      // COMPROBAR LA FECHA NUEVA ESTÁ DISPONIBLE
+
+      _disponible = await _compruebaDisponibilidad(totalTiempoHoras,
+          totalTiempoMinutos, usuarioAPP, iniciadaSesionUsuario);
+      _disponible = true;
+      print('disponible: $_disponible');
+      print('fecha1  $fechaInicio ');
     } else {
       resServicio =
           await CitaListProvider().cargarServicioPorId(int.parse(idServicio));
-    }
 
-    print('tiempo del Servicio  = ${resServicio.tiempo}');
-    DateTime fechaInicio = DateTime.parse(textoFechaHora);
+      print('tiempo del Servicio  = ${resServicio.tiempo}');
 
-    // String tiempoServicio = servicio['TIEMPO'];
-    var tiempoServicio = resServicio.tiempo!;
-    // tiempo servicio en horas
-    int tiempoServicioHoras =
-        int.parse('${tiempoServicio[0]}${tiempoServicio[1]}');
-    // tiempo servicio en minutos
-    int tiempoServicioMinutos =
-        int.parse('${tiempoServicio[3]}${tiempoServicio[4]}');
-    // la hora final se obtiene sumandole a la de inicio el tiempo del servicio
-    DateTime fechaFinal = fechaInicio.add(
-        Duration(hours: tiempoServicioHoras, minutes: tiempoServicioMinutos));
-    // HORA FINAL
-    textoHoraF = fechaFinal.toString();
+      // String tiempoServicio = servicio['TIEMPO'];
+      var tiempoServicio = resServicio.tiempo!;
+      // tiempo servicio en horas
+      int tiempoServicioHoras =
+          int.parse('${tiempoServicio[0]}${tiempoServicio[1]}');
+      // tiempo servicio en minutos
+      int tiempoServicioMinutos =
+          int.parse('${tiempoServicio[3]}${tiempoServicio[4]}');
+      // la hora final se obtiene sumandole a la de inicio el tiempo del servicio
+      DateTime fechaFinal = fechaInicio.add(
+          Duration(hours: tiempoServicioHoras, minutes: tiempoServicioMinutos));
+      // HORA FINAL
+      textoHoraF = fechaFinal.toString();
 
-    print('fecha1  $fechaInicio ');
+      print('fecha1  $fechaInicio ');
 
-    /*  micontexto.setCitaElegida = {
+      /*  micontexto.setCitaElegida = {
       'FECHA': textoDia,
       'HORAINICIO': fechaInicio,
       'HORAFINAL': fechaFinal
     }; */
 
-    // COMPROBAR LA FECHA NUEVA ESTÁ DISPONIBLE
-    _disponible = await _compruebaDisponibilidad(tiempoServicioHoras,
-        tiempoServicioMinutos, usuarioAPP, iniciadaSesionUsuario);
-    print('disponible: $_disponible');
+      // COMPROBAR LA FECHA NUEVA ESTÁ DISPONIBLE
+      _disponible = await _compruebaDisponibilidad(tiempoServicioHoras,
+          tiempoServicioMinutos, usuarioAPP, iniciadaSesionUsuario);
+      print('disponible: $_disponible');
+    }
+
     setState(() {});
 
     // RETORNA SI ESTÁ DISPONIBLE LA FECHA

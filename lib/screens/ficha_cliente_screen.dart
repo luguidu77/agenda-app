@@ -326,7 +326,9 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
                         const SizedBox(
                             width: 8), // Espacio entre el icono y el texto
                         Text(
-                          cliente.nota == '' ? 'Notas' : cliente.nota!,
+                          cliente.nota == '' || cliente.nota == 'null'
+                              ? 'Notas'
+                              : cliente.nota!,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           style: textoEstilo,

@@ -1,6 +1,9 @@
+import 'package:agendacitas/providers/Firebase/notificaciones.dart';
+import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/models.dart';
+import '../../providers/Firebase/emailHtml/emails_html.dart';
 
 class Comunicaciones {
   static void hacerLlamadaTelefonica(String phoneNumber) async {
@@ -117,18 +120,51 @@ class Comunicaciones {
     }
   }
 
-  void compartirCitaEmail(PerfilModel perfilUsuarioApp, String textoActual,
-      String clienta, String email, String fecha, String servicio) async {
-    String? encodeQueryParameters(Map<String, String> params) {
+  void compartirCitaEmail(
+      context,
+      PerfilModel perfilUsuarioApp,
+      String textoActual,
+      String clienta,
+      String email,
+      String fecha,
+      String servicio) async {
+    //***           ENVIOS EMAIL AUTOMATICOS SERVICIO FIREBASE ******************************** */
+    PerfilModel negocio = PerfilModel(
+        denominacion: perfilUsuarioApp.denominacion,
+        telefono: perfilUsuarioApp.telefono);
+    CitaModelFirebase cita =
+        CitaModelFirebase(horaInicio: '2024-05-12 18:00:00Z', email: email);
+
+    await emailEstadoCita(
+            'Cita confirmada por el negocio (No aparecerá en su administración de citas)',
+            cita,
+            perfilUsuarioApp.email)
+        .then((mailId) {
+      Future.delayed(const Duration(seconds: 5), () async {
+        dynamic statusEnvio = await comprueStatusEmail(mailId);
+        switch (statusEnvio) {
+          case 'SUCCESS':
+            mensajeInfo(context, 'Email entregado correctamente');
+
+          default:
+            mensajeError(context, 'No se ha entregado el email');
+        }
+      });
+    });
+
+    //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+    //** ********** ENVIOS MANUALES *********************************************************** */
+
+    /*
+        String? encodeQueryParameters(Map<String, String> params) {
       return params.entries
           .map((MapEntry<String, String> e) =>
               '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
           .join('&');
     }
-
-    String texto =
-        textoCompartir(perfilUsuarioApp, textoActual, clienta, fecha, servicio);
-    final Uri emailLaunchUri = Uri(
+    string text= textoCompartir(perfilUsuarioApp, textoActual, clienta, fecha, servicio);
+      final Uri emailLaunchUri = Uri(
       scheme: 'mailto',
       path: email,
       query: encodeQueryParameters(<String, String>{
@@ -136,7 +172,8 @@ class Comunicaciones {
       }),
     );
 
-    await launchUrl(emailLaunchUri);
+    await launchUrl(emailLaunchUri); */
+    //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
   }
 
   void compartirCitaSms(PerfilModel perfilUsuarioApp, String textoActual,

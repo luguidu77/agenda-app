@@ -61,7 +61,11 @@ class FirebaseProvider extends ChangeNotifier {
       }); */
 
       //? TRAIGO LOS DATOS DE FIREBASE
-      await db!.collection("agendacitasapp").doc(usuarioAPP).get().then((res) {
+      await db!
+          .collection("agendacitasapp")
+          .doc(usuarioAPP)
+          .get()
+          .then((res) {
         var data = res.data();
 
         perfil.email = data!['email'];
@@ -74,6 +78,7 @@ class FirebaseProvider extends ChangeNotifier {
         perfil.ubicacion = data['ubicacion'];
         perfil.website = data['website'];
       });
+      
     } catch (e) {
       print('error lectura en firebase $e');
     }
@@ -106,7 +111,7 @@ class FirebaseProvider extends ChangeNotifier {
       String precio,
       String comentario,
       String idCliente,
-      String idServicio,
+      List<dynamic> idServicio,
       String idEmpleado) async {
     final Map<String, dynamic> cita = ({
       'dia': dia,
@@ -115,7 +120,7 @@ class FirebaseProvider extends ChangeNotifier {
       'precio': precio,
       'comentario': comentario,
       'idcliente': idCliente,
-      'idservicio': idServicio,
+      'idservicio': idServicio.map((e) => e).toList(),
       'idempleado': idEmpleado,
       'confirmada': true,
       'idCitaCliente': '',

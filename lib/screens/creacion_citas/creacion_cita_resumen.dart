@@ -174,7 +174,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         citaElegida['HORAFINAL'].toString(),
         citaElegida['COMENTARIO'].toString(),
         clienta['ID'],
-        listaServicios.first['ID'],
+        listaServicios.map((e) => e['ID']).toList(),
         clienta['NOMBRE'],
         listaServicios.first['SERVICIO'],
         listaServicios.first['PRECIO']);
@@ -326,8 +326,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
     int idCita = 0;
     if (_iniciadaSesionUsuario) {
-      String idServicioAux = idServicio
-          .toString(); //id los paso a String porque los id de Firebase son caracteres
+      List<dynamic> idServicioAux =
+          idServicio; //id los paso a String porque los id de Firebase son caracteres
       String idEmpleado = '55';
       //###### CREA CITA Y TRAE ID CITA CREADA EN FIREBASE PARA ID DEL RECORDATORIO
       idCita = await FirebaseProvider().nuevaCita(

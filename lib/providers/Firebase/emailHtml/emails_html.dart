@@ -153,7 +153,9 @@ String textoHTML(
 <tbody style="vertical-align: top; font-size: 14px; line-height: 120%;">
 <tr>
 <td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">Negocio:</td>
-<td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">${negocioNombre}</td>
+<td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">
+            <a href="http://agendadecitas.online" style="color: #1e0e4b; text-decoration: none;" target="_blank">${negocioNombre}</span></a> 
+</td>
 </tr>
 <tr>
 <td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">Ubicación:</td>

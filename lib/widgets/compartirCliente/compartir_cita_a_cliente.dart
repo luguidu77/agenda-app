@@ -29,6 +29,7 @@ class CompartirCitaConCliente extends StatefulWidget {
 }
 
 class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
+  bool animarIcon = false;
   String _emailSesionUsuario = '';
   PerfilModel perfilUsuarioApp = PerfilModel();
   bool pagado =
@@ -148,8 +149,17 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
           widget.email != ' ' && widget.email != ''
               ? GestureDetector(
                   onTap: () {
+                    
+                    animarIcon = true; // animado el icono
+                    setState(() {});
+
+                    Future.delayed(const Duration(seconds: 3), () {
+                      animarIcon = false; // para la animacion del icono
+                      setState(() {});
+                    });
                     pagado
                         ? Comunicaciones().compartirCitaEmail(
+                            context,
                             perfilUsuarioApp,
                             textoActual,
                             widget.cliente,
@@ -158,10 +168,12 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
                             widget.servicio)
                         : alerta(context);
                   },
-                  child: const Card(
+                  child: Card(
                     child: ListTile(
-                      title: Text('Email'),
-                      trailing: FaIcon(FontAwesomeIcons.envelope),
+                      title:const Text('Email'),
+                      trailing: animarIcon
+                          ?const CircularProgressIndicator()
+                          :const FaIcon(FontAwesomeIcons.envelope),
                     ),
                   ),
                 )

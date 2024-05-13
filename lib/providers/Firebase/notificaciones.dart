@@ -121,19 +121,34 @@ eliminaLeidas(emailUsuario) async {
 
 //? NOTIFICACIONES EMAILS ***************************************
 // Usando la extensión Trigger Email  de Firebase
-emailEstadoCita(String estado, CitaModelFirebase cita, emailnegocio) async {
+Future<dynamic> emailEstadoCita(
+    String estado, CitaModelFirebase cita, emailnegocio) async {
   // obtengo el perfil del negocio
   PerfilModel negocio = await FirebaseProvider().cargarPerfilFB(emailnegocio);
   await _iniFirebase();
   final collectionRef = db!.collection("mail");
 
-  collectionRef.add({
+  var refDoc = await collectionRef.add({
     'to': cita.email,
     'message': {
       'subject': estado,
       'html': textoHTML(estado, negocio, cita),
     },
   });
+
+  final res = await collectionRef.doc(refDoc.id).get();
+   return res.id; //retorno el id de la coleccion mail
+}
+
+//comprueba el envio del email
+Future<dynamic> comprueStatusEmail(String mailId) async {
+  await _iniFirebase();
+  final collectionRef = db!.collection("mail");
+
+  dynamic status = await collectionRef.doc(mailId).get();
+  // print(status['delivery']['state']);
+
+  return status['delivery']['state'];
 }
 
 emailCitaCancelada(cita, emailnegocio) async {

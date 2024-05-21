@@ -4,6 +4,7 @@ import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/providers/Firebase/notificaciones.dart';
 import 'package:agendacitas/providers/db_provider.dart';
+import 'package:agendacitas/utils/extraerServicios.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -61,11 +62,7 @@ class FirebaseProvider extends ChangeNotifier {
       }); */
 
       //? TRAIGO LOS DATOS DE FIREBASE
-      await db!
-          .collection("agendacitasapp")
-          .doc(usuarioAPP)
-          .get()
-          .then((res) {
+      await db!.collection("agendacitasapp").doc(usuarioAPP).get().then((res) {
         var data = res.data();
 
         perfil.email = data!['email'];
@@ -78,7 +75,6 @@ class FirebaseProvider extends ChangeNotifier {
         perfil.ubicacion = data['ubicacion'];
         perfil.website = data['website'];
       });
-      
     } catch (e) {
       print('error lectura en firebase $e');
     }
@@ -345,7 +341,10 @@ class FirebaseProvider extends ChangeNotifier {
       await docRef.get().then((QuerySnapshot snapshot) async => {
             for (var cita in snapshot.docs)
               {
-                servicio = await cargarServicioPorId(email, cita['idservicio']),
+                servicio = await cargarServicioPorId(
+                    email,
+                    cita['idservicio']
+                        .first), //todo . solo tiene en cuenta el primer servicio (ficha_cliente -Historial citas)
                 //AGREGA CITAS POR ID DE CLIENTE
                 if (idCliente == cita['idcliente'])
                   {
@@ -988,7 +987,7 @@ class FirebaseProvider extends ChangeNotifier {
     await docRef.doc(idCita).update({'confirmada': !estadoActual});
   }
 
-  // estado confirmacion de la cita en agenda del cliente (BOTON CONFIRMAR/ANULAR)
+  //*(BOTON CONFIRMAR/ANULAR) estado confirmacion de la cita en agenda del cliente 
   Future<void> cambiarEstadoConfirmacionCitaCliente(
       Map<String, dynamic> citaMap, String emailnegocio) async {
     String nota = '';
@@ -1001,7 +1000,9 @@ class FirebaseProvider extends ChangeNotifier {
     cita.horaFinal = citaMap['horaFinal'];
     cita.comentario = citaMap['comentario'];
     cita.idcliente = citaMap['idcliente'];
-    cita.idservicio = citaMap['idservicio'];
+    cita.idservicio = [
+      ''
+    ]; //citaMap['idservicio']; // todo no esta como lista de servicios
     cita.idEmpleado = citaMap['idEmpleado'];
     cita.precio = double.parse(citaMap['precio']);
     cita.confirmada = citaMap['confirmada'] == 'true' ? true : false;
@@ -1042,7 +1043,7 @@ class FirebaseProvider extends ChangeNotifier {
     await collectionRef.update({'confirmada': estadoActual, 'notas': nota});
   }
 
-  // estado confirmacion de la cita en agenda del cliente
+  //* (BOTON ELIMINAR) estado confirmacion de la cita en agenda del cliente 
   Future<void> cancelacionCitaCliente(
       //reserva['email'], reserva['idCitaCliente'].toString()
       Map<String, dynamic> citaMap,
@@ -1050,13 +1051,16 @@ class FirebaseProvider extends ChangeNotifier {
     CitaModelFirebase cita = CitaModelFirebase();
     cita.email = citaMap['email'];
     cita.idCitaCliente = citaMap['idCitaCliente'];
+    cita.idservicio = ['cancelada'];
     cita.id = citaMap['id'];
     cita.dia = citaMap['dia'];
     cita.horaInicio = citaMap['horaInicio'];
     cita.horaFinal = citaMap['horaFinal'];
     cita.comentario = citaMap['comentario'];
     cita.idcliente = citaMap['idcliente'];
-    cita.idservicio = citaMap['idservicio'];
+    cita.idservicio = [
+      'eliminada'
+    ]; //citaMap['idservicio']; // todo no esta como lista de servicios
     cita.idEmpleado = citaMap['idEmpleado'];
     cita.precio = double.parse(citaMap['precio']);
     cita.confirmada = citaMap['confirmada'] == 'true' ? true : false;
@@ -1071,6 +1075,7 @@ class FirebaseProvider extends ChangeNotifier {
     //1ª envia notificacion al cliente agendo web*/
     // necesito del cliente su email,  idCitaCliente y tokenclienteweb
     //! comprobar si el cliente tiene activado en su perfil, autorizacion para recibir emails
+
     await emailEstadoCita('Cita cancelada', cita, emailnegocio);
 
     //2º ACTUALIAZO EL DATO
@@ -1096,13 +1101,21 @@ class FirebaseProvider extends ChangeNotifier {
         .collection('citas')
         .doc(cita.idCitaCliente);
 
+    // antes de enviar email, extraigo los nombres de los servicios por los id
+    cita.idservicio = await convierteListaIDaNombres(emailnegocio,
+        cita.idservicio!); // ahora tengo en idservicio, lista de sus nombres en vez de lista de los id
+
+    //1º ENVIO EMAIL AL CLIENTE
     await emailEstadoCita('Cita modificada', cita, emailnegocio);
+
     //2º ACTUALIAZO EL DATO CITA EN AGENDO WEB DEL CLIENTE
-    await collectionRef.update({
-      'confirmada': true,
-      'fechaHora': horaInicio,
-      'fecha': fechaFormateada,
-      'hora': horaFormateada
-    });
+    if (cita.idCitaCliente != '') {
+      await collectionRef.update({
+        'confirmada': true,
+        'fechaHora': horaInicio,
+        'fecha': fechaFormateada,
+        'hora': horaFormateada
+      });
+    }
   }
 }

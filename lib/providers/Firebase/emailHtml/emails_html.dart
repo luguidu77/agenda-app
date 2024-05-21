@@ -31,6 +31,14 @@ String textoHTML(
   String negocioDireccion = '${negocio.ubicacion} '; /* - ${negocio.ciudad} */
   String fechaCita = formatearFecha(cita.horaInicio!);
   String horaCita = formatearHora(cita.horaInicio!);
+  
+
+   // Crear una cadena de texto HTML con los elementos de la lista en columna
+    String htmlServicios = "<div>";
+    for (String item in cita.idservicio!) {
+      htmlServicios += "<p>$item</p>";
+    }
+    htmlServicios += "</div>";
 
   return '''<!DOCTYPE html>
 
@@ -170,13 +178,13 @@ String textoHTML(
 <td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">${horaCita}</td>
 </tr>
 <tr>
-<td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">​</td>
-<td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">​</td>
+<td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">Servicios:​</td>
+<td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">${htmlServicios}​</td>
 </tr>
 </tbody>
 </table>
 </td>
-</tr>
+</tr> 
 </table>
 <table border="0" cellpadding="10" cellspacing="0" class="divider_block block-3" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
 <tr>

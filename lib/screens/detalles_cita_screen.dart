@@ -111,7 +111,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                   cliente: reserva['nombre'],
                   telefono: reserva['telefono']!,
                   email: reserva['email'],
-                  fechaCita: fechaLarga,
+                  fechaCita: reserva['horaInicio'],
                   servicio: reserva['servicio']),
             ),
           ]),

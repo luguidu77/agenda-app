@@ -1,3 +1,5 @@
+import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
+
 List<String> extraerServicios(texto) {
   // La cadena de texto que representa la lista de objetos JSON
   String jsonString = texto;
@@ -18,4 +20,17 @@ List<String> extraerServicios(texto) {
   }
 
   return idServicioValues;
+}
+
+//Creo lista de nombre de servicios a partir de una lista de id de servicios
+Future<List<String>> convierteListaIDaNombres(emailNegocio, idServicios) async {
+  List<String> servicios = [];
+  for (var id in idServicios) {
+    var servicio =
+        await FirebaseProvider().cargarServicioPorId(emailNegocio, id);
+
+    servicios.add(servicio['servicio']);
+  }
+
+  return servicios;
 }

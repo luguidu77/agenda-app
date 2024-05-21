@@ -1,5 +1,6 @@
 import 'package:agendacitas/providers/Firebase/notificaciones.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/models.dart';
@@ -107,10 +108,18 @@ class Comunicaciones {
     String fecha,
     String servicio,
   ) async {
+    String? fechaLarga;
+    DateTime resFecha =
+        DateTime.parse(fecha); // horaInicio trae 2022-12-05 20:27:00.000Z
+    //? FECHA LARGA EN ESPAÑOL
+    fechaLarga = DateFormat.MMMMEEEEd('es_ES')
+        .add_Hm()
+        .format(DateTime.parse(resFecha.toString()));
+
     String telef = '+$telefono';
 
-    String texto =
-        textoCompartir(perfilUsuarioApp, textoActual, clienta, fecha, servicio);
+    String texto = textoCompartir(
+        perfilUsuarioApp, textoActual, clienta, fechaLarga, servicio);
 
     final url = Uri.parse('whatsapp://send?phone=$telef&text=$texto');
     if (await launchUrl(url)) {
@@ -132,8 +141,15 @@ class Comunicaciones {
     PerfilModel negocio = PerfilModel(
         denominacion: perfilUsuarioApp.denominacion,
         telefono: perfilUsuarioApp.telefono);
-    CitaModelFirebase cita =
-        CitaModelFirebase(horaInicio: '2024-05-12 18:00:00Z', email: email);
+    // Convertir el texto en una lista de textos
+    List<String> textListServicio = servicio.split(', ');
+
+    // FORMATO DE fecha : 2024-05-21 13:00:00.000 . dejo este formato porque se hace el formateo en textoHTML
+    CitaModelFirebase cita = CitaModelFirebase(
+        horaInicio: fecha, email: email, idservicio: textListServicio);
+
+    print(
+        '***************************************** ${textListServicio.toString()}');
 
     await emailEstadoCita(
             'Cita confirmada por el negocio (No aparecerá en su administración de citas)',
@@ -178,8 +194,16 @@ class Comunicaciones {
 
   void compartirCitaSms(PerfilModel perfilUsuarioApp, String textoActual,
       String clienta, String telefono, String fecha, String servicio) async {
-    String texto =
-        textoCompartir(perfilUsuarioApp, textoActual, clienta, fecha, servicio);
+    String? fechaLarga;
+    DateTime resFecha =
+        DateTime.parse(fecha); // horaInicio trae 2022-12-05 20:27:00.000Z
+    //? FECHA LARGA EN ESPAÑOL
+    fechaLarga = DateFormat.MMMMEEEEd('es_ES')
+        .add_Hm()
+        .format(DateTime.parse(resFecha.toString()));
+
+    String texto = textoCompartir(
+        perfilUsuarioApp, textoActual, clienta, fechaLarga, servicio);
     final Uri smsLaunchUri = Uri(
       scheme: 'sms',
       path: telefono,

@@ -31,7 +31,7 @@ class _BotonConfirmarCitaWebState extends State<BotonConfirmarCitaWeb> {
 
   @override
   Widget build(BuildContext context) {
-    bool clienteTieneCuentaWeb =
+    bool clienteTieneToken =
         widget.cita['tokenWebCliente'] != '' ? true : false;
 
     return ListTile(
@@ -46,7 +46,7 @@ class _BotonConfirmarCitaWebState extends State<BotonConfirmarCitaWeb> {
               ),
         trailing: ElevatedButton(
           // color: _visto ? Colors.blueGrey : Colors.blue,
-          onPressed: clienteTieneCuentaWeb ? _cambiaEstadoConfirmacion : null,
+          onPressed: _cambiaEstadoConfirmacion,
           child: _cargando
               ? const SizedBox(
                   width: 15, height: 15, child: LinearProgressIndicator())
@@ -69,6 +69,8 @@ class _BotonConfirmarCitaWebState extends State<BotonConfirmarCitaWeb> {
     // Cambiar estado en Firebase
     await FirebaseProvider()
         .cambiarEstadoConfirmacionCita(widget.emailUsuario, widget.cita['id']);
+
+    //todo: enviar notificacion (web o appcliente) al cliente en caso de existir token    
 
     // Cambiar estado local
     setState(() {

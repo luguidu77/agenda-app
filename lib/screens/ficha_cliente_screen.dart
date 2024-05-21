@@ -393,6 +393,9 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
                     child: ListView.builder(
                       itemCount: citas.length,
                       itemBuilder: (context, index) {
+                        print(
+                            '55555555555555555555555555555555555555555555555555555555555555555555');
+                        print(citas[index]);
                         return Card(
                           color: (DateTime.now().isBefore(
                                   DateTime.parse(citas[index]['dia'])))
@@ -420,8 +423,9 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(citas[index]['servicio']
-                                        .toString()
-                                        .toUpperCase()),
+                                        /*  .toString()
+                                        .toUpperCase() */
+                                        ),
                                     Text(
                                         '${citas[index]['precio'].toString()} ${personaliza.moneda}'),
                                   ],

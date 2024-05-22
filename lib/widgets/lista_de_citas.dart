@@ -124,8 +124,8 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           debugPrint(cita.toString()); // print cita
 
           //? la funcion extraerServicios, resuelve el problema de que el json no tiene comillas en sus claves: [{idServicio: QF3o14RyJ5KbSSb0d6bB, activo: true, servicio: Semiperman
-          List<String> idServicios = extraerServicios(cita['idServicio']);
-         
+          List<String> idServicios =
+              extraerIdServiciosdeCadenaTexto(cita['idServicio']);
 
           CitaModelFirebase newCita = CitaModelFirebase();
 

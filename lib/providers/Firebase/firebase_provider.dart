@@ -974,7 +974,7 @@ class FirebaseProvider extends ChangeNotifier {
     }
   }
 
-  // estado confirmacion de la cita en agenda del negocio
+  //* (BOTON CONFIRMAR/ANULAR) estado confirmacion de la cita en agenda del - NEGOCIO
   Future<void> cambiarEstadoConfirmacionCita(
       String emailUsuario, String idCita) async {
     await _iniFirebase();
@@ -987,7 +987,8 @@ class FirebaseProvider extends ChangeNotifier {
     await docRef.doc(idCita).update({'confirmada': !estadoActual});
   }
 
-  //*(BOTON CONFIRMAR/ANULAR) estado confirmacion de la cita en agenda del cliente 
+  //*(BOTON CONFIRMAR/ANULAR) estado confirmacion de la cita en agenda del- CLIENTE
+  bool estadoActual = false;
   Future<void> cambiarEstadoConfirmacionCitaCliente(
       Map<String, dynamic> citaMap, String emailnegocio) async {
     String nota = '';
@@ -1017,33 +1018,51 @@ class FirebaseProvider extends ChangeNotifier {
 
     // 1º VEO EL ESTADO DE LA VARIABLE ACUTAL
     final docSnapshot = await collectionRef.get();
-    final confirmada = docSnapshot.data();
-    bool estadoActual = confirmada!['confirmada'];
 
-    // cambia el estado
-    estadoActual = !estadoActual;
+    if (docSnapshot.exists) {
+      var data = docSnapshot.data() as Map<String, dynamic>;
 
-    //******    email al cliente del estado de la cita ****** */
-    if (estadoActual == true) {
-      nota = '';
-      // envia notificacion al cliente agendo web*/
-      // necesito del cliente su email,  idCitaCliente y tokenclienteweb
-      await emailEstadoCita('Cita confirmada', cita, emailnegocio);
-    } else {
-      nota =
-          'CANCELADA POR EL NEGOCIO'; // si es cancelada crea la nota CANCELADA POR EL NEGOCIO
-      // envia notificacion al cliente agendo web*/
-      // necesito del cliente su email,  idCitaCliente y tokenclienteweb
-      //! comprobar si el cliente tiene activado en su perfil, autorizacion para recibir emails
-      await emailEstadoCita('Cita cancelada', cita, emailnegocio);
+      estadoActual = data['confirmada'];
+
+      // cambia el estado
+      estadoActual = !estadoActual;
+      List<String> serviciosNom = [];
+
+      //******    email al cliente del estado de la cita ****** */
+      if (estadoActual == true) {
+        nota = '';
+        // envia notificacion al cliente agendo web*/
+        // necesito del cliente su email,  idCitaCliente y tokenclienteweb
+
+        List<String> serviciosID =
+            extraerDenominacionServiciosdeCadenaTexto(citaMap['idServicio']);
+        for (var id in serviciosID) {
+          serviciosNom.add(id);
+        }
+        cita.idservicio = serviciosNom;
+        await emailEstadoCita('Cita confirmada', cita, emailnegocio);
+      } else {
+        nota =
+            'CANCELADA POR EL NEGOCIO'; // si es cancelada crea la nota CANCELADA POR EL NEGOCIO
+        // envia notificacion al cliente agendo web*/
+        // necesito del cliente su email,  idCitaCliente y tokenclienteweb
+        //! comprobar si el cliente tiene activado en su perfil, autorizacion para recibir emails
+        List<String> serviciosID =
+            extraerDenominacionServiciosdeCadenaTexto(citaMap['idServicio']);
+        for (var id in serviciosID) {
+          serviciosNom.add(id);
+        }
+        cita.idservicio = serviciosNom;
+        await emailEstadoCita('Cita cancelada', cita, emailnegocio);
+      }
+
+      //3º ACTUALIAZO EL DATO
+
+      await collectionRef.update({'confirmada': estadoActual, 'notas': nota});
     }
-
-    //3º ACTUALIAZO EL DATO
-
-    await collectionRef.update({'confirmada': estadoActual, 'notas': nota});
   }
 
-  //* (BOTON ELIMINAR) estado confirmacion de la cita en agenda del cliente 
+  //* (BOTON ELIMINAR) estado confirmacion de la cita en agenda del cliente
   Future<void> cancelacionCitaCliente(
       //reserva['email'], reserva['idCitaCliente'].toString()
       Map<String, dynamic> citaMap,

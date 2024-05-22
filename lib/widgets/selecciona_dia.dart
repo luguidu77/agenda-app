@@ -270,7 +270,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
     if (iniciadaSesionUsuario) {
       Map<String, dynamic> resServicioFB = {};
       //idServicio VIENE COMO UN TEXTO [{idServicio: QF3o14RyJ5KbSSb0d6bB, activo: true, servicio: Semipermanente con refuerzo, detalle: , precio: 20, tiempo: 01:00}]
-      List<String> idServicios = extraerServicios(idServicio);
+      List<String> idServicios = extraerIdServiciosdeCadenaTexto(idServicio);
       for (var idservicio in idServicios) {
         resServicioFB = await FirebaseProvider()
             .cargarServicioPorId(usuarioAPP, idservicio);
@@ -463,7 +463,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
               if (iniciadaSesionUsuario) {
                 //? la funcion extraerServicios, resuelve el problema de que el json no tiene comillas en sus claves: [{idServicio: QF3o14RyJ5KbSSb0d6bB, activo: true, servicio: Semiperman
                 List<String> idServicios =
-                    extraerServicios(oldCita['idServicio']);
+                    extraerIdServiciosdeCadenaTexto(oldCita['idServicio']);
                 CitaModelFirebase newCita = CitaModelFirebase();
                 newCita.id = idCitaOld;
                 newCita.dia = fecha;

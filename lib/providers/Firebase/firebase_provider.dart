@@ -989,7 +989,7 @@ class FirebaseProvider extends ChangeNotifier {
 
   //*(BOTON CONFIRMAR/ANULAR) estado confirmacion de la cita en agenda del- CLIENTE
   bool estadoActual = false;
-  Future<void> cambiarEstadoConfirmacionCitaCliente(
+  Future<void> cambiarEstadoConfirmacionCitaCliente(context,
       Map<String, dynamic> citaMap, String emailnegocio) async {
     String nota = '';
     CitaModelFirebase cita = CitaModelFirebase();
@@ -1019,6 +1019,7 @@ class FirebaseProvider extends ChangeNotifier {
     // 1º VEO EL ESTADO DE LA VARIABLE ACUTAL
     final docSnapshot = await collectionRef.get();
 
+    //Antes de actuar con el cliente , verifico si la cita en cuestión sigue en la base de datos del cliente clientesAgendoWeb
     if (docSnapshot.exists) {
       var data = docSnapshot.data() as Map<String, dynamic>;
 
@@ -1028,7 +1029,7 @@ class FirebaseProvider extends ChangeNotifier {
       estadoActual = !estadoActual;
       List<String> serviciosNom = [];
 
-      //******    email al cliente del estado de la cita ****** */
+      //*****************    email al cliente del estado de la cita ************ */
       if (estadoActual == true) {
         nota = '';
         // envia notificacion al cliente agendo web*/
@@ -1041,6 +1042,7 @@ class FirebaseProvider extends ChangeNotifier {
         }
         cita.idservicio = serviciosNom;
         await emailEstadoCita('Cita confirmada', cita, emailnegocio);
+         mensajeSuccess(context, 'Hemos envíado un email al cliente confirmando la cita');
       } else {
         nota =
             'CANCELADA POR EL NEGOCIO'; // si es cancelada crea la nota CANCELADA POR EL NEGOCIO
@@ -1054,11 +1056,16 @@ class FirebaseProvider extends ChangeNotifier {
         }
         cita.idservicio = serviciosNom;
         await emailEstadoCita('Cita cancelada', cita, emailnegocio);
+         mensajeSuccess(context, 'Hemos envíado un email al cliente anulando la cita');
       }
 
       //3º ACTUALIAZO EL DATO
 
       await collectionRef.update({'confirmada': estadoActual, 'notas': nota});
+    } else {
+      // si la cita no existe en clientesAgendoWeb (el cliente ya ha borrado esta cita por ejemplo)
+      debugPrint('EL CLIENTE YA ELIMINO ESTA CITA');
+       mensajeSuccess(context, 'EL CLIENTE YA ELIMINÓ ESTA CITA');
     }
   }
 

@@ -61,8 +61,8 @@ class _BotonConfirmarCitaWebState extends State<BotonConfirmarCitaWeb> {
 
     //** 1 modifica el estado de confirmada en perfil  del cliente (clienteAgendoWeb)*/
 
-    FirebaseProvider()
-        .cambiarEstadoConfirmacionCitaCliente(widget.cita, widget.emailUsuario);
+    FirebaseProvider().cambiarEstadoConfirmacionCitaCliente(
+        context, widget.cita, widget.emailUsuario);
     //
     //** cambian el estado de confirmada la cita en agendadecitas */
 
@@ -70,21 +70,13 @@ class _BotonConfirmarCitaWebState extends State<BotonConfirmarCitaWeb> {
     await FirebaseProvider()
         .cambiarEstadoConfirmacionCita(widget.emailUsuario, widget.cita['id']);
 
-    //todo: enviar notificacion (web o appcliente) al cliente en caso de existir token    
+    //todo: enviar notificacion (web o appcliente) al cliente en caso de existir token
 
     // Cambiar estado local
     setState(() {
       _visto = !_visto;
       _cargando = false; // Oculta el indicador de carga
     });
-    // Mostrar mensaje
-    mensaje(_visto
-        ? 'Hemos envíado un email al cliente confirmando la cita'
-        : 'Hemos envíado un email al cliente anulando la cita');
-  }
-
-  void mensaje(texto) {
-    mensajeSuccess(context, texto);
   }
 }
 

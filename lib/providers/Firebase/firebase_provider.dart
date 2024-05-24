@@ -1019,7 +1019,7 @@ class FirebaseProvider extends ChangeNotifier {
     // 1º VEO EL ESTADO DE LA VARIABLE ACUTAL
     final docSnapshot = await collectionRef.get();
 
-    //Antes de actuar con el cliente , verifico si la cita en cuestión sigue en la base de datos del cliente clientesAgendoWeb
+    //*Antes de actuar con el cliente , verifico si la cita en cuestión sigue en la base de datos del cliente clientesAgendoWeb
     if (docSnapshot.exists) {
       var data = docSnapshot.data() as Map<String, dynamic>;
 

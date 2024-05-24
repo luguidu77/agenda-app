@@ -108,6 +108,10 @@ class Comunicaciones {
     String fecha,
     String servicio,
   ) async {
+    print(
+        'compartir =============================================================');
+    print(textoActual);
+
     String? fechaLarga;
     DateTime resFecha =
         DateTime.parse(fecha); // horaInicio trae 2022-12-05 20:27:00.000Z
@@ -122,11 +126,11 @@ class Comunicaciones {
         perfilUsuarioApp, textoActual, clienta, fechaLarga, servicio);
 
     final url = Uri.parse('whatsapp://send?phone=$telef&text=$texto');
-    if (await launchUrl(url)) {
-      await launchUrl(url);
+    /*   if (await launchUrl(url)) {
+         await launchUrl(url);
     } else {
       throw 'Could not launch $url';
-    }
+    } */
   }
 
   void compartirCitaEmail(

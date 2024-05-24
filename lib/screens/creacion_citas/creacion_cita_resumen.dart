@@ -341,6 +341,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
           idServicioAux,
           idEmpleado);
     } else {
+    /*   print('id servicio sin sesion ***********************************');
+      print(idServicio); */
       //###### CREA CITA Y TRAE ID CITA CREADA EN DISPOSITIVO PARA ID DEL RECORDATORIO
       idCita = await citaElegida.nuevaCita(
         fecha,
@@ -348,7 +350,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         horaFinal,
         comentario,
         idCliente,
-        idServicio,
+        idServicio
+            .first, //todo: solo visible el primer servicio de los que se reserve
       );
     }
 

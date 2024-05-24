@@ -191,7 +191,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
       //SERVICIOS DEPENDENRA DE SI ES CON SESION O EN DISPOSITIVO
       var servicios = _iniciadaSesionUsuario
           ? cita['idServicio'].map((serv) => serv['servicio']).join(', ')
-          : cita['idServicio'];
+          : cita['servicio'];
 
       // **** DONDE CREAMOS LA NOTA QUE TRAE TODOS LOS DATOS NECESARIOS PARA LA GESTION DE CITA ****************
       //
@@ -263,7 +263,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         citaConfirmada ? 'CONFIRMADA' : 'PENDIENTE CONFIRMAR';
     var servicios = _iniciadaSesionUsuario
         ? cita['idServicio'].map((serv) => serv['servicio']).join(', ')
-        : cita['idServicio'];
+        : cita['servicio'];
     return (cita['nombre'] != null)
         ? '${textoConfirmada.padLeft(60)}'
             '\n😀 ${cita['nombre']}'

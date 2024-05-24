@@ -165,6 +165,8 @@ class CitaListProvider extends ChangeNotifier {
 
     citas = await CitaListProvider().cargarCitasPorFecha(fechaElegida);
 
+   
+
     //?CREA NUEVA LISTA citas ORDENADAS POR hora de inicio
     citas.sort((a, b) {
       return DateTime.parse(a['horaInicio'])

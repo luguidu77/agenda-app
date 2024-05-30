@@ -108,7 +108,8 @@ class FirebaseProvider extends ChangeNotifier {
       String comentario,
       String idCliente,
       List<dynamic> idServicio,
-      String idEmpleado) async {
+      String idEmpleado,
+      idCitaCliente) async {
     final Map<String, dynamic> cita = ({
       'dia': dia,
       'horaInicio': horaInicio,
@@ -119,7 +120,7 @@ class FirebaseProvider extends ChangeNotifier {
       'idservicio': idServicio.map((e) => e).toList(),
       'idempleado': idEmpleado,
       'confirmada': true,
-      'idCitaCliente': '',
+      'idCitaCliente': idCitaCliente,
       'tokenWebCliente': '',
     });
     //rinicializa Firebase
@@ -989,8 +990,8 @@ class FirebaseProvider extends ChangeNotifier {
 
   //*(BOTON CONFIRMAR/ANULAR) estado confirmacion de la cita en agenda del- CLIENTE
   bool estadoActual = false;
-  Future<void> cambiarEstadoConfirmacionCitaCliente(context,
-      Map<String, dynamic> citaMap, String emailnegocio) async {
+  Future<void> cambiarEstadoConfirmacionCitaCliente(
+      context, Map<String, dynamic> citaMap, String emailnegocio) async {
     String nota = '';
     CitaModelFirebase cita = CitaModelFirebase();
     cita.email = citaMap['email'];
@@ -1010,62 +1011,73 @@ class FirebaseProvider extends ChangeNotifier {
     cita.tokenWebCliente = citaMap['tokenWebCliente'];
 
     await _iniFirebase();
-    final collectionRef = db!
-        .collection("clientesAgendoWeb")
-        .doc(cita.email) //email usuario
-        .collection('citas')
-        .doc(cita.idCitaCliente);
+    print(cita.email);
+    print(cita.idcliente);
+    try {
+      final collectionRef = db!
+          .collection("clientesAgendoWeb")
+          .doc(cita.email) //email usuario
+          .collection('citas')
+          .doc(cita.idCitaCliente);
 
-    // 1º VEO EL ESTADO DE LA VARIABLE ACUTAL
-    final docSnapshot = await collectionRef.get();
+      // 1º VEO EL ESTADO DE LA VARIABLE ACUTAL
+      final docSnapshot = await collectionRef.get();
 
-    //*Antes de actuar con el cliente , verifico si la cita en cuestión sigue en la base de datos del cliente clientesAgendoWeb
-    if (docSnapshot.exists) {
-      var data = docSnapshot.data() as Map<String, dynamic>;
+      //*Antes de actuar con el cliente , verifico si la cita en cuestión sigue en la base de datos del cliente clientesAgendoWeb
+      if (docSnapshot.exists) {
+        var data = docSnapshot.data() as Map<String, dynamic>;
 
-      estadoActual = data['confirmada'];
+        estadoActual = data['confirmada'];
 
-      // cambia el estado
-      estadoActual = !estadoActual;
-      List<String> serviciosNom = [];
+        // cambia el estado
+        estadoActual = !estadoActual;
+        List<String> serviciosNom = [];
 
-      //*****************    email al cliente del estado de la cita ************ */
-      if (estadoActual == true) {
-        nota = '';
-        // envia notificacion al cliente agendo web*/
-        // necesito del cliente su email,  idCitaCliente y tokenclienteweb
+        //*****************    email al cliente del estado de la cita ************ */
+        if (estadoActual == true) {
+          nota = '';
+          // envia notificacion al cliente agendo web*/
+          // necesito del cliente su email,  idCitaCliente y tokenclienteweb
 
-        List<String> serviciosID =
-            extraerDenominacionServiciosdeCadenaTexto(citaMap['idServicio']);
-        for (var id in serviciosID) {
-          serviciosNom.add(id);
+          List<String> serviciosID =
+              extraerDenominacionServiciosdeCadenaTexto(citaMap['idServicio']);
+          for (var id in serviciosID) {
+            serviciosNom.add(id);
+          }
+          cita.idservicio = serviciosNom;
+          await emailEstadoCita('Cita confirmada', cita, emailnegocio);
+          mensajeSuccess(
+              context, 'Hemos envíado un email al cliente confirmando la cita');
+        } else {
+          nota =
+              'CANCELADA POR EL NEGOCIO'; // si es cancelada crea la nota CANCELADA POR EL NEGOCIO
+          // envia notificacion al cliente agendo web*/
+          // necesito del cliente su email,  idCitaCliente y tokenclienteweb
+          //! comprobar si el cliente tiene activado en su perfil, autorizacion para recibir emails
+          List<String> serviciosID =
+              extraerDenominacionServiciosdeCadenaTexto(citaMap['idServicio']);
+          for (var id in serviciosID) {
+            serviciosNom.add(id);
+          }
+          cita.idservicio = serviciosNom;
+          await emailEstadoCita('Cita cancelada', cita, emailnegocio);
+          mensajeSuccess(
+              context, 'Hemos envíado un email al cliente anulando la cita');
         }
-        cita.idservicio = serviciosNom;
-        await emailEstadoCita('Cita confirmada', cita, emailnegocio);
-         mensajeSuccess(context, 'Hemos envíado un email al cliente confirmando la cita');
+
+        //3º ACTUALIAZO EL DATO
+
+        await collectionRef.update({'confirmada': estadoActual, 'notas': nota});
       } else {
-        nota =
-            'CANCELADA POR EL NEGOCIO'; // si es cancelada crea la nota CANCELADA POR EL NEGOCIO
-        // envia notificacion al cliente agendo web*/
-        // necesito del cliente su email,  idCitaCliente y tokenclienteweb
-        //! comprobar si el cliente tiene activado en su perfil, autorizacion para recibir emails
-        List<String> serviciosID =
-            extraerDenominacionServiciosdeCadenaTexto(citaMap['idServicio']);
-        for (var id in serviciosID) {
-          serviciosNom.add(id);
-        }
-        cita.idservicio = serviciosNom;
-        await emailEstadoCita('Cita cancelada', cita, emailnegocio);
-         mensajeSuccess(context, 'Hemos envíado un email al cliente anulando la cita');
+        // si la cita no existe en clientesAgendoWeb (el cliente ya ha borrado esta cita por ejemplo)
+        debugPrint('EL CLIENTE YA ELIMINO ESTA CITA');
+        mensajeSuccess(context, 'EL CLIENTE YA ELIMINÓ ESTA CITA');
       }
-
-      //3º ACTUALIAZO EL DATO
-
-      await collectionRef.update({'confirmada': estadoActual, 'notas': nota});
-    } else {
-      // si la cita no existe en clientesAgendoWeb (el cliente ya ha borrado esta cita por ejemplo)
-      debugPrint('EL CLIENTE YA ELIMINO ESTA CITA');
-       mensajeSuccess(context, 'EL CLIENTE YA ELIMINÓ ESTA CITA');
+    } catch (e) {
+      debugPrint(e.toString());
+      //TODO: PODAEMOS DAR LA OPCION DE ENVIARLE UN EMAIL AL CLIENTE PARA QUE SE REGISTRE EN LA WEB
+      mensajeInfo(
+          context, 'NO PODEMOS NOTIFICAR AL CLIENTE PORQUE NO TIENE CUENTA');
     }
   }
 
@@ -1143,5 +1155,40 @@ class FirebaseProvider extends ChangeNotifier {
         'hora': horaFormateada
       });
     }
+  }
+
+  creaNuevacitaAdministracionCliente(
+    NegocioModel negocio,
+    fechaHora,
+    String fechaCita,
+    String horaFormateada,
+    String duracion,
+    List<ServicioModel> servicios,
+    String cliente,
+    idCitaCliente,
+  ) async {
+    await _iniFirebase();
+    final collectionRef = db!
+        .collection("clientesAgendoWeb")
+        .doc(cliente) //email usuario
+        .collection('citas')
+        .doc(idCitaCliente);
+
+    // ****** citas ******
+    final citaGenerada = await collectionRef.set({
+      'confirmada': true,
+      'fechaHora': fechaHora,
+      'fecha': fechaCita,
+      'hora': horaFormateada,
+      'idNegocio': negocio.id,
+      'negocio': negocio.denominacion,
+      'ubicacion': '${negocio.direccion}-${negocio.ubicacion}',
+      'duracion': duracion,
+      'servicios': servicios.map((e) => e.servicio).toList(),
+      'contacto': negocio.telefono,
+      'notas': ''
+    });
+
+    //return citaGenerada.id;
   }
 }

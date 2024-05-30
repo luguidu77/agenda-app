@@ -1,10 +1,13 @@
 // ignore_for_file: file_names
 
+import 'package:agendacitas/models/perfil_usuarioapp_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/appBar.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:agendacitas/providers/cita_list_provider.dart';
 import 'package:agendacitas/providers/recordatorios_provider.dart';
@@ -15,10 +18,13 @@ import 'package:agendacitas/utils/notificaciones/recordatorio_local/recordatorio
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../firebase_options.dart';
 import '../../models/models.dart';
 import '../../mylogic_formularios/mylogic.dart';
 import '../../widgets/widgets.dart';
 import 'provider/creacion_cita_provider.dart';
+import 'utils/formatea_fecha_hora.dart';
+import 'utils/id_cita_cliente_random.dart';
 
 //import 'package:url_launcher/url_launcher_string.dart';
 
@@ -164,6 +170,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
     //
     // ignore: use_build_context_synchronously
+    String idCitaCliente = generarCadenaAleatoria(20);
+    print(idCitaCliente); // Ejemplo: b7gjR3jNuMRomunRo6SJ
     await grabarCita(
         context,
         fecha,
@@ -177,7 +185,77 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         listaServicios.map((e) => e['ID']).toList(),
         clienta['NOMBRE'],
         listaServicios.first['SERVICIO'],
-        listaServicios.first['PRECIO']);
+        listaServicios.first['PRECIO'],
+        idCitaCliente);
+
+    //* CLIENTE : comprobar si el cliente tiene cuenta en la web para agregarle la cita
+    FirebaseFirestore? db;
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+
+    db = FirebaseFirestore.instance;
+    print(clienta['EMAIL']);
+    print(idCitaCliente);
+
+    final perfilNegocio =
+        await FirebaseProvider().cargarPerfilFB(_emailSesionUsuario);
+    NegocioModel negocio = NegocioModel(
+        id: '',
+        denominacion: perfilNegocio.denominacion!,
+        direccion: 'perfilNegocio.ciudad!',
+        ubicacion: perfilNegocio.ubicacion!,
+        email: perfilNegocio.email!,
+        telefono: perfilNegocio.telefono!,
+        imagen: perfilNegocio.foto!,
+        moneda: 'perfilNegocio.moneda!',
+        latitud: 0,
+        longitud: 0,
+        valoracion: '',
+        categoria: '',
+        servicios: '',
+        tokenMessaging: '',
+        descripcion: '',
+        facebook: '',
+        instagram: '',
+        horarios: '',
+        destacado: false,
+        publicado: true,
+        blog: {});
+    // Formatear la fecha al formato deseado
+    Map<String, dynamic> resultado =
+        formatearFechaYHora(citaElegida['HORAINICIO']);
+
+    String fechaFormateada = resultado['fechaFormateada'];
+    String horaFormateada = resultado['horaFormateada'];
+
+    //String duracion = formatearHora(tiempoTotal);
+
+    List<ServicioModel> servicios = [];
+    ServicioModel servicio = ServicioModel();
+    listaServicios.map((e) => e['SERVICIO']).toList();
+
+    for (var element in listaServicios) {
+      print(element.toString());
+      servicio.servicio = element['SERVICIO'];
+      servicios.add(servicio);
+    }
+
+    /*  try { */
+
+    print('AGREGA LA CITA AL CLIENTE');
+    await FirebaseProvider().creaNuevacitaAdministracionCliente(
+      negocio,
+      citaElegida['HORAINICIO'],
+      fechaFormateada,
+      horaFormateada,
+      'duracion',
+      servicios,
+      clienta['EMAIL'],
+      idCitaCliente,
+    );
+    /*  } catch (e) {
+      print('ERROR');
+    } */
 
     // limpia la lista de servicios
     listaServicios.clear();
@@ -317,7 +395,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
       var idServicio,
       String nombreCliente,
       String nombreServicio,
-      String precio) async {
+      String precio,
+      idCitaCliente) async {
     String title = 'Tienes cita $fechaTexto-$horaIniciotexto h';
     String body =
         '$nombreCliente se va a hacer $nombreServicio ¡ganarás $precio ! 🤑';
@@ -339,9 +418,10 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
           comentario,
           idCliente,
           idServicioAux,
-          idEmpleado);
+          idEmpleado,
+          idCitaCliente);
     } else {
-    /*   print('id servicio sin sesion ***********************************');
+      /*   print('id servicio sin sesion ***********************************');
       print(idServicio); */
       //###### CREA CITA Y TRAE ID CITA CREADA EN DISPOSITIVO PARA ID DEL RECORDATORIO
       idCita = await citaElegida.nuevaCita(

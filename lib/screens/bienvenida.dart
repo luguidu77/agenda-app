@@ -148,7 +148,7 @@ class _BienvenidaState extends State<Bienvenida> {
           const SizedBox(
             height: 10,
           ),
-          SizedBox(
+          /*  SizedBox(
             width: double.infinity,
             height: 60,
             child: ElevatedButton(
@@ -169,7 +169,7 @@ class _BienvenidaState extends State<Bienvenida> {
                         context, 'No se ha aceptado la política de privacidad');
               },
             ),
-          ),
+          ), */
           SizedBox(
             width: double.infinity,
             height: 60,

@@ -13,7 +13,7 @@ fotoPerfil(emailSesionUsuario) {
             final data = snapshot.data;
             return CircleAvatar(
               backgroundColor: Colors.transparent,
-              child: data!.foto != ''
+              child: data!.foto != '' 
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(100.0),
                       child: FadeInImage.assetNetwork(

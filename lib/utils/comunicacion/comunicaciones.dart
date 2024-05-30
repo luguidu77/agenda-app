@@ -126,11 +126,11 @@ class Comunicaciones {
         perfilUsuarioApp, textoActual, clienta, fechaLarga, servicio);
 
     final url = Uri.parse('whatsapp://send?phone=$telef&text=$texto');
-    /*   if (await launchUrl(url)) {
-         await launchUrl(url);
+    if (await launchUrl(url)) {
+      await launchUrl(url);
     } else {
       throw 'Could not launch $url';
-    } */
+    }
   }
 
   void compartirCitaEmail(
@@ -160,7 +160,9 @@ class Comunicaciones {
             cita,
             perfilUsuarioApp.email)
         .then((mailId) {
-      Future.delayed(const Duration(seconds: 5), () async {
+      mensajeInfo(context, 'Enviando email');
+
+      Future.delayed(const Duration(seconds: 10), () async {
         dynamic statusEnvio = await comprueStatusEmail(mailId);
         switch (statusEnvio) {
           case 'SUCCESS':

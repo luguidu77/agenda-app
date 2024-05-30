@@ -81,7 +81,7 @@ class SincronizarFirebase {
 //? foto, denominacion, descripcion ,... ////////////////////////////////////////////
   _configCamposPerfilUsuarioApp(String usuarioAPP, String updown) async {
     //referencia al documento
-    final docRef = await _referenciaDocumento(usuarioAPP, 'perfil');
+    // final docRef = await _referenciaDocumento(usuarioAPP, 'perfil');
     try {
       /*  // si no existen perfilUsuarioApp lo crea con los campos correspondientes
       await docRef.doc('perfilUsuarioApp').get().then((data) async {
@@ -103,13 +103,13 @@ class SincronizarFirebase {
       ///* NUEVA UBICACION DEL PERFIL DE USUARIO
       final docRefNuevo = db!.collection("agendacitasapp").doc(usuarioAPP);
       await docRefNuevo.get().then((data) async {
-        if (data.data() == null) {
+        if (data.data() != null) {
           await docRefNuevo.set({
             'foto': '',
             'denominacion': '',
             'descripcion': '',
             'telefono': '',
-            'website': '',
+            'website': 'agendadecitas.online',
             'facebook': '',
             'instagram': '',
             'ubicacion': '',

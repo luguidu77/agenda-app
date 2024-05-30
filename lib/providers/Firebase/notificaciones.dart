@@ -147,7 +147,7 @@ Future<dynamic> comprueStatusEmail(String mailId) async {
 
   dynamic status = await collectionRef.doc(mailId).get();
   // print(status['delivery']['state']);
-
+  
   return status['delivery']['state'];
 }
 

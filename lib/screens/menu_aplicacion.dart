@@ -124,12 +124,12 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
 
         const Divider(),
 
-        _estadopago == 'INITIAL' || _estadopago == 'GRATUITA'
+        /*  _estadopago == 'INITIAL' || _estadopago == 'GRATUITA'
             ? _creaCuentaPruebas()
-            : const Text(''),
+            : const Text(''), */
 
         // COMPRAR LA APLICACION
-        _estadopago == 'COMPRADA' ? const Text('') : _comprarAPP(context),
+        // _estadopago == 'COMPRADA' ? const Text('') : _comprarAPP(context),
 
         // PLAN AMIGO
         // _estadopago == 'COMPRADA' ? const Text('') : _planAmigo(context),

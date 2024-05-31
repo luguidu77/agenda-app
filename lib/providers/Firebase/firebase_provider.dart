@@ -41,30 +41,30 @@ class FirebaseProvider extends ChangeNotifier {
   PerfilModel perfil = PerfilModel();
   Future<PerfilModel> cargarPerfilFB(usuarioAPP) async {
     await _iniFirebase();
-
+    String idNegocio = '';
     try {
-      /*   final docRef = await _referenciaDocumento(
-          usuarioAPP, 'perfil'); //! referencia antigua a extinguir
+      //? TRAIGO EL ID DEL NEGOCIO EN AGENDOWEB
+      QuerySnapshot querySnapshot = await db!
+          .collection("agendoWeb")
+          .where("usuario", isEqualTo: usuarioAPP)
+          .get();
+      // Verifica si se encontró algún documento
+      if (querySnapshot.docs.isNotEmpty) {
+        // Obtén el primer documento que coincida (suponiendo que buscas una coincidencia única)
+        DocumentSnapshot docSnapshot = querySnapshot.docs.first;
 
-      //? TRAIGO LOS DATOS DE FIREBASE
-      await docRef.doc('perfilUsuarioApp').get().then((res) {
-        var data = res.data();
+        // Devuelve el ID del documento
+        idNegocio = docSnapshot.id;
+      } else {
+        // No se encontró ningún documento que coincida con la consulta
+        debugPrint('No se encontró ningún documento para el usuario');
+      }
 
-        perfil.email = data['email'];
-        perfil.foto = data['foto'];
-        perfil.denominacion = data['denominacion'];
-        perfil.descripcion = data['descripcion'];
-        perfil.facebook = data['facebook'];
-        perfil.instagram = data['instagram'];
-        perfil.telefono = data['telefono'];
-        perfil.ubicacion = data['ubicacion'];
-        perfil.website = data['website'];
-      }); */
 
       //? TRAIGO LOS DATOS DE FIREBASE
       await db!.collection("agendacitasapp").doc(usuarioAPP).get().then((res) {
         var data = res.data();
-
+        perfil.id = idNegocio;
         perfil.email = data!['email'];
         perfil.foto = data['foto'];
         perfil.denominacion = data['denominacion'];
@@ -1182,7 +1182,7 @@ class FirebaseProvider extends ChangeNotifier {
       'hora': horaFormateada,
       'idNegocio': negocio.id,
       'negocio': negocio.denominacion,
-      'ubicacion': '${negocio.direccion}-${negocio.ubicacion}',
+      'ubicacion': negocio.direccion,
       'duracion': duracion,
       'servicios': servicios.map((e) => e.servicio).toList(),
       'contacto': negocio.telefono,

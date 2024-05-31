@@ -23,6 +23,7 @@ import '../../models/models.dart';
 import '../../mylogic_formularios/mylogic.dart';
 import '../../widgets/widgets.dart';
 import 'provider/creacion_cita_provider.dart';
+import 'utils/adaptacion_perfilmodel_negociomodel.dart';
 import 'utils/formatea_fecha_hora.dart';
 import 'utils/id_cita_cliente_random.dart';
 
@@ -114,7 +115,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
       // si tiempo a restar es '24:00' , resto un día
       if (tiempoTextoRecord[0] == '2') {
         horaRecordatorio = cita
-            .subtract(Duration(
+            .subtract(const Duration(
               days: 1,
             ))
             .toString();
@@ -168,10 +169,10 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     String dateOnlyString =
         '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
 
-    //
-    // ignore: use_build_context_synchronously
+    // GENERO UN ID PARA LA CITA(idCitaCliente); // Ejemplo: b7gjR3jNuMRomunRo6SJ
     String idCitaCliente = generarCadenaAleatoria(20);
-    print(idCitaCliente); // Ejemplo: b7gjR3jNuMRomunRo6SJ
+
+    //GRABA LA CITA EN EL NEGOCIO
     await grabarCita(
         context,
         fecha,
@@ -189,38 +190,15 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         idCitaCliente);
 
     //* CLIENTE : comprobar si el cliente tiene cuenta en la web para agregarle la cita
-    FirebaseFirestore? db;
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
 
-    db = FirebaseFirestore.instance;
-    print(clienta['EMAIL']);
-    print(idCitaCliente);
-
+    //? PERFIL DEL NEGOCIO (USUARIOAPP)
     final perfilNegocio =
         await FirebaseProvider().cargarPerfilFB(_emailSesionUsuario);
-    NegocioModel negocio = NegocioModel(
-        id: '',
-        denominacion: perfilNegocio.denominacion!,
-        direccion: 'perfilNegocio.ciudad!',
-        ubicacion: perfilNegocio.ubicacion!,
-        email: perfilNegocio.email!,
-        telefono: perfilNegocio.telefono!,
-        imagen: perfilNegocio.foto!,
-        moneda: 'perfilNegocio.moneda!',
-        latitud: 0,
-        longitud: 0,
-        valoracion: '',
-        categoria: '',
-        servicios: '',
-        tokenMessaging: '',
-        descripcion: '',
-        facebook: '',
-        instagram: '',
-        horarios: '',
-        destacado: false,
-        publicado: true,
-        blog: {});
+    //? PASO DE PERFILMODEL A NEGOCIOMODEL
+    NegocioModel negocio = adaptacionPerfilNegocio(perfilNegocio);
+
+
+   
     // Formatear la fecha al formato deseado
     Map<String, dynamic> resultado =
         formatearFechaYHora(citaElegida['HORAINICIO']);
@@ -235,27 +213,25 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     listaServicios.map((e) => e['SERVICIO']).toList();
 
     for (var element in listaServicios) {
-      print(element.toString());
       servicio.servicio = element['SERVICIO'];
       servicios.add(servicio);
     }
 
-    /*  try { */
-
-    print('AGREGA LA CITA AL CLIENTE');
-    await FirebaseProvider().creaNuevacitaAdministracionCliente(
-      negocio,
-      citaElegida['HORAINICIO'],
-      fechaFormateada,
-      horaFormateada,
-      'duracion',
-      servicios,
-      clienta['EMAIL'],
-      idCitaCliente,
-    );
-    /*  } catch (e) {
-      print('ERROR');
-    } */
+    try {
+      //******************************************('AGREGA LA CITA AL CLIENTE')****************
+      await FirebaseProvider().creaNuevacitaAdministracionCliente(
+        negocio,
+        citaElegida['HORAINICIO'],
+        fechaFormateada,
+        horaFormateada,
+        'duracion',
+        servicios,
+        clienta['EMAIL'],
+        idCitaCliente,
+      );
+    } catch (e) {
+      // print('ERROR');
+    }
 
     // limpia la lista de servicios
     listaServicios.clear();

@@ -155,10 +155,7 @@ class Comunicaciones {
     print(
         '***************************************** ${textListServicio.toString()}');
 
-    await emailEstadoCita(
-            'Cita confirmada por el negocio (No aparecerá en su administración de citas)',
-            cita,
-            perfilUsuarioApp.email)
+    await emailEstadoCita('Cita confirmada', cita, perfilUsuarioApp.email)
         .then((mailId) {
       mensajeInfo(context, 'Enviando email');
 

@@ -42,6 +42,18 @@ class FormatearFechaHora {
     }
   }
 }
+ //? FECHA LARGA EN ESPAÑOL miércoles, 5 de junio 16:49
+String formateaFechaLarga(fecha){
+   String? fechaLarga;
+   
+    DateTime resFecha =
+        DateTime.parse(fecha); // horaInicio trae 2022-12-05 20:27:00.000Z
+    //? FECHA LARGA EN ESPAÑOL
+    fechaLarga = DateFormat.MMMMEEEEd('es_ES')
+        .add_Hm()
+        .format(DateTime.parse(resFecha.toString()));
+        return fechaLarga;
+}
 
 String suma(String tiempo1, String valor) {
   // Definir la cadena de tiempo en el formato "02:00".

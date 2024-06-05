@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/models.dart';
 import '../../providers/Firebase/emailHtml/emails_html.dart';
+import '../formatear.dart';
 
 class Comunicaciones {
   static void hacerLlamadaTelefonica(String phoneNumber) async {
@@ -148,7 +149,6 @@ class Comunicaciones {
     // Convertir el texto en una lista de textos
     List<String> textListServicio = servicio.split(', ');
 
-    // FORMATO DE fecha : 2024-05-21 13:00:00.000 . dejo este formato porque se hace el formateo en textoHTML
     CitaModelFirebase cita = CitaModelFirebase(
         horaInicio: fecha, email: email, idservicio: textListServicio);
 

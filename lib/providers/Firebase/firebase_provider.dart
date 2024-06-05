@@ -60,7 +60,6 @@ class FirebaseProvider extends ChangeNotifier {
         debugPrint('No se encontró ningún documento para el usuario');
       }
 
-
       //? TRAIGO LOS DATOS DE FIREBASE
       await db!.collection("agendacitasapp").doc(usuarioAPP).get().then((res) {
         var data = res.data();

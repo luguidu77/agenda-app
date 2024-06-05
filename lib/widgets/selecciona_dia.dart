@@ -12,7 +12,7 @@ import '../utils/publicidad.dart';
 import '../utils/utils.dart';
 
 class SeleccionaDia extends StatefulWidget {
-  const SeleccionaDia(
+  const  SeleccionaDia(
       {Key? key,
       required this.botonReprogramarVisible,
       required this.idServicio,

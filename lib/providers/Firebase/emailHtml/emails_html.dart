@@ -29,16 +29,15 @@ String textoHTML(
     String estadoCita, PerfilModel negocio, CitaModelFirebase cita) {
   String negocioNombre = negocio.denominacion!;
   String negocioDireccion = '${negocio.ubicacion} '; /* - ${negocio.ciudad} */
-  String fechaCita = formatearFecha(cita.horaInicio!);
-  String horaCita = formatearHora(cita.horaInicio!);
-  
+  String fechaCita = cita.horaInicio!; //formatearFecha(cita.horaInicio!);
+  // String horaCita = cita.horaInicio!; // formatearHora(cita.horaInicio!);
 
-   // Crear una cadena de texto HTML con los elementos de la lista en columna
-    String htmlServicios = "<div>";
-    for (String item in cita.idservicio!) {
-      htmlServicios += "<p>$item</p>";
-    }
-    htmlServicios += "</div>";
+  // Crear una cadena de texto HTML con los elementos de la lista en columna
+  String htmlServicios = "<div>";
+  for (String item in cita.idservicio!) {
+    htmlServicios += "<p>$item</p>";
+  }
+  htmlServicios += "</div>";
 
   return '''<!DOCTYPE html>
 
@@ -173,10 +172,7 @@ String textoHTML(
 <td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">Fecha:</td>
 <td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">${fechaCita}</td>
 </tr>
-<tr>
-<td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">Hora:</td>
-<td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">${horaCita}</td>
-</tr>
+
 <tr>
 <td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">Servicios:​</td>
 <td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">${htmlServicios}​</td>

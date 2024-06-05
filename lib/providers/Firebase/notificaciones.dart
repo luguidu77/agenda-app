@@ -8,6 +8,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../utils/formatear.dart';
 import '../buttom_nav_notificaciones_provider.dart';
 
 FirebaseFirestore? db;
@@ -123,6 +124,10 @@ eliminaLeidas(emailUsuario) async {
 // Usando la extensión Trigger Email  de Firebase
 Future<dynamic> emailEstadoCita(
     String estado, CitaModelFirebase cita, emailnegocio) async {
+  //? FECHA LARGA EN ESPAÑOL
+  String fechaLarga = formateaFechaLarga(cita.horaInicio);
+  cita.horaInicio = fechaLarga;
+
   // obtengo el perfil del negocio
   PerfilModel negocio = await FirebaseProvider().cargarPerfilFB(emailnegocio);
   await _iniFirebase();
@@ -137,7 +142,7 @@ Future<dynamic> emailEstadoCita(
   });
 
   final res = await collectionRef.doc(refDoc.id).get();
-   return res.id; //retorno el id de la coleccion mail
+  return res.id; //retorno el id de la coleccion mail
 }
 
 //comprueba el envio del email
@@ -147,7 +152,7 @@ Future<dynamic> comprueStatusEmail(String mailId) async {
 
   dynamic status = await collectionRef.doc(mailId).get();
   // print(status['delivery']['state']);
-  
+
   return status['delivery']['state'];
 }
 

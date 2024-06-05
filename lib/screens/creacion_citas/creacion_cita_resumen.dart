@@ -21,6 +21,7 @@ import 'package:provider/provider.dart';
 import '../../firebase_options.dart';
 import '../../models/models.dart';
 import '../../mylogic_formularios/mylogic.dart';
+import '../../utils/formatear.dart';
 import '../../widgets/widgets.dart';
 import 'provider/creacion_cita_provider.dart';
 import 'utils/adaptacion_perfilmodel_negociomodel.dart';
@@ -197,8 +198,6 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     //? PASO DE PERFILMODEL A NEGOCIOMODEL
     NegocioModel negocio = adaptacionPerfilNegocio(perfilNegocio);
 
-
-   
     // Formatear la fecha al formato deseado
     Map<String, dynamic> resultado =
         formatearFechaYHora(citaElegida['HORAINICIO']);
@@ -206,16 +205,26 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     String fechaFormateada = resultado['fechaFormateada'];
     String horaFormateada = resultado['horaFormateada'];
 
-    //String duracion = formatearHora(tiempoTotal);
-
+    //* TODOS LOS SERVICIOS
     List<ServicioModel> servicios = [];
     ServicioModel servicio = ServicioModel();
     listaServicios.map((e) => e['SERVICIO']).toList();
 
     for (var element in listaServicios) {
       servicio.servicio = element['SERVICIO'];
+      servicio.tiempo = element['TIEMPO'];
       servicios.add(servicio);
     }
+    String tiempoTotal = '00:00';
+    //*SUMA DE LOS TIEMPOS DE LOS SERVICIOS
+    for (var element in servicios) {
+     
+      tiempoTotal = suma(tiempoTotal, element.tiempo.toString());
+    }
+
+    // duracion total de los servicios
+    String duracion = formatearHora(tiempoTotal);
+   
 
     try {
       //******************************************('AGREGA LA CITA AL CLIENTE')****************
@@ -224,7 +233,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         citaElegida['HORAINICIO'],
         fechaFormateada,
         horaFormateada,
-        'duracion',
+        duracion,
         servicios,
         clienta['EMAIL'],
         idCitaCliente,
@@ -238,6 +247,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
     setState(() {});
   }
+
+  
 
   pagoProvider() async {
     return Provider.of<PagoProvider>(context, listen: false);

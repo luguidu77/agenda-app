@@ -41,7 +41,7 @@ class ConfirmarStep extends StatefulWidget {
 
 class _ConfirmarStepState extends State<ConfirmarStep> {
   late CreacionCitaProvider contextoCreacionCita;
-  final citaElegida = CitaListProvider();
+   Map<String, dynamic> citaElegida ={};
   List<String> tRecordatorioGuardado = [];
   String tiempoTextoRecord = '';
   var tiempoEstablecido = RecordatoriosProvider();
@@ -102,7 +102,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     List<Map<String, dynamic>> listaServicios =
         contextoCreacionCita.getServiciosElegidos;
 
-    Map<String, dynamic> citaElegida = contextoCreacionCita.getCitaElegida;
+    citaElegida = contextoCreacionCita.getCitaElegida;
 
     DateTime cita = DateTime.parse(
       citaElegida['HORAINICIO'].toString(),
@@ -218,13 +218,11 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     String tiempoTotal = '00:00';
     //*SUMA DE LOS TIEMPOS DE LOS SERVICIOS
     for (var element in servicios) {
-     
       tiempoTotal = suma(tiempoTotal, element.tiempo.toString());
     }
 
     // duracion total de los servicios
     String duracion = formatearHora(tiempoTotal);
-   
 
     try {
       //******************************************('AGREGA LA CITA AL CLIENTE')****************
@@ -248,8 +246,6 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     setState(() {});
   }
 
-  
-
   pagoProvider() async {
     return Provider.of<PagoProvider>(context, listen: false);
   }
@@ -271,6 +267,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
   @override
   Widget build(BuildContext context) {
+   
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
@@ -331,7 +328,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
                                 cliente: clientaTexto,
                                 telefono: telefono,
                                 email: email,
-                                fechaCita: fechaTexto,
+                                fechaCita: citaElegida['HORAINICIO'].toString(),
                                 servicio: servicioTexto),
                             const SizedBox(height: 20),
                             ElevatedButton.icon(
@@ -411,7 +408,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
       /*   print('id servicio sin sesion ***********************************');
       print(idServicio); */
       //###### CREA CITA Y TRAE ID CITA CREADA EN DISPOSITIVO PARA ID DEL RECORDATORIO
-      idCita = await citaElegida.nuevaCita(
+     /*  idCita = await citaElegida.nuevaCita(
         fecha,
         horaInicio,
         horaFinal,
@@ -419,7 +416,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         idCliente,
         idServicio
             .first, //todo: solo visible el primer servicio de los que se reserve
-      );
+      ); */
     }
 
     //  RECORDATORIO CON ID PARA EN EL CASO DE QUE SE ELIMINE LA CITA, PODER BORRARLO

@@ -1157,15 +1157,15 @@ class FirebaseProvider extends ChangeNotifier {
   }
 
   creaNuevacitaAdministracionCliente(
-    NegocioModel negocio,
-    fechaHora,
-    String fechaCita,
-    String horaFormateada,
-    String duracion,
-    List<ServicioModel> servicios,
-    String cliente,
-    idCitaCliente,
-  ) async {
+      NegocioModel negocio,
+      fechaHora,
+      String fechaCita,
+      String horaFormateada,
+      String duracion,
+      List<ServicioModel> servicios,
+      String cliente,
+      idCitaCliente,
+      precioTotal) async {
     await _iniFirebase();
     final collectionRef = db!
         .collection("clientesAgendoWeb")
@@ -1183,8 +1183,9 @@ class FirebaseProvider extends ChangeNotifier {
       'negocio': negocio.denominacion,
       'ubicacion': negocio.direccion,
       'duracion': duracion,
-      'servicios': servicios.map((e) => e.servicio).toList(),
       'contacto': negocio.telefono,
+      'servicios': servicios.map((e) => e.servicio).toList(),
+      'precio': precioTotal,
       'notas': ''
     });
 

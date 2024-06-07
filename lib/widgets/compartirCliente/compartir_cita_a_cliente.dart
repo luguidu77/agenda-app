@@ -149,7 +149,6 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
           widget.email != ' ' && widget.email != ''
               ? GestureDetector(
                   onTap: () {
-                    
                     animarIcon = true; // animado el icono
                     setState(() {});
 
@@ -170,10 +169,10 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
                   },
                   child: Card(
                     child: ListTile(
-                      title:const Text('Email'),
+                      title: const Text('Email (envío automático )'),
                       trailing: animarIcon
-                          ?const CircularProgressIndicator()
-                          :const FaIcon(FontAwesomeIcons.envelope),
+                          ? const CircularProgressIndicator()
+                          : const FaIcon(FontAwesomeIcons.envelope),
                     ),
                   ),
                 )

@@ -378,66 +378,77 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
 
               //###################    SI HAY DATOS Y LA CITAS NO ESTA VACIA ###########################
             } else if (snapshot.hasData && citas.isNotEmpty) {
-              return Column(
-                children: [
-                  SizedBox(
-                    // tarjeta con numero de citas concertadas
+              return Flexible(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      // tarjeta con numero de citas concertadas
 
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
                       child: Text('${citas.length} citas concertadas ',
                           style: subTituloEstilo),
                     ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: citas.length,
-                      itemBuilder: (context, index) {
-                        print(
-                            '55555555555555555555555555555555555555555555555555555555555555555555');
-                        print(citas[index]);
-                        return Card(
-                          color: (DateTime.now().isBefore(
-                                  DateTime.parse(citas[index]['dia'])))
-                              ? const Color.fromARGB(255, 245, 197, 194)
-                              : null,
-                          child: Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Row(
-                                  children: [
-                                    //? FECHA LARGA EN ESPAÑOL
+                    SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 350,
+                            child: ListView.builder(
+                              itemCount: citas.length,
+                              itemBuilder: (context, index) {
+                                print(
+                                    '55555555555555555555555555555555555555555555555555555555555555555555');
+                                print(citas[index]);
+                                return Card(
+                                  color: (DateTime.now().isBefore(
+                                          DateTime.parse(citas[index]['dia'])))
+                                      ? const Color.fromARGB(255, 245, 197, 194)
+                                      : null,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            //? FECHA LARGA EN ESPAÑOL
 
-                                    Text(DateFormat.MMMMEEEEd('es_ES').format(
-                                        DateTime.parse(
-                                            citas[index]['dia'].toString()))),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(citas[index]['servicio']
-                                        /*  .toString()
-                                        .toUpperCase() */
+                                            Text(DateFormat.MMMMEEEEd('es_ES')
+                                                .format(DateTime.parse(
+                                                    citas[index]['dia']
+                                                        .toString()))),
+                                          ],
                                         ),
-                                    Text(
-                                        '${citas[index]['precio'].toString()} ${personaliza.moneda}'),
-                                  ],
-                                )
-                              ],
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(citas[index]['servicio']
+                                                /*  .toString()
+                                                .toUpperCase() */
+                                                ),
+                                            Text(
+                                                '${citas[index]['precio'].toString()} ${personaliza.moneda}'),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ),
-                        );
-                      },
+                          SizedBox(
+                            height: 50,
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               );
             } else {
               return Column(

@@ -41,7 +41,7 @@ class ConfirmarStep extends StatefulWidget {
 
 class _ConfirmarStepState extends State<ConfirmarStep> {
   late CreacionCitaProvider contextoCreacionCita;
-   Map<String, dynamic> citaElegida ={};
+  Map<String, dynamic> citaElegida = {};
   List<String> tRecordatorioGuardado = [];
   String tiempoTextoRecord = '';
   var tiempoEstablecido = RecordatoriosProvider();
@@ -88,6 +88,18 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     debugPrint('tRecordatorioGuardado : ${tRecordatorioGuardado.first}');
 
     await guardalacita();
+  }
+
+  double sumarPrecios(listaServicios) {
+    double suma = 0.0;
+
+    for (var servicio in listaServicios) {
+      // Obtener el precio en formato de cadena y convertirlo a double
+      double precio = double.parse(servicio['PRECIO']!);
+      suma += precio;
+    }
+
+    return suma;
   }
 
   guardalacita() async {
@@ -144,8 +156,9 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
     //VARIABLES PARA PRESENTARLA EN PANTALLA AL USUARIO
     //todo: SUMAR TODOS LOS SERVICIOS ELEGIDOS -------------------------------------??????
+    double sumaTotal = sumarPrecios(listaServicios);
     servicioTexto = listaServicios.first['SERVICIO'];
-    precioTexto = listaServicios.first['PRECIO'];
+    precioTexto = sumaTotal.toString();
     fechaTexto = fecha;
     horaInicioTexto = textoHoraInicio;
     horaFinalTexto = textoHoraFinal;
@@ -187,7 +200,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         listaServicios.map((e) => e['ID']).toList(),
         clienta['NOMBRE'],
         listaServicios.first['SERVICIO'],
-        listaServicios.first['PRECIO'],
+        precioTexto,
         idCitaCliente);
 
     //* CLIENTE : comprobar si el cliente tiene cuenta en la web para agregarle la cita
@@ -235,6 +248,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         servicios,
         clienta['EMAIL'],
         idCitaCliente,
+        precioTexto,
       );
     } catch (e) {
       // print('ERROR');
@@ -267,7 +281,6 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
   @override
   Widget build(BuildContext context) {
-   
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
@@ -408,7 +421,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
       /*   print('id servicio sin sesion ***********************************');
       print(idServicio); */
       //###### CREA CITA Y TRAE ID CITA CREADA EN DISPOSITIVO PARA ID DEL RECORDATORIO
-     /*  idCita = await citaElegida.nuevaCita(
+      /*  idCita = await citaElegida.nuevaCita(
         fecha,
         horaInicio,
         horaFinal,

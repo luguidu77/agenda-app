@@ -156,7 +156,7 @@ Future<dynamic> comprueStatusEmail(String mailId) async {
   return status['delivery']['state'];
 }
 
-emailCitaCancelada(cita, emailnegocio) async {
+/* emailCitaCancelada(cita, emailnegocio) async {
   // obtengo el perfil del negocio
   PerfilModel negocio = await FirebaseProvider().cargarPerfilFB(emailnegocio);
   await _iniFirebase();
@@ -169,7 +169,7 @@ emailCitaCancelada(cita, emailnegocio) async {
       'html': textoHTML('Su cita ha sido cancelada', negocio, cita),
     },
   });
-}
+} */
 
 //? NOTIFICACIONES PUSH ***************************************
 

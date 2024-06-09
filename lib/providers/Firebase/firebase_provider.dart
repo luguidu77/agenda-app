@@ -1005,13 +1005,14 @@ class FirebaseProvider extends ChangeNotifier {
       ''
     ]; //citaMap['idservicio']; // todo no esta como lista de servicios
     cita.idEmpleado = citaMap['idEmpleado'];
-    cita.precio = double.parse(citaMap['precio']);
+    cita.precio = citaMap['precio'];
     cita.confirmada = citaMap['confirmada'] == 'true' ? true : false;
     cita.tokenWebCliente = citaMap['tokenWebCliente'];
 
     await _iniFirebase();
     print(cita.email);
     print(cita.idcliente);
+    print(cita.precio);
     try {
       final collectionRef = db!
           .collection("clientesAgendoWeb")
@@ -1099,7 +1100,7 @@ class FirebaseProvider extends ChangeNotifier {
       'eliminada'
     ]; //citaMap['idservicio']; // todo no esta como lista de servicios
     cita.idEmpleado = citaMap['idEmpleado'];
-    cita.precio = double.parse(citaMap['precio']);
+    cita.precio = citaMap['precio'];
     cita.confirmada = citaMap['confirmada'] == 'true' ? true : false;
     cita.tokenWebCliente = citaMap['tokenWebCliente'];
     await _iniFirebase();

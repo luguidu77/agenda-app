@@ -108,11 +108,13 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
             SizedBox(
               height: 300,
               child: CompartirCitaConCliente(
-                  cliente: reserva['nombre'],
-                  telefono: reserva['telefono']!,
-                  email: reserva['email'],
-                  fechaCita: reserva['horaInicio'],
-                  servicio: reserva['servicio']),
+                cliente: reserva['nombre'],
+                telefono: reserva['telefono']!,
+                email: reserva['email'],
+                fechaCita: reserva['horaInicio'],
+                servicio: reserva['servicio'],
+                precio: reserva['precio'],
+              ),
             ),
           ]),
         ));

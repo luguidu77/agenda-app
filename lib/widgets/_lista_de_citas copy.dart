@@ -195,7 +195,7 @@ class _ListaCitasState extends State<ListaCitas> {
                           child: GestureDetector(
                             onTap: () {
                               if (compruebafechaDisponible) {
-                                Navigator.push(
+                               /*  Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
@@ -203,7 +203,7 @@ class _ListaCitasState extends State<ListaCitas> {
                                             emailUsuario: widget.emailusuario,
                                             reserva: citas[index]),
                                   ),
-                                );
+                                ); */
                               } else {
                                 showTopSnackBar(
                                   Overlay.of(context),

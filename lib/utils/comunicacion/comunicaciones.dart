@@ -141,7 +141,7 @@ class Comunicaciones {
       String clienta,
       String email,
       String fecha,
-      String servicio) async {
+      String servicio, String precio) async {
     //***           ENVIOS EMAIL AUTOMATICOS SERVICIO FIREBASE ******************************** */
     PerfilModel negocio = PerfilModel(
         denominacion: perfilUsuarioApp.denominacion,
@@ -150,7 +150,7 @@ class Comunicaciones {
     List<String> textListServicio = servicio.split(', ');
 
     CitaModelFirebase cita = CitaModelFirebase(
-        horaInicio: fecha, email: email, idservicio: textListServicio);
+        horaInicio: fecha, email: email, idservicio: textListServicio, precio: precio);
 
     print(
         '***************************************** ${textListServicio.toString()}');

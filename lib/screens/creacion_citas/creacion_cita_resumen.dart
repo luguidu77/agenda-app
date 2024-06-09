@@ -342,7 +342,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
                                 telefono: telefono,
                                 email: email,
                                 fechaCita: citaElegida['HORAINICIO'].toString(),
-                                servicio: servicioTexto),
+                                servicio: servicioTexto,
+                                precio: precioTexto),
                             const SizedBox(height: 20),
                             ElevatedButton.icon(
                                 onPressed: () {

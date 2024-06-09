@@ -31,6 +31,7 @@ String textoHTML(
   String negocioDireccion = '${negocio.ubicacion} '; /* - ${negocio.ciudad} */
   String fechaCita = cita.horaInicio!; //formatearFecha(cita.horaInicio!);
   // String horaCita = cita.horaInicio!; // formatearHora(cita.horaInicio!);
+  String precioTotal = cita.precio.toString();
 
   // Crear una cadena de texto HTML con los elementos de la lista en columna
   String htmlServicios = "<div>";
@@ -172,10 +173,13 @@ String textoHTML(
 <td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">Fecha:</td>
 <td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">${fechaCita}</td>
 </tr>
-
 <tr>
 <td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">Servicios:​</td>
 <td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">${htmlServicios}​</td>
+</tr>
+<tr>
+<td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">Precio total:​</td>
+<td style="padding: 10px; word-break: break-word; border-top: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; border-left: 1px solid #dddddd;" width="50%">${precioTotal}​</td>
 </tr>
 </tbody>
 </table>

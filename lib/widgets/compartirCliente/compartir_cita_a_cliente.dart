@@ -14,14 +14,16 @@ class CompartirCitaConCliente extends StatefulWidget {
   final dynamic email;
   final dynamic fechaCita;
   final dynamic servicio;
-  const CompartirCitaConCliente({
-    Key? key,
-    required this.cliente,
-    required this.telefono,
-    required this.email,
-    required this.fechaCita,
-    required this.servicio,
-  }) : super(key: key);
+  final dynamic precio;
+  const CompartirCitaConCliente(
+      {Key? key,
+      required this.cliente,
+      required this.telefono,
+      required this.email,
+      required this.fechaCita,
+      required this.servicio,
+      required this.precio})
+      : super(key: key);
 
   @override
   State<CompartirCitaConCliente> createState() =>
@@ -164,7 +166,8 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
                             widget.cliente,
                             widget.email,
                             widget.fechaCita,
-                            widget.servicio)
+                            widget.servicio,
+                            widget.precio)
                         : alerta(context);
                   },
                   child: Card(

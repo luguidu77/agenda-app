@@ -37,7 +37,7 @@ dependencies:
   provider:
   path:
   path_provider:
-  intl: ^0.18.0
+  intl:
 
   uuid: ^3.0.7
   crypto: ^3.0.3

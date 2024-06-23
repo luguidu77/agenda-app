@@ -105,7 +105,7 @@ dependencies:
   flutter_sendinblue: ^0.1.1
   drag_and_drop_lists: ^0.3.3
   google_nav_bar: ^5.0.6
-  syncfusion_flutter_calendar: ^22.1.38
+  syncfusion_flutter_calendar: ^25.2.3
   twilio_flutter: ^0.0.9
   flutter_native_timezone: ^2.0.0
 

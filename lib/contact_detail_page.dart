@@ -108,7 +108,8 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Row(
               children: [
-                Text('Optin', style: Theme.of(context).textTheme.headline6),
+                Text('Optin',
+                    style: Theme.of(context).textTheme.headlineMedium),
                 const Spacer(),
                 switcher,
               ],

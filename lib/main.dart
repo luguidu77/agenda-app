@@ -27,7 +27,7 @@ import 'widgets/formulariosSessionApp/registro_usuario_screen.dart'; //utilizado
 //?            quitar PAGADO DEL home.dart -->> PagoProvider().guardaPagado(true);
 //?            comprobar pago STRIPE en PRODUCTION google_pay_payment_profile.json y variables en wallet/ tarjetaPago.dart
 //?   flutter build appbundle
-//?            - C:\ProyectosFutter\agenda3\build\app\outputs\bundle\release
+//?            - C:\PROYECTOS FLUTTER\AGENDA DE CITAS\agenda-app\build\app\outputs\bundle\release
 //      VER SOLUCIONES DE ERRORES README.md
 //! GITHUB :
 /* 

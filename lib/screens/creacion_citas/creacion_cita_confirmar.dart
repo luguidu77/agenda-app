@@ -335,7 +335,10 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                     color: color),
                 child: const Padding(
                   padding: EdgeInsets.all(15.0),
-                  child: Text('Confirmar cita'),
+                  child: Text(
+                    'Confirmar cita',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             )

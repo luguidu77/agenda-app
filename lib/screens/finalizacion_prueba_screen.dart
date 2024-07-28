@@ -65,11 +65,11 @@ class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
                     await PagoProvider().guardaPagado(false, '');
                     await FirebaseAuth.instance.signOut();
                     estadoPagoProvider.estadoPagoEmailApp('');
-                   
+
                     _irPaginaInicio();
                   },
                   child: const Text(
-                    'No, continuar con la opción gratuita',
+                    'No, en otro momento',
                     style: TextStyle(
                       fontSize: 16,
                     ),
@@ -86,7 +86,7 @@ class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  '💳 ¡Mejora tu experiencia con la opción de pago! 💳\n¡Un solo pago sin suscripción para acceder a todas las funcionalidades de la app!',
+                  '¡Claro, para contiunar con todas las funcionalidades de la app!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
@@ -104,14 +104,16 @@ class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
                     _irPaginaCompra();
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.blue, // Cambia el color de fondo del botón
+                    foregroundColor: const Color.fromARGB(
+                        255, 3, 70, 124), // Cambia el color de fondo del botón
                   ),
                   child: const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text(
-                      'Sí, continuar con todas las opciones, manteniendo la publicación en la web',
+                      'Sí, un sólo pago 💳 sin suscripción',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, color: Colors.white),
+                      style: TextStyle(
+                          fontSize: 16, color: Color.fromARGB(255, 33, 4, 138)),
                     ),
                   ),
                 ),

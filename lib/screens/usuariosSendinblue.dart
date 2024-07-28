@@ -46,7 +46,7 @@ class _UsuariosSendinblueState extends State<UsuariosSendinblue> {
                 return ListTile(
                   title: Text(
                     contact.email,
-                    style: Theme.of(context).textTheme.bodyText1,
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   subtitle: Text('id: ${contact.id}'),
                   onTap: () =>

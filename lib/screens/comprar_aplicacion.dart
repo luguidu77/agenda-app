@@ -134,7 +134,7 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
                                   onPressed: () async {
                                     // 5,45€ https://buy.stripe.com/7sIcPEclB53EbCwfYY
                                     const url =
-                                        'https://buy.stripe.com/7sIcPEclB53EbCwfYY';
+                                        'https://buy.stripe.com/4gwcPE5XdeEecGA001'; //10,90€
                                     if (await launchUrl(Uri.parse(url))) {
                                       await launchUrl(Uri.parse(url));
                                     } else {

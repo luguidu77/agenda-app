@@ -98,6 +98,9 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //* HERRAMIENTA PARA AGREGAR Y MODIFICAR DATOS FIREBASE PARA CORRECION DE ERRORES
+    FirebaseProvider().modificaEstructura();
+
     // LLEE MICONTEXTO DE CreacionCitaProvider
     contextoCreacionCita = context.read<CreacionCitaProvider>();
     // al cancelar, limpiamos el contexto de los servicios

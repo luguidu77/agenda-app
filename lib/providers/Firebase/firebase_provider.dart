@@ -238,7 +238,7 @@ class FirebaseProvider extends ChangeNotifier {
 
   getTodasLasCitas(emailUsuario) async {
     List<Map<String, dynamic>> data = [];
-
+    dynamic verifica;
     await _iniFirebase();
 
     final docRef = await _referenciaDocumento(emailUsuario, 'cita');
@@ -247,7 +247,8 @@ class FirebaseProvider extends ChangeNotifier {
           for (var element in snapshot.docs)
             {
               //AGREGA LAS CITAS
-
+              verifica = element
+                  .data(), // Accede a los datos del documento como un mapa
               data.add({
                 'id': element.id,
                 'precio': element['precio'],
@@ -258,7 +259,10 @@ class FirebaseProvider extends ChangeNotifier {
                 'idCliente': element['idcliente'],
                 'idServicio': element['idservicio'],
                 'idEmpleado': element['idempleado'],
-                'confirmada': element['confirmada'],
+                // 'confirmada': element['confirmada'],
+                'confirmada': verifica.containsKey('confirmada')
+                    ? element['confirmada']
+                    : '',
               })
             }
         });
@@ -315,14 +319,24 @@ class FirebaseProvider extends ChangeNotifier {
 
         double precio =
             (cita['precio'] != '') ? double.parse(cita['precio']) : 0;
-
-        if (cita['confirmada']) {
-          // la ganancia mensual solo tiene en cuenta las citas CONFIRMADAS
+        if (cita['confirmada'] == "") {
+          // verifico que exita el campo "confirmada" en firebase(antiguas versiones no estaba este dato)
+          // sin no existiera, agregare a la lista por defecto
           data.add({
             'id': cita['id'],
             'fecha': fecha,
             'precio': precio,
           });
+        } else {
+          // si existiera el campo "confirmada" , solo agregare a la lista los confirmados
+          if (cita['confirmada']) {
+            // la ganancia mensual solo tiene en cuenta las citas CONFIRMADAS
+            data.add({
+              'id': cita['id'],
+              'fecha': fecha,
+              'precio': precio,
+            });
+          }
         }
       }
     }
@@ -679,6 +693,42 @@ class FirebaseProvider extends ChangeNotifier {
 
   actalizarCliente(ClienteModel cliente) async {
     //  await DBProvider.db.actualizarCliente(cliente);
+  }
+
+//* HERRAMIENTA PARA AGREGAR Y MODIFICAR DATOS FIREBASE PARA CORRECION DE ERRORES, SE INICIA DESDE calendario_screen.dart
+  modificaEstructura() async {
+    await _iniFirebase();
+// Obtener referencia a la colección 'cita'
+    final docRef = await _referenciaDocumento(
+        "monicagarciatorrejimeno@hotmail.com", 'cita');
+
+    // Obtener todos los documentos en la colección
+    QuerySnapshot snapshot = await docRef.get();
+
+    // Recorrer cada documento y actualizar el campo 'idservicio'
+    for (QueryDocumentSnapshot doc in snapshot.docs) {
+      // Obtener el valor actual de 'idservicio'
+      var idServicioActual = doc['idservicio'];
+      if (idServicioActual is String) {
+        // Modificar 'idservicio' para que sea un array con el valor original
+        List<String> nuevoIdServicio = [idServicioActual];
+
+        // Eliminar el campo actual 'idservicio'
+        await doc.reference.update({
+          'idservicio': FieldValue.delete(),
+        });
+        // Actualizar el documento con el nuevo valor de 'idservicio'
+        await doc.reference.update({
+          'idservicio': nuevoIdServicio,
+        });
+
+        await doc.reference.update({
+          'confirmada': true,
+        });
+      }
+      debugPrint("  TRABAJANDO.....");
+    }
+    debugPrint(" ____________ FINALIZADO __________");
   }
 
   actualizarCita(String usuarioAPP, CitaModelFirebase cita) async {

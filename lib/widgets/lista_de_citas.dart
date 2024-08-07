@@ -25,6 +25,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
   List<Appointment> meetings = <Appointment>[];
   String _emailSesionUsuario = '';
   bool _iniciadaSesionUsuario = false;
+  bool _leerEstadoBotonIndisponibilidad = false;
   emailUsuarioApp() async {
     final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
     _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
@@ -34,16 +35,24 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
   @override
   void initState() {
     emailUsuarioApp();
-
+    leerEstadoBotonIndisponibilidad();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final _leerEstadoBotonIndisponibilidad =
+        Provider.of<BotonAgregarIndisponibilidadProvider>(context).botonPulsado;
+    print(
+        'este es el estado del boton de indisponibilidad $_leerEstadoBotonIndisponibilidad  <__________________________');
     int tiempoServicios = 1;
 
     return Scaffold(
         body: SfCalendar(
+      backgroundColor: _leerEstadoBotonIndisponibilidad
+          ? Colors.red.withOpacity(0.1)
+          : Colors.white,
+
       // appointmentBuilder: appointmentBuilder,//? ########### CUSTOMIZACION DE LAS TARJETAS
       // ················   Config calendario ······································
 
@@ -87,6 +96,10 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           //############# CREACION DE CITA -- ELECCION DE CLIENTE ########################
           Navigator.pushNamed(context, 'creacionCitaCliente',
               arguments: details.date);
+
+          if (_leerEstadoBotonIndisponibilidad) {
+            mensajeInfo(context, 'nueva indisponibilidad');
+          }
         }
       },
 
@@ -272,6 +285,8 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
             '\n 💰 ${cita['precio']}'
         : '🌴⛵🍍🦀 NO DISPONIBLE \n\n MOTIVO: ${cita['comentario']}';
   }
+
+  void leerEstadoBotonIndisponibilidad() {}
 }
 
 class MeetingDataSource extends CalendarDataSource {

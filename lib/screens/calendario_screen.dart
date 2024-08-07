@@ -98,6 +98,8 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final _leerEstadoBotonIndisponibilidad =
+        Provider.of<BotonAgregarIndisponibilidadProvider>(context).botonPulsado;
     //* HERRAMIENTA PARA AGREGAR Y MODIFICAR DATOS FIREBASE PARA CORRECION DE ERRORES
     // FirebaseProvider().modificaEstructura();
 
@@ -134,8 +136,8 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
     visibleCalendario = calendarioProvider.visibleCalendario;
 
     return Scaffold(
-      /*  floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
-      floatingActionButton: const BotonSpeedDial(), */
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
+      floatingActionButton: const BotonSpeedDial(),
       key: _scaffoldKey,
       //drawer: const MenuDrawer(),
       onDrawerChanged: (isOpened) {
@@ -149,118 +151,151 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
       },
 
       body: SafeArea(
-        child: Column(
-          children: [
-            // TARJETA DE NOVEDADES O MENSAJES A LOS USUARIOS
-            /*   Expanded(
-              flex: 3,
-              child: tarjetaNodades(),
-            ), */
-            //****  activacion de mantenimientos ********* */
-            Visibility(
-              visible: true,
-              child: Mantenimientos(
-                emailSesionUsuario: _emailSesionUsuario,
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Visibility(
-                  visible: !visibleCalendario,
-                  child: selecionFechas(calendarioProvider)),
-            ),
-            Visibility(
-                visible: visibleCalendario,
-                child: Expanded(flex: 10, child: calendario())),
-
-            Visibility(
-                visible: !visibleCalendario,
-                child: _iniciadaSesionUsuario
-                    ? const SizedBox(
-                        height: 10,
-                        // child: _fotoPerfil(),
-                      )
-                    : Column(
+        child: Container(
+          color: Colors.white.withOpacity(0.95), // Tono blanquecino
+          child: Column(
+            children: [
+              // TARJETA DE NOVEDADES O MENSAJES A LOS USUARIOS
+              /*   Expanded(
+                flex: 3,
+                child: tarjetaNodades(),
+              ), */
+              // ---------------agrego tarjeta de alerta Señala indisponibilidad cuando se ha pulsado del boton del boton_speed_dial.dart No Disponibles -----------------
+              Visibility(
+                visible: _leerEstadoBotonIndisponibilidad,
+                child: Card(
+                    color: Colors.red,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CircleAvatar(
-                              backgroundColor: Colors.transparent,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(100.0),
-                                child: Image.asset(
-                                  './assets/icon/icon.png',
-                                ),
-                              )),
                           const Text(
-                            'agendadecitas',
-                            style: TextStyle(fontSize: 12),
-                          )
+                            'Señala inidisponivilidad',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          const SizedBox(width: 10),
+                          TextButton(
+                              child: const Text('descartar'),
+                              onPressed: () {
+                                setState(() {});
+                                Provider.of<BotonAgregarIndisponibilidadProvider>(
+                                        context,
+                                        listen: false)
+                                    .setBotonPulsadoIndisponibilidad(false);
+                              })
                         ],
-                      )),
-            Visibility(
-              visible: !visibleCalendario,
-              child: Expanded(
-                flex: 8,
-                child: diasNoDisponibles.contains(fechaElegida.weekday)
-                    ? Column(
-                        children: [
-                          const SizedBox(
-                            height: 50,
-                          ),
-                          const Text('DIA NO DISPONIBLE PARA CITAR '),
-                          const SizedBox(
-                            height: 50,
-                          ),
-                          GestureDetector(
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const DisponibilidadSemanalScreen(),
-                                )),
-                            child: Image.asset(
-                              ('./assets/icon/beach.png'),
-                              width: MediaQuery.of(context).size.width - 200,
-                            ),
-                          ),
-                        ],
-                      )
-                    : ListaCitas(
-                        emailusuario: _emailSesionUsuario,
-                        fechaElegida: fechaElegida,
-                        iniciadaSesionUsuario: _iniciadaSesionUsuario,
-                        filter: filter, // envia 'TODAS' O 'PENDIENTES'
                       ),
-
-                /* BackdropFilterCitas(
-                          backLayer: Container()
-                          /*  EnviosRecordatorios( 
-                            usuarioAPP: _emailSesionUsuario,
-                            fechaElegida: fechaElegida
-        
-                           
-                          ) */
-                          ,
-                          frontLayer: // ListaCitasNuevo(),
-        
-                              ListaCitas(
-                            emailusuario: _emailSesionUsuario,
-                            fechaElegida: fechaElegida,
-                            iniciadaSesionUsuario: _iniciadaSesionUsuario,
-                            filter: filter, // envia 'TODAS' O 'PENDIENTES'
-                          ),
-                          backTitle: const Text(
-                            'RECORDATOIOS',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          frontTitle: Text(
-                            'Citas para ${_emailSesionUsuario.toString().split('@')[0]}',
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          usuarioAPP: _emailSesionUsuario,
-                        )  */ //_vercitas(usuarioAPP)),
+                    )),
               ),
-            )
-          ],
+              //****  activacion de mantenimientos ********* */
+              Visibility(
+                visible: true,
+                child: Mantenimientos(
+                  emailSesionUsuario: _emailSesionUsuario,
+                ),
+              ),
+
+              Expanded(
+                flex: 1,
+                child: Visibility(
+                    visible: !visibleCalendario,
+                    child: selecionFechas(calendarioProvider)),
+              ),
+              Visibility(
+                  visible: visibleCalendario,
+                  child: Expanded(flex: 10, child: calendario())),
+
+              Visibility(
+                  visible: !visibleCalendario,
+                  child: _iniciadaSesionUsuario
+                      ? const SizedBox(
+                          height: 10,
+                          // child: _fotoPerfil(),
+                        )
+                      : Column(
+                          children: [
+                            CircleAvatar(
+                                backgroundColor: Colors.transparent,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(100.0),
+                                  child: Image.asset(
+                                    './assets/icon/icon.png',
+                                  ),
+                                )),
+                            const Text(
+                              'agendadecitas',
+                              style: TextStyle(fontSize: 12),
+                            )
+                          ],
+                        )),
+
+              Visibility(
+                visible: !visibleCalendario,
+                child: Expanded(
+                  flex: 8,
+                  child: diasNoDisponibles.contains(fechaElegida.weekday)
+                      ? Column(
+                          children: [
+                            const SizedBox(
+                              height: 50,
+                            ),
+                            const Text('DIA NO DISPONIBLE PARA CITAR '),
+                            const SizedBox(
+                              height: 50,
+                            ),
+                            GestureDetector(
+                              onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const DisponibilidadSemanalScreen(),
+                                  )),
+                              child: Image.asset(
+                                ('./assets/icon/beach.png'),
+                                width: MediaQuery.of(context).size.width - 200,
+                              ),
+                            ),
+                          ],
+                        )
+                      : ListaCitas(
+                          emailusuario: _emailSesionUsuario,
+                          fechaElegida: fechaElegida,
+                          iniciadaSesionUsuario: _iniciadaSesionUsuario,
+                          filter: filter, // envia 'TODAS' O 'PENDIENTES'
+                        ),
+
+                  /* BackdropFilterCitas(
+                            backLayer: Container()
+                            /*  EnviosRecordatorios( 
+                              usuarioAPP: _emailSesionUsuario,
+                              fechaElegida: fechaElegida
+          
+                             
+                            ) */
+                            ,
+                            frontLayer: // ListaCitasNuevo(),
+          
+                                ListaCitas(
+                              emailusuario: _emailSesionUsuario,
+                              fechaElegida: fechaElegida,
+                              iniciadaSesionUsuario: _iniciadaSesionUsuario,
+                              filter: filter, // envia 'TODAS' O 'PENDIENTES'
+                            ),
+                            backTitle: const Text(
+                              'RECORDATOIOS',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            frontTitle: Text(
+                              'Citas para ${_emailSesionUsuario.toString().split('@')[0]}',
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                            usuarioAPP: _emailSesionUsuario,
+                          )  */ //_vercitas(usuarioAPP)),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

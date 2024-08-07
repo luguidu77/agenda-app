@@ -3,7 +3,9 @@ import 'package:agendacitas/utils/alertasSnackBar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:provider/provider.dart';
 
+import '../../providers/providers.dart';
 import '../../screens/screens.dart';
 
 class BotonSpeedDial extends StatefulWidget {
@@ -29,6 +31,8 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
   }
 
   SpeedDial _botonSpeedDial(BuildContext context) {
+    final _leerEstadoBotonIndisponibilidad =
+        Provider.of<BotonAgregarIndisponibilidadProvider>(context);
     var renderOverlay = true;
     var visible = true;
     var switchLabelPosition = false;
@@ -130,12 +134,15 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
           foregroundColor: Colors.white,
           label: 'No disponible',
           onTap: () {
-            // formulario de no disponibilidad
+            _leerEstadoBotonIndisponibilidad
+                .setBotonPulsadoIndisponibilidad(true);
+
+            /*  // formulario de no disponibilidad
             Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => const FechasNoDisponibles()),
-            );
+            ); */
           },
         ),
       ],

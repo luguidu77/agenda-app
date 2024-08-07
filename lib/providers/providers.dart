@@ -14,3 +14,5 @@ export 'package:agendacitas/providers/estado_pago_app_provider.dart';
 
 export '../../providers/Firebase/firebase_provider.dart';
 export '../../providers/personaliza_provider.dart';
+
+export '../../providers/estado_creacion_indisponibilidad.dart';

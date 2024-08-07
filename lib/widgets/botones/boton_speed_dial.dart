@@ -112,13 +112,15 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
           : */
           const StadiumBorder(),
       children: [
-        /*  SpeedDialChild(
-          child: const Icon(Icons.bar_chart_rounded),
+        SpeedDialChild(
+          child: const Icon(Icons.chat_rounded),
           // backgroundColor: Colors.red,
           // foregroundColor: Colors.white,
           label: 'Crea una cita',
           onTap: () {
             mensajeInfo(context, 'SELECCIONA UNA HORA EN EL CALENDARIO');
+            _leerEstadoBotonIndisponibilidad
+                .setBotonPulsadoIndisponibilidad(false);
             /*   Navigator.push(
               context,
               MaterialPageRoute(
@@ -127,7 +129,7 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
                           ClienteModel(nombre: '', telefono: '', email: ''))),
             ); */
           },
-        ), */
+        ),
         SpeedDialChild(
           child: const Icon(Icons.work_off),
           backgroundColor: Colors.red,

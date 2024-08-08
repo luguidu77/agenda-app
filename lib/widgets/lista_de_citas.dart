@@ -35,7 +35,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
   @override
   void initState() {
     emailUsuarioApp();
-    leerEstadoBotonIndisponibilidad();
+
     super.initState();
   }
 
@@ -93,12 +93,14 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         } else {
           // print(details.date);
 
-          //############# CREACION DE CITA -- ELECCION DE CLIENTE ########################
-          Navigator.pushNamed(context, 'creacionCitaCliente',
-              arguments: details.date);
-
           if (_leerEstadoBotonIndisponibilidad) {
-            mensajeInfo(context, 'nueva indisponibilidad');
+            //############# CREACION DE CITA -- ELECCION DE CLIENTE ########################
+            Navigator.pushNamed(context, 'creacionNoDisponibilidad',
+                arguments: details.date);
+          } else {
+            //############# CREACION DE CITA -- ELECCION DE CLIENTE ########################
+            Navigator.pushNamed(context, 'creacionCitaCliente',
+                arguments: details.date);
           }
         }
       },
@@ -285,8 +287,6 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
             '\n 💰 ${cita['precio']}'
         : '🌴⛵🍍🦀 NO DISPONIBLE \n\n MOTIVO: ${cita['comentario']}';
   }
-
-  void leerEstadoBotonIndisponibilidad() {}
 }
 
 class MeetingDataSource extends CalendarDataSource {

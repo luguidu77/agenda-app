@@ -6,7 +6,6 @@ import 'package:fast_contacts/fast_contacts.dart';
 
 import 'package:flutter/material.dart';
 
-
 import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
@@ -69,6 +68,7 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
 
   @override
   Widget build(BuildContext context) {
+    //fecha y hora de inicio elegida
     final fecha = ModalRoute.of(context)?.settings.arguments;
     // LEER MICONTEXTO DE CreacionCitaProvider
     contextoCreacionCita = context.read<CreacionCitaProvider>();
@@ -116,8 +116,4 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
       ),
     );
   }
-
-
-
-
 }

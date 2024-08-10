@@ -57,9 +57,18 @@ class _ListaCitasState extends State<ListaCitas> {
   }
 
   vercitas(context, List<Map<String, dynamic>> citas) {
+    int contadorCitas = 0;
     final _leerEstadoBotonIndisponibilidad =
         Provider.of<BotonAgregarIndisponibilidadProvider>(context).botonPulsado;
-    final numCitas = citas.length;
+
+    // ············DESCUENTA DE LAS CITAS LOS INDISPUESTOS ............................... ;
+    for (var cita in citas) {
+      if (cita['idCliente'] != '999') {
+        contadorCitas++;
+      }
+    }
+    final numCitas = contadorCitas;
+
     return Column(
       children: [
         // ########## TEXTO SUMA DE GANANCIAS DIARIAS  ##############################

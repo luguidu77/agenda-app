@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_cliente.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_confirmar.dart';
-import 'package:agendacitas/screens/creacion_no_disponibilidad/creacion_no_disponibilidad_screen.dart';
 
 import 'package:agendacitas/screens/detalles_cita_screen.dart';
 import 'package:agendacitas/screens/notificaciones_screen.dart';
@@ -248,8 +247,6 @@ class _HomeScreenState extends State<HomeScreen> {
           'creacionCitaServicio': (context) => const CreacionCitaServicio(),
           'creacionCitaComfirmar': (context) => const CreacionCitaConfirmar(),
           'serviciosCitas': (_) => const ServiciosCreacionCita(),
-          'creacionNoDisponibilidad': (_) =>
-              const CreacionNoDisponibilidadScreen()
         });
   }
 

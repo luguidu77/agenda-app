@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:agendacitas/screens/creacion_no_disponibilidad/tarjeta_indisponibilidad.dart';
 import 'package:agendacitas/utils/extraerServicios.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -95,8 +96,10 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
           if (_leerEstadoBotonIndisponibilidad) {
             //############# CREACION DE CITA -- ELECCION DE CLIENTE ########################
-            Navigator.pushNamed(context, 'creacionNoDisponibilidad',
-                arguments: details.date);
+            setState(() {});
+            _mostrarTarjetaIndisponibilidad(context, details.date);
+            /*  Navigator.pushNamed(context, 'creacionNoDisponibilidad',
+                arguments: details.date); */
           } else {
             //############# CREACION DE CITA -- ELECCION DE CLIENTE ########################
             Navigator.pushNamed(context, 'creacionCitaCliente',
@@ -322,5 +325,20 @@ Widget appointmentBuilder(BuildContext context,
         ),
       )
     ],
+  );
+}
+
+void _mostrarTarjetaIndisponibilidad(BuildContext context, fecha) {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return TarjetaIndisponibilidad(argument: fecha);
+    },
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    backgroundColor: Colors.white,
+    isScrollControlled:
+        true, // Si quieres que el modal pueda ser de altura completa
   );
 }

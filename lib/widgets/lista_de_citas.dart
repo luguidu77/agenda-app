@@ -72,7 +72,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
       headerHeight: 0, // oculta fecha
       allowDragAndDrop: true,
-      onTap: (CalendarTapDetails details) {
+      onTap: (CalendarTapDetails details) async {
         // DateTime date = details.date!;
         dynamic appointments = details.appointments;
         // CalendarElement view = details.targetElement;
@@ -96,8 +96,9 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
           if (_leerEstadoBotonIndisponibilidad) {
             //############# CREACION DE CITA -- ELECCION DE CLIENTE ########################
-            setState(() {});
-            _mostrarTarjetaIndisponibilidad(context, details.date);
+
+            await _mostrarTarjetaIndisponibilidad(context, details.date);
+
             /*  Navigator.pushNamed(context, 'creacionNoDisponibilidad',
                 arguments: details.date); */
           } else {
@@ -328,8 +329,8 @@ Widget appointmentBuilder(BuildContext context,
   );
 }
 
-void _mostrarTarjetaIndisponibilidad(BuildContext context, fecha) {
-  showModalBottomSheet(
+_mostrarTarjetaIndisponibilidad(context, fecha) async {
+  await showModalBottomSheet(
     context: context,
     builder: (BuildContext context) {
       return TarjetaIndisponibilidad(argument: fecha);
@@ -340,5 +341,7 @@ void _mostrarTarjetaIndisponibilidad(BuildContext context, fecha) {
     backgroundColor: Colors.white,
     isScrollControlled:
         true, // Si quieres que el modal pueda ser de altura completa
-  );
+  ).whenComplete(() =>
+      Provider.of<BotonAgregarIndisponibilidadProvider>(context, listen: false)
+          .setBotonPulsadoIndisponibilidad(false));
 }

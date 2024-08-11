@@ -1,8 +1,10 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/mylogic_formularios/my_logic_cita.dart';
+import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/providers.dart';
@@ -19,14 +21,18 @@ class TarjetaIndisponibilidad extends StatefulWidget {
 
 class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   int _selectedIndex = 0; // Variable para almacenar el índice seleccionado
+  DateTime? dateTimeElegido;
+  Duration? selectedDateTime;
   String? selectedTimeOption;
-  List<String> timeOptions = [
-    '30 minutos',
-    '1 hora',
-    '1 hora 30 minutos',
-    '2 horas',
-    '2 horas 30 minutos',
-    '3 horas',
+  List<Map<String, Duration>> timeOptions = [
+    {
+      '30 minutos': const Duration(minutes: 30),
+      '1 hora': const Duration(hours: 1),
+      '1 hora 30 minutos': const Duration(hours: 1, minutes: 30),
+      '2 horas': const Duration(hours: 2),
+      '2 horas 30 minutos': const Duration(hours: 2, minutes: 30),
+      '3 horas': const Duration(hours: 3),
+    }
   ];
   late CreacionCitaProvider contextoCreacionCita;
   final _formKey = GlobalKey<FormState>();
@@ -39,21 +45,28 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   String _asunto3 = '';
   String _asunto4 = '';
 
+  String fechaPantalla = '';
+  String dia = '';
+  String horaInicioPantalla = '';
+  String horaFinPantalla = '';
   String fechaInicio = '';
   String fechaFin = '';
-  String horaInicio = '2024-08-09 13:00:00.000Z';
-  String horaFin = '2024-08-09 14:00:00.000Z';
+  String horaInicio = ''; //2024-08-09 13:00:00.000Z'
+  String horaFin = '';
 
   @override
   void initState() {
     emailUsuario();
     traeAsuntosIndisponibilidad();
-    myLogic = MyLogicNoDisponible(citaInicio, citaFin, asunto);
-    myLogic.init();
+    // Formatear la fecha  para firebase
+    dia = DateFormat('yyyy-MM-dd').format(widget.argument);
+    // Formatear la fecha  para visualizar en pantalla
+    fechaPantalla = DateFormat('dd-MM-yyyy').format(widget.argument);
+    horaInicioPantalla = DateFormat('HH:mm').format(widget.argument);
+
     super.initState();
   }
 
-  bool _iniciadaSesionUsuario = false;
   String _emailSesionUsuario = '';
 
   List<String> _asuntos = [];
@@ -61,7 +74,6 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   emailUsuario() async {
     final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
     _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
-    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
   }
 
   traeAsuntosIndisponibilidad() {
@@ -76,13 +88,12 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   String asunto = ' 🩺 medico ';
   @override
   Widget build(BuildContext context) {
+    Map<String, Duration> optionsMap = timeOptions.first;
     //fecha y hora de inicio elegida
-    final fecha = widget.argument;
-    // LEER MICONTEXTO DE CreacionCitaProvider
-    contextoCreacionCita = context.read<CreacionCitaProvider>();
-    final cita = contextoCreacionCita.getCitaElegida;
-    print(fecha);
-    print(cita);
+    dateTimeElegido = widget.argument;
+
+    horaInicio = (widget.argument).toString();
+
     return Padding(
       padding: const EdgeInsets.all(18.0),
       child: SizedBox(
@@ -90,117 +101,156 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            // ------------------- DURACION----------------------------
+            _tiempo(optionsMap),
             // ------------------- ASUNTOS----------------------------
+            _listaAsuntos(),
+
+            // ------------------- PRESENTACION DE FECHA Y HORAS---------
+            _presentacionFechaHoras(),
 
             Expanded(
-              flex: 2,
-              child: SizedBox(
-                  child: PageView.builder(
-                controller: PageController(
-                  initialPage: 1,
-                  viewportFraction: 0.4, // Esto ajusta el ancho de cada tarjeta
-                ),
-                itemCount: 4,
-                itemBuilder: (BuildContext context, int i) {
-                  return InkWell(
-                      onTap: () {
-                        setState(() {
-                          _selectedIndex = i; // Guardar el índice seleccionado
-                          asunto = _asuntos[i].toString();
-                        });
-                      },
-                      child: Card(
-                          child: Container(
-                              color: _selectedIndex == i
-                                  ? Colors.blue[50]
-                                  : Colors
-                                      .white, // Cambia de color si está seleccionado
-                              child: Text(_asuntos[i]))));
-                },
-              )),
-            ),
+                flex: 2,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                        onPressed: () async {
+                          await FirebaseProvider().nuevaCita(
+                              _emailSesionUsuario,
+                              dia,
+                              horaInicio,
+                              horaFin,
+                              '0', //precio
+                              asunto, //comentario,
+                              '999', //idcliente
+                              [''], //idServicio,
+                              'idEmpleado',
+                              '' //idCitaCliente
+                              );
 
-            // ------------------- TIEMPO----------------------------
-            Expanded(
-              flex: 6,
-              child: Center(
-                child: Container(
-                    child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      //SELECTOR DEL MIEMBRO DEL EQUIPO PARA NO DISPONIBILIDAD
-                      //todo: _miembroEquipo(),
-                      Text(
-                        asunto,
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      const SizedBox(height: 20),
-
-                      const SizedBox(height: 50),
-                      const Text('FECHA'),
-                      Text('${fecha.toString()}'),
-                      //FECHA INICIO
-
-                      //HORA INICIO
-
-                      const Text('TRAMO HORARIO'),
-                      _duracion(),
-                      SizedBox(height: 20),
-
-                      //  const Text('Hasta'),
-                      //FECHA FINAL
-                      //HORA FINAL
-                      // selectDia(context, 'final'),
-                      // selectHora(context, 'final'),
-                      const SizedBox(
-                        height: 50,
-                      ),
-                    ],
-                  ),
-                )),
-              ),
-            ),
-            Expanded(
-                child: ElevatedButton(
-                    onPressed: () async {
-                      await FirebaseProvider().nuevaCita(
-                          _emailSesionUsuario,
-                          '2024-08-10',
-                          horaInicio,
-                          horaFin,
-                          '0', //precio
-                          asunto, //comentario,
-                          '999', //idcliente
-                          [''], //idServicio,
-                          'idEmpleado',
-                          '' //idCitaCliente
-                          );
-                    },
-                    child: Text('Aceptar')))
+                          cerrar();
+                        },
+                        child: const Text('Aceptar')),
+                  ],
+                ))
           ])),
     );
   }
 
-  _duracion() {
+  Expanded _presentacionFechaHoras() {
+    return Expanded(
+      flex: 4,
+      child: Center(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              //SELECTOR DEL MIEMBRO DEL EQUIPO PARA NO DISPONIBILIDAD
+
+              const SizedBox(height: 20),
+
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        fechaPantalla,
+                        style: subTituloEstilo,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        horaInicioPantalla,
+                        style: tituloEstilo,
+                      ),
+                      Text(' - '),
+                      Text(
+                        horaFinPantalla,
+                        style: tituloEstilo,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Expanded _listaAsuntos() {
+    return Expanded(
+      flex: 2,
+      child: SizedBox(
+          child: PageView.builder(
+        controller: PageController(
+          initialPage: 1,
+          viewportFraction: 0.4, // Esto ajusta el ancho de cada tarjeta
+        ),
+        itemCount: 4,
+        itemBuilder: (BuildContext context, int i) {
+          return InkWell(
+              onTap: () {
+                setState(() {
+                  _selectedIndex = i; // Guardar el índice seleccionado
+                  asunto = _asuntos[i].toString();
+                });
+              },
+              child: Card(
+                  child: Container(
+                      color: _selectedIndex == i
+                          ? Colors.blue[50]
+                          : Colors
+                              .white, // Cambia de color si está seleccionado
+                      child: Text(_asuntos[i]))));
+        },
+      )),
+    );
+  }
+
+  Expanded _tiempo(Map<String, Duration> optionsMap) => Expanded(
+      flex: 2,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [_duracion(optionsMap)],
+      ));
+
+  _duracion(Map<String, Duration> optionsMap) {
     return Column(
       children: [
         DropdownButton<String>(
-            hint: Text('Selecciona duración'),
-            value: selectedTimeOption,
-            items: timeOptions.map((String option) {
-              return DropdownMenuItem<String>(
-                value: option,
-                child: Text(option),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {
-              setState(() {
-                selectedTimeOption = newValue;
-              });
-            }),
+          hint: const Text('Selecciona duración'),
+          value: selectedTimeOption,
+          items: optionsMap.keys.map((String key) {
+            return DropdownMenuItem<String>(
+              value: key,
+              child: Text(key),
+            );
+          }).toList(),
+          onChanged: (String? newValue) {
+            setState(() {
+              selectedTimeOption = newValue;
+              selectedDateTime = optionsMap[newValue];
+              // Actualiza 'horaFin' con la duración seleccionada.
+              if (selectedDateTime != null) {
+                horaFin = selectedDateTime!.toString();
+              }
+              DateTime aux = dateTimeElegido!.add(selectedDateTime!);
+              horaFin = aux.toString();
+              horaFinPantalla = DateFormat('HH:mm').format(aux);
+            });
+          },
+        ),
       ],
     );
+  }
+
+  void cerrar() {
+    Navigator.pop(context);
   }
 }

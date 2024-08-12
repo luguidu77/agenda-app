@@ -42,17 +42,28 @@ class FormatearFechaHora {
     }
   }
 }
- //? FECHA LARGA EN ESPAÑOL miércoles, 5 de junio 16:49
-String formateaFechaLarga(fecha){
-   String? fechaLarga;
-   
-    DateTime resFecha =
-        DateTime.parse(fecha); // horaInicio trae 2022-12-05 20:27:00.000Z
-    //? FECHA LARGA EN ESPAÑOL
-    fechaLarga = DateFormat.MMMMEEEEd('es_ES')
-        .add_Hm()
-        .format(DateTime.parse(resFecha.toString()));
-        return fechaLarga;
+
+//? FECHA LARGA EN ESPAÑOL miércoles, 5 de junio 16:49
+String formateaFechaLarga(fecha) {
+  String? fechaLarga;
+
+  DateTime resFecha =
+      DateTime.parse(fecha); // horaInicio trae 2022-12-05 20:27:00.000Z
+  //? FECHA LARGA EN ESPAÑOL
+  fechaLarga = DateFormat.MMMMEEEEd('es_ES')
+      .add_Hm()
+      .format(DateTime.parse(resFecha.toString()));
+  return fechaLarga;
+}
+
+String formateaDurationString(_asuntos, i) {
+  Duration duration = _asuntos[i]!.values.first;
+
+  String twoDigits(int n) => n.toString().padLeft(2, "0");
+
+  String formattedDuration =
+      "${twoDigits(duration.inHours)}:${twoDigits(duration.inMinutes.remainder(60))}";
+  return formattedDuration;
 }
 
 String suma(String tiempo1, String valor) {

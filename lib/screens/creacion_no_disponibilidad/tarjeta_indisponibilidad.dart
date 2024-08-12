@@ -1,6 +1,7 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/mylogic_formularios/my_logic_cita.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
+import 'package:agendacitas/utils/formatear.dart';
 import 'package:agendacitas/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -40,10 +41,10 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   CitaModel citaInicio = CitaModel();
   CitaModel citaFin = CitaModel();
 
-  String _asunto1 = '';
-  String _asunto2 = '';
-  String _asunto3 = '';
-  String _asunto4 = '';
+  Map<String, Duration>? _asunto1;
+  Map<String, Duration>? _asunto2;
+  Map<String, Duration>? _asunto3;
+  Map<String, Duration>? _asunto4;
 
   String fechaPantalla = '';
   String dia = '';
@@ -69,7 +70,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
   String _emailSesionUsuario = '';
 
-  List<String> _asuntos = [];
+  List<Map<String, Duration>?> _asuntos = [];
 
   emailUsuario() async {
     final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
@@ -78,10 +79,11 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
   traeAsuntosIndisponibilidad() {
     // traer los textos de los asuntos de firebase
-    _asunto1 = ' 🩺 medico ';
-    _asunto2 = ' 🥣 descanso ';
-    _asunto3 = ' 🚙 vacaciones ';
-    _asunto4 = 'otro ';
+    _asunto1 = {' ✏️ personalizado ': const Duration(minutes: 0)};
+    _asunto2 = {' 🥣 descanso ': const Duration(minutes: 30)};
+    _asunto3 = {' 😷  médico ': const Duration(hours: 1)};
+    _asunto4 = {' ➕  nuevo asunto ': const Duration(minutes: 30)};
+
     _asuntos = [_asunto1, _asunto2, _asunto3, _asunto4];
   }
 
@@ -101,10 +103,10 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // ------------------- DURACION----------------------------
-            _tiempo(optionsMap),
             // ------------------- ASUNTOS----------------------------
             _listaAsuntos(),
+            // ------------------- DURACION----------------------------
+            _tiempo(optionsMap),
 
             // ------------------- PRESENTACION DE FECHA Y HORAS---------
             _presentacionFechaHoras(),
@@ -189,25 +191,37 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
       child: SizedBox(
           child: PageView.builder(
         controller: PageController(
-          initialPage: 1,
+          initialPage: 0,
           viewportFraction: 0.4, // Esto ajusta el ancho de cada tarjeta
         ),
-        itemCount: 4,
+        itemCount: _asuntos.length,
         itemBuilder: (BuildContext context, int i) {
+          String duracion = formateaDurationString(_asuntos, i);
+
           return InkWell(
               onTap: () {
                 setState(() {
                   _selectedIndex = i; // Guardar el índice seleccionado
                   asunto = _asuntos[i].toString();
+
+                  DateTime aux =
+                      dateTimeElegido!.add(_asuntos[i]!.values.first);
+                  horaFin = aux.toString();
+                  horaFinPantalla = DateFormat('HH:mm').format(aux);
                 });
               },
               child: Card(
-                  child: Container(
+                  child: Column(
+                children: [
+                  Container(
                       color: _selectedIndex == i
                           ? Colors.blue[50]
                           : Colors
                               .white, // Cambia de color si está seleccionado
-                      child: Text(_asuntos[i]))));
+                      child: Text('${_asuntos[i]!.keys.first}')),
+                  Text(duracion)
+                ],
+              )));
         },
       )),
     );

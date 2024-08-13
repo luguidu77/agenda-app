@@ -52,8 +52,10 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   String horaFinPantalla = '';
   String fechaInicio = '';
   String fechaFin = '';
-  String horaInicio = ''; //2024-08-09 13:00:00.000Z'
-  String horaFin = '';
+  DateTime? horaInicio;
+  DateTime? horaFin;
+  String horaInicioTexto = ''; //2024-08-09 13:00:00.000Z'
+  String horaFinTexto = '';
 
   @override
   void initState() {
@@ -94,7 +96,8 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     //fecha y hora de inicio elegida
     dateTimeElegido = widget.argument;
 
-    horaInicio = (widget.argument).toString();
+    horaInicioTexto = (widget.argument).toString();
+    horaInicio = widget.argument;
 
     return Padding(
       padding: const EdgeInsets.all(18.0),
@@ -121,8 +124,8 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
                           await FirebaseProvider().nuevaCita(
                               _emailSesionUsuario,
                               dia,
-                              horaInicio,
-                              horaFin,
+                              horaInicioTexto,
+                              horaFinTexto,
                               '0', //precio
                               asunto, //comentario,
                               '999', //idcliente
@@ -167,13 +170,16 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
                     children: [
                       Text(
                         horaInicioPantalla,
-                        style: tituloEstilo,
+                        style: estiloHorarios,
                       ),
                       Text(' - '),
-                      Text(
+                      /*  Text(
                         horaFinPantalla,
                         style: tituloEstilo,
-                      ),
+                      ), */
+                      CarruselDeHorarios(
+                        horaInicio: horaInicio,
+                      )
                     ],
                   ),
                 ],
@@ -206,7 +212,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
                   DateTime aux =
                       dateTimeElegido!.add(_asuntos[i]!.values.first);
-                  horaFin = aux.toString();
+                  horaFinTexto = aux.toString();
                   horaFinPantalla = DateFormat('HH:mm').format(aux);
                 });
               },
@@ -252,10 +258,10 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
               selectedDateTime = optionsMap[newValue];
               // Actualiza 'horaFin' con la duración seleccionada.
               if (selectedDateTime != null) {
-                horaFin = selectedDateTime!.toString();
+                horaFinTexto = selectedDateTime!.toString();
               }
               DateTime aux = dateTimeElegido!.add(selectedDateTime!);
-              horaFin = aux.toString();
+              horaFinTexto = aux.toString();
               horaFinPantalla = DateFormat('HH:mm').format(aux);
             });
           },
@@ -266,5 +272,111 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
   void cerrar() {
     Navigator.pop(context);
+  }
+}
+
+class CarruselDeHorarios extends StatefulWidget {
+  final DateTime? horaInicio;
+
+  const CarruselDeHorarios({super.key, this.horaInicio});
+
+  static Map<String, DateTime> generarHorarios(horaInicio) {
+    Map<String, DateTime> horarios = {};
+    DateTime startTime = horaInicio; //DateTime(2024, 1, 1, 8, 0); // 08:00 AM
+
+    for (int i = 0; i <= 14; i++) {
+      String formattedTime = DateFormat('HH:mm').format(startTime);
+      horarios[formattedTime] = startTime;
+      startTime = startTime.add(const Duration(minutes: 30));
+    }
+
+    return horarios;
+  }
+
+  @override
+  State<CarruselDeHorarios> createState() => _CarruselDeHorariosState();
+}
+
+class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
+  Map<String, DateTime> horarios = {};
+  final PageController _pageController = PageController(viewportFraction: 0.3);
+  int _currentPage = 0;
+  String _guardaHoraTexto = '';
+  DateTime? _guardaHoraFin;
+
+  bool _visibleCarrusel = false;
+
+  double alturaCarrusel = 95;
+  int numeroHoras = 1;
+
+  final _estiloResaltado = const TextStyle(
+      fontSize: 20, color: Colors.blue, fontWeight: FontWeight.bold);
+  final _estiloNormal = const TextStyle(
+    fontSize: 18,
+    color: Color.fromARGB(255, 5, 5, 5),
+  ); // /;
+
+  @override
+  void initState() {
+    horarios = CarruselDeHorarios.generarHorarios(widget.horaInicio);
+    _guardaHoraTexto = horarios.keys.elementAt(0);
+    super.initState();
+    _pageController.addListener(() {
+      int newPage = _pageController.page!.round();
+      if (_currentPage != newPage) {
+        setState(() {
+          _currentPage = newPage;
+          print(
+              "Página seleccionada: $_currentPage, Horario: ${horarios.keys.elementAt(_currentPage)}");
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {});
+        _visibleCarrusel = !_visibleCarrusel;
+      },
+      child: Container(
+          width: 100,
+          height: 100,
+          child: _visibleCarrusel
+              ? Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Container(
+                      color: Colors.white,
+                      height: 100,
+                      width: 100, // Altura del carrusel
+                      child: PageView.builder(
+                          scrollDirection: Axis.vertical,
+                          controller: _pageController,
+                          itemCount: horarios.length,
+                          itemBuilder: (context, i) {
+                            String horario = horarios.keys.elementAt(i);
+                            _guardaHoraTexto =
+                                horarios.keys.elementAt(_currentPage);
+
+                            return Center(
+                              child: Text(horario,
+                                  style: _currentPage == i
+                                      ? estiloHorarios
+                                      : _estiloNormal),
+                            );
+                          })),
+                )
+              : Center(child: Text(_guardaHoraTexto, style: estiloHorarios))),
+    );
   }
 }

@@ -22,3 +22,10 @@ final textoPequenoEstilo = GoogleFonts.bebasNeue(
 
 const String mensajeYaExisteCliente =
     'Ya existe el teléfono asociado al contacto:';
+
+final estiloHorarios = GoogleFonts.bebasNeue(
+  fontSize: 24,
+);
+
+final estiloHorariosResaltado = GoogleFonts.bebasNeue(
+    fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue[900]);

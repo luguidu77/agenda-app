@@ -371,8 +371,8 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
                             return Center(
                               child: Text(horario,
                                   style: _currentPage == i
-                                      ? estiloHorarios
-                                      : _estiloNormal),
+                                      ? estiloHorariosResaltado
+                                      : estiloHorarios),
                             );
                           })),
                 )

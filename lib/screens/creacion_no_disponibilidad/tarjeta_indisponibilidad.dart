@@ -102,10 +102,17 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     return Padding(
       padding: const EdgeInsets.all(18.0),
       child: SizedBox(
-          height: 500, // Puedes ajustar la altura según tus necesidades
+          height: 650, // Puedes ajustar la altura según tus necesidades
 
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(
+              ' Agrega horario no disponible',
+              style: estiloHorarios,
+            ),
+            SizedBox(
+              height: 40,
+            ),
             // ------------------- ASUNTOS----------------------------
             _listaAsuntos(),
             // ------------------- DURACION----------------------------
@@ -160,6 +167,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
                 children: [
                   Row(
                     children: [
+                      Text(' Fecha:   '),
                       Text(
                         fechaPantalla,
                         style: subTituloEstilo,
@@ -168,11 +176,12 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
                   ),
                   Row(
                     children: [
+                      Text(' de   '),
                       Text(
                         horaInicioPantalla,
                         style: estiloHorarios,
                       ),
-                      Text(' - '),
+                      Text('    a '),
                       /*  Text(
                         horaFinPantalla,
                         style: tituloEstilo,
@@ -275,6 +284,8 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   }
 }
 
+// ///////////////////// CARRUSEL DE HORARIO //////////////////////
+
 class CarruselDeHorarios extends StatefulWidget {
   final DateTime? horaInicio;
 
@@ -282,9 +293,10 @@ class CarruselDeHorarios extends StatefulWidget {
 
   static Map<String, DateTime> generarHorarios(horaInicio) {
     Map<String, DateTime> horarios = {};
-    DateTime startTime = horaInicio; //DateTime(2024, 1, 1, 8, 0); // 08:00 AM
+    DateTime startTime = horaInicio;
 
-    for (int i = 0; i <= 14; i++) {
+    while (startTime.hour < 23 ||
+        (startTime.hour == 23 && startTime.minute == 0)) {
       String formattedTime = DateFormat('HH:mm').format(startTime);
       horarios[formattedTime] = startTime;
       startTime = startTime.add(const Duration(minutes: 30));
@@ -306,7 +318,7 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
 
   bool _visibleCarrusel = false;
 
-  double alturaCarrusel = 95;
+  double alturaCarrusel = 140;
   int numeroHoras = 1;
 
   final _estiloResaltado = const TextStyle(
@@ -344,11 +356,12 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
     return GestureDetector(
       onTap: () {
         setState(() {});
+
         _visibleCarrusel = !_visibleCarrusel;
       },
       child: Container(
-          width: 100,
-          height: 100,
+          width: 80,
+          height: alturaCarrusel,
           child: _visibleCarrusel
               ? Card(
                   elevation: 2,
@@ -357,8 +370,9 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
                   ),
                   child: Container(
                       color: Colors.white,
-                      height: 100,
-                      width: 100, // Altura del carrusel
+                      width: 80,
+                      height: alturaCarrusel,
+                      // Altura del carrusel
                       child: PageView.builder(
                           scrollDirection: Axis.vertical,
                           controller: _pageController,

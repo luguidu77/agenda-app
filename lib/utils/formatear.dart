@@ -56,13 +56,23 @@ String formateaFechaLarga(fecha) {
   return fechaLarga;
 }
 
-String formateaDurationString(_asuntos, i) {
-  Duration duration = _asuntos[i]!.values.first;
+String formateaDurationString(List<Map<String, Duration>?> asuntos, int i) {
+  Duration duration = asuntos[i]!.values.first;
 
-  String twoDigits(int n) => n.toString().padLeft(2, "0");
+  // Calcula horas y minutos
+  int hours = duration.inHours;
+  int minutes = duration.inMinutes.remainder(60);
 
-  String formattedDuration =
-      "${twoDigits(duration.inHours)}:${twoDigits(duration.inMinutes.remainder(60))}";
+  // Genera el texto formateado según las horas y minutos
+  String formattedDuration = '';
+  if (hours > 0) {
+    formattedDuration += '$hours hora${hours > 1 ? 's' : ''}';
+  }
+  if (minutes > 0) {
+    if (hours > 0) formattedDuration += ', ';
+    formattedDuration += '$minutes minuto${minutes > 1 ? 's' : ''}';
+  }
+
   return formattedDuration;
 }
 

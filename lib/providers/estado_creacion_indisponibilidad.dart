@@ -10,3 +10,14 @@ class BotonAgregarIndisponibilidadProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+class HoraFinCarrusel extends ChangeNotifier {
+  DateTime _horaFin = DateTime(0);
+
+  DateTime get horaFin => _horaFin;
+
+  setHoraFin(DateTime hora) async {
+    _horaFin = hora;
+    notifyListeners();
+  }
+}

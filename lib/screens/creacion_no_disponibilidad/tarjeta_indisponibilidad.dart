@@ -2,9 +2,9 @@ import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/mylogic_formularios/my_logic_cita.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/utils/formatear.dart';
-import 'package:agendacitas/widgets/widgets.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -55,10 +55,15 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   DateTime? horaInicio;
   DateTime? horaFin;
   String horaInicioTexto = ''; //2024-08-09 13:00:00.000Z'
-  String horaFinTexto = '';
+  String horaFinTexto = ''; //2024-08-09 14:00:00.000Z'
+
+  bool personalizado = false;
+
+  TextEditingController personalizacionController = TextEditingController();
 
   @override
   void initState() {
+    reseteaHoraFin();
     emailUsuario();
     traeAsuntosIndisponibilidad();
     // Formatear la fecha  para firebase
@@ -73,6 +78,11 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   String _emailSesionUsuario = '';
 
   List<Map<String, Duration>?> _asuntos = [];
+
+  reseteaHoraFin() {
+    final providerHoraFinCarrusel = context.read<HoraFinCarrusel>();
+    providerHoraFinCarrusel.setHoraFin(widget.argument);
+  }
 
   emailUsuario() async {
     final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
@@ -92,62 +102,88 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   String asunto = ' 🩺 medico ';
   @override
   Widget build(BuildContext context) {
-    Map<String, Duration> optionsMap = timeOptions.first;
+    final color = Theme.of(context).primaryColor;
+    final providerHoraFinCarrusel = Provider.of<HoraFinCarrusel>(context);
+    horaFin = providerHoraFinCarrusel.horaFin;
+    horaFinTexto = horaFin.toString();
+
+    print('horaFinTexto para grabar cita -----------------------$horaFinTexto');
+
     //fecha y hora de inicio elegida
     dateTimeElegido = widget.argument;
 
     horaInicioTexto = (widget.argument).toString();
     horaInicio = widget.argument;
 
-    return Padding(
-      padding: const EdgeInsets.all(18.0),
-      child: SizedBox(
-          height: 650, // Puedes ajustar la altura según tus necesidades
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: SizedBox(
+            height: 650, // Puedes ajustar la altura según tus necesidades
 
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(
-              ' Agrega horario no disponible',
-              style: estiloHorarios,
-            ),
-            SizedBox(
-              height: 40,
-            ),
-            // ------------------- ASUNTOS----------------------------
-            _listaAsuntos(),
-            // ------------------- DURACION----------------------------
-            _tiempo(optionsMap),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(
+                ' Agrega horario no disponible',
+                style: estiloHorarios,
+              ),
+              const SizedBox(height: 40),
+              // ------------------- ASUNTOS----------------------------
+              _listaAsuntos(providerHoraFinCarrusel),
 
-            // ------------------- PRESENTACION DE FECHA Y HORAS---------
-            _presentacionFechaHoras(),
+              // -------------------TEXTO PERSONALIZADO ----------------------------
+              Visibility(
+                visible: personalizado,
+                child: Form(child: formPersonalizaAsunto(color)),
+              ),
+              // ------------------- PRESENTACION DE FECHA Y HORAS---------
+              _presentacionFechaHoras(),
 
-            Expanded(
-                flex: 2,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                        onPressed: () async {
-                          await FirebaseProvider().nuevaCita(
-                              _emailSesionUsuario,
-                              dia,
-                              horaInicioTexto,
-                              horaFinTexto,
-                              '0', //precio
-                              asunto, //comentario,
-                              '999', //idcliente
-                              [''], //idServicio,
-                              'idEmpleado',
-                              '' //idCitaCliente
-                              );
+              Expanded(
+                  flex: 2,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                          onPressed: () async {
+                            await FirebaseProvider().nuevaCita(
+                                _emailSesionUsuario,
+                                dia,
+                                horaInicioTexto,
+                                horaFinTexto,
+                                '0', //precio
+                                asunto, //comentario,
+                                '999', //idcliente
+                                [''], //idServicio,
+                                'idEmpleado',
+                                '' //idCitaCliente
+                                );
 
-                          cerrar();
-                        },
-                        child: const Text('Aceptar')),
-                  ],
-                ))
-          ])),
+                            cerrar();
+                          },
+                          child: const Text('Aceptar')),
+                    ],
+                  ))
+            ])),
+      ),
     );
+  }
+
+  TextFormField formPersonalizaAsunto(Color color) {
+    return TextFormField(
+        onChanged: (value) => {asunto = personalizacionController.text},
+        controller: personalizacionController,
+        decoration: InputDecoration(
+          iconColor: color,
+          suffixIconColor: color,
+          fillColor: color,
+          hoverColor: color,
+          prefixIconColor: color,
+          focusColor: color,
+          prefixIcon: const Icon(Icons.edit),
+          hintText: 'Edita el asunto',
+          helperText: 'Mínimo 3 letras',
+        ));
   }
 
   Expanded _presentacionFechaHoras() {
@@ -167,7 +203,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
                 children: [
                   Row(
                     children: [
-                      Text(' Fecha:   '),
+                      const Text(' Fecha:   '),
                       Text(
                         fechaPantalla,
                         style: subTituloEstilo,
@@ -176,19 +212,19 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
                   ),
                   Row(
                     children: [
-                      Text(' de   '),
+                      const Text(' de   '),
                       Text(
                         horaInicioPantalla,
                         style: estiloHorarios,
                       ),
-                      Text('    a '),
+                      const Text('    a    '),
                       /*  Text(
                         horaFinPantalla,
                         style: tituloEstilo,
                       ), */
                       CarruselDeHorarios(
                         horaInicio: horaInicio,
-                      )
+                      ),
                     ],
                   ),
                 ],
@@ -200,14 +236,14 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     );
   }
 
-  Expanded _listaAsuntos() {
+  Expanded _listaAsuntos(providerHoraFinCarrusel) {
     return Expanded(
       flex: 2,
       child: SizedBox(
           child: PageView.builder(
         controller: PageController(
           initialPage: 0,
-          viewportFraction: 0.4, // Esto ajusta el ancho de cada tarjeta
+          viewportFraction: 0.5, // Esto ajusta el ancho de cada tarjeta
         ),
         itemCount: _asuntos.length,
         itemBuilder: (BuildContext context, int i) {
@@ -217,70 +253,57 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
               onTap: () {
                 setState(() {
                   _selectedIndex = i; // Guardar el índice seleccionado
-                  asunto = _asuntos[i].toString();
+
+                  _selectedIndex ==
+                          0 // si el asunto es PERSONALIZADO , visible el form texto personalizado
+                      ? personalizado = true
+                      : personalizado = false;
+
+                  asunto = _asuntos[i]!
+                      .keys
+                      .first
+                      .toString(); // texto del asunto elegido para grabar en firebase
 
                   DateTime aux =
                       dateTimeElegido!.add(_asuntos[i]!.values.first);
                   horaFinTexto = aux.toString();
                   horaFinPantalla = DateFormat('HH:mm').format(aux);
+
+                  providerHoraFinCarrusel
+                      .setHoraFin(aux); // agrega al provider la hora fin
                 });
               },
               child: Card(
-                  child: Column(
-                children: [
-                  Container(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(15), // Radio de los bordes
+                    side: BorderSide(
                       color: _selectedIndex == i
-                          ? Colors.blue[50]
+                          ? const Color(0xFF0000FF)
                           : Colors
                               .white, // Cambia de color si está seleccionado
-                      child: Text('${_asuntos[i]!.keys.first}')),
-                  Text(duracion)
-                ],
-              )));
+                      width: 2, // Grosor del borde
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(_asuntos[i]!.keys.first),
+                      Text(
+                        duracion,
+                        style: subTituloEstilo,
+                      )
+                    ],
+                  )));
         },
       )),
     );
   }
 
-  Expanded _tiempo(Map<String, Duration> optionsMap) => Expanded(
-      flex: 2,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [_duracion(optionsMap)],
-      ));
-
-  _duracion(Map<String, Duration> optionsMap) {
-    return Column(
-      children: [
-        DropdownButton<String>(
-          hint: const Text('Selecciona duración'),
-          value: selectedTimeOption,
-          items: optionsMap.keys.map((String key) {
-            return DropdownMenuItem<String>(
-              value: key,
-              child: Text(key),
-            );
-          }).toList(),
-          onChanged: (String? newValue) {
-            setState(() {
-              selectedTimeOption = newValue;
-              selectedDateTime = optionsMap[newValue];
-              // Actualiza 'horaFin' con la duración seleccionada.
-              if (selectedDateTime != null) {
-                horaFinTexto = selectedDateTime!.toString();
-              }
-              DateTime aux = dateTimeElegido!.add(selectedDateTime!);
-              horaFinTexto = aux.toString();
-              horaFinPantalla = DateFormat('HH:mm').format(aux);
-            });
-          },
-        ),
-      ],
-    );
-  }
-
   void cerrar() {
     Navigator.pop(context);
+    setState(() {});
   }
 }
 
@@ -321,16 +344,10 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
   double alturaCarrusel = 140;
   int numeroHoras = 1;
 
-  final _estiloResaltado = const TextStyle(
-      fontSize: 20, color: Colors.blue, fontWeight: FontWeight.bold);
-  final _estiloNormal = const TextStyle(
-    fontSize: 18,
-    color: Color.fromARGB(255, 5, 5, 5),
-  ); // /;
-
   @override
   void initState() {
     horarios = CarruselDeHorarios.generarHorarios(widget.horaInicio);
+
     _guardaHoraTexto = horarios.keys.elementAt(0);
     super.initState();
     _pageController.addListener(() {
@@ -338,9 +355,11 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
       if (_currentPage != newPage) {
         setState(() {
           _currentPage = newPage;
-          print(
-              "Página seleccionada: $_currentPage, Horario: ${horarios.keys.elementAt(_currentPage)}");
+          /*   print(
+              "Página seleccionada: $_currentPage, Horario: ${horarios.keys.elementAt(_currentPage)}"); */
         });
+
+        //  horarios.values.elementAt(_currentPage);
       }
     });
   }
@@ -353,13 +372,19 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
 
   @override
   Widget build(BuildContext context) {
+    final providerHoraFinCarrusel = Provider.of<HoraFinCarrusel>(context);
+    String textoHoraFin =
+        DateFormat('HH:mm').format(providerHoraFinCarrusel.horaFin);
     return GestureDetector(
       onTap: () {
+        providerHoraFinCarrusel
+            .setHoraFin(horarios.values.elementAt(_currentPage));
+
         setState(() {});
 
         _visibleCarrusel = !_visibleCarrusel;
       },
-      child: Container(
+      child: SizedBox(
           width: 80,
           height: alturaCarrusel,
           child: _visibleCarrusel
@@ -383,14 +408,26 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
                                 horarios.keys.elementAt(_currentPage);
 
                             return Center(
-                              child: Text(horario,
-                                  style: _currentPage == i
-                                      ? estiloHorariosResaltado
-                                      : estiloHorarios),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(horario,
+                                      style: _currentPage == i
+                                          ? estiloHorariosResaltado
+                                          : estiloHorariosDifuminado),
+                                ],
+                              ),
                             );
                           })),
                 )
-              : Center(child: Text(_guardaHoraTexto, style: estiloHorarios))),
+              : Center(
+                  child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(textoHoraFin, style: estiloHorarios),
+                    const Icon(Icons.arrow_drop_down_outlined)
+                  ],
+                ))),
     );
   }
 }

@@ -26,5 +26,9 @@ const String mensajeYaExisteCliente =
 final estiloHorarios = GoogleFonts.bebasNeue(
   fontSize: 24,
 );
-final estiloHorariosResaltado = GoogleFonts.bebasNeue(
-    fontSize: 24, color: Colors.blueAccent, fontWeight: FontWeight.bold);
+final estiloHorariosDifuminado = GoogleFonts.bebasNeue(
+  fontSize: 24,
+  color: const Color.fromARGB(255, 211, 211, 212),
+);
+final estiloHorariosResaltado =
+    GoogleFonts.bebasNeue(fontSize: 24, fontWeight: FontWeight.bold);

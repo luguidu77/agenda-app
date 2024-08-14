@@ -156,7 +156,9 @@ class _MyAppState extends State<MyApp> {
                 ButtomNavNotificacionesProvider()),
         ChangeNotifierProvider(
             create: (BuildContext context) =>
-                BotonAgregarIndisponibilidadProvider())
+                BotonAgregarIndisponibilidadProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => HoraFinCarrusel()),
       ],
       builder: (context, _) {
         return MaterialApp(

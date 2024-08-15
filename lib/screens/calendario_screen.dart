@@ -171,7 +171,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            'Señala inidisponivilidad',
+                            'Señala horario no disponible',
                             style: TextStyle(color: Colors.white),
                           ),
                           const SizedBox(width: 10),

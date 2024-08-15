@@ -1,5 +1,6 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/mylogic_formularios/my_logic_cita.dart';
+
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/utils/formatear.dart';
 
@@ -10,6 +11,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/providers.dart';
 import '../creacion_citas/provider/creacion_cita_provider.dart';
+import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 
 class TarjetaIndisponibilidad extends StatefulWidget {
   final dynamic argument;
@@ -57,7 +59,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   String horaInicioTexto = ''; //2024-08-09 13:00:00.000Z'
   String horaFinTexto = ''; //2024-08-09 14:00:00.000Z'
 
-  bool personalizado = false;
+  bool personalizado = true;
 
   TextEditingController personalizacionController = TextEditingController();
 
@@ -115,12 +117,17 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     horaInicioTexto = (widget.argument).toString();
     horaInicio = widget.argument;
 
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: SizedBox(
-            height: 650, // Puedes ajustar la altura según tus necesidades
-
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          actions: [
+            IconButton(onPressed: () {}, icon: const Icon(Icons.close))
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(
@@ -132,62 +139,161 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
               _listaAsuntos(providerHoraFinCarrusel),
 
               // -------------------TEXTO PERSONALIZADO ----------------------------
+
               Visibility(
                 visible: personalizado,
                 child: Form(child: formPersonalizaAsunto(color)),
               ),
+              const SizedBox(height: 20),
               // ------------------- PRESENTACION DE FECHA Y HORAS---------
-              _presentacionFechaHoras(),
-
-              Expanded(
-                  flex: 2,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ElevatedButton(
-                          onPressed: () async {
-                            await FirebaseProvider().nuevaCita(
-                                _emailSesionUsuario,
-                                dia,
-                                horaInicioTexto,
-                                horaFinTexto,
-                                '0', //precio
-                                asunto, //comentario,
-                                '999', //idcliente
-                                [''], //idServicio,
-                                'idEmpleado',
-                                '' //idCitaCliente
-                                );
-
-                            cerrar();
-                          },
-                          child: const Text('Aceptar')),
-                    ],
-                  ))
-            ])),
+              _presentacionFecha(),
+              const SizedBox(height: 20),
+              _presentacionHoras(),
+              const SizedBox(height: 40),
+              _botonGuardar()
+            ]),
+          ),
+        ),
       ),
     );
   }
 
-  TextFormField formPersonalizaAsunto(Color color) {
-    return TextFormField(
-        onChanged: (value) => {asunto = personalizacionController.text},
-        controller: personalizacionController,
-        decoration: InputDecoration(
-          iconColor: color,
-          suffixIconColor: color,
-          fillColor: color,
-          hoverColor: color,
-          prefixIconColor: color,
-          focusColor: color,
-          prefixIcon: const Icon(Icons.edit),
-          hintText: 'Edita el asunto',
-          helperText: 'Mínimo 3 letras',
-        ));
+  _botonGuardar() {
+    return Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          border: Border.all(
+            color: Colors.grey,
+            width: 1.0,
+          ),
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: InkWell(
+            onTap: () async {
+              await FirebaseProvider().nuevaCita(
+                  _emailSesionUsuario,
+                  dia,
+                  horaInicioTexto,
+                  horaFinTexto,
+                  '0', //precio
+                  asunto, //comentario,
+                  '999', //idcliente
+                  [''], //idServicio,
+                  'idEmpleado',
+                  '' //idCitaCliente
+                  );
+
+              cerrar();
+            },
+            child: const Center(
+              child: Text(
+                'Guardar',
+                style: TextStyle(color: Colors.white),
+              ),
+            )));
   }
 
-  Expanded _presentacionFechaHoras() {
-    return Expanded(
+  formPersonalizaAsunto(Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Título:',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        TextFormField(
+            onChanged: (value) => {asunto = personalizacionController.text},
+            controller: personalizacionController,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(borderSide: BorderSide(width: 2)),
+              iconColor: color,
+              suffixIconColor: color,
+              fillColor: color,
+              hoverColor: color,
+              prefixIconColor: color,
+              focusColor: color,
+              hintText: 'ej.: comida de empresa',
+            )),
+      ],
+    );
+  }
+
+  _presentacionFecha() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Fecha:',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        InkWell(
+          onTap: () => _mostrarTarjeta(context, 'calendario', widget.argument),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.grey,
+                width: 1.0,
+              ),
+              borderRadius: BorderRadius.circular(5.0),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(fechaPantalla, style: estiloHorarios),
+                const Icon(Icons.arrow_drop_down_outlined)
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  _presentacionHoras() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Hora:',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        InkWell(
+          onTap: () => _mostrarTarjeta(context, 'hora', widget.argument),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.grey,
+                width: 1.0,
+              ),
+              borderRadius: BorderRadius.circular(5.0),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('de'),
+                Text(
+                  horaInicioPantalla,
+                  style: estiloHorarios,
+                ),
+                const Text('a'),
+                Text(horaFinPantalla, style: estiloHorarios),
+                const Icon(Icons.arrow_drop_down_outlined)
+                /*  Text(
+                              horaFinPantalla,
+                              style: tituloEstilo,
+                            ), */
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+
+    /* Expanded(
       flex: 4,
       child: Center(
         child: Form(
@@ -201,14 +307,9 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
               Column(
                 children: [
-                  Row(
-                    children: [
-                      const Text(' Fecha:   '),
-                      Text(
-                        fechaPantalla,
-                        style: subTituloEstilo,
-                      ),
-                    ],
+                  Text(
+                    fechaPantalla,
+                    style: subTituloEstilo,
                   ),
                   Row(
                     children: [
@@ -233,72 +334,89 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
           ),
         ),
       ),
-    );
+    ); */
   }
 
-  Expanded _listaAsuntos(providerHoraFinCarrusel) {
-    return Expanded(
-      flex: 2,
-      child: SizedBox(
-          child: PageView.builder(
-        controller: PageController(
-          initialPage: 0,
-          viewportFraction: 0.5, // Esto ajusta el ancho de cada tarjeta
-        ),
-        itemCount: _asuntos.length,
-        itemBuilder: (BuildContext context, int i) {
-          String duracion = formateaDurationString(_asuntos, i);
+  _listaAsuntos(providerHoraFinCarrusel) {
+    return SizedBox(
+        height: 150,
+        child: PageView.builder(
+          controller: PageController(
+            initialPage: 0,
+            viewportFraction: 0.5, // Esto ajusta el ancho de cada tarjeta
+          ),
+          itemCount: _asuntos.length,
+          itemBuilder: (BuildContext context, int i) {
+            String duracion = formateaDurationString(_asuntos, i);
 
-          return InkWell(
-              onTap: () {
-                setState(() {
-                  _selectedIndex = i; // Guardar el índice seleccionado
+            return InkWell(
+                onTap: () {
+                  setState(() {
+                    _selectedIndex = i; // Guardar el índice seleccionado
 
-                  _selectedIndex ==
-                          0 // si el asunto es PERSONALIZADO , visible el form texto personalizado
-                      ? personalizado = true
-                      : personalizado = false;
+                    _selectedIndex ==
+                            0 // si el asunto es PERSONALIZADO , visible el form texto personalizado
+                        ? personalizado = true
+                        : personalizado = false;
 
-                  asunto = _asuntos[i]!
-                      .keys
-                      .first
-                      .toString(); // texto del asunto elegido para grabar en firebase
+                    asunto = _asuntos[i]!
+                        .keys
+                        .first
+                        .toString(); // texto del asunto elegido para grabar en firebase
 
-                  DateTime aux =
-                      dateTimeElegido!.add(_asuntos[i]!.values.first);
-                  horaFinTexto = aux.toString();
-                  horaFinPantalla = DateFormat('HH:mm').format(aux);
+                    DateTime aux =
+                        dateTimeElegido!.add(_asuntos[i]!.values.first);
+                    horaFinTexto = aux.toString();
+                    horaFinPantalla = DateFormat('HH:mm').format(aux);
 
-                  providerHoraFinCarrusel
-                      .setHoraFin(aux); // agrega al provider la hora fin
-                });
-              },
-              child: Card(
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(15), // Radio de los bordes
-                    side: BorderSide(
-                      color: _selectedIndex == i
-                          ? const Color(0xFF0000FF)
-                          : Colors
-                              .white, // Cambia de color si está seleccionado
-                      width: 2, // Grosor del borde
+                    providerHoraFinCarrusel
+                        .setHoraFin(aux); // agrega al provider la hora fin
+                  });
+                },
+                child: Card(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(15), // Radio de los bordes
+                      side: BorderSide(
+                        color: _selectedIndex == i
+                            ? const Color(0xFF0000FF)
+                            : Colors
+                                .white, // Cambia de color si está seleccionado
+                        width: 2, // Grosor del borde
+                      ),
                     ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(_asuntos[i]!.keys.first),
-                      Text(
-                        duracion,
-                        style: subTituloEstilo,
-                      )
-                    ],
-                  )));
-        },
-      )),
-    );
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(_asuntos[i]!.keys.first),
+                        Text(
+                          duracion,
+                          style: subTituloEstilo,
+                        )
+                      ],
+                    )));
+          },
+        ));
+  }
+
+  _mostrarTarjeta(context, tarjeta, fecha) async {
+    await showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return tarjeta == 'calendario'
+            ? TarjetaCalendario(argument: fecha)
+            : TarjetaHora(argument: fecha);
+      },
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      backgroundColor: Colors.white,
+      isScrollControlled:
+          true, // Si quieres que el modal pueda ser de altura completa
+    ); /* .whenComplete(() =>
+      Provider.of<BotonAgregarIndisponibilidadProvider>(context, listen: false)
+          .setBotonPulsadoIndisponibilidad(false)); */
   }
 
   void cerrar() {
@@ -429,5 +547,37 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
                   ],
                 ))),
     );
+  }
+}
+
+class TarjetaCalendario extends StatefulWidget {
+  final dynamic argument;
+  const TarjetaCalendario({super.key, this.argument});
+
+  @override
+  State<TarjetaCalendario> createState() => _TarjetaCalendarioState();
+}
+
+class _TarjetaCalendarioState extends State<TarjetaCalendario> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Text('calendario ${widget.argument}'),
+    );
+  }
+}
+
+class TarjetaHora extends StatefulWidget {
+  final dynamic argument;
+  const TarjetaHora({super.key, this.argument});
+
+  @override
+  State<TarjetaHora> createState() => _TarjetaHoraState();
+}
+
+class _TarjetaHoraState extends State<TarjetaHora> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(child: Text('hora ${widget.argument}'));
   }
 }

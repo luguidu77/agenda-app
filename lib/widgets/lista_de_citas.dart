@@ -95,9 +95,29 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           // print(details.date);
 
           if (_leerEstadoBotonIndisponibilidad) {
-            //############# CREACION DE CITA -- ELECCION DE CLIENTE ########################
+            //############# CREACION DE HORARIO NO DISPONIBLE --  ########################
 
-            await _mostrarTarjetaIndisponibilidad(context, details.date);
+            Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      TarjetaIndisponibilidad(argument: details.date),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(
+                        1.0, 0.0); // Inicia fuera de la pantalla a la derecha
+                    const end = Offset.zero; // Termina en la posición normal
+                    const curve = Curves.ease;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                ));
 
             /*  Navigator.pushNamed(context, 'creacionNoDisponibilidad',
                 arguments: details.date); */
@@ -327,21 +347,4 @@ Widget appointmentBuilder(BuildContext context,
       )
     ],
   );
-}
-
-_mostrarTarjetaIndisponibilidad(context, fecha) async {
-  await showModalBottomSheet(
-    context: context,
-    builder: (BuildContext context) {
-      return TarjetaIndisponibilidad(argument: fecha);
-    },
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    backgroundColor: Colors.white,
-    isScrollControlled:
-        true, // Si quieres que el modal pueda ser de altura completa
-  ).whenComplete(() =>
-      Provider.of<BotonAgregarIndisponibilidadProvider>(context, listen: false)
-          .setBotonPulsadoIndisponibilidad(false));
 }

@@ -158,6 +158,8 @@ class _MyAppState extends State<MyApp> {
             create: (BuildContext context) =>
                 BotonAgregarIndisponibilidadProvider()),
         ChangeNotifierProvider(
+            create: (BuildContext context) => FechaElegida()),
+        ChangeNotifierProvider(
             create: (BuildContext context) => HoraFinCarrusel()),
       ],
       builder: (context, _) {

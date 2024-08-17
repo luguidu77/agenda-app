@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 import '../../providers/providers.dart';
 import '../creacion_citas/provider/creacion_cita_provider.dart';
@@ -55,7 +56,8 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   String fechaInicio = '';
   String fechaFin = '';
   DateTime? horaInicio;
-  DateTime? horaFin;
+  DateTime? fechaElegida; // provider fecha elegida
+  DateTime? horaFin; // provider hora fin elegida
   String horaInicioTexto = ''; //2024-08-09 13:00:00.000Z'
   String horaFinTexto = ''; //2024-08-09 14:00:00.000Z'
 
@@ -65,14 +67,10 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
   @override
   void initState() {
+    seteafechaElegida();
     reseteaHoraFin();
     emailUsuario();
     traeAsuntosIndisponibilidad();
-    // Formatear la fecha  para firebase
-    dia = DateFormat('yyyy-MM-dd').format(widget.argument);
-    // Formatear la fecha  para visualizar en pantalla
-    fechaPantalla = DateFormat('dd-MM-yyyy').format(widget.argument);
-    horaInicioPantalla = DateFormat('HH:mm').format(widget.argument);
 
     super.initState();
   }
@@ -80,6 +78,16 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   String _emailSesionUsuario = '';
 
   List<Map<String, Duration>?> _asuntos = [];
+  seteafechaElegida() {
+    // provider fecha elegida
+    final providerFechaElegida =
+        Provider.of<FechaElegida>(context, listen: false);
+    providerFechaElegida.setFechaElegida(widget.argument);
+
+    // Formatear la fecha  para visualizar en pantalla
+    horaInicioPantalla =
+        DateFormat('HH:mm').format(providerFechaElegida.fechaElegida);
+  }
 
   reseteaHoraFin() {
     final providerHoraFinCarrusel = context.read<HoraFinCarrusel>();
@@ -104,7 +112,15 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   String asunto = ' 🩺 medico ';
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).primaryColor;
+    final color = Theme.of(context).primaryColor; // color del tema
+
+    // provider FECHA elegida
+    final providerFechaElegida = Provider.of<FechaElegida>(context);
+    fechaElegida = providerFechaElegida.fechaElegida;
+    dia = DateFormat('yyyy-MM-dd') // fecha formateada para FIREBASE
+        .format(fechaElegida!);
+
+    // provider HORA elegidad
     final providerHoraFinCarrusel = Provider.of<HoraFinCarrusel>(context);
     horaFin = providerHoraFinCarrusel.horaFin;
     horaFinTexto = horaFin.toString();
@@ -112,10 +128,10 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     print('horaFinTexto para grabar cita -----------------------$horaFinTexto');
 
     //fecha y hora de inicio elegida
-    dateTimeElegido = widget.argument;
+    // dateTimeElegido = widget.argument;
 
-    horaInicioTexto = (widget.argument).toString();
-    horaInicio = widget.argument;
+    horaInicioTexto = (fechaElegida).toString();
+    horaInicio = fechaElegida;
 
     return SafeArea(
       child: Scaffold(
@@ -146,7 +162,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
               ),
               const SizedBox(height: 20),
               // ------------------- PRESENTACION DE FECHA Y HORAS---------
-              _presentacionFecha(),
+              _presentacionFecha(providerFechaElegida),
               const SizedBox(height: 20),
               _presentacionHoras(),
               const SizedBox(height: 40),
@@ -220,7 +236,9 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     );
   }
 
-  _presentacionFecha() {
+  _presentacionFecha(providerFechaElegida) {
+    final dia = DateFormat('dd-MM-yyyy') // FECHA FORMATEADA ESPAÑOLA
+        .format(fechaElegida!);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -242,7 +260,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(fechaPantalla, style: estiloHorarios),
+                Text(dia, style: estiloHorarios),
                 const Icon(Icons.arrow_drop_down_outlined)
               ],
             ),
@@ -282,59 +300,12 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
                 const Text('a'),
                 Text(horaFinPantalla, style: estiloHorarios),
                 const Icon(Icons.arrow_drop_down_outlined)
-                /*  Text(
-                              horaFinPantalla,
-                              style: tituloEstilo,
-                            ), */
               ],
             ),
           ),
         ),
       ],
     );
-
-    /* Expanded(
-      flex: 4,
-      child: Center(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              //SELECTOR DEL MIEMBRO DEL EQUIPO PARA NO DISPONIBILIDAD
-
-              const SizedBox(height: 20),
-
-              Column(
-                children: [
-                  Text(
-                    fechaPantalla,
-                    style: subTituloEstilo,
-                  ),
-                  Row(
-                    children: [
-                      const Text(' de   '),
-                      Text(
-                        horaInicioPantalla,
-                        style: estiloHorarios,
-                      ),
-                      const Text('    a    '),
-                      /*  Text(
-                        horaFinPantalla,
-                        style: tituloEstilo,
-                      ), */
-                      CarruselDeHorarios(
-                        horaInicio: horaInicio,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    ); */
   }
 
   _listaAsuntos(providerHoraFinCarrusel) {
@@ -423,6 +394,99 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     Navigator.pop(context);
     setState(() {});
   }
+}
+
+/////////// TARJETA DEL CALENDARIO ///////////////////////////////////
+
+class TarjetaCalendario extends StatefulWidget {
+  final dynamic argument;
+  const TarjetaCalendario({super.key, this.argument});
+
+  @override
+  State<TarjetaCalendario> createState() => _TarjetaCalendarioState();
+}
+
+class _TarjetaCalendarioState extends State<TarjetaCalendario> {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 500,
+      child: Column(children: [
+        calendario(context),
+      ]),
+    );
+  }
+
+  calendario(context) {
+    final providerFechaElegida =
+        Provider.of<FechaElegida>(context, listen: false);
+
+    return TableCalendar(
+      startingDayOfWeek: StartingDayOfWeek.monday,
+      locale: "es_ES",
+      rowHeight: 65, // separacion entre los numeros diarios
+      headerStyle:
+          const HeaderStyle(formatButtonVisible: false, titleCentered: true),
+      daysOfWeekHeight: 50, //altura contenedor de los dias semanales
+      daysOfWeekStyle: const DaysOfWeekStyle(
+        decoration: BoxDecoration(color: Color.fromARGB(255, 210, 207, 219)),
+        weekdayStyle: TextStyle(color: Color.fromARGB(255, 92, 91, 94)),
+        weekendStyle: TextStyle(color: Color.fromARGB(255, 134, 6, 6)),
+      ),
+      availableGestures: AvailableGestures.all,
+      selectedDayPredicate: (day) => isSameDay(
+          day, providerFechaElegida.fechaElegida), // fecha seleccionada
+      focusedDay: DateTime.now(),
+      firstDay: DateTime.now().subtract(const Duration(days: 30)),
+      lastDay: DateTime.now().add(const Duration(days: 365)),
+      onDaySelected: (day, newFechaElegida) {
+        //setea provider fechaElegida con la fecha seleccionada
+
+        providerFechaElegida.setFechaElegida(newFechaElegida);
+
+        Navigator.pop(context);
+      }, //_diaSeleccionado,
+      // eventLoader: _getEventsForDay,
+      calendarBuilders: CalendarBuilders(markerBuilder: (_, datetime, event) {
+        return event.isEmpty
+            ? Container()
+            : Container(
+                width: 25,
+                height: 25,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5.0),
+                    color: const Color.fromARGB(255, 197, 75, 75)),
+                child: Center(
+                  child: Text(
+                    (event.length).toString(),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+              );
+      }),
+    );
+  }
+}
+
+/////////// TARJETA DE SELECCION DE HORARIOS /////////////////////////
+class TarjetaHora extends StatefulWidget {
+  final dynamic argument;
+  const TarjetaHora({super.key, this.argument});
+
+  @override
+  State<TarjetaHora> createState() => _TarjetaHoraState();
+}
+
+class _TarjetaHoraState extends State<TarjetaHora> {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 500,
+      child: seleccionHorarios(context),
+    );
+  }
+
+  seleccionHorarios(BuildContext context) {}
 }
 
 // ///////////////////// CARRUSEL DE HORARIO //////////////////////
@@ -547,37 +611,5 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
                   ],
                 ))),
     );
-  }
-}
-
-class TarjetaCalendario extends StatefulWidget {
-  final dynamic argument;
-  const TarjetaCalendario({super.key, this.argument});
-
-  @override
-  State<TarjetaCalendario> createState() => _TarjetaCalendarioState();
-}
-
-class _TarjetaCalendarioState extends State<TarjetaCalendario> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Text('calendario ${widget.argument}'),
-    );
-  }
-}
-
-class TarjetaHora extends StatefulWidget {
-  final dynamic argument;
-  const TarjetaHora({super.key, this.argument});
-
-  @override
-  State<TarjetaHora> createState() => _TarjetaHoraState();
-}
-
-class _TarjetaHoraState extends State<TarjetaHora> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(child: Text('hora ${widget.argument}'));
   }
 }

@@ -22,10 +22,17 @@ class FechaElegida extends ChangeNotifier {
   }
 }
 
-class HoraFinCarrusel extends ChangeNotifier {
+class HorarioElegidoCarrusel extends ChangeNotifier {
+  DateTime _horaInicio = DateTime(0);
   DateTime _horaFin = DateTime(0);
 
+  DateTime get horaInicio => _horaInicio;
   DateTime get horaFin => _horaFin;
+
+  setHoraInicio(DateTime hora) async {
+    _horaInicio = hora;
+    notifyListeners();
+  }
 
   setHoraFin(DateTime hora) async {
     _horaFin = hora;

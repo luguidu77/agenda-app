@@ -51,8 +51,8 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
   String fechaPantalla = '';
   String dia = '';
-  String horaInicioPantalla = '';
-  String horaFinPantalla = '';
+  String horaInicioPantalla = ''; // se presenta cuadro Hora: de 09:00 a 10:00
+  String horaFinPantalla = ''; // se presenta cuadro Hora: de 09:00 a 10:00
   String fechaInicio = '';
   String fechaFin = '';
   DateTime? horaInicio;
@@ -90,7 +90,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   }
 
   reseteaHoraFin() {
-    final providerHoraFinCarrusel = context.read<HoraFinCarrusel>();
+    final providerHoraFinCarrusel = context.read<HorarioElegidoCarrusel>();
     providerHoraFinCarrusel.setHoraFin(widget.argument);
   }
 
@@ -121,7 +121,8 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
         .format(fechaElegida!);
 
     // provider HORA elegidad
-    final providerHoraFinCarrusel = Provider.of<HoraFinCarrusel>(context);
+    final providerHoraFinCarrusel =
+        Provider.of<HorarioElegidoCarrusel>(context);
     horaFin = providerHoraFinCarrusel.horaFin;
     horaFinTexto = horaFin.toString();
 
@@ -152,7 +153,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
               ),
               const SizedBox(height: 40),
               // ------------------- ASUNTOS----------------------------
-              _listaAsuntos(providerHoraFinCarrusel),
+              _listaAsuntos(context, fechaElegida, providerHoraFinCarrusel),
 
               // -------------------TEXTO PERSONALIZADO ----------------------------
 
@@ -308,7 +309,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     );
   }
 
-  _listaAsuntos(providerHoraFinCarrusel) {
+  _listaAsuntos(context, fechaElegida, providerHoraFinCarrusel) {
     return SizedBox(
         height: 150,
         child: PageView.builder(
@@ -324,24 +325,18 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
                 onTap: () {
                   setState(() {
                     _selectedIndex = i; // Guardar el índice seleccionado
-
-                    _selectedIndex ==
-                            0 // si el asunto es PERSONALIZADO , visible el form texto personalizado
+                    // si el asunto es PERSONALIZADO , visible el form texto personalizado
+                    _selectedIndex == 0
                         ? personalizado = true
                         : personalizado = false;
+                    // texto del asunto elegido para grabar en firebase
+                    asunto = _asuntos[i]!.keys.first.toString();
 
-                    asunto = _asuntos[i]!
-                        .keys
-                        .first
-                        .toString(); // texto del asunto elegido para grabar en firebase
-
-                    DateTime aux =
-                        dateTimeElegido!.add(_asuntos[i]!.values.first);
+                    DateTime aux = fechaElegida!.add(_asuntos[i]!.values.first);
                     horaFinTexto = aux.toString();
                     horaFinPantalla = DateFormat('HH:mm').format(aux);
-
-                    providerHoraFinCarrusel
-                        .setHoraFin(aux); // agrega al provider la hora fin
+                    // agrega al provider la hora fin
+                    providerHoraFinCarrusel.setHoraFin(aux);
                   });
                 },
                 child: Card(
@@ -440,9 +435,16 @@ class _TarjetaCalendarioState extends State<TarjetaCalendario> {
       firstDay: DateTime.now().subtract(const Duration(days: 30)),
       lastDay: DateTime.now().add(const Duration(days: 365)),
       onDaySelected: (day, newFechaElegida) {
-        //setea provider fechaElegida con la fecha seleccionada
-
-        providerFechaElegida.setFechaElegida(newFechaElegida);
+        // Combina la nueva fecha con la hora original
+        DateTime fechaConHoraRespetada = DateTime(
+          newFechaElegida.year,
+          newFechaElegida.month,
+          newFechaElegida.day,
+          providerFechaElegida.fechaElegida.hour,
+          providerFechaElegida.fechaElegida.minute,
+        );
+        //setea provider fechaElegida con la fecha seleccionada respetando la hora
+        providerFechaElegida.setFechaElegida(fechaConHoraRespetada);
 
         Navigator.pop(context);
       }, //_diaSeleccionado,
@@ -486,7 +488,11 @@ class _TarjetaHoraState extends State<TarjetaHora> {
     );
   }
 
-  seleccionHorarios(BuildContext context) {}
+  seleccionHorarios(BuildContext context) {
+    return CarruselDeHorarios(
+      horaInicio: widget.argument,
+    );
+  }
 }
 
 // ///////////////////// CARRUSEL DE HORARIO //////////////////////
@@ -515,6 +521,8 @@ class CarruselDeHorarios extends StatefulWidget {
 }
 
 class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
+  DateTime? fechaElegida;
+
   Map<String, DateTime> horarios = {};
   final PageController _pageController = PageController(viewportFraction: 0.3);
   int _currentPage = 0;
@@ -525,6 +533,12 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
 
   double alturaCarrusel = 140;
   int numeroHoras = 1;
+
+  @override
+  void didChangeDependencies() {
+    seteaFechaElegida();
+    super.didChangeDependencies();
+  }
 
   @override
   void initState() {
@@ -554,7 +568,8 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
 
   @override
   Widget build(BuildContext context) {
-    final providerHoraFinCarrusel = Provider.of<HoraFinCarrusel>(context);
+    final providerHoraFinCarrusel =
+        Provider.of<HorarioElegidoCarrusel>(context);
     String textoHoraFin =
         DateFormat('HH:mm').format(providerHoraFinCarrusel.horaFin);
     return GestureDetector(
@@ -611,5 +626,12 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
                   ],
                 ))),
     );
+  }
+
+  void seteaFechaElegida() {
+    // provider FECHA elegida
+    final providerFechaElegida =
+        Provider.of<FechaElegida>(context, listen: false);
+    fechaElegida = providerFechaElegida.fechaElegida;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/mylogic_formularios/my_logic_cita.dart';
+import 'package:agendacitas/providers/estado_creacion_indisponibilidad.dart';
 
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/utils/formatear.dart';
@@ -68,7 +69,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   @override
   void initState() {
     seteafechaElegida();
-    reseteaHoraFin();
+    reseteaHoraElegida();
     emailUsuario();
     traeAsuntosIndisponibilidad();
 
@@ -85,12 +86,13 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     providerFechaElegida.setFechaElegida(widget.argument);
 
     // Formatear la fecha  para visualizar en pantalla
-    horaInicioPantalla =
-        DateFormat('HH:mm').format(providerFechaElegida.fechaElegida);
   }
 
-  reseteaHoraFin() {
+  reseteaHoraElegida() {
     final providerHoraFinCarrusel = context.read<HorarioElegidoCarrusel>();
+    // hora inicio
+    providerHoraFinCarrusel.setHoraInicio(widget.argument);
+    // hora fin
     providerHoraFinCarrusel.setHoraFin(widget.argument);
   }
 
@@ -123,8 +125,14 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     // provider HORA elegidad
     final providerHoraFinCarrusel =
         Provider.of<HorarioElegidoCarrusel>(context);
+    // hora inicio
+    horaInicio = providerHoraFinCarrusel.horaInicio;
+    horaInicioPantalla = DateFormat('HH:mm').format(horaInicio!);
+
+    // hora fin
     horaFin = providerHoraFinCarrusel.horaFin;
     horaFinTexto = horaFin.toString();
+    horaFinPantalla = DateFormat('HH:mm').format(horaFin!);
 
     print('horaFinTexto para grabar cita -----------------------$horaFinTexto');
 
@@ -139,7 +147,11 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
         appBar: AppBar(
           automaticallyImplyLeading: false,
           actions: [
-            IconButton(onPressed: () {}, icon: const Icon(Icons.close))
+            IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.close))
           ],
         ),
         body: SingleChildScrollView(
@@ -163,7 +175,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
               ),
               const SizedBox(height: 20),
               // ------------------- PRESENTACION DE FECHA Y HORAS---------
-              _presentacionFecha(providerFechaElegida),
+              _presentacionFecha(),
               const SizedBox(height: 20),
               _presentacionHoras(),
               const SizedBox(height: 40),
@@ -237,7 +249,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     );
   }
 
-  _presentacionFecha(providerFechaElegida) {
+  _presentacionFecha() {
     final dia = DateFormat('dd-MM-yyyy') // FECHA FORMATEADA ESPAÑOLA
         .format(fechaElegida!);
     return Column(
@@ -257,7 +269,8 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
               ),
               borderRadius: BorderRadius.circular(5.0),
             ),
-            padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -280,7 +293,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         InkWell(
-          onTap: () => _mostrarTarjeta(context, 'hora', widget.argument),
+          onTap: () => _mostrarTarjeta(context, 'hora', fechaElegida),
           child: Container(
             decoration: BoxDecoration(
               border: Border.all(
@@ -289,7 +302,8 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
               ),
               borderRadius: BorderRadius.circular(5.0),
             ),
-            padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -368,6 +382,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
   _mostrarTarjeta(context, tarjeta, fecha) async {
     await showModalBottomSheet(
+      isDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return tarjeta == 'calendario'
@@ -380,9 +395,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
       backgroundColor: Colors.white,
       isScrollControlled:
           true, // Si quieres que el modal pueda ser de altura completa
-    ); /* .whenComplete(() =>
-      Provider.of<BotonAgregarIndisponibilidadProvider>(context, listen: false)
-          .setBotonPulsadoIndisponibilidad(false)); */
+    );
   }
 
   void cerrar() {
@@ -416,6 +429,9 @@ class _TarjetaCalendarioState extends State<TarjetaCalendario> {
     final providerFechaElegida =
         Provider.of<FechaElegida>(context, listen: false);
 
+    final providerHorario =
+        Provider.of<HorarioElegidoCarrusel>(context, listen: false);
+
     return TableCalendar(
       startingDayOfWeek: StartingDayOfWeek.monday,
       locale: "es_ES",
@@ -443,8 +459,10 @@ class _TarjetaCalendarioState extends State<TarjetaCalendario> {
           providerFechaElegida.fechaElegida.hour,
           providerFechaElegida.fechaElegida.minute,
         );
-        //setea provider fechaElegida con la fecha seleccionada respetando la hora
+        //setea provider fechaElegida y horario con la fecha seleccionada respetando la hora
         providerFechaElegida.setFechaElegida(fechaConHoraRespetada);
+        providerHorario.setHoraInicio(fechaConHoraRespetada);
+        providerHorario.setHoraFin(fechaConHoraRespetada);
 
         Navigator.pop(context);
       }, //_diaSeleccionado,
@@ -480,37 +498,104 @@ class TarjetaHora extends StatefulWidget {
 }
 
 class _TarjetaHoraState extends State<TarjetaHora> {
+  bool botonActivado = false;
+
   @override
   Widget build(BuildContext context) {
+    final providerHoraFinCarrusel =
+        Provider.of<HorarioElegidoCarrusel>(context);
+    // Verifica el estado del botón antes de construir la interfaz
+    verificarBotonActivado(providerHoraFinCarrusel);
     return SizedBox(
       height: 500,
-      child: seleccionHorarios(context),
+      child: seleccionHorarios(),
     );
   }
 
-  seleccionHorarios(BuildContext context) {
-    return CarruselDeHorarios(
-      horaInicio: widget.argument,
+  void verificarBotonActivado(HorarioElegidoCarrusel providerHoraFinCarrusel) {
+    bool nuevoEstado = !providerHoraFinCarrusel.horaInicio.isAfter(
+        providerHoraFinCarrusel.horaFin.subtract(const Duration(
+            minutes:
+                15))); // sustrae 15 minutos para que las horas no sean las mismas
+    if (botonActivado != nuevoEstado) {
+      setState(() {
+        botonActivado = nuevoEstado;
+        print("Estado del botón cambiado: $nuevoEstado");
+      });
+    }
+  }
+
+  seleccionHorarios() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SizedBox(
+        width: double.maxFinite,
+        height: 300,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                CarruselDeHorarios(
+                    horaSeleccionada: widget.argument, carrusel: 'horaInicio'),
+                const Text('a'),
+                CarruselDeHorarios(
+                    horaSeleccionada: widget.argument, carrusel: 'horaFinal'),
+              ],
+            ),
+            _botonEstablecerHorario()
+          ],
+        ),
+      ),
     );
+  }
+
+  _botonEstablecerHorario() {
+    return Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: botonActivado ? Colors.black : Colors.grey,
+          border: Border.all(
+            color: Colors.grey,
+            width: 1.0,
+          ),
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: InkWell(
+            onTap: () {
+              botonActivado ? Navigator.pop(context) : null;
+            },
+            child: const Center(
+              child: Text(
+                'Establecer',
+                style: TextStyle(color: Colors.white),
+              ),
+            )));
   }
 }
 
 // ///////////////////// CARRUSEL DE HORARIO //////////////////////
 
 class CarruselDeHorarios extends StatefulWidget {
-  final DateTime? horaInicio;
+  final DateTime? horaSeleccionada;
+  final String? carrusel;
 
-  const CarruselDeHorarios({super.key, this.horaInicio});
+  const CarruselDeHorarios({super.key, this.horaSeleccionada, this.carrusel});
 
-  static Map<String, DateTime> generarHorarios(horaInicio) {
+  static Map<String, DateTime> generarHorarios(DateTime horaSeleccionada) {
+    final horaRef = DateTime(horaSeleccionada.year, horaSeleccionada.month,
+        horaSeleccionada.day, 7, 0);
+
     Map<String, DateTime> horarios = {};
-    DateTime startTime = horaInicio;
+    DateTime startTime = horaRef; // 07:00h
 
     while (startTime.hour < 23 ||
         (startTime.hour == 23 && startTime.minute == 0)) {
       String formattedTime = DateFormat('HH:mm').format(startTime);
       horarios[formattedTime] = startTime;
-      startTime = startTime.add(const Duration(minutes: 30));
+      startTime = startTime.add(const Duration(minutes: 15));
     }
 
     return horarios;
@@ -524,39 +609,44 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
   DateTime? fechaElegida;
 
   Map<String, DateTime> horarios = {};
-  final PageController _pageController = PageController(viewportFraction: 0.3);
+  final _pageController = PageController(viewportFraction: 0.2);
   int _currentPage = 0;
-  String _guardaHoraTexto = '';
-  DateTime? _guardaHoraFin;
 
-  bool _visibleCarrusel = false;
-
-  double alturaCarrusel = 140;
+  double alturaCarrusel = 240;
   int numeroHoras = 1;
 
   @override
   void didChangeDependencies() {
-    seteaFechaElegida();
+    //seteaFechaElegida();
     super.didChangeDependencies();
   }
 
   @override
   void initState() {
-    horarios = CarruselDeHorarios.generarHorarios(widget.horaInicio);
-
-    _guardaHoraTexto = horarios.keys.elementAt(0);
     super.initState();
-    _pageController.addListener(() {
-      int newPage = _pageController.page!.round();
-      if (_currentPage != newPage) {
-        setState(() {
-          _currentPage = newPage;
-          /*   print(
-              "Página seleccionada: $_currentPage, Horario: ${horarios.keys.elementAt(_currentPage)}"); */
-        });
+    horarios = CarruselDeHorarios.generarHorarios(widget.horaSeleccionada!);
 
-        //  horarios.values.elementAt(_currentPage);
-      }
+    _pageController.addListener(() {
+      setState(() {
+        _currentPage = _pageController.page!.round();
+      });
+    });
+
+    // Navegar a la página deseada después de que el widget se haya construido.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Clave específica que queremos buscar
+      String horaBuscada = DateFormat('HH:mm').format(widget.horaSeleccionada!);
+
+      // Convertimos las claves en una lista y encontramos el índice de la clave deseada
+      int indice = horarios.keys.toList().indexOf(horaBuscada);
+
+      // Navega a la pagina numero:  índice
+      // print('El índice de $horaBuscada es: $indice');
+      _pageController.animateToPage(
+        indice,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.bounceIn,
+      );
     });
   }
 
@@ -570,68 +660,82 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
   Widget build(BuildContext context) {
     final providerHoraFinCarrusel =
         Provider.of<HorarioElegidoCarrusel>(context);
-    String textoHoraFin =
-        DateFormat('HH:mm').format(providerHoraFinCarrusel.horaFin);
+    print(horarios);
     return GestureDetector(
-      onTap: () {
-        providerHoraFinCarrusel
-            .setHoraFin(horarios.values.elementAt(_currentPage));
+        onTap: () {},
+        child: SizedBox(
+            width: 80,
+            height: alturaCarrusel,
+            child: Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Container(
+                  color: Colors.white,
+                  width: 80,
+                  height: alturaCarrusel,
+                  // Altura del carrusel
+                  child: PageView.builder(
+                      scrollDirection: Axis.vertical,
+                      controller: _pageController,
+                      itemCount: horarios.length,
+                      onPageChanged: (int index) {
+                        setState(() {
+                          _currentPage = index;
+                        });
 
-        setState(() {});
+                        // Actualizar Provider en base al carrusel
+                        if (widget.carrusel == 'horaInicio') {
+                          providerHoraFinCarrusel
+                              .setHoraInicio(horarios.values.elementAt(index));
+                        }
 
-        _visibleCarrusel = !_visibleCarrusel;
-      },
-      child: SizedBox(
-          width: 80,
-          height: alturaCarrusel,
-          child: _visibleCarrusel
-              ? Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Container(
-                      color: Colors.white,
-                      width: 80,
-                      height: alturaCarrusel,
-                      // Altura del carrusel
-                      child: PageView.builder(
-                          scrollDirection: Axis.vertical,
-                          controller: _pageController,
-                          itemCount: horarios.length,
-                          itemBuilder: (context, i) {
-                            String horario = horarios.keys.elementAt(i);
-                            _guardaHoraTexto =
-                                horarios.keys.elementAt(_currentPage);
+                        if (widget.carrusel == 'horaFinal') {
+                          providerHoraFinCarrusel
+                              .setHoraFin(horarios.values.elementAt(index));
+                        }
 
-                            return Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(horario,
-                                      style: _currentPage == i
-                                          ? estiloHorariosResaltado
-                                          : estiloHorariosDifuminado),
-                                ],
-                              ),
-                            );
-                          })),
-                )
-              : Center(
-                  child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(textoHoraFin, style: estiloHorarios),
-                    const Icon(Icons.arrow_drop_down_outlined)
-                  ],
-                ))),
-    );
+                        print('INICIO: ${providerHoraFinCarrusel.horaInicio}');
+                        print('FIN: ${providerHoraFinCarrusel.horaFin}');
+                      },
+                      itemBuilder: (context, i) {
+                        String horario = horarios.keys.elementAt(i);
+
+                        return Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                horario,
+                                style: estilo(i),
+                              )
+                            ],
+                          ),
+                        );
+                      })),
+            )));
   }
 
   void seteaFechaElegida() {
     // provider FECHA elegida
-    final providerFechaElegida =
+    /*  final providerFechaElegida =
         Provider.of<FechaElegida>(context, listen: false);
-    fechaElegida = providerFechaElegida.fechaElegida;
+     providerFechaElegida.setFechaElegida(hora); */
+
+    final providerHorario =
+        Provider.of<HorarioElegidoCarrusel>(context, listen: false);
+    providerHorario.setHoraInicio(widget.horaSeleccionada!);
+    providerHorario.setHoraFin(widget.horaSeleccionada!);
+  }
+
+  estilo(int i) {
+    if (_currentPage == i) {
+      return estiloHorariosResaltado;
+    } else if (_currentPage == i - 1 || _currentPage == i + 1) {
+      return estiloHorariosAlgoDifuminado;
+    } else {
+      return estiloHorariosDifuminado;
+    }
   }
 }

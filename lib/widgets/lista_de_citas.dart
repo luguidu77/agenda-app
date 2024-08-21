@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:agendacitas/screens/creacion_no_disponibilidad/tarjeta_indisponibilidad.dart';
+import 'package:agendacitas/screens/detalles_horario_no_disponible_screen.dart';
 import 'package:agendacitas/utils/extraerServicios.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -80,26 +81,35 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         //###### SI AL HACER CLIC EN EL CALENDARIO, EXISTE UNA CITA NAVEGA A LOS DETALLES DE LA CITA, SI NO HAY CITA NAVEGA A CREACION DE UNA NUEVA CITA-----------
         if (appointments != null) {
           Map<String, dynamic> cita = json.decode(appointments[0].notes);
+          print(cita);
+          if (cita['nombre'] != 'null') {
+            // print(cita);
+            //############# DETALLE DE LA CITA                   ########################
 
-          // print(cita);
-          //############# DETALLE DE LA CITA                   ########################
-
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DetallesCitaScreen(
-                  emailUsuario: _emailSesionUsuario, reserva: cita),
-            ),
-          );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetallesCitaScreen(
+                    emailUsuario: _emailSesionUsuario, reserva: cita),
+              ),
+            );
+          } else {
+            //############# DETALLE HORARIO NO DISPONIBLE      ########################
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetallesHorarioNoDisponibleScreen(
+                    emailUsuario: _emailSesionUsuario, reserva: cita),
+              ),
+            );
+          }
         } else {
-          // print(details.date);
-
+          //############# CREACION DE HORARIO NO DISPONIBLE --  ########################
           if (_leerEstadoBotonIndisponibilidad) {
-            //############# CREACION DE HORARIO NO DISPONIBLE --  ########################
-
             Navigator.push(
                 context,
                 PageRouteBuilder(
+                  transitionDuration: const Duration(milliseconds: 500),
                   pageBuilder: (context, animation, secondaryAnimation) =>
                       TarjetaIndisponibilidad(argument: details.date),
                   transitionsBuilder:
@@ -297,19 +307,25 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
             : false
         : true;
 
-    print('$citaConfirmada ---- $_iniciadaSesionUsuario');
+    // print('$citaConfirmada ---- $_iniciadaSesionUsuario');
     String textoConfirmada =
         citaConfirmada ? 'CONFIRMADA' : 'PENDIENTE CONFIRMAR';
     var servicios = _iniciadaSesionUsuario
         ? cita['idServicio'].map((serv) => serv['servicio']).join(', ')
         : cita['servicio'];
+
+    // ###### COMPROBACION SI SE TRATA DE UNA CITA O UNA HORA INDISPONIBLE
     return (cita['nombre'] != null)
+
+        // ------------TARJETA CITA RESERVADA         ---------------------
         ? '${textoConfirmada.padLeft(60)}'
             '\n😀 ${cita['nombre']}'
             '\n 🤝 $servicios' //.join(', ') => para que no quitar los ()
             '\n 📇 ${cita['comentario']}'
             '\n 💰 ${cita['precio']}'
-        : '🌴⛵🍍🦀 NO DISPONIBLE \n\n MOTIVO: ${cita['comentario']}';
+
+        // ------------TARJETA HORARIO NO DISPONIBLE ---------------------
+        : ' ${cita['comentario']}';
   }
 }
 

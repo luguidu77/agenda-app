@@ -24,10 +24,14 @@ const String mensajeYaExisteCliente =
     'Ya existe el teléfono asociado al contacto:';
 
 final estiloHorarios = GoogleFonts.bebasNeue(
+  fontSize: 25,
+);
+final estiloHorariosAlgoDifuminado = GoogleFonts.bebasNeue(
   fontSize: 24,
+  color: const Color.fromARGB(255, 130, 130, 131),
 );
 final estiloHorariosDifuminado = GoogleFonts.bebasNeue(
-  fontSize: 24,
+  fontSize: 23,
   color: const Color.fromARGB(255, 211, 211, 212),
 );
 final estiloHorariosResaltado =

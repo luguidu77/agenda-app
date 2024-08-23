@@ -209,7 +209,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
                   '0', //precio
                   asunto, //comentario,
                   '999', //idcliente
-                  [''], //idServicio,
+                  ['indispuesto'], //idServicio,
                   'idEmpleado',
                   '' //idCitaCliente
                   );

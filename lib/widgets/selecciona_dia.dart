@@ -12,7 +12,7 @@ import '../utils/publicidad.dart';
 import '../utils/utils.dart';
 
 class SeleccionaDia extends StatefulWidget {
-  const  SeleccionaDia(
+  const SeleccionaDia(
       {Key? key,
       required this.botonReprogramarVisible,
       required this.idServicio,
@@ -48,6 +48,8 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
       false; // ?  VARIABLE PARA VERIFICAR SI HAY USUARIO CON INCIO DE SESION
   String _emailSesionUsuario = '';
   String _estadoPagadaApp = '';
+  DateTime horaInicioProgramable = DateTime.now();
+  DateTime horaFinalProgramable = DateTime.now();
 
   @override
   void initState() {
@@ -155,7 +157,8 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                botonReprogramar(_emailSesionUsuario, _iniciadaSesionUsuario)
+                botonReprogramar(
+                    context, _emailSesionUsuario, _iniciadaSesionUsuario)
               ],
             )
           ],
@@ -390,8 +393,8 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
         debugPrint('hora inicio cita cogida $horaInicioEstablecida');
         debugPrint('hora final cita cogida $horaFinalEstablecida');
 
-        DateTime horaInicioProgramable = DateTime.parse(textoFechaHora);
-        DateTime horaFinalProgramable = horaInicioProgramable.add(Duration(
+        horaInicioProgramable = DateTime.parse(textoFechaHora);
+        horaFinalProgramable = horaInicioProgramable!.add(Duration(
             hours: tiempoServicioHoras, minutes: tiempoServicioMinutos));
 
         debugPrint('hora INICIO nueva cita $horaInicioProgramable');
@@ -420,11 +423,11 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
 
         //  ?  SI ENCUENTRA UNA CITA EN LA HORA ELEGIDA, COMPRUEBA QUE NO SE TRATE DE LA MISMA CITA (ID IGUALES)
 
-        bool valIpIn = horaInicioEstablecida.isBefore(horaInicioProgramable);
-        bool valFpIn = horaFinalEstablecida.isBefore(horaInicioProgramable) ||
+        bool valIpIn = horaInicioEstablecida.isBefore(horaInicioProgramable!);
+        bool valFpIn = horaFinalEstablecida.isBefore(horaInicioProgramable!) ||
             horaFinalEstablecida == horaInicioProgramable;
-        bool valIpFn = horaInicioEstablecida.isAfter(horaFinalProgramable) ||
-            horaInicioEstablecida.isAtSameMomentAs(horaFinalProgramable);
+        bool valIpFn = horaInicioEstablecida.isAfter(horaFinalProgramable!) ||
+            horaInicioEstablecida.isAtSameMomentAs(horaFinalProgramable!);
 
         //? COMPROBACION FINAL
         if (valIpIn) {
@@ -439,7 +442,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
     // si no se trata de la misma cita compruebo disponibilidad-^^^^^^^^^^^^^^----
   }
 
-  botonReprogramar(String usuarioAP, bool iniciadaSesionUsuario) {
+  botonReprogramar(context, String usuarioAP, bool iniciadaSesionUsuario) {
     return ElevatedButton.icon(
         icon: const Icon(FontAwesomeIcons.check),
         onPressed: () async {
@@ -458,36 +461,19 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
 
               String fecha =
                   '${DateTime.parse(textoFechaHora).year.toString()}-${DateTime.parse(textoFechaHora).month.toString().padLeft(2, '0')}-${DateTime.parse(textoFechaHora).day.toString().padLeft(2, '0')}';
-              var idCitaOld = oldCita['id'];
+              //  var idCitaOld = oldCita['id'];
 
               if (iniciadaSesionUsuario) {
-                //? la funcion extraerServicios, resuelve el problema de que el json no tiene comillas en sus claves: [{idServicio: QF3o14RyJ5KbSSb0d6bB, activo: true, servicio: Semiperman
-                List<String> idServicios =
-                    extraerIdServiciosdeCadenaTexto(oldCita['idServicio']);
-                CitaModelFirebase newCita = CitaModelFirebase();
-                newCita.id = idCitaOld;
-                newCita.dia = fecha;
-                newCita.horaInicio = textoFechaHora;
-                newCita.horaFinal = textoHoraF;
-                newCita.comentario = oldCita['comentario'] +
-                    '🔃'; //todo: AGREGAR CAMPO REPROGRAMACION O REASIGANACION
-                newCita.email = oldCita['email'];
-                newCita.idcliente = oldCita['idCliente'];
-                newCita.idservicio = idServicios;
-                newCita.idEmpleado = oldCita['idEmpleado'];
-                newCita.confirmada = true;
-                //  oldCita['confirmada'] ;
-                newCita.idCitaCliente = oldCita['idCitaCliente'];
-                newCita.tokenWebCliente = oldCita['tokenWebCliente'];
-
-                debugPrint('$fecha  $textoFechaHora $textoHoraF');
-
-                //* ACUTALIZA LAS BASE DE DATOS DE agandadecitaspp y clienteAgendoWeb
-                await FirebaseProvider().actualizarCita(usuarioAP, newCita);
-                await FirebaseProvider()
-                    .actualizaCitareasignada(usuarioAP, newCita);
-
-                snackbar();
+                ////XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXFUNCION
+                ////XXxxxx FUNCION actualizar la cita en Firebase  xxxxxXX
+                ActualizacionCita.actualizar(
+                  context,
+                  oldCita,
+                  null,
+                  fecha,
+                  horaInicioProgramable,
+                  _emailSesionUsuario,
+                );
               } else {
                 //reprogramacion de fecha y hora de la cita
                 CitaModel newCita = CitaModel();

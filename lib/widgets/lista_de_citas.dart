@@ -152,57 +152,14 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           // extraemos los datos de (notes) para obtener la cita
           Map<String, dynamic> cita = json.decode(appointment.notes);
 
-          // OBTENER LA DIFERENCIA ENTRE LA HORA DE INICIO Y LA FINAL PARA CONOCER EL TIEMPO DE LA CITA
-          List<int> tiempoServicios =
-              calculaTiempo(cita['horaInicio'], cita['horaFinal']);
-
-          final nuevaHora = appointmentDragEndDetails.droppingTime!;
-
-          String textoDia =
-              '${nuevaHora.year}-${nuevaHora.month.toString().padLeft(2, '0')}-${nuevaHora.day.toString().padLeft(2, '0')}';
-          String textoFechaHoraInicio =
-              ('$textoDia ${nuevaHora.hour.toString().padLeft(2, '0')}:${nuevaHora.minute.toString().padLeft(2, '0')}:00Z');
-          // a la hora final le sumo el tiempoServicios
-          String textoFechaHoraFinal =
-              ('$textoDia ${(nuevaHora.hour + tiempoServicios[0]).toString().padLeft(2, '0')}:${(nuevaHora.minute + tiempoServicios[1]).toString().padLeft(2, '0')}:00Z');
-
-          String fecha =
-              '${DateTime.parse(textoFechaHoraInicio).year.toString()}-${DateTime.parse(textoFechaHoraInicio).month.toString().padLeft(2, '0')}-${DateTime.parse(textoFechaHoraInicio).day.toString().padLeft(2, '0')}';
-          // print(textoFechaHoraInicio);
-
-          debugPrint(cita.toString()); // print cita
-
-          //? la funcion extraerServicios, resuelve el problema de que el json no tiene comillas en sus claves: [{idServicio: QF3o14RyJ5KbSSb0d6bB, activo: true, servicio: Semiperman
-          List<String> idServicios =
-              extraerIdServiciosdeCadenaTexto(cita['idServicio']);
-
-          CitaModelFirebase newCita = CitaModelFirebase();
-
-          newCita.email = cita['email'];
-          newCita.id = cita['id'];
-          newCita.dia = fecha;
-          newCita.horaInicio = textoFechaHoraInicio;
-          newCita.horaFinal = textoFechaHoraFinal;
-          newCita.comentario = cita['comentario'] +
-              ' 🔃​'; //todo añadir un nuevo campo REPROGRAMACION
-          newCita.idcliente = cita['idCliente'];
-          newCita.idservicio = idServicios;
-          newCita.idEmpleado = cita['idEmpleado'];
-          newCita.confirmada =
-              cita['confirmada'] == 'true'; // Convertir cadena a booleano
-
-          newCita.idCitaCliente = cita['idCitaCliente'];
-          newCita.tokenWebCliente = cita['tokenWebCliente'];
-          debugPrint('$fecha  $textoFechaHoraInicio $textoFechaHoraFinal');
-
-          //* ACUTALIZA LAS BASE DE DATOS DE agandadecitaspp y clienteAgendoWeb
-          await FirebaseProvider().actualizarCita(_emailSesionUsuario, newCita);
-          await FirebaseProvider()
-              .actualizaCitareasignada(_emailSesionUsuario, newCita);
-
-          // ignore: use_build_context_synchronously
-          mensajeSuccess(context,
-              'Cita reprogramada para las ${nuevaHora.hour.toString().padLeft(2, '0')}:${nuevaHora.minute.toString().padLeft(2, '0')}');
+          ////XXxxxx FUNCION actualizar la cita en Firebase  xxxxxXX
+          ActualizacionCita.actualizar(
+              context,
+              cita,
+              appointmentDragEndDetails.droppingTime!,
+              null,
+              null,
+              _emailSesionUsuario);
 
           Navigator.pushNamed(context, '/');
         } else {
@@ -288,16 +245,6 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
     }
     debugPrint(meetings.toString());
     return meetings;
-  }
-
-  List<int> calculaTiempo(timestamp1, timestamp2) {
-    DateTime dateTime1 = DateTime.parse(timestamp1);
-    DateTime dateTime2 = DateTime.parse(timestamp2);
-    Duration difference = dateTime2.difference(dateTime1);
-
-    int hours = difference.inHours;
-    int minutes = difference.inMinutes % 60;
-    return [hours, minutes];
   }
 
   String textoCita(cita) {

@@ -5,8 +5,8 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../providers/providers.dart';
 import '../utils/utils.dart';
 
-mensajeAlerta(BuildContext context, int index, citas,
-    bool iniciadaSesionUsuario, String emailusuario) async {
+mensajeAlerta(context, int index, citas, bool iniciadaSesionUsuario,
+    String emailusuario) async {
   late String textoPregunta;
   bool respuesta = false;
   late String textoNombre;
@@ -64,8 +64,7 @@ mensajeAlerta(BuildContext context, int index, citas,
                   ),
                   ElevatedButton(
                       onPressed: () {
-                        Navigator.pop(context);
-                        //  setState(() {});
+                        Navigator.pushNamed(context, '/');
                       },
                       child: const Text(
                         ' No ',

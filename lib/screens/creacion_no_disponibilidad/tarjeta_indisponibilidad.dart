@@ -4,6 +4,7 @@ import 'package:agendacitas/providers/estado_creacion_indisponibilidad.dart';
 
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/utils/formatear.dart';
+import 'package:agendacitas/utils/verificaDiferenciaHorario.dart';
 
 import 'package:flutter/material.dart';
 
@@ -45,11 +46,6 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   CitaModel citaInicio = CitaModel();
   CitaModel citaFin = CitaModel();
 
-  Map<String, Duration>? _asunto1;
-  Map<String, Duration>? _asunto2;
-  Map<String, Duration>? _asunto3;
-  Map<String, Duration>? _asunto4;
-
   String fechaPantalla = '';
   String dia = '';
   String horaInicioPantalla = ''; // se presenta cuadro Hora: de 09:00 a 10:00
@@ -64,8 +60,11 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
   bool personalizado = true;
 
-  TextEditingController personalizacionController = TextEditingController();
+  final _asuntoController = TextEditingController();
+  bool botonActivado = false;
 
+  var _pageController;
+  String? _errorText;
   @override
   void initState() {
     seteafechaElegida();
@@ -74,6 +73,23 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     traeAsuntosIndisponibilidad();
 
     super.initState();
+    _pageController =
+        Provider.of<ControladorTarjetasAsuntos>(context, listen: false);
+
+    // Escuchar cambios en el controlador del texto
+    _asuntoController.addListener(() {
+      setState(() {
+        _validateField(_asuntoController.text);
+      });
+    });
+  }
+
+  void _validateField(String value) {
+    if (value.isEmpty) {
+      _errorText = 'Este campo no puede estar vacío';
+    } else {
+      _errorText = null; // Campo válido
+    }
   }
 
   String _emailSesionUsuario = '';
@@ -101,17 +117,26 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
   }
 
+  Map<String, Duration>? asunto1;
+  Map<String, Duration>? asunto2;
+
+  Map<String, Duration>? asunto3;
+
+  Map<String, Duration>? asunto4;
+  Map<String, Duration>? asunto5;
+
   traeAsuntosIndisponibilidad() {
     // traer los textos de los asuntos de firebase
-    _asunto1 = {' ✏️ personalizado ': const Duration(minutes: 0)};
-    _asunto2 = {' 🥣 descanso ': const Duration(minutes: 30)};
-    _asunto3 = {' 😷  médico ': const Duration(hours: 1)};
-    _asunto4 = {' ➕  nuevo asunto ': const Duration(minutes: 30)};
+    asunto1 = {'✏️ Personalizado': const Duration(minutes: 0)};
+    asunto2 = {'🥣 Descanso ': const Duration(minutes: 30)};
+    asunto3 = {'📚 Formación': const Duration(hours: 1)};
+    asunto4 = {'📅 Reunión': const Duration(hours: 1)};
+    asunto5 = {'➕  nuevo asunto ': const Duration(minutes: 30)};
 
-    _asuntos = [_asunto1, _asunto2, _asunto3, _asunto4];
+    _asuntos = [asunto1, asunto2, asunto3, asunto4, asunto5];
   }
 
-  String asunto = ' 🩺 medico ';
+  String asunto = '';
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).primaryColor; // color del tema
@@ -122,7 +147,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     dia = DateFormat('yyyy-MM-dd') // fecha formateada para FIREBASE
         .format(fechaElegida!);
 
-    // provider HORA elegidad
+    // provider HORA elegida
     final providerHoraFinCarrusel =
         Provider.of<HorarioElegidoCarrusel>(context);
     // hora inicio
@@ -164,14 +189,41 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
                 style: estiloHorarios,
               ),
               const SizedBox(height: 40),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'Tipo de horarios',
+                    style: subTituloEstilo,
+                  ),
+                  const SizedBox(
+                    width: 90,
+                  ),
+                  IconButton.outlined(
+                      onPressed: () {
+                        if (_pageController.controller.hasClients) {
+                          _pageController.paginaAnterior();
+                        }
+                      },
+                      icon: Icon(Icons.arrow_left)),
+                  IconButton.outlined(
+                      onPressed: () {
+                        if (_pageController.controller.hasClients) {
+                          _pageController.paginaSiguiente();
+                        }
+                      },
+                      icon: const Icon(Icons.arrow_right)),
+                ],
+              ),
+
               // ------------------- ASUNTOS----------------------------
               _listaAsuntos(context, fechaElegida, providerHoraFinCarrusel),
-
+              const SizedBox(height: 40),
               // -------------------TEXTO PERSONALIZADO ----------------------------
 
               Visibility(
                 visible: personalizado,
-                child: Form(child: formPersonalizaAsunto(color)),
+                child: formPersonalizaAsunto(color),
               ),
               const SizedBox(height: 20),
               // ------------------- PRESENTACION DE FECHA Y HORAS---------
@@ -179,7 +231,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
               const SizedBox(height: 20),
               _presentacionHoras(),
               const SizedBox(height: 40),
-              _botonGuardar()
+              _botonGuardar(providerHoraFinCarrusel)
             ]),
           ),
         ),
@@ -187,11 +239,14 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     );
   }
 
-  _botonGuardar() {
+  _botonGuardar(providerHoraFinCarrusel) {
+    // Verifica el estado del botón antes de construir la interfaz
+    botonActivado = Verificadiferenciahorario.verificarBotonActivado(
+        providerHoraFinCarrusel);
     return Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: botonActivado ? Colors.black : Colors.grey,
           border: Border.all(
             color: Colors.grey,
             width: 1.0,
@@ -200,22 +255,27 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         child: InkWell(
-            onTap: () async {
-              await FirebaseProvider().nuevaCita(
-                  _emailSesionUsuario,
-                  dia,
-                  horaInicioTexto,
-                  horaFinTexto,
-                  '0', //precio
-                  asunto, //comentario,
-                  '999', //idcliente
-                  ['indispuesto'], //idServicio,
-                  'idEmpleado',
-                  '' //idCitaCliente
-                  );
+            onTap: botonActivado &&
+                    _formKey.currentState != null &&
+                    _formKey.currentState!.validate() &&
+                    _errorText == null
+                ? () async {
+                    await FirebaseProvider().nuevaCita(
+                        _emailSesionUsuario,
+                        dia,
+                        horaInicioTexto,
+                        horaFinTexto,
+                        '0', // precio
+                        asunto, // comentario
+                        '999', // idcliente
+                        ['indispuesto'], // idServicio
+                        'idEmpleado',
+                        '' // idCitaCliente
+                        );
 
-              cerrar();
-            },
+                    cerrar();
+                  }
+                : null,
             child: const Center(
               child: Text(
                 'Guardar',
@@ -232,19 +292,35 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
           'Título:',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        TextFormField(
-            onChanged: (value) => {asunto = personalizacionController.text},
-            controller: personalizacionController,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(borderSide: BorderSide(width: 2)),
-              iconColor: color,
-              suffixIconColor: color,
-              fillColor: color,
-              hoverColor: color,
-              prefixIconColor: color,
-              focusColor: color,
-              hintText: 'ej.: comida de empresa',
-            )),
+        Form(
+          key: _formKey,
+          child: TextFormField(
+              // Validación para verificar si el campo está vacío
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Este campo no puede estar vacío';
+                }
+                return null; // Si pasa la validación, devuelve null
+              },
+              onChanged: (value) {
+                setState(() {
+                  asunto = value;
+                });
+                _validateField(value); // Llama a la validación manualmente
+              },
+              controller: _asuntoController,
+              decoration: InputDecoration(
+                  border: const OutlineInputBorder(
+                      borderSide: BorderSide(width: 2)),
+                  iconColor: color,
+                  suffixIconColor: color,
+                  fillColor: color,
+                  hoverColor: color,
+                  prefixIconColor: color,
+                  focusColor: color,
+                  hintText: 'ej.: comida de empresa',
+                  errorText: _errorText)),
+        ),
       ],
     );
   }
@@ -325,12 +401,9 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
   _listaAsuntos(context, fechaElegida, providerHoraFinCarrusel) {
     return SizedBox(
-        height: 150,
+        height: 130,
         child: PageView.builder(
-          controller: PageController(
-            initialPage: 0,
-            viewportFraction: 0.5, // Esto ajusta el ancho de cada tarjeta
-          ),
+          controller: _pageController.controller,
           itemCount: _asuntos.length,
           itemBuilder: (BuildContext context, int i) {
             String duracion = formateaDurationString(_asuntos, i);
@@ -505,14 +578,15 @@ class _TarjetaHoraState extends State<TarjetaHora> {
     final providerHoraFinCarrusel =
         Provider.of<HorarioElegidoCarrusel>(context);
     // Verifica el estado del botón antes de construir la interfaz
-    verificarBotonActivado(providerHoraFinCarrusel);
+    botonActivado = Verificadiferenciahorario.verificarBotonActivado(
+        providerHoraFinCarrusel);
     return SizedBox(
       height: 500,
       child: seleccionHorarios(),
     );
   }
 
-  void verificarBotonActivado(HorarioElegidoCarrusel providerHoraFinCarrusel) {
+  /*  void verificarBotonActivado(HorarioElegidoCarrusel providerHoraFinCarrusel) {
     bool nuevoEstado = !providerHoraFinCarrusel.horaInicio.isAfter(
         providerHoraFinCarrusel.horaFin.subtract(const Duration(
             minutes:
@@ -523,7 +597,7 @@ class _TarjetaHoraState extends State<TarjetaHora> {
         print("Estado del botón cambiado: $nuevoEstado");
       });
     }
-  }
+  } */
 
   seleccionHorarios() {
     return Padding(

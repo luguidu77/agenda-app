@@ -39,3 +39,24 @@ class HorarioElegidoCarrusel extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+class ControladorTarjetasAsuntos extends ChangeNotifier {
+  PageController _pageController = PageController(
+    initialPage: 0,
+    viewportFraction: 0.5,
+  );
+
+  PageController get controller => _pageController;
+
+  paginaAnterior() {
+    _pageController.previousPage(
+        duration: Duration(milliseconds: 200), curve: Curves.bounceIn);
+    notifyListeners();
+  }
+
+  paginaSiguiente() {
+    _pageController.nextPage(
+        duration: Duration(milliseconds: 200), curve: Curves.linear);
+    notifyListeners();
+  }
+}

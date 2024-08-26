@@ -17,6 +17,7 @@ class FirebaseProvider extends ChangeNotifier {
   List<CitaModelFirebase> citas = [];
   List<ServicioModel> servicios = [];
   FirebaseFirestore? db;
+  List<Map<String, dynamic>> data = [];
 
   //?INICIALIZA FIREBASE //////////////////////////////////////////
   _iniFirebase() async {
@@ -270,7 +271,45 @@ class FirebaseProvider extends ChangeNotifier {
     return data; //retorna una lista de todas las citas(CitaModelFirebase)
   }
 
-  List<Map<String, dynamic>> data = [];
+  getAsuntosIndispuestos(emailUsuario) async {
+    List<Map<String, dynamic>> data = [];
+
+    await _iniFirebase();
+
+    final docRef = await _referenciaDocumento(emailUsuario, 'personaliza');
+
+    // Verifica si el documento "NoDisponibles" existe
+    final noDisponiblesDoc = docRef.doc('NoDisponibles');
+    final noDisponiblesSnapshot = await noDisponiblesDoc.get();
+
+    // Si no existe, créalo
+    if (!noDisponiblesSnapshot.exists) {
+      await noDisponiblesDoc.set({
+        // Puedes inicializarlo con datos vacíos o algún valor por defecto
+        'inicializado': true
+      });
+    }
+
+    // Ahora puedes obtener los datos de la colección "asuntos"
+    await noDisponiblesDoc
+        .collection('asuntos')
+        .get()
+        .then((QuerySnapshot snapshot) => {
+              for (var element in snapshot.docs)
+                {
+                  // Agrega los asuntos a la lista
+                  data.add({
+                    'id': element.id,
+                    'titulo': element['titulo'],
+                    'horas': element['horas'],
+                    'minutos': element['minutos'],
+                  })
+                }
+            });
+
+    print(data);
+    return data; // Retorna una lista de todos los asuntos
+  }
 
   // List<ClienteModel> cientes = [];
 
@@ -642,18 +681,22 @@ class FirebaseProvider extends ChangeNotifier {
 
   cargarPersonaliza(String emailUsuario) async {
     Map<String, dynamic> personaliza = {};
-
+    dynamic data;
     await _iniFirebase();
 
     final docRef = await _referenciaDocumento(emailUsuario, 'personaliza');
-    await docRef.get();
+    // await docRef.get();
     await docRef.get().then((QuerySnapshot snapshot) => {
+          data = snapshot.docs,
           for (var element in snapshot.docs)
-            personaliza = {
-              //AGREGA DATOS
+            if (element.id == 'mensajeCita')
+              {
+                personaliza = {
+                  //AGREGA DATOS
 
-              'mensaje': element['mensaje'],
-            }
+                  'mensaje': element['mensaje'],
+                }
+              }
         });
 
     return personaliza; //retorna una lista de personaliza(PersonalizaModelFirebase)

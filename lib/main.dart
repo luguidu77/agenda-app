@@ -163,6 +163,9 @@ class _MyAppState extends State<MyApp> {
             create: (BuildContext context) => HorarioElegidoCarrusel()),
         ChangeNotifierProvider(
             create: (BuildContext context) => ControladorTarjetasAsuntos()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) =>
+                BotonGuardarAgregarNoDisponible()),
       ],
       builder: (context, _) {
         return MaterialApp(

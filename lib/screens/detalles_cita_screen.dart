@@ -138,14 +138,10 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                   widget.emailUsuario);
 
               if (res == true) {
-                /*   print('${reserva}');
-                print('${reserva['email']}');
-                print('${reserva['idCitaCliente']}'); */
                 await FirebaseProvider()
                     .cancelacionCitaCliente(reserva, widget.emailUsuario);
                 // ignore: use_build_context_synchronously
                 Navigator.pushReplacementNamed(context, '/');
-                // Cambiar estado en Firebase
               }
             },
             icon: const Icon(Icons.delete),

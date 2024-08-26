@@ -97,7 +97,7 @@ class _CalendarioState extends State<Calendario> {
         debugPrint('evento seleccionada _________________$evento');
 
         // AÑADE EVENTO AL CALENDARIO CON SU FECHA CORRESPONDIENTE Y SIEMPRE QUE NO SEA UN NO DISPONIBLE('999')
-        if (fecha.day == day.day && item['idServicio'] != '999') {
+        if (fecha.day == day.day && item['idCliente'] != '999') {
           // LISTA DE EVENTOS:
           // {2023-03-09 00:00:00.000: [cervicalES], 2023-02-23 00:00:00.000: [cervicalES], 2023-02-14 00:00:00.000: [cervicalES], 2023-03-11 00:00:00.000: [cervicalES], 2023-03-05 00:00:00.000: [cervicalES], 2023-02-15 00:00:00.000: [cervicalES], 2023-02-21 00:00:00.000: [cervicalES]}
           listaEventos.add(evento);

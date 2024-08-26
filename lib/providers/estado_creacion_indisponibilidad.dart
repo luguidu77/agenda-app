@@ -11,6 +11,17 @@ class BotonAgregarIndisponibilidadProvider extends ChangeNotifier {
   }
 }
 
+class BotonGuardarAgregarNoDisponible extends ChangeNotifier {
+  bool _visible = true;
+
+  bool get forularioVisible => _visible;
+
+  setBotonGuardar(bool p) async {
+    _visible = p;
+    notifyListeners();
+  }
+}
+
 class FechaElegida extends ChangeNotifier {
   DateTime _fechaElegida = DateTime(0);
 
@@ -41,22 +52,34 @@ class HorarioElegidoCarrusel extends ChangeNotifier {
 }
 
 class ControladorTarjetasAsuntos extends ChangeNotifier {
-  PageController _pageController = PageController(
-    initialPage: 0,
-    viewportFraction: 0.5,
-  );
+  PageController _pageController;
+  int _paginaActual = 0; // Almacena la página actual
+
+  ControladorTarjetasAsuntos()
+      : _pageController = PageController(
+          initialPage: 0,
+          viewportFraction: 0.5,
+        );
 
   PageController get controller => _pageController;
 
-  paginaAnterior() {
+  void paginaAnterior() {
     _pageController.previousPage(
-        duration: Duration(milliseconds: 200), curve: Curves.bounceIn);
+        duration: const Duration(milliseconds: 200), curve: Curves.bounceIn);
+    _paginaActual = _pageController.page?.toInt() ?? 0;
     notifyListeners();
   }
 
-  paginaSiguiente() {
+  void paginaSiguiente() {
     _pageController.nextPage(
-        duration: Duration(milliseconds: 200), curve: Curves.linear);
+        duration: const Duration(milliseconds: 200), curve: Curves.linear);
+    _paginaActual = _pageController.page?.toInt() ?? 0;
+    notifyListeners();
+  }
+
+  void setea(int pagina) {
+    _paginaActual = pagina;
+    _pageController.jumpToPage(_paginaActual);
     notifyListeners();
   }
 }

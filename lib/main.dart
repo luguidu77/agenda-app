@@ -166,6 +166,8 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(
             create: (BuildContext context) =>
                 BotonGuardarAgregarNoDisponible()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => TextoTituloIndispuesto()),
       ],
       builder: (context, _) {
         return MaterialApp(

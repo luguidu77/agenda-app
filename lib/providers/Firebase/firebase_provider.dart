@@ -271,6 +271,15 @@ class FirebaseProvider extends ChangeNotifier {
     return data; //retorna una lista de todas las citas(CitaModelFirebase)
   }
 
+  void nuevoAsuntoIndispuestos(
+      emailUsuario, Map<String, dynamic> asunto) async {
+    await _iniFirebase();
+    final CollectionReference docRef =
+        await _referenciaDocumento(emailUsuario, 'personaliza');
+
+    await docRef.doc('NoDisponibles').collection('asuntos').doc().set(asunto);
+  }
+
   getAsuntosIndispuestos(emailUsuario) async {
     List<Map<String, dynamic>> data = [];
 

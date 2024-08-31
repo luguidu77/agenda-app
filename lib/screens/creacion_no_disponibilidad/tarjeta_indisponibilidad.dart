@@ -52,14 +52,16 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
   late ControladorTarjetasAsuntos _controladorTarjetasAsuntos;
   late PageController _pageController;
-  String? _errorText;
+
+  late TextoTituloIndispuesto providerTextoTitulo;
+
   @override
   void initState() {
     seteafechaElegida();
     reseteaHoraElegida();
-    emailUsuario();
 
     super.initState();
+
     // Obtén la instancia del ControladorTarjetasAsuntos
     _controladorTarjetasAsuntos =
         Provider.of<ControladorTarjetasAsuntos>(context, listen: false);
@@ -67,25 +69,16 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     // Asigna el PageController desde el controlador
     _pageController = _controladorTarjetasAsuntos.controller;
 
+    /// inicializa la variable
+    providerTextoTitulo =
+        Provider.of<TextoTituloIndispuesto>(context, listen: false);
+
     // Escuchar cambios en el controlador del texto
-    _asuntoController.addListener(() {
-      setState(() {
-        _validateField(_asuntoController.text);
-      });
-    });
+    /*  _asuntoController.addListener(() {
+      _validateField(textoTitulo);
+    }); */
   }
 
-  void _validateField(String value) {
-    if (value.isEmpty) {
-      _errorText = 'Este campo no puede estar vacío';
-    } else {
-      _errorText = null; // Campo válido
-    }
-  }
-
-  String _emailSesionUsuario = '';
-
-  /* List<Map<String, Duration>?> _asuntos = []; */
   seteafechaElegida() {
     // provider fecha elegida
     final providerFechaElegida =
@@ -103,19 +96,14 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     providerHoraFinCarrusel.setHoraFin(widget.argument);
   }
 
-  emailUsuario() async {
-    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
-    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
-  }
-
-  String asunto = '';
+  String textoTitulo = '';
   @override
   Widget build(BuildContext context) {
+    // provider del boton Guardar
     final personalizadoProvider =
         Provider.of<BotonGuardarAgregarNoDisponible>(context);
-    personalizado = personalizadoProvider.forularioVisible;
-
-    final color = Theme.of(context).primaryColor; // color del tema
+    personalizado =
+        personalizadoProvider.forularioVisible; // formulario es visible o no
 
     // provider FECHA elegida
     final providerFechaElegida = Provider.of<FechaElegida>(context);
@@ -201,15 +189,20 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
               Visibility(
                 visible: personalizado,
-                child: formPersonalizaAsunto(color),
+                child: const FormularioAsunto(),
               ),
+              Visibility(
+                  visible: !personalizado, child: _textoAsuntoPredefinido()),
+
+              //Text(providerTextoTitulo.getTitulo)),
               const SizedBox(height: 20),
               // ------------------- PRESENTACION DE FECHA Y HORAS---------
               _presentacionFecha(),
               const SizedBox(height: 20),
               _presentacionHoras(),
               const SizedBox(height: 40),
-              _botonGuardar(providerHoraFinCarrusel)
+
+              const BotonGuardar(),
             ]),
           ),
         ),
@@ -217,67 +210,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
     );
   }
 
-  _botonGuardar(providerHoraFinCarrusel) {
-    bool condicionBotonActivado() {
-      //  con la variable 'personalizado' verfico si esta la opcion del asunto es personalizado
-      // si es personalizado, compruebo con 'botonAtivado' los tramos horarios, y si el formulario está validado
-      // si no es personalizado y el fomulario no esta visible, pues retorno la condicion verdadera para activar el boton y realizar el guardado.
-      if (personalizado!) {
-        if (botonActivado &&
-            _formKey.currentState != null &&
-            _formKey.currentState!.validate() &&
-            _errorText == null) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-
-      return true;
-    }
-
-    // Verifica el estado del botón antes de construir la interfaz
-    botonActivado = Verificadiferenciahorario.verificarBotonActivado(
-        providerHoraFinCarrusel);
-    return Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: condicionBotonActivado() ? Colors.black : Colors.grey,
-          border: Border.all(
-            color: Colors.grey,
-            width: 1.0,
-          ),
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-        child: InkWell(
-            onTap: condicionBotonActivado()
-                ? () async {
-                    await FirebaseProvider().nuevaCita(
-                        _emailSesionUsuario,
-                        dia,
-                        horaInicioTexto,
-                        horaFinTexto,
-                        '0', // precio
-                        asunto, // comentario
-                        '999', // idcliente
-                        ['indispuesto'], // idServicio
-                        'idEmpleado',
-                        '' // idCitaCliente
-                        );
-
-                    cerrar();
-                  }
-                : null,
-            child: const Center(
-              child: Text(
-                'Guardar',
-                style: TextStyle(color: Colors.white),
-              ),
-            )));
-  }
-
-  formPersonalizaAsunto(Color color) {
+  Column _textoAsuntoPredefinido() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -285,34 +218,23 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
           'Título:',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        Form(
-          key: _formKey,
-          child: TextFormField(
-              // Validación para verificar si el campo está vacío
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Este campo no puede estar vacío';
-                }
-                return null; // Si pasa la validación, devuelve null
-              },
-              onChanged: (value) {
-                setState(() {
-                  asunto = value;
-                });
-                _validateField(value); // Llama a la validación manualmente
-              },
-              controller: _asuntoController,
-              decoration: InputDecoration(
-                  border: const OutlineInputBorder(
-                      borderSide: BorderSide(width: 2)),
-                  iconColor: color,
-                  suffixIconColor: color,
-                  fillColor: color,
-                  hoverColor: color,
-                  prefixIconColor: color,
-                  focusColor: color,
-                  hintText: 'ej.: comida de empresa',
-                  errorText: _errorText)),
+        Container(
+          width: double.infinity, // Ocupa todo el ancho de la pantalla
+          padding: const EdgeInsets.all(18.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5.0),
+            border: Border.all(
+                color: Colors.black,
+                width: 1), // Borde para asemejar el outline
+          ),
+          child: Text(
+            providerTextoTitulo.getTitulo,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontStyle: FontStyle.italic,
+            ),
+          ),
         ),
       ],
     );
@@ -418,7 +340,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
 ///////////  TARJETA ASUNTOS    ///////////////////////////////////
 class TarjetasAsuntos extends StatefulWidget {
-  final fechaElegida;
+  final DateTime? fechaElegida;
   const TarjetasAsuntos({super.key, this.fechaElegida});
 
   @override
@@ -437,20 +359,17 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
   DateTime? horaFin; // provider hora fin elegida
   String horaInicioTexto = ''; //2024-08-09 13:00:00.000Z'
   String horaFinTexto = ''; //2024-08-09 14:00:00.000Z'
-  String asunto = '';
+  String textoTitulo = '';
   bool? personalizado;
   int _selectedIndex = 0; // Variable para almacenar el índice seleccionado
   String _emailSesionUsuario = '';
   late ControladorTarjetasAsuntos _controladorTarjetasAsuntos;
-  late PageController _pageController;
   late BotonGuardarAgregarNoDisponible _personalizadoProvider;
 
   List<Map<String, Duration>?> _asuntos = [];
   Map<String, Duration>? asunto1;
   Map<String, Duration>? asunto2;
-
   Map<String, Duration>? asunto3;
-
   Map<String, Duration>? asunto4;
   Map<String, Duration>? asunto5;
   Future<void> traeAsuntosIndisponibilidad() async {
@@ -460,15 +379,15 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
 
     // Imprimir los títulos de los asuntos obtenidos desde Firebase
     for (var element in asuntosFB) {
-      print(element['titulo']);
+      print(element['id']);
     }
 
-    // Inicializar los asuntos por defecto
-    asunto1 = {'✏️ Personalizado': const Duration()};
-    asunto2 = {'🥣 Descanso ': const Duration(minutes: 30)};
-    asunto3 = {'📚 Formación': const Duration(hours: 1)};
-    asunto4 = {'📅 Reunión': const Duration(hours: 1)};
-    asunto5 = {'➕ Nuevo asunto': const Duration()};
+    // Inicializar los asuntos por defecto : id? lo utilizo para los asuntos de Firebase
+    asunto1 = {'✏️ Personalizado id?': const Duration()};
+    asunto2 = {'🥣 Descanso id?': const Duration(minutes: 30)};
+    asunto3 = {'🤸 Gym id?': const Duration(hours: 1, minutes: 30)};
+    asunto4 = {'📅 Reunión id?': const Duration(hours: 1)};
+    asunto5 = {'➕ Nuevo asunto id?': const Duration()};
 
     // Agregar los asuntos por defecto a la lista
     _asuntos = [asunto1, asunto2, asunto3, asunto4];
@@ -476,8 +395,9 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
     // Agregar los asuntos obtenidos desde Firebase a la lista _asuntos
     for (var element in asuntosFB) {
       // Crear un nuevo mapa con el título y la duración desde Firebase
+      //? al titulo le agrego el id para  poder editarlo
       final Map<String, Duration> asuntoDesdeFB = {
-        element['titulo']: Duration(
+        element['titulo'] + 'id?' + '${element['id']}': Duration(
           hours: element['horas'],
           minutes: element['minutos'],
         )
@@ -486,15 +406,13 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
       // Agregar el asunto desde Firebase a la lista _asuntos
       _asuntos.add(asuntoDesdeFB);
     }
-
+    if (asuntosFB.length < 3) {}
     _asuntos.add(asunto5);
-
     // Ahora _asuntos contiene tanto los asuntos por defecto como los de Firebase
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     emailUsuario();
     // Obtén la instancia del ControladorTarjetasAsuntos
@@ -513,19 +431,21 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
 
   @override
   Widget build(BuildContext context) {
+    final providerTextoTitulo = context.read<TextoTituloIndispuesto>();
     final color = Theme.of(context).primaryColor; // color del tema
     final personalizadoProvider =
         Provider.of<BotonGuardarAgregarNoDisponible>(context);
 
     // provider FECHA elegida
-    final providerFechaElegida = Provider.of<FechaElegida>(context);
+    final providerFechaElegida =
+        Provider.of<FechaElegida>(context, listen: false);
     fechaElegida = providerFechaElegida.fechaElegida;
     dia = DateFormat('yyyy-MM-dd') // fecha formateada para FIREBASE
         .format(fechaElegida!);
 
     // provider HORA elegida
     final providerHoraFinCarrusel =
-        Provider.of<HorarioElegidoCarrusel>(context);
+        Provider.of<HorarioElegidoCarrusel>(context, listen: false);
     // hora inicio
     horaInicio = providerHoraFinCarrusel.horaInicio;
     horaInicioPantalla = DateFormat('HH:mm').format(horaInicio!);
@@ -537,11 +457,9 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
 
     print('horaFinTexto para grabar cita -----------------------$horaFinTexto');
 
-    //fecha y hora de inicio elegida
-    // dateTimeElegido = widget.argument;
-
     horaInicioTexto = (fechaElegida).toString();
     horaInicio = fechaElegida;
+
     return SizedBox(
         height: 130,
         child: FutureBuilder<void>(
@@ -563,9 +481,9 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
                 itemCount: _asuntos.length,
                 itemBuilder: (BuildContext context, int i) {
                   String duracion = formateaDurationString(_asuntos, i);
-
+                  print(_asuntos.length);
                   return InkWell(
-                      onTap: () {
+                      onTap: () async {
                         _selectedIndex = i; // Guardar el índice seleccionado
                         // Navegar a la página seleccionada
                         if (_controladorTarjetasAsuntos.controller.hasClients) {
@@ -579,7 +497,8 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
                               : personalizadoProvider.setBotonGuardar(false);
 
                           // texto del asunto elegido para grabar en firebase
-                          asunto = _asuntos[i]!.keys.first.toString();
+                          providerTextoTitulo
+                              .setTitulo(_asuntos[i]!.keys.first.toString());
 
                           DateTime aux =
                               fechaElegida!.add(_asuntos[i]!.values.first);
@@ -588,37 +507,178 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
                           // agrega al provider la hora fin
                           providerHoraFinCarrusel.setHoraFin(aux);
                         } else {
-                          mensajeInfo(context, 'texto');
+                          // ir a tarjeta creacion de asunto
+
+                          await showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return const TarjetaCreacionAsunto();
+                            },
+                          ).then((shouldReset) {
+                            _controladorTarjetasAsuntos
+                                .resetPagina(); // Resetea a la página inicial
+
+                            if (shouldReset == true) {
+                              _controladorTarjetasAsuntos
+                                  .resetPagina(); // Resetea a la página inicial
+                            }
+                          });
+                          // setState(() {});
                         }
                       },
-                      child: Card(
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                                15), // Radio de los bordes
-                            side: BorderSide(
-                              color: _selectedIndex == i
-                                  ? const Color(0xFF0000FF)
-                                  : Colors
-                                      .white, // Cambia de color si está seleccionado
-                              width: 2, // Grosor del borde
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(_asuntos[i]!.keys.first),
-                              Text(
-                                duracion,
-                                style: subTituloEstilo,
-                              )
-                            ],
-                          )));
+                      child: _asuntos.length > 7 && (i == _asuntos.length - 1)
+                          ? Container() // si hay mas de 7 asuntos , la tarjeta de añadir no aparece para que no se añadan mas
+                          : Card(
+                              color: (i != _asuntos.length - 1)
+                                  ? Colors.white
+                                  : Colors.grey[400],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    15), // Radio de los bordes
+                                side: BorderSide(
+                                  style: BorderStyle.solid,
+                                  color: (i != _asuntos.length - 1)
+                                      ? _selectedIndex == i
+                                          ? const Color(0xFF0000FF)
+                                          : Colors.white
+                                      : Colors
+                                          .grey, // Cambia de color si está seleccionado
+                                  width: 2, // Grosor del borde
+                                ),
+                              ),
+                              child: Stack(
+                                children: [
+                                  // Botón de edición en la esquina superior derecha
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: ((_asuntos[i]!.keys.first)
+                                                .split('id?')[1] !=
+                                            '')
+                                        ? IconButton(
+                                            onPressed: () {},
+                                            icon: Icon(Icons.edit),
+                                          )
+                                        : Container(),
+                                  ),
+                                  // Centrar el asunto y la duración
+                                  Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          // Separo el título y su id para solo rescatar el título
+                                          (_asuntos[i]!.keys.first)
+                                              .split('id?')[0],
+                                          style: TextStyle(
+                                            color: (i != _asuntos.length - 1)
+                                                ? Colors.black
+                                                : Colors.white,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        Text(
+                                          duracion,
+                                          style: subTituloEstilo,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ));
                 },
               );
             }
           },
         ));
+  }
+}
+
+////////// FORMULARIO TITULO DEL ASUNTO //////////////////////////////
+class FormularioAsunto extends StatefulWidget {
+  const FormularioAsunto({super.key});
+
+  @override
+  State<FormularioAsunto> createState() => _FormularioAsuntoState();
+}
+
+class _FormularioAsuntoState extends State<FormularioAsunto> {
+  final _formKey = GlobalKey<FormState>();
+  String? _errorText;
+
+  final TextEditingController _asuntoController = TextEditingController();
+
+  final ValueNotifier asuntoNotifier = ValueNotifier("");
+  late TextoTituloIndispuesto providerTextoTitulo;
+
+  void _validateField(String value) {
+    if (value.isEmpty) {
+      setState(() {});
+      _errorText = 'Este campo no puede estar vacío';
+    } else {
+      setState(() {});
+      _errorText = null; // Campo válido
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // escucha el provider del titulo del asunto
+    providerTextoTitulo = context.read<TextoTituloIndispuesto>();
+
+    // Escuchar cambios en el controlador del texto
+    _asuntoController.addListener(() {
+      _validateField(providerTextoTitulo.getTitulo);
+      print(
+          'el titulo del asunto es: ----------------------------------- ${providerTextoTitulo.getTitulo}');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).primaryColor;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Título:',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Form(
+          key: _formKey,
+          child: TextFormField(
+              // Validación para verificar si el campo está vacío
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Este campo no puede estar vacío';
+                }
+                return null; // Si pasa la validación, devuelve null
+              },
+              onChanged: (value) {
+                providerTextoTitulo.setTitulo(value);
+
+                _validateField(value); // Llama a la validación manualmente
+              },
+              controller: _asuntoController,
+              decoration: InputDecoration(
+                  border: const OutlineInputBorder(
+                      borderSide: BorderSide(width: 2)),
+                  iconColor: color,
+                  suffixIconColor: color,
+                  fillColor: color,
+                  hoverColor: color,
+                  prefixIconColor: color,
+                  focusColor: color,
+                  hintText: 'ej.: 🥗 Comida de empresa',
+                  errorText: _errorText)),
+        ),
+      ],
+    );
   }
 }
 
@@ -943,5 +1003,321 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
     } else {
       return estiloHorariosDifuminado;
     }
+  }
+}
+
+class BotonGuardar extends StatefulWidget {
+  const BotonGuardar({super.key});
+
+  @override
+  State<BotonGuardar> createState() => _BotonGuardarState();
+}
+
+class _BotonGuardarState extends State<BotonGuardar> {
+  String _emailSesionUsuario = '';
+  bool botonActivado = false;
+  bool personalizado = true;
+  late TextoTituloIndispuesto providerTextoTitulo;
+  String textoTitulo = '';
+
+  String fechaPantalla = '';
+  String dia = '';
+  String horaInicioPantalla = ''; // se presenta cuadro Hora: de 09:00 a 10:00
+  String horaFinPantalla = ''; // se presenta cuadro Hora: de 09:00 a 10:00
+  String fechaInicio = '';
+  String fechaFin = '';
+  DateTime? horaInicio;
+  DateTime? fechaElegida; // provider fecha elegida
+  DateTime? horaFin; // provider hora fin elegida
+  String horaInicioTexto = ''; //2024-08-09 13:00:00.000Z'
+  String horaFinTexto = ''; //2024-08-09 14:00:00.000Z'
+
+  emailUsuario() async {
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    emailUsuario();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // escucha el provider del titulo del asunto
+    providerTextoTitulo = Provider.of<TextoTituloIndispuesto>(context);
+    textoTitulo = providerTextoTitulo.getTitulo;
+    // provider HORA elegida
+    final providerHoraFinCarrusel =
+        Provider.of<HorarioElegidoCarrusel>(context, listen: false);
+    // Verifica el estado del botón antes de construir la interfaz
+    botonActivado = Verificadiferenciahorario.verificarBotonActivado(
+        providerHoraFinCarrusel);
+
+    // provider del boton Guardar
+    final personalizadoProvider =
+        Provider.of<BotonGuardarAgregarNoDisponible>(context);
+    personalizado =
+        personalizadoProvider.forularioVisible; // formulario es visible o no
+
+    bool condicionBotonActivado() {
+      //  con la variable 'personalizado' verfico si esta la opcion del asunto es personalizado
+      // si es personalizado, compruebo con 'botonAtivado' los tramos horarios, y si el formulario está validado
+      // si no es personalizado y el fomulario no esta visible, pues retorno la condicion verdadera para activar el boton y realizar el guardado.
+      if (personalizado) {
+        if (botonActivado && textoTitulo != ''
+            /*  _formKey.currentState != null &&
+            _formKey.currentState!.validate() &&
+            _errorText == null */
+            ) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    void cerrar() {
+      personalizadoProvider.setBotonGuardar(true); // formulario es visible o no
+
+      Navigator.pop(context);
+      setState(() {});
+    }
+
+    // provider FECHA elegida
+    final providerFechaElegida = Provider.of<FechaElegida>(context);
+    fechaElegida = providerFechaElegida.fechaElegida;
+    dia = DateFormat('yyyy-MM-dd') // fecha formateada para FIREBASE
+        .format(fechaElegida!);
+
+    // hora inicio
+    horaInicio = providerHoraFinCarrusel.horaInicio;
+    horaInicioPantalla = DateFormat('HH:mm').format(horaInicio!);
+
+    // hora fin
+    horaFin = providerHoraFinCarrusel.horaFin;
+    horaFinTexto = horaFin.toString();
+    horaFinPantalla = DateFormat('HH:mm').format(horaFin!);
+
+    print('horaFinTexto para grabar cita -----------------------$horaFinTexto');
+
+    //fecha y hora de inicio elegida
+    // dateTimeElegido = widget.argument;
+
+    horaInicioTexto = (fechaElegida).toString();
+    horaInicio = fechaElegida;
+
+    return Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: condicionBotonActivado() ? Colors.black : Colors.grey,
+          border: Border.all(
+            color: Colors.grey,
+            width: 1.0,
+          ),
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: InkWell(
+            onTap: condicionBotonActivado()
+                ? () async {
+                    await FirebaseProvider().nuevaCita(
+                        _emailSesionUsuario,
+                        dia,
+                        horaInicioTexto,
+                        horaFinTexto,
+                        '0', // precio
+                        textoTitulo, // comentario
+                        '999', // idcliente
+                        ['indispuesto'], // idServicio
+                        'idEmpleado',
+                        '' // idCitaCliente
+                        );
+
+                    cerrar();
+                  }
+                : null,
+            child: const Center(
+              child: Text(
+                'Guardar',
+                style: TextStyle(color: Colors.white),
+              ),
+            )));
+  }
+}
+
+////////////// TARJETA DE CREACION DEL ASUNTO /////////////////////////
+
+class TarjetaCreacionAsunto extends StatefulWidget {
+  const TarjetaCreacionAsunto({super.key});
+
+  @override
+  State<TarjetaCreacionAsunto> createState() => _TarjetaCreacionAsuntoState();
+}
+
+class _TarjetaCreacionAsuntoState extends State<TarjetaCreacionAsunto> {
+  String _emailSesionUsuario = '';
+  String? selectedTime; // Variable para almacenar la selección actual
+  String? _errorText;
+  String textoTitulo = '';
+  Map<String, dynamic>? newAsunto;
+
+  final _keyForm = GlobalKey<FormState>();
+
+  final List<String> timeIntervals = [
+    "30 m",
+    "1 h",
+    "1 h 30 m",
+    "2 h",
+    "2 h 30 m",
+    "3 h"
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeUserEmail();
+  }
+
+  Future<void> _initializeUserEmail() async {
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    setState(() {
+      _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    });
+  }
+
+  Map<String, dynamic> _createNewAsunto(String titulo, String? selectedTime) {
+    final Map<String, int> timeMap = {
+      "30 m": 0,
+      "1 h": 1,
+      "1 h 30 m": 1,
+      "2 h": 2,
+      "2 h 30 m": 2,
+      "3 h": 3
+    };
+
+    final Map<String, int> minutesMap = {
+      "30 m": 30,
+      "1 h": 0,
+      "1 h 30 m": 30,
+      "2 h": 0,
+      "2 h 30 m": 30,
+      "3 h": 0
+    };
+
+    return {
+      'titulo': titulo,
+      'horas': timeMap[selectedTime] ?? 0,
+      'minutos': minutesMap[selectedTime] ?? 30,
+    };
+  }
+
+  void _onSubmit() {
+    // provider del boton Guardar
+    final personalizadoProvider =
+        Provider.of<BotonGuardarAgregarNoDisponible>(context, listen: false);
+    /*  // Obtén la instancia del ControladorTarjetasAsuntos
+    final controladorTarjetasAsuntos =
+        Provider.of<ControladorTarjetasAsuntos>(context, listen: false); */
+
+    if (_keyForm.currentState?.validate() ?? false) {
+      personalizadoProvider.setBotonGuardar(true); // formulario es visible o no
+
+      newAsunto = _createNewAsunto(textoTitulo, selectedTime);
+      FirebaseProvider()
+          .nuevoAsuntoIndispuestos(_emailSesionUsuario, newAsunto!);
+      mensajeInfo(context, 'Nuevo asunto agregado');
+      Navigator.pop(context, true); // Indica que se debe resetear la página
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        body: Center(
+          child: Form(
+            key: _keyForm,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  const Text('Agrega un horario'),
+                  _buildTitleInput(),
+                  _buildDropdown(),
+                  _buildSubmitButton(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTitleInput() {
+    final color = Theme.of(context).primaryColor;
+    return TextFormField(
+      onChanged: (value) {
+        setState(() {
+          textoTitulo = value;
+        });
+      },
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(borderSide: BorderSide(width: 2)),
+        iconColor: color,
+        suffixIconColor: color,
+        fillColor: color,
+        hoverColor: color,
+        prefixIconColor: color,
+        focusColor: color,
+        hintText: '🏖️ Título',
+        errorText: _errorText,
+      ),
+    );
+  }
+
+  Widget _buildDropdown() {
+    return DropdownButton<String>(
+      value: selectedTime, // Valor seleccionado
+      hint: const Text(
+          'Selecciona una duración'), // Texto cuando no hay selección
+      items: timeIntervals.map((String time) {
+        return DropdownMenuItem<String>(
+          value: time,
+          child: Text(time),
+        );
+      }).toList(),
+      onChanged: (String? newValue) {
+        setState(() {
+          selectedTime = newValue; // Actualizar el valor seleccionado
+        });
+      },
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.black,
+        border: Border.all(color: Colors.grey, width: 1.0),
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      child: InkWell(
+        onTap: _onSubmit,
+        child: const Center(
+          child: Text(
+            'Agregar',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ),
+    );
   }
 }

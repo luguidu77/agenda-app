@@ -320,6 +320,50 @@ class FirebaseProvider extends ChangeNotifier {
     return data; // Retorna una lista de todos los asuntos
   }
 
+  Future<Map<String, dynamic>> getAsuntoIndispuestoID(emailUsuario, id) async {
+    Map<String, dynamic> asunto = {};
+
+    await _iniFirebase();
+
+    final docRef = await _referenciaDocumento(emailUsuario, 'personaliza');
+
+    // Verifica si el documento "NoDisponibles" existe
+    final noDisponiblesDoc = docRef.doc('NoDisponibles');
+
+    // Suponiendo que tienes el ID del documento que quieres traer
+    String documentId = id;
+
+// Accede al documento directamente por su ID
+    DocumentSnapshot documentSnapshot =
+        await noDisponiblesDoc.collection('asuntos').doc(documentId).get();
+
+// Verifica si el documento existe
+    if (documentSnapshot.exists) {
+      // Extrae los datos del documento
+      Map<String, dynamic>? data =
+          documentSnapshot.data() as Map<String, dynamic>?;
+
+      // Si necesitas acceder a un campo específico
+      String titulo = data?['titulo'] ?? '';
+      int horas = data?['horas'] ?? 0;
+      int minutos = data?['minutos'] ?? 0;
+
+      // Haz lo que necesites con los datos
+      print('Título: $titulo, Horas: $horas, Minutos: $minutos');
+      // Agrega los asuntos a la lista
+      asunto = {
+        'id': id,
+        'titulo': titulo,
+        'horas': horas,
+        'minutos': minutos,
+      };
+    } else {
+      print('El documento con ID $documentId no existe.');
+    }
+
+    print(asunto);
+    return asunto; // Retorna una lista de todos los asuntos
+  }
   // List<ClienteModel> cientes = [];
 
   getClientePorId(String email, String idcliente) async {

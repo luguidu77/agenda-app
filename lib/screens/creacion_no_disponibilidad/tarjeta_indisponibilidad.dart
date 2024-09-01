@@ -512,7 +512,10 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
                           await showModalBottomSheet(
                             context: context,
                             builder: (BuildContext context) {
-                              return const TarjetaCreacionAsunto();
+                              return TarjetaCreacionAsunto(
+                                edicion: false,
+                                id: '',
+                              );
                             },
                           ).then((shouldReset) {
                             _controladorTarjetasAsuntos
@@ -556,8 +559,29 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
                                                 .split('id?')[1] !=
                                             '')
                                         ? IconButton(
-                                            onPressed: () {},
-                                            icon: Icon(Icons.edit),
+                                            onPressed: () async {
+                                              await showModalBottomSheet(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return TarjetaCreacionAsunto(
+                                                      edicion: true,
+                                                      id: _asuntos[i]!
+                                                          .keys
+                                                          .first
+                                                          .split('id?')[1]);
+                                                },
+                                              ).then((shouldReset) {
+                                                _controladorTarjetasAsuntos
+                                                    .resetPagina(); // Resetea a la página inicial
+
+                                                if (shouldReset == true) {
+                                                  _controladorTarjetasAsuntos
+                                                      .resetPagina(); // Resetea a la página inicial
+                                                }
+                                              });
+                                            },
+                                            icon: const Icon(Icons.edit),
                                           )
                                         : Container(),
                                   ),
@@ -1152,7 +1176,9 @@ class _BotonGuardarState extends State<BotonGuardar> {
 ////////////// TARJETA DE CREACION DEL ASUNTO /////////////////////////
 
 class TarjetaCreacionAsunto extends StatefulWidget {
-  const TarjetaCreacionAsunto({super.key});
+  bool? edicion = false;
+  String? id;
+  TarjetaCreacionAsunto({super.key, this.edicion, this.id = ''});
 
   @override
   State<TarjetaCreacionAsunto> createState() => _TarjetaCreacionAsuntoState();
@@ -1163,6 +1189,7 @@ class _TarjetaCreacionAsuntoState extends State<TarjetaCreacionAsunto> {
   String? selectedTime; // Variable para almacenar la selección actual
   String? _errorText;
   String textoTitulo = '';
+  Map<String, dynamic> asunto = {};
   Map<String, dynamic>? newAsunto;
 
   final _keyForm = GlobalKey<FormState>();
@@ -1180,6 +1207,9 @@ class _TarjetaCreacionAsuntoState extends State<TarjetaCreacionAsunto> {
   void initState() {
     super.initState();
     _initializeUserEmail();
+    if (widget.edicion == true) {
+      getAsuntoFB();
+    }
   }
 
   Future<void> _initializeUserEmail() async {
@@ -1246,7 +1276,9 @@ class _TarjetaCreacionAsuntoState extends State<TarjetaCreacionAsunto> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Text('Agrega un horario'),
+                  Text(widget.edicion!
+                      ? 'Edita el asunto ${widget.id}'
+                      : 'Agrega un horario'),
                   _buildTitleInput(),
                   _buildDropdown(),
                   _buildSubmitButton(),
@@ -1319,5 +1351,12 @@ class _TarjetaCreacionAsuntoState extends State<TarjetaCreacionAsunto> {
         ),
       ),
     );
+  }
+
+  void getAsuntoFB() async {
+    asunto = await FirebaseProvider()
+        .getAsuntoIndispuestoID(_emailSesionUsuario, widget.id!);
+    print('99999999999999999999999999999999999999999999999999');
+    print(asunto);
   }
 }

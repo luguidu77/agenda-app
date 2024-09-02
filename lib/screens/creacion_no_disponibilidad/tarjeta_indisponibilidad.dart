@@ -1257,11 +1257,26 @@ class _TarjetaCreacionAsuntoState extends State<TarjetaCreacionAsunto> {
       personalizadoProvider.setBotonGuardar(true); // formulario es visible o no
 
       newAsunto = _createNewAsunto(textoTitulo, selectedTime);
-      FirebaseProvider()
-          .nuevoAsuntoIndispuestos(_emailSesionUsuario, newAsunto!);
-      mensajeInfo(context, 'Nuevo asunto agregado');
+
+      if (widget.edicion!) {
+        FirebaseProvider().editaAsuntoIndispuestos(
+            _emailSesionUsuario, newAsunto!, widget.id!);
+        mensajeInfo(context, 'Asunto editado');
+      } else {
+        FirebaseProvider()
+            .nuevoAsuntoIndispuestos(_emailSesionUsuario, newAsunto!);
+        mensajeInfo(context, 'Nuevo asunto agregado');
+      }
+
       Navigator.pop(context, true); // Indica que se debe resetear la página
     }
+  }
+
+  void _onDelete() {
+    FirebaseProvider()
+        .eliminaAsuntoIndispuestos(_emailSesionUsuario, widget.id!);
+    mensajeInfo(context, 'Asunto eliminado');
+    Navigator.pop(context, true); // Indica que se debe resetear la página
   }
 
   @override
@@ -1277,11 +1292,13 @@ class _TarjetaCreacionAsuntoState extends State<TarjetaCreacionAsunto> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(widget.edicion!
-                      ? 'Edita el asunto ${widget.id}'
+                      ? 'Edita el asunto'
                       : 'Agrega un horario'),
                   _buildTitleInput(),
                   _buildDropdown(),
                   _buildSubmitButton(),
+                  Visibility(
+                      visible: widget.edicion!, child: _buildDeleteButton())
                 ],
               ),
             ),
@@ -1307,17 +1324,21 @@ class _TarjetaCreacionAsuntoState extends State<TarjetaCreacionAsunto> {
         hoverColor: color,
         prefixIconColor: color,
         focusColor: color,
-        hintText: '🏖️ Título',
+        hintText: widget.edicion! ? asunto['titulo'] : '🏖️ Título',
         errorText: _errorText,
       ),
     );
   }
 
   Widget _buildDropdown() {
+    String duracion = widget.edicion!
+        ? '${(asunto['horas'] != null && asunto['horas'] != 0) ? '${asunto['horas']} h ' : ''}'
+            '${(asunto['minutos'] != null && asunto['minutos'] != 0) ? '${asunto['minutos']} m' : ''}'
+        : 'Selecciona una duración';
+
     return DropdownButton<String>(
       value: selectedTime, // Valor seleccionado
-      hint: const Text(
-          'Selecciona una duración'), // Texto cuando no hay selección
+      hint: Text(duracion), // Texto cuando no hay selección
       items: timeIntervals.map((String time) {
         return DropdownMenuItem<String>(
           value: time,
@@ -1343,9 +1364,30 @@ class _TarjetaCreacionAsuntoState extends State<TarjetaCreacionAsunto> {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       child: InkWell(
         onTap: _onSubmit,
+        child: Center(
+          child: Text(
+            widget.edicion! ? 'Editar' : 'Agregar',
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDeleteButton() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 228, 13, 13),
+        border: Border.all(color: Colors.grey, width: 1.0),
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      child: InkWell(
+        onTap: _onDelete,
         child: const Center(
           child: Text(
-            'Agregar',
+            'Eliminar',
             style: TextStyle(color: Colors.white),
           ),
         ),
@@ -1358,5 +1400,6 @@ class _TarjetaCreacionAsuntoState extends State<TarjetaCreacionAsunto> {
         .getAsuntoIndispuestoID(_emailSesionUsuario, widget.id!);
     print('99999999999999999999999999999999999999999999999999');
     print(asunto);
+    setState(() {});
   }
 }

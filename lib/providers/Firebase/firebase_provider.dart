@@ -280,6 +280,27 @@ class FirebaseProvider extends ChangeNotifier {
     await docRef.doc('NoDisponibles').collection('asuntos').doc().set(asunto);
   }
 
+  void editaAsuntoIndispuestos(
+      emailUsuario, Map<String, dynamic> asunto, id) async {
+    await _iniFirebase();
+    final CollectionReference docRef =
+        await _referenciaDocumento(emailUsuario, 'personaliza');
+
+    await docRef
+        .doc('NoDisponibles')
+        .collection('asuntos')
+        .doc(id)
+        .update(asunto);
+  }
+
+  void eliminaAsuntoIndispuestos(emailUsuario, id) async {
+    await _iniFirebase();
+    final CollectionReference docRef =
+        await _referenciaDocumento(emailUsuario, 'personaliza');
+
+    await docRef.doc('NoDisponibles').collection('asuntos').doc(id).delete();
+  }
+
   getAsuntosIndispuestos(emailUsuario) async {
     List<Map<String, dynamic>> data = [];
 

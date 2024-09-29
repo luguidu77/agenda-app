@@ -14,7 +14,7 @@ class PagoProvider extends ChangeNotifier {
     _pagado = {'pago': newpagado['pago'], 'email': newpagado['email']};
 
     notifyListeners();
-  } 
+  }
 
 // guarda en bd dispositibo
   guardaPagado(bool pago, String email) async {
@@ -32,16 +32,12 @@ class PagoProvider extends ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> cargarPago() async {
-
-    
-       var p = await DBProvider.db.getPago();
+    var p = await DBProvider.db.getPago();
 
     bool auxPago;
     ((p['pago'] == 'true')) ? auxPago = true : auxPago = false;
 
     _pagado = {'pago': auxPago, 'email': p['email']};
-
-
 
     debugPrint('App PAGADA (pago_provider) : ${_pagado['pago']}');
     debugPrint('App EMAILUSUARIOAPP (pago_provider) :${_pagado['email']}');

@@ -1,5 +1,5 @@
 // DIAS QUE ESTARA LA APP EN TIEMPO DE PRUEBA GRATUITA
-const perido_de_prueba = Duration(days: 15);
+const perido_de_prueba = Duration(days: 30);
 
 // NO HAY FOTO ( ESTA GUARDADA EN STORAGE DE FIREBASE )
 

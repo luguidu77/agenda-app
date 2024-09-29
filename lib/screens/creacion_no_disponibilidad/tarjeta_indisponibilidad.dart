@@ -382,12 +382,12 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
       print(element['id']);
     }
 
-    // Inicializar los asuntos por defecto : id? lo utilizo para los asuntos de Firebase
-    asunto1 = {'✏️ Personalizado id?': const Duration()};
-    asunto2 = {'🥣 Descanso id?': const Duration(minutes: 30)};
-    asunto3 = {'🤸 Gym id?': const Duration(hours: 1, minutes: 30)};
-    asunto4 = {'📅 Reunión id?': const Duration(hours: 1)};
-    asunto5 = {'➕ Nuevo asunto id?': const Duration()};
+    // Inicializar los asuntos por defecto : ? lo utilizo para los asuntos de Firebase
+    asunto1 = {'✏️ Personalizado?': const Duration()};
+    asunto2 = {'🥣 Descanso?': const Duration(minutes: 30)};
+    asunto3 = {'🤸 Gym?': const Duration(hours: 1, minutes: 30)};
+    asunto4 = {'📅 Reunión?': const Duration(hours: 1)};
+    asunto5 = {'➕ Nuevo asunto?': const Duration()};
 
     // Agregar los asuntos por defecto a la lista
     _asuntos = [asunto1, asunto2, asunto3, asunto4];
@@ -397,7 +397,7 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
       // Crear un nuevo mapa con el título y la duración desde Firebase
       //? al titulo le agrego el id para  poder editarlo
       final Map<String, Duration> asuntoDesdeFB = {
-        element['titulo'] + 'id?' + '${element['id']}': Duration(
+        element['titulo'] + '?' + '${element['id']}': Duration(
           hours: element['horas'],
           minutes: element['minutos'],
         )
@@ -497,8 +497,8 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
                               : personalizadoProvider.setBotonGuardar(false);
 
                           // texto del asunto elegido para grabar en firebase
-                          providerTextoTitulo
-                              .setTitulo(_asuntos[i]!.keys.first.toString());
+                          providerTextoTitulo.setTitulo(
+                              _asuntos[i]!.keys.first.split('?')[0].toString());
 
                           DateTime aux =
                               fechaElegida!.add(_asuntos[i]!.values.first);
@@ -556,7 +556,7 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
                                     top: 8,
                                     right: 8,
                                     child: ((_asuntos[i]!.keys.first)
-                                                .split('id?')[1] !=
+                                                .split('?')[1] !=
                                             '')
                                         ? IconButton(
                                             onPressed: () async {
@@ -569,7 +569,7 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
                                                       id: _asuntos[i]!
                                                           .keys
                                                           .first
-                                                          .split('id?')[1]);
+                                                          .split('?')[1]);
                                                 },
                                               ).then((shouldReset) {
                                                 _controladorTarjetasAsuntos
@@ -594,7 +594,7 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
                                         Text(
                                           // Separo el título y su id para solo rescatar el título
                                           (_asuntos[i]!.keys.first)
-                                              .split('id?')[0],
+                                              .split('?')[0],
                                           style: TextStyle(
                                             color: (i != _asuntos.length - 1)
                                                 ? Colors.black

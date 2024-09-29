@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/models/models.dart';
+import 'package:agendacitas/providers/Firebase/emailHtml/emails_html.dart';
 import 'package:agendacitas/providers/Firebase/notificaciones.dart';
 import 'package:agendacitas/providers/db_provider.dart';
 import 'package:agendacitas/utils/extraerServicios.dart';
@@ -107,9 +108,17 @@ class FirebaseProvider extends ChangeNotifier {
       String precio,
       String comentario,
       String idCliente,
-      List<dynamic> idServicio,
+      List<String> idServicios,
       String idEmpleado,
       idCitaCliente) async {
+    // Crear una lista de futuros a partir de la lista de ids de servicio
+    List<Map<String, dynamic>> listaServiciosAux = [];
+    for (var element in idServicios) {
+      final servicio = await FirebaseProvider()
+          .cargarServicioPorId(emailUsuarioAPP, element);
+      listaServiciosAux.add(servicio);
+    }
+
     final Map<String, dynamic> cita = ({
       'dia': dia,
       'horaInicio': horaInicio,
@@ -117,7 +126,7 @@ class FirebaseProvider extends ChangeNotifier {
       'precio': precio,
       'comentario': comentario,
       'idcliente': idCliente,
-      'idservicio': idServicio.map((e) => e).toList(),
+      'idservicio': listaServiciosAux.map((e) => e['idServicio']),
       'idempleado': idEmpleado,
       'confirmada': true,
       'idCitaCliente': idCitaCliente,
@@ -133,6 +142,63 @@ class FirebaseProvider extends ChangeNotifier {
     print('id del documento cita ${docRef.id}');
 
     await docRef.set(cita);
+    // Obtener el ID del documento
+
+    // retorna el id de la cita para utilizarlo en id recordatorio
+    return convertirIdEnEntero(docRef.id);
+  }
+
+  //------------crea el recordatorio ----------------------------------------------
+  creaRecordatorio(
+      String emailUsuarioAPP,
+      String dia,
+      String horaInicio,
+      String precio,
+      String comentario,
+      String nombreCliente,
+      String telfonoCliente,
+      String emailCliente,
+      List<String> idServicios,
+      String idEmpleado,
+      idCitaCliente) async {
+    // Crear una lista de futuros a partir de la lista de ids de servicio
+    List<String> listaServiciosAux = [];
+    for (var element in idServicios) {
+      final servicio = await FirebaseProvider()
+          .cargarServicioPorId(emailUsuarioAPP, element);
+      listaServiciosAux.add(servicio['servicio']);
+    }
+
+    /// obtiene el tokenMessaging del usuario app
+    await _iniFirebase();
+    //referencia a la coleccion
+    final perfilUsuarioApp =
+        await db!.collection("agendacitasapp").doc(emailUsuarioAPP).get();
+
+    final Map<String, dynamic> recordatorio = ({
+      'emailUsuarioApp': emailUsuarioAPP,
+      'fechaCita': dia,
+      'fechaFormateada': formatearFecha(horaInicio),
+      'horaFormateada': formatearHora(horaInicio),
+      //'horaFinal': horaFinal,
+      //'precio': precio,
+      //'comentario': comentario,
+      'cliente': nombreCliente,
+      'servicio': listaServiciosAux,
+
+      'telefono': telfonoCliente,
+      'email': emailCliente,
+      'timezone': "Europe/Madrid",
+      'tokenMessanging': perfilUsuarioApp['tokenMessaging'],
+    });
+
+    //referencia a la coleccion
+    final coleccion = db!.collection("recordatorios");
+    // Crear una referencia a un nuevo documento
+    DocumentReference docRef = coleccion.doc();
+    print('id del documento cita ${docRef.id}');
+
+    await docRef.set(recordatorio);
     // Obtener el ID del documento
 
     // retorna el id de la cita para utilizarlo en id recordatorio
@@ -490,7 +556,7 @@ class FirebaseProvider extends ChangeNotifier {
     return listaCitas;
   }
 
-  cargarServicioPorId(String email, idservicio) async {
+  cargarServicioPorId(String email, String idservicio) async {
     Map<String, dynamic> servicio = {};
 
     await _iniFirebase();
@@ -1009,11 +1075,13 @@ class FirebaseProvider extends ChangeNotifier {
 
   // actualizar el pago en Firebase
   actualizaPago(String usuarioAPP) async {
-    final docRef = await _referenciaDocumento(usuarioAPP, 'pago');
+    await _iniFirebase();
+    final docRef =
+        db!.collection("agendacitasapp").doc(usuarioAPP); //email usuario
 
-    var data = {'id': 0, 'pago': true, 'email': usuarioAPP};
+    var data = {'pago': true};
 
-    await docRef.doc(data['id'].toString()).set(data);
+    await docRef.update(data);
   }
 
   leerBasedatosFirebase(emailUsuarioApp, fecha) async {

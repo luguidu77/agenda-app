@@ -17,6 +17,11 @@ class EstadoPagoAppProvider extends ChangeNotifier {
 
   bool get iniciadaSesionUsuario => _iniciadaSesionUsuario;
 
+  setearPagado(String pago) {
+    _estadoPagadaApp = pago;
+    notifyListeners();
+  }
+
   estadoPagoEmailApp(String usuarioAPP) async {
     bool email = usuarioAPP != '' ? true : false;
 
@@ -48,7 +53,7 @@ class EstadoPagoAppProvider extends ChangeNotifier {
         if (pago) {
           _estadoPagadaApp = 'COMPRADA';
 
-          // notifyListeners();
+          notifyListeners();
           debugPrint('#######   estado ###### COMPRADA');
         } else {
           // comprueba tiempo registro

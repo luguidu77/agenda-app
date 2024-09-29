@@ -60,11 +60,11 @@ android {
         applicationId "agendadecitas.app"
         minSdkVersion 23
         targetSdkVersion flutter.targetSdkVersion
-        versionCode 80 // aumentar en unidades al subir a playstore
-        versionName "8.00"
+        versionCode 88 // aumentar en unidades al subir a playstore
+        versionName "8.08"
         multiDexEnabled true
     }
-
+    
     signingConfigs {
        release {
            keyAlias keystoreProperties['keyAlias']
@@ -105,4 +105,7 @@ dependencies {
     // Stripe Android SDK
     implementation 'com.stripe:stripe-android:20.17.0'
     implementation 'com.google.android.play:integrity:1.0.2'
+
+    // pago a traves de Google play
+    implementation("com.android.billingclient:billing-ktx:7.0.0")
 }

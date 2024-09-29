@@ -76,18 +76,14 @@ Future<List<Map<String, dynamic>>> getTodasLasNotificacionesCitas(
         for (var element in snapshot.docs)
           {
             //SI LA CATEGORIA DE LA NOTIFICACION == CITA o CITAWEB, AGREGA NOTIFICACION
-            if (element['categoria'] == 'cita' ||
-                element['categoria'] == 'citaweb' ||
-                element['categoria'] == 'administrador')
-              {
-                data.add({
-                  'id': element.id,
-                  'categoria': element['categoria'],
-                  'data': element['data'],
-                  'fechaNotificacion': element['fechaNotificacion'],
-                  'visto': element['visto'],
-                })
-              }
+
+            data.add({
+              'id': element.id,
+              'categoria': element['categoria'],
+              'data': element['data'],
+              'fechaNotificacion': element['fechaNotificacion'],
+              'visto': element['visto'],
+            })
           }
       });
   // Ordena la lista de citas por hora de inicio
@@ -95,6 +91,16 @@ Future<List<Map<String, dynamic>>> getTodasLasNotificacionesCitas(
   data.sort((a, b) => b['fechaNotificacion'].compareTo(a['fechaNotificacion']));
 
   return data; //retorna una lista de todas las citas(CitaModelFirebase)
+}
+
+eliminaNotificacion(emailUsuario, id) async {
+  await _iniFirebase();
+
+  final docRef = await _referenciaDocumentoAPP(emailUsuario, 'notificaciones');
+
+  // elimina la notificacion
+  await docRef.doc(id).delete();
+  print(id);
 }
 
 eliminaLeidas(emailUsuario) async {

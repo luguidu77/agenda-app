@@ -87,13 +87,20 @@ class _HomeScreenState extends State<HomeScreen> {
     //  navigatorKey.currentState?.pushNamed('PaginaNotificacionesScreen');
 
     //mensajeInfo(context, 'Nueva notificación');
-    // final notificacion = message.data;
+    final titulo = message.notification!.title;
+    final texto = message.notification!.body;
     //final cita = notificacion['notificacion'];
-    showDialog(
+    /* showDialog(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-              title: const Text('📣'), // 'citaweb'
-              content: const Text('Has recibido una nueva notificación'),
+              title: const Text(
+                '📣 NOTIFICACIONES',
+                style: TextStyle(fontSize: 10),
+              ), // 'citaweb'
+              content: textoConTituloNegrita(
+                titulo!,
+                texto!,
+              ),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
@@ -102,31 +109,35 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: const Text('Aceptar'),
                 ),
               ],
-            ));
+            )); */
 
-    /*    Map<String, dynamic> notificacion =
+    /*  Map<String, dynamic> notificacion =
         jsonDecode(message.data['notificacion']);
 
-   Map<String, dynamic> nombreCliente = notificacion['cliente'];
+    Map<String, dynamic> nombreCliente = notificacion['cliente'];
     Map<String, dynamic> cita = notificacion[
-        'fechaCita']; //{"horaFormateada":"11:00","fechaFormateada":"7 de febrero de 2024"}}
+        'fechaCita']; //{"horaFormateada":"11:00","fechaFormateada":"7 de febrero de 2024"}} */
 
-    final snackBar = SnackBar(
-        content: Text(
-            'Nueva solicitud de cita de ${nombreCliente['nombre']}, para el ${cita['fechaFormateada']} - ${cita['horaFormateada']}'));
-    scaffoldKey.currentState?.showSnackBar(snackBar);
+    /*   final snackBar = SnackBar(
+        content: textoConTituloNegrita(
+      titulo!,
+      texto!,
+    ));
+    scaffoldKey.currentState?.showSnackBar(snackBar); */
     Future.delayed(
         const Duration(seconds: 5),
         () => {
-              navigatorKey.currentState?.pushNamed('PaginaNotificacionesScreen')
+              navigatorKey.currentState?.push(MaterialPageRoute(
+                builder: (context) => HomeScreen(
+                  index: 1,
+                  myBnB: 1,
+                ),
+              ))
             });
-  */
   }
 
   @override
   void initState() {
-    FirebaseMessaging.onMessage.listen(showFlutterNotification);
-
     //iniciamos myBnB(bottomNavigationBar) trayendo BNavigator
     myBnB = BNavigator(
       currentIndex: (i) {
@@ -408,4 +419,27 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     ); */
   }
+}
+
+Widget textoConTituloNegrita(String titulo, String texto) {
+  return RichText(
+    text: TextSpan(
+      children: [
+        TextSpan(
+          text: titulo,
+          style: TextStyle(
+            fontWeight: FontWeight.bold, // Poner el título en negrita
+            color: Colors
+                .black, // Asegúrate de que el color del texto sea el correcto
+          ),
+        ),
+        TextSpan(
+          text: '\n$texto', // El texto normal debajo del título
+          style: TextStyle(
+            color: Colors.black, // El color del texto
+          ),
+        ),
+      ],
+    ),
+  );
 }

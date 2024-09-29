@@ -197,8 +197,9 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         citaElegida['HORAFINAL'].toString(),
         citaElegida['COMENTARIO'].toString(),
         clienta['ID'],
-        listaServicios.map((e) => e['ID']).toList(),
+        listaServicios.map((e) => e['ID'].toString()).toList(),
         clienta['NOMBRE'],
+        clienta['TELEFONO'],
         listaServicios.first['SERVICIO'],
         precioTexto,
         idCitaCliente);
@@ -390,8 +391,9 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
       String horaFinal,
       String comentario,
       var idCliente,
-      var idServicio,
+      List<String> idServicios,
       String nombreCliente,
+      String telefonoCliente,
       String nombreServicio,
       String precio,
       idCitaCliente) async {
@@ -403,8 +405,6 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
     int idCita = 0;
     if (_iniciadaSesionUsuario) {
-      List<dynamic> idServicioAux =
-          idServicio; //id los paso a String porque los id de Firebase son caracteres
       String idEmpleado = '55';
       //###### CREA CITA Y TRAE ID CITA CREADA EN FIREBASE PARA ID DEL RECORDATORIO
       idCita = await FirebaseProvider().nuevaCita(
@@ -415,7 +415,21 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
           precio,
           comentario,
           idCliente,
-          idServicioAux,
+          idServicios,
+          idEmpleado,
+          idCitaCliente);
+
+      //###### CREA RECORDATORIO EN FIREBASE //######//######//######//######
+      await FirebaseProvider().creaRecordatorio(
+          _emailSesionUsuario,
+          fecha,
+          horaInicio,
+          precio,
+          comentario,
+          nombreCliente,
+          telefonoCliente,
+          email,
+          idServicios,
           idEmpleado,
           idCitaCliente);
     } else {

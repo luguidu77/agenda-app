@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:agendacitas/.env.dart';
 import 'package:agendacitas/providers/FormularioBusqueda/formulario_busqueda_provider.dart';
 import 'package:agendacitas/providers/buttom_nav_notificaciones_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
+import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +16,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 
 import 'models/models.dart';
@@ -27,7 +32,7 @@ import 'widgets/formulariosSessionApp/registro_usuario_screen.dart'; //utilizado
 //?            quitar PAGADO DEL home.dart -->> PagoProvider().guardaPagado(true);
 //?            comprobar pago STRIPE en PRODUCTION google_pay_payment_profile.json y variables en wallet/ tarjetaPago.dart
 //?   flutter build appbundle
-//?            - C:\PROYECTOS FLUTTER\AGENDA DE CITAS\agenda-app\build\app\outputs\bundle\release
+//?            - C:\PROYECTOS FLUTTER\agenda_app\build\app\outputs\bundle\release
 //      VER SOLUCIONES DE ERRORES README.md
 //! GITHUB :
 /* 
@@ -37,11 +42,15 @@ git push
 */
 
 //https://help.syncfusion.com/common/essential-studio/licensing/how-to-register-in-an-application
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // Este es el manejador de mensajes en background
+  print("Handling a background message: ${message.messageId}");
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
+  FirebaseMessaging.onMessage.listen(_firebaseMessagingBackgroundHandler);
   // initializeDateFormatting().then((_) {
 
   MobileAds.instance.initialize();
@@ -114,8 +123,9 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    reseteoprueba();
-    inicializacion();
+    // reseteoprueba();
+    //inicializacion();
+
     super.initState();
   }
 

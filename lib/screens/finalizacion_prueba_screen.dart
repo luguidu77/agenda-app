@@ -1,14 +1,18 @@
+import 'dart:async';
+
 import 'package:agendacitas/screens/comprar_aplicacion.dart';
 import 'package:agendacitas/screens/home.dart';
+import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/providers.dart';
 
 class FinalizacionPrueba extends StatefulWidget {
-  final String? usuarioAPP;
+  final usuarioAPP;
   const FinalizacionPrueba({Key? key, this.usuarioAPP = ''}) : super(key: key);
 
   @override
@@ -16,6 +20,65 @@ class FinalizacionPrueba extends StatefulWidget {
 }
 
 class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
+  InAppPurchase _inAppPurchase = InAppPurchase.instance;
+  late StreamSubscription<dynamic> _streamSubscription;
+  List<ProductDetails> _products = [];
+  final _variant = {"agenda"}; // id del producto googleplay console
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    //// pago de la aplicacion
+    Stream pruchaseUpdated = InAppPurchase.instance.purchaseStream;
+    _streamSubscription = pruchaseUpdated.listen((purchaseList) {
+      _listenToPurchase(purchaseList);
+    }, onDone: () {
+      _streamSubscription.cancel();
+    }, onError: (error) {
+      mensajeError(context, '$error');
+    });
+
+    initStore();
+    ///////////////////////////////
+  }
+
+  _listenToPurchase(List<PurchaseDetails> purchaseDetailsList) {
+    purchaseDetailsList.forEach((PurchaseDetails purchaseDetails) async {
+      if (purchaseDetails.status == PurchaseStatus.pending) {
+        mensajeInfo(context, 'Pendiente');
+      } else if (purchaseDetails.status == PurchaseStatus.error) {
+        mensajeError(context, 'Error');
+      } else if (purchaseDetails.status == PurchaseStatus.purchased) {
+        mensajeSuccess(context, 'Pago realizado');
+        _modificaPagoFb();
+      }
+    });
+  }
+
+  _buy() {
+    final PurchaseParam param = PurchaseParam(productDetails: _products[0]);
+    _inAppPurchase.buyConsumable(purchaseParam: param);
+  }
+
+  initStore() async {
+    // Asegúrate de que este ID sea el correcto y esté configurado en Google Play Console
+    ProductDetailsResponse productDetailsResponse =
+        await _inAppPurchase.queryProductDetails(_variant);
+    if (productDetailsResponse.error == null) {
+      if (productDetailsResponse.productDetails.isNotEmpty) {
+        setState(() {
+          _products = productDetailsResponse.productDetails;
+        });
+      } else {
+        mensajeError(context, 'No se encontraron productos.');
+      }
+    } else {
+      mensajeError(context, 'Error al recuperar los detalles del producto.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // final parametros = ModalRoute.of(context)?.settings.arguments;
@@ -25,96 +88,89 @@ class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
       child: Scaffold(
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  widget.usuarioAPP.toString(),
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                  ),
+                  'Hola, ${widget.usuarioAPP.toString().split('@')[0]}',
+                  style: Theme.of(context)
+                      .primaryTextTheme
+                      .headlineMedium
+                      ?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.indigo,
+                      ),
+                ),
+                const SizedBox(height: 20),
+                const Icon(
+                  Icons.sentiment_dissatisfied,
+                  color: Colors.redAccent,
+                  size: 80,
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  '😔 ¡El periodo de prueba ha finalizado!',
+                  'El periodo de prueba ha finalizado',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  '¿Quieres continuar disfrutando de todas las funcionalidades de la app?',
+                  '¿Deseas continuar disfrutando de todas las funcionalidades?',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.black,
+                    color: Colors.black54,
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 40),
                 ElevatedButton(
                   onPressed: () async {
-                    // GUARDA EN EL PROVIDER Y LIMPIA VARIABLES PARA QUE SE PUEDA INICIAR SESION CON OTRO EMAIL
-
+                    _buy(); // Asumiendo que tienes un método para iniciar la compra
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32.0, vertical: 12.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child: const Text(
+                    'Sí, un sólo pago 💳 sin suscripción',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 35),
+                ElevatedButton(
+                  onPressed: () async {
                     await PagoProvider().guardaPagado(false, '');
                     await FirebaseAuth.instance.signOut();
                     estadoPagoProvider.estadoPagoEmailApp('');
 
                     _irPaginaInicio();
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[200],
+                    foregroundColor: Colors.black54,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32.0, vertical: 12.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
                   child: const Text(
                     'No, en otro momento',
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'o',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  '¡Claro, para contiunar con todas las funcionalidades de la app!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    // GUARDA EN EL PROVIDER Y LIMPIA VARIABLES PARA QUE SE PUEDA INICIAR SESION CON OTRO EMAIL
-                    await PagoProvider().guardaPagado(false, '');
-                    // await FirebaseAuth.instance.signOut();
-
-                    _irPaginaCompra();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: const Color.fromARGB(
-                        255, 3, 70, 124), // Cambia el color de fondo del botón
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Sí, un sólo pago 💳 sin suscripción',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontSize: 16, color: Color.fromARGB(255, 33, 4, 138)),
-                    ),
+                    style: TextStyle(fontSize: 16),
                   ),
                 ),
               ],
@@ -126,6 +182,7 @@ class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
   }
 
   _irPaginaCompra() {
+    // compra con pagina Stripe
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -144,5 +201,14 @@ class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
                 myBnB: 0,
               )),
     );
+  }
+
+  void _modificaPagoFb() async {
+    // LLEE CONTEXTO ESTADO DE PAGO y lo seteo a COMPRADA
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    estadoPagoProvider.setearPagado('COMPRADA');
+    //ACTUALIZO PAGO EN FIREBASE
+    await FirebaseProvider().actualizaPago(widget.usuarioAPP);
+    _irPaginaInicio();
   }
 }

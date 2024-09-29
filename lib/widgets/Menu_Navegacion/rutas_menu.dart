@@ -15,7 +15,7 @@ class RutasNav extends StatelessWidget {
       CalendarioCitasScreen(),
       PaginaNotificacionesScreen(),
       //* InformesScreen(),
-      ClientesScreen(), 
+      ClientesScreen(),
       MenuAplicacion(),
     ];
     return myList[index];

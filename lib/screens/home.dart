@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_cliente.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_confirmar.dart';
 
@@ -40,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // contextoPersonaliza es la variable para actuar con este contexto
   late PersonalizaProvider contextoPersonaliza;
   late PersonalizaProviderFirebase contextoPersonalizaFirebase;
-
+  int tabRegordatorios = 0;
   //trae mediante funcion de BNavigator el index de la pagina menu de abajo , myBnB
   BNavigator? myBnB;
 
@@ -77,6 +78,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //***********ESCUCHANDO NOTIFICACIONES Y ACTUACION *************************************/
   void showFlutterNotification(RemoteMessage message) async {
+    switch (message.data['categoria']) {
+      case 'recordatorio':
+        context.read<TabNotifiacionesScreenProvider>().setTap(0);
+
+        break;
+      case 'citaweb':
+        context.read<TabNotifiacionesScreenProvider>().setTap(1);
+        break;
+      case 'administrador':
+        context.read<TabNotifiacionesScreenProvider>().setTap(2);
+        break;
+      default:
+        context.read<TabNotifiacionesScreenProvider>().setTap(0);
+    }
+
     debugPrint('A continuacion los datos que trae la notificacion:');
     print(
         '************ mensaje notificacion recibida *************************************');
@@ -138,6 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    FirebaseMessaging.onMessage.listen(showFlutterNotification);
     //iniciamos myBnB(bottomNavigationBar) trayendo BNavigator
     myBnB = BNavigator(
       currentIndex: (i) {

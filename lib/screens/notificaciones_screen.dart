@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:agendacitas/providers/Firebase/notificaciones.dart';
+import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
@@ -34,7 +35,11 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
   void initState() {
     inicializacion();
     _tabController = TabController(
-        length: 3, vsync: this); // Inicializamos TabController con 3 pestañas
+      length: 3,
+      vsync: this,
+      initialIndex: context.read<TabNotifiacionesScreenProvider>().getTap,
+    ); // Índice del tab inicial); // Inicializamos TabController con 3 pestañas
+
     super.initState();
   }
 
@@ -46,6 +51,7 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
 
   @override
   Widget build(BuildContext context) {
+    context.watch<TabNotifiacionesScreenProvider>().getTap;
     return Scaffold(
       appBar: AppBar(
         leading: Container(),

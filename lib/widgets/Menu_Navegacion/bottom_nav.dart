@@ -1,3 +1,4 @@
+import 'package:agendacitas/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +17,7 @@ class BNavigator extends StatefulWidget {
   State<BNavigator> createState() => _BNavigatorState();
 }
 
-class _BNavigatorState extends State<BNavigator> {
+class _BNavigatorState extends State<BNavigator> with WidgetsBindingObserver {
   int index = 0;
 
   IconData iconoNotificaciones = Icons.notification_important_outlined;
@@ -31,9 +32,38 @@ class _BNavigatorState extends State<BNavigator> {
 
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     inicializacion();
     contadorNotificacionesCitasNoLeidas(context, _emailSesionUsuario);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // La aplicación está activa nuevamente
+
+      Navigator.push(
+          // dirige a la pagina Buzon
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(
+              index: 1,
+              myBnB: 1,
+            ),
+          ));
+
+      print('La aplicación está activa');
+    } else if (state == AppLifecycleState.paused) {
+      // La aplicación está en segundo plano
+      print('La aplicación está en segundo plano');
+    }
   }
 
   @override

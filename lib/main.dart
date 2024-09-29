@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:agendacitas/.env.dart';
 import 'package:agendacitas/providers/FormularioBusqueda/formulario_busqueda_provider.dart';
 import 'package:agendacitas/providers/buttom_nav_notificaciones_provider.dart';
+import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
-import 'package:agendacitas/utils/alertasSnackBar.dart';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -16,7 +17,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
+
 import 'package:provider/provider.dart';
 
 import 'models/models.dart';
@@ -42,15 +43,21 @@ git push
 */
 
 //https://help.syncfusion.com/common/essential-studio/licensing/how-to-register-in-an-application
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Este es el manejador de mensajes en background
-  print("Handling a background message: ${message.messageId}");
+
+////////////////·······························································///////
+
+// Este es el manejador de mensajes en background
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage payload) async {
+  /// esta funcion guarda la notificacion en su tabla correspondiente de firebase a traves del
+  /// funcion saveNotification (function firebase que realiza la el guardado)
+  await FirebaseProvider().guardaNotificacion(payload);
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  FirebaseMessaging.onMessage.listen(_firebaseMessagingBackgroundHandler);
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   // initializeDateFormatting().then((_) {
 
   MobileAds.instance.initialize();
@@ -178,6 +185,8 @@ class _MyAppState extends State<MyApp> {
                 BotonGuardarAgregarNoDisponible()),
         ChangeNotifierProvider(
             create: (BuildContext context) => TextoTituloIndispuesto()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => TabNotifiacionesScreenProvider()),
       ],
       builder: (context, _) {
         return MaterialApp(

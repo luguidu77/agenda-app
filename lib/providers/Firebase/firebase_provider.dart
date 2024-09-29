@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/models/models.dart';
@@ -8,6 +11,7 @@ import 'package:agendacitas/providers/db_provider.dart';
 import 'package:agendacitas/utils/extraerServicios.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -1185,6 +1189,46 @@ class FirebaseProvider extends ChangeNotifier {
       pago = false;
     }
     return pago;
+  }
+
+  /// esta funcion guarda la notificacion en su tabla correspondiente de firebase
+
+  Future<void> guardaNotificacion(RemoteMessage payload) async {
+    try {
+      // Parsear el contenido de 'data'
+      final data = json.decode(payload.data['data']);
+      final String? email = data['emailUsuarioApp']; // Extraer emailUsuarioApp
+
+      // Asegúrate de usar el email correctamente
+      if (email == null || email.isEmpty) {
+        print(
+            "No se ha configurado el email, no se puede procesar la notificación.");
+        return;
+      }
+
+      // Enviar solicitud a la función en la nube
+      final response = await http.post(
+        Uri.parse(
+            'https://us-central1-flutter-varios-576e6.cloudfunctions.net/saveNotification'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: json.encode({
+          'categoria': payload.data['categoria'],
+          'data': payload.data['data'],
+          'email': email // Usa email aquí
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception(
+            'Error en la solicitud a la función en la nube: ${response.body}');
+      }
+
+      print('Notificación guardada en Firebase con éxito.');
+    } catch (e) {
+      print('Error al manejar la notificación: $e');
+    }
   }
 
   Future<void> cambiarEstadoVisto(

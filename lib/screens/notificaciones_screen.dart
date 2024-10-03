@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/providers/Firebase/notificaciones.dart';
 import 'package:agendacitas/providers/buttom_nav_notificaciones_provider.dart';
 import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
@@ -305,17 +306,20 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
                                   ),
                                 ],
                               ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.delete_forever_outlined,
-                                  color: Colors.redAccent,
-                                  size: 28,
-                                ),
-                                onPressed: () {
-                                  _eliminaNotificacion(
-                                      _emailSesionUsuario, notificacion['id']);
-                                },
-                              ),
+                              notificacion['categoria'] == 'administrador'
+                                  ? Container()
+                                  : IconButton(
+                                      icon: const Icon(
+                                        Icons.delete_forever_outlined,
+                                        color: Colors.redAccent,
+                                        size: 28,
+                                      ),
+                                      onPressed: () {
+                                        _eliminaNotificacion(
+                                            _emailSesionUsuario,
+                                            notificacion['id']);
+                                      },
+                                    ),
                             ],
                           ),
                         ),
@@ -349,15 +353,22 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
           },
         ).then((value) async {
           if (notificacion['categoria'] == 'administrador') {
-            await FirebaseProvider().cambiarEstadoVistoNotifAdministrador(
-                emailSesionUsuario, notificacion['id']);
+            if (!notificacion['vistoPor'].contains(emailSesionUsuario)) {
+              await FirebaseProvider().cambiarEstadoVistoNotifAdministrador(
+                  emailSesionUsuario, notificacion['id']);
+              await contadorNotificacionesCitasNoLeidas(
+                  context, _emailSesionUsuario);
+            }
           } else {
-            await FirebaseProvider().cambiarEstadoVisto(
-                emailSesionUsuario, notificacion['id'], false);
+            if (!notificacion['visto']) {
+              await FirebaseProvider().cambiarEstadoVisto(
+                  emailSesionUsuario, notificacion['id'], false);
+              await contadorNotificacionesCitasNoLeidas(
+                  context, _emailSesionUsuario);
+            }
           }
-          await contadorNotificacionesCitasNoLeidas(
-              context, _emailSesionUsuario);
-          setState(() {});
+
+          //setState(() {});
         });
       },
       child: _tarjetasNotificaciones(_emailSesionUsuario, fechaNotificacion,
@@ -474,8 +485,7 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
       child: Container(
-        width: 200,
-        height: 100,
+        width: double.infinity,
         child: Card(
           elevation: 6, // Aumentar la sombra para más profundidad
           shape: RoundedRectangleBorder(
@@ -566,7 +576,8 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
                 _obtieneTextoCategoria(notificacion['categoria'], 8)
               ],
             ),
-            title: Text(notificacion['categoria']),
+            title: _obtieneTextoTitulo(
+                notificacion['categoria'], notificacion['data'], 12),
             // subtitulo si se trata de una cita para agregar fecha cita y telefono cliente
             subtitle: switch (notificacion['categoria']) {
               'cita' || 'citaweb' || 'recordatorio' => Column(
@@ -633,6 +644,34 @@ Text _obtieneTextoCategoria(String categoria, double size) {
     'cita' => Text('CITA', style: TextStyle(fontSize: size)),
     'citaweb' => Text('CITA', style: TextStyle(fontSize: size)),
     'administrador' => Text('ADMIN', style: TextStyle(fontSize: size)),
+    _ => Text('N/A', style: TextStyle(fontSize: size)),
+  };
+}
+
+Text _obtieneTextoTitulo(String categoria, String data, double size) {
+  String servicios = '';
+  if (categoria != 'administrador') {
+    // Decodificar el texto JSON en un mapa
+    Map<String, dynamic> parsedJson = json.decode(data);
+    // Acceder al campo 'servicio'
+    servicios = parsedJson['servicio'];
+  }
+  String truncarTexto(String texto, int maxCaracteres) {
+    if (texto.length > maxCaracteres) {
+      return texto.substring(0, maxCaracteres) + '...';
+    } else {
+      return texto;
+    }
+  }
+
+  return switch (categoria) {
+    'recordatorio' => Text('RECORDATORIO', style: TextStyle(fontSize: size)),
+    'cita' =>
+      Text(truncarTexto(servicios, 25), style: TextStyle(fontSize: size)),
+    'citaweb' =>
+      Text(truncarTexto(servicios, 25), style: TextStyle(fontSize: size)),
+    'administrador' =>
+      Text(truncarTexto(data, 25), style: TextStyle(fontSize: size)),
     _ => Text('N/A', style: TextStyle(fontSize: size)),
   };
 }

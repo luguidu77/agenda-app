@@ -1193,47 +1193,75 @@ class FirebaseProvider extends ChangeNotifier {
 
   /// esta funcion guarda la notificacion en su tabla correspondiente de firebase
 
-  Future<void> guardaNotificacion(RemoteMessage payload) async {
+  /* Future<void> guardaNotificacion(RemoteMessage payload) async {
     try {
-      // Parsear el contenido de 'data'
-      final data = json.decode(payload.data['data']);
-      final String? email = data['emailUsuarioApp']; // Extraer emailUsuarioApp
+      print("Payload recibido: ${payload.data}");
 
-      // Asegúrate de usar el email correctamente
-      if (email == null || email.isEmpty) {
-        print(
-            "No se ha configurado el email, no se puede procesar la notificación.");
-        return;
+      // Verifica si 'data' es un JSON válido
+      final rawData = payload.data['data'];
+
+      // Solo intenta parsear si el valor es un JSON válido (NOTIFICACIONES DE CITAS)
+      if (rawData != null && rawData.startsWith('{') && rawData.endsWith('}')) {
+        final data = json.decode(rawData); // Parsear solo si es un JSON
+        final String? email = data['emailUsuarioApp'];
+
+        if (email == null || email.isEmpty) {
+          print(
+              "No se ha configurado el email, no se puede procesar la notificación.");
+          return;
+        }
+
+        // Enviar solicitud a la función en la nube
+        final response = await http.post(
+          Uri.parse(
+              'https://us-central1-flutter-varios-576e6.cloudfunctions.net/saveNotification'),
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: json.encode({
+            'categoria': payload.data['categoria'],
+            'data': payload.data['data'],
+            'email': email,
+          }),
+        );
+
+        if (response.statusCode != 200) {
+          throw Exception(
+              'Error en la solicitud a la función en la nube: ${response.body}');
+        }
+
+        print('Notificación guardada en Firebase con éxito.');
+      } else {
+        // NOTIFICACIONES DEL ADMINISTRADOR SIN ESTRUCTURA JSON
+        // Enviar solicitud a la función en la nube
+        final response = await http.post(
+          Uri.parse(
+              'https://us-central1-flutter-varios-576e6.cloudfunctions.net/saveNotificationAdministrador'),
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: json.encode({
+            'categoria': payload.data['categoria'],
+            'data': payload.data['data'],
+          }),
+        );
+
+        if (response.statusCode != 200) {
+          throw Exception(
+              'Error en la solicitud a la función en la nube: ${response.body}');
+        }
+
+        print('Notificación guardada en Firebase con éxito.');
+        print("NOTIFICACIONES DEL ADMINISTRADOR.");
       }
-
-      // Enviar solicitud a la función en la nube
-      final response = await http.post(
-        Uri.parse(
-            'https://us-central1-flutter-varios-576e6.cloudfunctions.net/saveNotification'),
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: json.encode({
-          'categoria': payload.data['categoria'],
-          'data': payload.data['data'],
-          'email': email // Usa email aquí
-        }),
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception(
-            'Error en la solicitud a la función en la nube: ${response.body}');
-      }
-
-      print('Notificación guardada en Firebase con éxito.');
     } catch (e) {
       print('Error al manejar la notificación: $e');
     }
   }
-
+ */
   Future<void> cambiarEstadoVisto(
-      String emailUsuario, String notificacionId, bool visto) async {
-    //si viene del boton visto = true // si viene de descripcion de la notificacion ,visto = false
+      String emailUsuario, String notificacionId, bool procedencia) async {
+    //si viene del boton, procedencia = true // si viene de descripcion de la notificacion ,procedencia = false
     await _iniFirebase();
     final docRef = await _referenciaDocumento(emailUsuario, 'notificaciones');
 
@@ -1242,7 +1270,7 @@ class FirebaseProvider extends ChangeNotifier {
     final notificacion =
         snapshot.docs.firstWhere((doc) => doc.id == notificacionId);
 
-    if (visto) {
+    if (procedencia) {
       // compruebo el estado actual de visto en Firebase
       bool estadoActual = notificacion['visto'];
       // cambio al contrario del estado actual
@@ -1251,6 +1279,29 @@ class FirebaseProvider extends ChangeNotifier {
       // viene del dialogo de descripcion de la notificacion, por lo que siempre se cambiara a visto= true
       await docRef.doc(notificacionId).update({'visto': true});
     }
+  }
+
+  Future<void> cambiarEstadoVistoNotifAdministrador(
+      String emailUsuario, String notificacionId) async {
+    //si viene del boton, procedencia = true // si viene de descripcion de la notificacion ,procedencia = false
+    await _iniFirebase();
+    final docRef = db!.collection("notificacionesAdministrador");
+
+    final snapshot = await docRef.get();
+
+    final notificacion =
+        snapshot.docs.firstWhere((doc) => doc.id == notificacionId);
+
+    List<dynamic> agregaEmail = notificacion['vistoPor'];
+
+    // agregamos el email del usuario al ser vista la notificacion
+    if (!agregaEmail.contains(emailUsuario)) {
+      agregaEmail.add(emailUsuario);
+    }
+
+    // viene del dialogo de descripcion de la notificacion, por lo que siempre se cambiara a visto= true
+
+    await docRef.doc(notificacionId).update({'vistoPor': agregaEmail});
   }
 
   //* (BOTON CONFIRMAR/ANULAR) estado confirmacion de la cita en agenda del - NEGOCIO

@@ -4,16 +4,19 @@ class NotificacionModel {
   final String id;
 
   final String iconoCategoria;
-  final bool visto;
+  final bool? visto;
   final String data; // Nuevo campo para datos adicionales
   final Timestamp fechaNotificacion;
+  final List<dynamic>? vistoPor;
 
-  NotificacionModel(
-      {required this.id,
-      required this.iconoCategoria,
-      required this.visto,
-      required this.data,
-      required this.fechaNotificacion});
+  NotificacionModel({
+    required this.id,
+    required this.iconoCategoria,
+    this.visto,
+    required this.data,
+    required this.fechaNotificacion,
+    this.vistoPor,
+  });
 
   factory NotificacionModel.fromJson(Map<String, dynamic> json) {
     return NotificacionModel(
@@ -23,6 +26,7 @@ class NotificacionModel {
       visto: json['visto'] ?? false,
       fechaNotificacion: json['fechaNotificacion'],
       data: json['data'], // Lee los datos adicionales desde el JSON
+      vistoPor: json['vistoPor'],
     );
   }
 
@@ -33,6 +37,7 @@ class NotificacionModel {
       'visto': visto,
       'fechaNotificacion': fechaNotificacion,
       'data': data,
+      'vistoPor': vistoPor,
     };
   }
 }

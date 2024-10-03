@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:agendacitas/.env.dart';
+import 'package:agendacitas/providers/Firebase/notificaciones.dart';
 import 'package:agendacitas/providers/FormularioBusqueda/formulario_busqueda_provider.dart';
 import 'package:agendacitas/providers/buttom_nav_notificaciones_provider.dart';
 import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
@@ -45,25 +46,32 @@ git push
 //https://help.syncfusion.com/common/essential-studio/licensing/how-to-register-in-an-application
 
 ////////////////·······························································///////
-
+///
+//***********ESCUCHANDO NOTIFICACIONES Y ACTUACION *************************************/
 // Este es el manejador de mensajes en background
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage payload) async {
-  /// esta funcion guarda la notificacion en su tabla correspondiente de firebase a traves del
-  /// funcion saveNotification (function firebase que realiza la el guardado)
-  await FirebaseProvider().guardaNotificacion(payload);
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print("Payload recibido en segundo plano: ${message.data}");
+
+  if (message.data == null || message.data.isEmpty) {
+    print("El payload no contiene datos.");
+    return;
+  }
+
+  guardaNotificacionAdministrador(message);
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   // initializeDateFormatting().then((_) {
 
   MobileAds.instance.initialize();
   Stripe.publishableKey = stripePublishableKey;
 
   //});
+  // Registra el background handler
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
 }
 

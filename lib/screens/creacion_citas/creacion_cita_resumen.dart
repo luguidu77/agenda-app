@@ -494,7 +494,7 @@ class BackgroundPermissionDialog extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Para proporcionar la mejor experiencia de usuario, la aplicación necesite ejecutarse en segundo plano para realizar ciertas tareas, como enviar notificaciones importantes o actualizar datos automáticamente.',
+            'Para proporcionar la mejor experiencia de usuario, la aplicación necesita ejecutarse en segundo plano para realizar ciertas tareas, como enviar notificaciones importantes o actualizar datos automáticamente.',
           ),
           SizedBox(height: 10),
           Text(

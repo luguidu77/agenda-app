@@ -9,6 +9,7 @@ import 'package:agendacitas/screens/notificaciones_screen.dart';
 
 import 'package:agendacitas/screens/servicios_screen.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
+import 'package:agendacitas/utils/notificaciones/recordatorio_local/recordatorio_local.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -97,14 +98,26 @@ class _HomeScreenState extends State<HomeScreen> {
     print(
         '************ mensaje notificacion recibida *************************************');
     print(message.data);
+    if (message.data['categoria'] == 'administrador') {
+      print('guarda en firebase notificacionesAdministrador');
+      guardaNotificacionAdministrador(message);
+    } else {
+      //*GUARDA LA NOTIFICACION EN FIRESTORE agendadecitasapp->notificaciones
+      guardaNotificacionAlUsuarioApp(message);
+      final titulo = message.notification!.title;
+      final texto = message.notification!.body;
+      //mensajeInfo(context, 'Nueva notificación');
 
-    //*GUARDA LA NOTIFICACION EN FIRESTORE agendadecitasapp->notificaciones
-    guardaNotificacionPorFirebaseMessaging(_emailSesionUsuario, message);
+      final snackBar = SnackBar(
+          content: textoConTituloNegrita(
+        titulo!,
+        texto!,
+      ));
+      scaffoldKey.currentState?.showSnackBar(snackBar);
+    }
+
     //  navigatorKey.currentState?.pushNamed('PaginaNotificacionesScreen');
 
-    //mensajeInfo(context, 'Nueva notificación');
-    final titulo = message.notification!.title;
-    final texto = message.notification!.body;
     //final cita = notificacion['notificacion'];
     /* showDialog(
         context: context,
@@ -134,12 +147,6 @@ class _HomeScreenState extends State<HomeScreen> {
     Map<String, dynamic> cita = notificacion[
         'fechaCita']; //{"horaFormateada":"11:00","fechaFormateada":"7 de febrero de 2024"}} */
 
-    /*   final snackBar = SnackBar(
-        content: textoConTituloNegrita(
-      titulo!,
-      texto!,
-    ));
-    scaffoldKey.currentState?.showSnackBar(snackBar); */
     Future.delayed(
         const Duration(seconds: 5),
         () => {
@@ -453,7 +460,7 @@ Widget textoConTituloNegrita(String titulo, String texto) {
         TextSpan(
           text: '\n$texto', // El texto normal debajo del título
           style: TextStyle(
-            color: Colors.black, // El color del texto
+            color: Colors.white, // El color del texto
           ),
         ),
       ],

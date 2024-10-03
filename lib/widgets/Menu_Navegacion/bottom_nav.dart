@@ -47,8 +47,9 @@ class _BNavigatorState extends State<BNavigator> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      contadorNotificacionesCitasNoLeidas(context, _emailSesionUsuario);
       // La aplicación está activa nuevamente
-
+/* 
       Navigator.push(
           // dirige a la pagina Buzon
           context,
@@ -57,7 +58,7 @@ class _BNavigatorState extends State<BNavigator> with WidgetsBindingObserver {
               index: 1,
               myBnB: 1,
             ),
-          ));
+          )); */
 
       print('La aplicación está activa');
     } else if (state == AppLifecycleState.paused) {
@@ -68,7 +69,9 @@ class _BNavigatorState extends State<BNavigator> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    hayNorificacionesNoleidas(_emailSesionUsuario);
+    final contadorNotificaciones =
+        Provider.of<ButtomNavNotificacionesProvider>(context);
+    hayNorificacionesNoleidas(_emailSesionUsuario, contadorNotificaciones);
     int index = widget.index;
     Color colorTema = Theme.of(context).primaryColor;
     return Container(
@@ -127,9 +130,7 @@ class _BNavigatorState extends State<BNavigator> with WidgetsBindingObserver {
     );
   }
 
-  hayNorificacionesNoleidas(email) async {
-    final contadorNotificaciones =
-        context.watch<ButtomNavNotificacionesProvider>();
+  hayNorificacionesNoleidas(email, contadorNotificaciones) async {
     int contNotif = contadorNotificaciones.contadorNotificaciones;
 
     print(

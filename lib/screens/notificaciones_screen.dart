@@ -1,10 +1,14 @@
 import 'dart:convert';
 
 import 'package:agendacitas/providers/Firebase/notificaciones.dart';
+import 'package:agendacitas/providers/buttom_nav_notificaciones_provider.dart';
 import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
+import 'package:agendacitas/utils/notificaciones/recordatorio_local/recordatorio_local.dart';
+import 'package:agendacitas/widgets/botones/boton_leido_notif_administrador.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +16,7 @@ import 'package:provider/provider.dart';
 import '../models/notificacion_model.dart';
 import '../providers/providers.dart';
 import '../widgets/botones/boton_ledido.dart';
+import 'package:badges/badges.dart' as badges;
 
 class PaginaNotificacionesScreen extends StatefulWidget {
   const PaginaNotificacionesScreen({super.key});
@@ -52,6 +57,13 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
   @override
   Widget build(BuildContext context) {
     context.watch<TabNotifiacionesScreenProvider>().getTap;
+    final contadorNotificaciones =
+        context.watch<ButtomNavNotificacionesProvider>();
+    int contNotifRecordatorios =
+        contadorNotificaciones.contadorNotificacionesRecordatorio;
+    int contNotifCitaWeb = contadorNotificaciones.contadorNotificacionesCitaweb;
+    int contNotifAdministrador =
+        contadorNotificaciones.contadorNotificacionesAdministrador;
     return Scaffold(
       appBar: AppBar(
         leading: Container(),
@@ -86,13 +98,16 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
           labelColor: const Color.fromARGB(255, 167, 144, 144),
           indicatorColor: Colors.blue,
           labelStyle: const TextStyle(fontSize: 10),
-          tabs: const [
+          tabs: [
             Tab(
-                icon: Icon(Icons.notification_important),
-                text: "recordatorios"),
-            Tab(icon: Icon(Icons.cloud_done), text: "cita web"),
+                icon: _icono(contNotifRecordatorios, Icons.notifications),
+                text: "recordatorios "),
             Tab(
-                icon: Icon(Icons.admin_panel_settings_sharp),
+                icon: _icono(contNotifCitaWeb, Icons.cloud_done),
+                text: "cita web"),
+            Tab(
+                icon: _icono(
+                    contNotifAdministrador, Icons.admin_panel_settings_sharp),
                 text: "generales"),
           ],
         ),
@@ -108,9 +123,26 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
     );
   }
 
+  Center _icono(int contNotifRecordatorios, IconData icono) {
+    return Center(
+      child: badges.Badge(
+        /* badgeContent */
+        badgeStyle: badges.BadgeStyle(
+          badgeColor: contNotifRecordatorios != 0
+              ? Colors.blue
+              : Colors.white, // Color del fondo del número
+        ),
+        child: Icon(
+          icono, // El ícono sobre el que se coloca el número
+          size: 25.0,
+        ),
+      ),
+    );
+  }
+
   Widget _buildNotificacionesCategoria(String categoria) {
     return FutureBuilder(
-      future: getTodasLasNotificacionesCitas(_emailSesionUsuario),
+      future: getTodasLasNotificaciones(_emailSesionUsuario),
       builder: (context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
@@ -150,6 +182,7 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
                             iconoCategoria: notificacion['categoria'],
                             visto: notificacion['visto'],
                             data: notificacion['data'],
+                            vistoPor: notificacion['vistoPor'],
                           );
 
                           String fechaNotificacion = _formateaFecha(
@@ -315,9 +348,15 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
             );
           },
         ).then((value) async {
-          await FirebaseProvider().cambiarEstadoVisto(
-              emailSesionUsuario, notificacion['id'], false);
-
+          if (notificacion['categoria'] == 'administrador') {
+            await FirebaseProvider().cambiarEstadoVistoNotifAdministrador(
+                emailSesionUsuario, notificacion['id']);
+          } else {
+            await FirebaseProvider().cambiarEstadoVisto(
+                emailSesionUsuario, notificacion['id'], false);
+          }
+          await contadorNotificacionesCitasNoLeidas(
+              context, _emailSesionUsuario);
           setState(() {});
         });
       },
@@ -434,58 +473,65 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
   Padding _tarjetaDescripcionAdministracion(notificacion) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-      child: Card(
-        elevation: 6, // Aumentar la sombra para más profundidad
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20), // Bordes más redondeados
-        ),
-        shadowColor: Colors.black.withOpacity(0.2), // Color de sombra más suave
-        child: Padding(
-          padding: const EdgeInsets.all(20.0), // Espaciado interno más amplio
-          child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start, // Alineación a la izquierda
-            children: [
-              Text(
-                'Detalles de la notificación', // Añadimos un título
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[800],
+      child: Container(
+        width: 200,
+        height: 100,
+        child: Card(
+          elevation: 6, // Aumentar la sombra para más profundidad
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20), // Bordes más redondeados
+          ),
+          shadowColor:
+              Colors.black.withOpacity(0.2), // Color de sombra más suave
+          child: Padding(
+            padding: const EdgeInsets.all(20.0), // Espaciado interno más amplio
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start, // Alineación a la izquierda
+              children: [
+                Text(
+                  'Detalles de la notificación', // Añadimos un título
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8.0), // Espacio entre título y contenido
-              Text(
-                notificacion['data'],
-                style: TextStyle(
-                  fontSize: 14.0,
-                  color: Colors.grey[600], // Texto más sutil
-                  height: 1.5, // Espaciado entre líneas para mayor legibilidad
+                const SizedBox(height: 8.0), // Espacio entre título y contenido
+                Text(
+                  notificacion['data'],
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.grey[600], // Texto más sutil
+                    height:
+                        1.5, // Espaciado entre líneas para mayor legibilidad
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12.0), // Espacio entre el texto y el botón
-              /*  Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Acción del botón aquí
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent, // Color del botón
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(12), // Botón redondeado
+                const SizedBox(
+                    height: 12.0), // Espacio entre el texto y el botón
+                /*  Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Acción del botón aquí
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent, // Color del botón
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(12), // Botón redondeado
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10), // Tamaño del botón
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10), // Tamaño del botón
+                    child: const Text(
+                      'Acción',
+                      style: TextStyle(fontSize: 14.0),
+                    ),
                   ),
-                  child: const Text(
-                    'Acción',
-                    style: TextStyle(fontSize: 14.0),
-                  ),
-                ),
-              ), */
-            ],
+                ), */
+              ],
+            ),
           ),
         ),
       ),
@@ -513,30 +559,33 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
           child: Text(fechaNotificacion),
         ),
         ListTile(
-          // Contenido de la tarjeta de notificación
-          leading: Column(
-            children: [
-              _obtieneIcono(notificacion['categoria']),
-              _obtieneTextoCategoria(notificacion['categoria'], 8)
-            ],
-          ),
-          title: Text(notificacion['categoria']),
-          // subtitulo si se trata de una cita para agregar fecha cita y telefono cliente
-          subtitle: switch (notificacion['categoria']) {
-            'cita' || 'citaweb' || 'recordatorio' => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("$fecha  $hora"),
-                  Text(nombre),
-                ],
-              ),
-            _ => Container(),
-          },
-
-          trailing: BotonLedido(
-              notificacion: notificacion,
-              emailSesionUsuario: emailSesionUsuario),
-        ),
+            // Contenido de la tarjeta de notificación
+            leading: Column(
+              children: [
+                _obtieneIcono(notificacion['categoria']),
+                _obtieneTextoCategoria(notificacion['categoria'], 8)
+              ],
+            ),
+            title: Text(notificacion['categoria']),
+            // subtitulo si se trata de una cita para agregar fecha cita y telefono cliente
+            subtitle: switch (notificacion['categoria']) {
+              'cita' || 'citaweb' || 'recordatorio' => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("$fecha  $hora"),
+                    Text(nombre),
+                  ],
+                ),
+              _ => Text(''),
+            },
+            trailing: switch (notificacion['categoria']) {
+              'administrador' => BotoLeidoNotifAdministrador(
+                  notificacion: notificacion,
+                  emailSesionUsuario: emailSesionUsuario),
+              _ => BotonLedido(
+                  notificacion: notificacion,
+                  emailSesionUsuario: emailSesionUsuario),
+            })
       ],
     );
   }

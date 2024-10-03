@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/providers/Firebase/emailHtml/emails_html.dart';
@@ -32,6 +34,14 @@ _referenciaDocumentoAPP(String usuarioAPP, String coleccion) async {
   return docRef;
 }
 
+//? REFERENCIA NOTIFICACIONES ADMINISTRADOR ////////////////////////////////////////////
+_referenciaNotificacionesAdministrador() async {
+  // creo una referencia al documento que contiene los clientes
+  final docRef = db!.collection("notificacionesAdministrador");
+
+  return docRef;
+}
+
 //? REFERENCIA DOCUMENTO  CLIENTE AGENDO WEB ////////////////////////////////////////////
 _referenciaDocumentoClienteAgendoWeb(
     String emailCliente, String coleccion) async {
@@ -45,12 +55,14 @@ _referenciaDocumentoClienteAgendoWeb(
   return collectionRef;
 }
 
-void guardaNotificacionPorFirebaseMessaging(
-    emailUsuario, RemoteMessage message) async {
+void guardaNotificacionAlUsuarioApp(RemoteMessage message) async {
   print(
       '************GUARDA  mensaje notificacion recibida *******(notificaciones.dart)******************************');
   print(message.data);
   await _iniFirebase();
+
+  final jsonData = jsonDecode(message.data['data']);
+  String emailUsuario = jsonData['emailUsuarioApp'];
 
   final docRef = await _referenciaDocumentoAPP(emailUsuario, 'notificaciones');
 
@@ -62,15 +74,32 @@ void guardaNotificacionPorFirebaseMessaging(
   });
 }
 
+void guardaNotificacionAdministrador(RemoteMessage message) async {
+  print(
+      '************GUARDA  mensaje notificacion recibida *******(notificaciones.dart)******************************');
+  print(message.data);
+  await _iniFirebase();
+
+  final docRef = await _referenciaNotificacionesAdministrador();
+
+  await docRef.add({
+    'categoria': message.data['categoria'],
+    'data': message.data['data'],
+    'fechaNotificacion': DateTime.now(),
+    'visto': false,
+    'vistoPor': [],
+  });
+}
+
 // ** NOTIFICACIONES RECIBIDAS A LA APP *************************************************
 //******************************************************************************************** */
-Future<List<Map<String, dynamic>>> getTodasLasNotificacionesCitas(
-    emailUsuario) async {
+Future<List<Map<String, dynamic>>>
+    getTodasLasNotificacionesAdministrador() async {
   List<Map<String, dynamic>> data = [];
 
   await _iniFirebase();
 
-  final docRef = await _referenciaDocumentoAPP(emailUsuario, 'notificaciones');
+  final docRef = await _referenciaNotificacionesAdministrador();
 
   await docRef.get().then((QuerySnapshot snapshot) => {
         for (var element in snapshot.docs)
@@ -83,14 +112,57 @@ Future<List<Map<String, dynamic>>> getTodasLasNotificacionesCitas(
               'data': element['data'],
               'fechaNotificacion': element['fechaNotificacion'],
               'visto': element['visto'],
+              'vistoPor': element['vistoPor'],
             })
           }
       });
   // Ordena la lista de citas por hora de inicio
-  print('****************data : $data');
+  print('****************data notificacionesAdministrador : $data');
   data.sort((a, b) => b['fechaNotificacion'].compareTo(a['fechaNotificacion']));
 
   return data; //retorna una lista de todas las citas(CitaModelFirebase)
+}
+
+Future<List<Map<String, dynamic>>> getNotificacionesCitas(emailUsuario) async {
+  List<Map<String, dynamic>> dataNotifUsuarioApp = [];
+
+  await _iniFirebase();
+
+  final docRef = await _referenciaDocumentoAPP(emailUsuario, 'notificaciones');
+
+  await docRef.get().then((QuerySnapshot snapshot) => {
+        for (var element in snapshot.docs)
+          {
+            //SI LA CATEGORIA DE LA NOTIFICACION == CITA o CITAWEB, AGREGA NOTIFICACION
+
+            dataNotifUsuarioApp.add({
+              'id': element.id,
+              'categoria': element['categoria'],
+              'data': element['data'],
+              'fechaNotificacion': element['fechaNotificacion'],
+              'visto': element['visto'],
+            })
+          }
+      });
+  // Ordena la lista de citas por hora de inicio
+  print('****************data : $dataNotifUsuarioApp');
+  dataNotifUsuarioApp
+      .sort((a, b) => b['fechaNotificacion'].compareTo(a['fechaNotificacion']));
+
+  return dataNotifUsuarioApp; //retorna una lista de todas las citas(CitaModelFirebase)
+}
+
+Future<List<Map<String, dynamic>>> getTodasLasNotificaciones(
+    emailUsuario) async {
+  List<Map<String, dynamic>> todasLasNotificaciones = [];
+
+  final notifCitas = await getNotificacionesCitas(emailUsuario);
+  todasLasNotificaciones.addAll(notifCitas);
+  final notifAdministrador = await getTodasLasNotificacionesAdministrador();
+
+  todasLasNotificaciones.addAll(notifAdministrador);
+
+  return todasLasNotificaciones;
 }
 
 eliminaNotificacion(emailUsuario, id) async {
@@ -182,19 +254,35 @@ Future<dynamic> comprueStatusEmail(String mailId) async {
 //******************************************************************************************** */
 contadorNotificacionesCitasNoLeidas(
     BuildContext context, String emailUsuario) async {
-  int cantidad = 0;
+  int cantidadTotal = 0;
+  int recordatorios = 0;
+  int citaweb = 0;
+  int administrador = 0;
   // List<Map<String, dynamic>> notificacionesCitas =
-  await getTodasLasNotificacionesCitas(emailUsuario)
-      .then((notificacionesCitas) {
+  await getTodasLasNotificaciones(emailUsuario).then((notificacionesCitas) {
     for (var element in notificacionesCitas) {
       if (element['visto'] == false) {
-        cantidad++;
+        if (element['categoria'] == 'recordatorio') {
+          cantidadTotal++;
+        }
+        if (element['categoria'] == 'citaweb') {
+          citaweb++;
+        }
+        cantidadTotal++;
+      }
+
+      if (element['categoria'] == 'administrador') {
+        List<dynamic> listaAux = element['vistoPor'];
+
+        if (!listaAux.contains(emailUsuario)) {
+          administrador++;
+          cantidadTotal++;
+        }
       }
     }
 
     // * setea el contador de las notificaciones
-    context
-        .read<ButtomNavNotificacionesProvider>()
-        .setContadorNotificaciones(cantidad);
+    context.read<ButtomNavNotificacionesProvider>().setContadorNotificaciones(
+        cantidadTotal, recordatorios, citaweb, administrador);
   });
 }

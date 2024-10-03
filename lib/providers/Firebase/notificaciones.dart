@@ -86,7 +86,7 @@ void guardaNotificacionAdministrador(RemoteMessage message) async {
     'categoria': message.data['categoria'],
     'data': message.data['data'],
     'fechaNotificacion': DateTime.now(),
-    'visto': false,
+    'visto': true,
     'vistoPor': [],
   });
 }

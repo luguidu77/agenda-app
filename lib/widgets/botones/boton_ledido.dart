@@ -43,16 +43,15 @@ class _BotonLedidoState extends State<BotonLedido> {
             widget.emailSesionUsuario, widget.notificacion['id'], true);
 
         // Cambiar estado local
-        setState(() {
-          _visto = !_visto;
-          _cargando = false; // Oculta el indicador de carga
-          contadorNotificacionesCitasNoLeidas(
-              context, widget.emailSesionUsuario);
-        });
-        // Mostrar mensaje
+
+        _visto = !_visto;
+        _cargando = false; // Oculta el indicador de carga
+        contadorNotificacionesCitasNoLeidas(context, widget.emailSesionUsuario);
+
+        /* // Mostrar mensaje
         mensaje(_visto
             ? 'Notificación marcada como leída'
-            : 'Notificación marcada como no leída');
+            : 'Notificación marcada como no leída'); */
       },
       icon: _cargando
           ? const SizedBox(

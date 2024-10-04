@@ -1,3 +1,4 @@
+import 'package:agendacitas/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -474,6 +475,19 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
                   horaInicioProgramable,
                   _emailSesionUsuario,
                 );
+                await FirebaseProvider().creaRecordatorio(
+                    usuarioAP,
+                    fecha,
+                    horaInicioProgramable.toString(),
+                    'precio',
+                    'comentariocita',
+                    'nombrecliente',
+                    'telefonocliente',
+                    'emailcliente',
+                    ['PJg5m6iQQw3btkv1H4EX'],
+                    'idempleado',
+                    cita.id);
+                snackbar();
               } else {
                 //reprogramacion de fecha y hora de la cita
                 CitaModel newCita = CitaModel();
@@ -531,6 +545,14 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
 
   void snackbar() {
     mensajeSuccess(context, 'CITA REPROGRAMADA');
-    Navigator.pushReplacementNamed(context, '/');
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(
+            index: 0,
+            myBnB: 0,
+          ),
+        ));
   }
 }

@@ -263,7 +263,7 @@ contadorNotificacionesCitasNoLeidas(
     for (var element in notificacionesCitas) {
       if (element['visto'] == false) {
         if (element['categoria'] == 'recordatorio') {
-          cantidadTotal++;
+          recordatorios++;
         }
         if (element['categoria'] == 'citaweb') {
           citaweb++;

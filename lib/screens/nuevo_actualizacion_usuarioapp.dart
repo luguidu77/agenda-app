@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:agendacitas/config/config_usuario_app.dart';
+import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -55,27 +56,32 @@ class _NuevoAcutalizacionUsuarioAppState
     PerfilModel perfilUsuarioApp = PerfilModel();
 
     return Scaffold(
-      appBar: AppBar(),
-      floatingActionButton: FloatingActionButton.extended(
-        label: const Text(
-          'ACTUALIZAR',
-        ),
-        isExtended: floatExtended,
-        icon: const Icon(Icons.change_circle_outlined),
-        onPressed: () async {
-          perfilUsuarioApp.denominacion =
-              myLogic.textControllerDenominacion.text;
+      appBar: AppBar(
+        title: const Text('EDICIÓN'),
+        actions: [
+          ElevatedButton.icon(
+              style: ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(
+                Theme.of(context).primaryColor,
+              )),
+              label: const Text('GUARDAR'),
+              onPressed: () {
+                perfilUsuarioApp.denominacion =
+                    myLogic.textControllerDenominacion.text;
 
-          perfilUsuarioApp.foto = myLogic.textControllerFoto.text;
-          perfilUsuarioApp.telefono = myLogic.textControllerTelefono.text;
+                perfilUsuarioApp.foto = myLogic.textControllerFoto.text;
+                perfilUsuarioApp.telefono = myLogic.textControllerTelefono.text;
 
-          perfilUsuarioApp.descripcion = myLogic.textControllerDescripcion.text;
-          perfilUsuarioApp.facebook = myLogic.textControllerFacebook.text;
-          perfilUsuarioApp.instagram = myLogic.textControllerInstagram.text;
-          perfilUsuarioApp.website = myLogic.textControllerWebsite.text;
-          perfilUsuarioApp.ubicacion = myLogic.textControllerUbicacion.text;
+                perfilUsuarioApp.descripcion =
+                    myLogic.textControllerDescripcion.text;
+                perfilUsuarioApp.facebook = myLogic.textControllerFacebook.text;
+                perfilUsuarioApp.instagram =
+                    myLogic.textControllerInstagram.text;
+                perfilUsuarioApp.website = myLogic.textControllerWebsite.text;
+                perfilUsuarioApp.ubicacion =
+                    myLogic.textControllerUbicacion.text;
 
-          /*  perfilUsuarioApp.moneda = myLogic.textControllerMoneda.text;
+                /*  perfilUsuarioApp.moneda = myLogic.textControllerMoneda.text;
           perfilUsuarioApp.servicios = myLogic.textControllerServicios.text;
           perfilUsuarioApp.ciudad = myLogic.textControllerCiudad.text;
           perfilUsuarioApp.horarios = myLogic.textControllerHorarios.text;
@@ -84,10 +90,12 @@ class _NuevoAcutalizacionUsuarioAppState
           perfilUsuarioApp.latitud = myLogic.textControllerLatitudtext;
           perfilUsuarioApp.longitud = myLogic.textControllerLongitud.text; */
 
-          setState(() {});
+                setState(() {});
 
-          _refrescaFicha(perfilUsuarioApp, usuarioAPP, myLogic);
-        },
+                _refrescaFicha(perfilUsuarioApp, usuarioAPP, myLogic);
+              },
+              icon: const Icon(Icons.save))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -96,168 +104,209 @@ class _NuevoAcutalizacionUsuarioAppState
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(150.0),
-                    child: myLogic.textControllerFoto.text != ''
-                        ? FadeInImage.assetNetwork(
-                            width: 150,
-                            height: 150,
-                            placeholder: './assets/icon/galeria-de-fotos.gif',
-                            image: myLogic.textControllerFoto.text.toString(),
-                          )
-                        : SizedBox(
-                            child: Image.asset(
+                  Container(
+                    width: MediaQuery.of(context).size.width - 110,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey, width: 2),
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: myLogic.textControllerFoto.text.isNotEmpty
+                          ? FadeInImage.assetNetwork(
+                              fit: BoxFit.cover,
+                              height: 150,
+                              placeholder: './assets/icon/galeria-de-fotos.gif',
+                              image: myLogic.textControllerFoto.text,
+                            )
+                          : Image.asset(
                               "./assets/images/nofoto.jpg",
                               width: 150,
                               height: 150,
                               fit: BoxFit.cover,
                             ),
-                          ),
+                    ),
                   ),
+                  const SizedBox(
+                      width: 16), // Espaciado entre la imagen y los íconos
                   Column(
                     children: [
-                      IconButton(
-                          onPressed: () async {
-                            cargandoImagen = true;
-
-                            final image = await getImageGaleria(
-                              usuarioAPP,
-                            );
-                            myLogic.textControllerFoto.text = image;
-
-                            setState(() {});
-
-                            cargandoImagen = false;
-
-                            //  /utils/alertaNodisponible.dart
-                          },
-                          icon: const Icon(Icons.image)),
-                      IconButton(
-                          onPressed: () async {
-                            cargandoImagen = true;
-
-                            final image = await getImageFoto(
-                              usuarioAPP,
-                            );
-                            myLogic.textControllerFoto.text = image;
-                            setState(() {});
-
-                            cargandoImagen = false;
-
-                            //  /utils/alertaNodisponible.dart
-                          },
-                          icon: const Icon(Icons.photo_camera)),
+                      ElevatedButton(
+                        onPressed: () async {
+                          cargandoImagen = true;
+                          final image = await getImageGaleria(usuarioAPP);
+                          myLogic.textControllerFoto.text = image;
+                          setState(() {});
+                          cargandoImagen = false;
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: CircleBorder(),
+                          backgroundColor: Colors.blue, // Color del botón
+                          padding: EdgeInsets.all(16), // Tamaño del botón
+                          elevation: 5,
+                        ),
+                        child: const Icon(Icons.image,
+                            size: 30, color: Colors.white),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () async {
+                          cargandoImagen = true;
+                          final image = await getImageFoto(usuarioAPP);
+                          myLogic.textControllerFoto.text = image;
+                          setState(() {});
+                          cargandoImagen = false;
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: const CircleBorder(),
+                          backgroundColor: Colors.green, // Color del botón
+                          padding: const EdgeInsets.all(16), // Tamaño del botón
+                          elevation: 5,
+                        ),
+                        child: const Icon(Icons.photo_camera,
+                            size: 30, color: Colors.white),
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
-              //todo: NO HAY FORM PARA VALIDAR LAS ENTRADAS?
-              TextField(
-                controller: myLogic.textControllerDenominacion,
-                decoration: const InputDecoration(
-                    labelText: 'Denominación de tu negocio'),
-              ),
-              TextField(
-                keyboardType: TextInputType.number,
-                controller: myLogic.textControllerTelefono,
-                decoration:
-                    const InputDecoration(labelText: 'Teléfono de contacto'),
-              ),
-              TextField(
-                enabled: false,
-                controller: textControllerEmail,
-                decoration: const InputDecoration(labelText: 'Email'),
-              ),
-              /*  TextField(
-                keyboardType: TextInputType.multiline,
-                maxLines: 20,
-                controller: myLogic.textControllerDescripcion,
-                decoration:
-                    const InputDecoration(labelText: 'Describe tu negocio'),
-              ),
- */
-              TextField(
-                enabled: false,
-                controller: myLogic.textControllerFoto,
-                decoration: const InputDecoration(labelText: 'Foto'),
-              ),
-              TextField(
-                controller: myLogic.textControllerFacebook,
-                decoration: const InputDecoration(labelText: 'Facebook'),
-              ),
-              TextField(
-                controller: myLogic.textControllerInstagram,
-                decoration: const InputDecoration(labelText: 'Instagram'),
-              ),
-              TextField(
-                controller: myLogic.textControllerWebsite,
-                decoration: const InputDecoration(labelText: 'Website'),
-              ),
-              TextField(
-                keyboardType: TextInputType.multiline,
-                maxLines: 2,
-                controller: myLogic.textControllerUbicacion,
-                decoration: const InputDecoration(labelText: 'Ubicación'),
-              ),
-              /*        TextField(
-                keyboardType: TextInputType.multiline,
-                maxLines: 2,
-                controller: myLogic.textControllerCiudad,
-                decoration: const InputDecoration(labelText: 'Ciudad'),
-              ),
-              TextField(
-                keyboardType: TextInputType.multiline,
-                maxLines: 2,
-                controller: myLogic.textControllerLatitud,
-                decoration: const InputDecoration(labelText: 'Latitud'),
-              ),
-              TextField(
-                keyboardType: TextInputType.multiline,
-                maxLines: 2,
-                controller: myLogic.textControllerLongitud,
-                decoration: const InputDecoration(labelText: 'Longitud'),
-              ),
-              TextField(
-                keyboardType: TextInputType.multiline,
-                maxLines: 2,
-                controller: myLogic.textControllerMoneda,
-                decoration: const InputDecoration(labelText: 'Moneda'),
-              ),
-              TextField(
-                keyboardType: TextInputType.multiline,
-                maxLines: 3,
-                controller: myLogic.textControllerServicios,
-                decoration: const InputDecoration(
-                    labelText:
-                        'Escribe 5 servicios se parados por comas (Se utilizarán para las busquedas)'),
-              ),
-              TextField(
-                keyboardType: TextInputType.multiline,
-                maxLines: 2,
-                controller: myLogic.textControllerHorarios,
-                decoration: const InputDecoration(labelText: 'Horario'),
-              ),
-              TextField(
-                keyboardType: TextInputType.multiline,
-                maxLines: 2,
-                controller: myLogic.textControllerInformacion,
-                decoration: const InputDecoration(
-                    labelText: 'Información adicional (Confiramación de cita)'),
-              ),
-              TextField(
-                keyboardType: TextInputType.multiline,
-                maxLines: 2,
-                controller: myLogic.textControllerNormas,
-                decoration: const InputDecoration(
-                    labelText: 'Normas de reserva de cita'),
-              ), */
 
               const SizedBox(
                 height: 50,
               ),
+              //todo: NO HAY FORM PARA VALIDAR LAS ENTRADAS?
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: myLogic.textControllerDenominacion,
+                    decoration: InputDecoration(
+                      labelText: 'Denominación de tu negocio',
+                      prefixIcon: Icon(Icons.business,
+                          color: Theme.of(context).primaryColor),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide:
+                            BorderSide(color: Theme.of(context).primaryColor),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    keyboardType: TextInputType.number,
+                    controller: myLogic.textControllerTelefono,
+                    decoration: InputDecoration(
+                      labelText: 'Teléfono de contacto',
+                      prefixIcon: Icon(Icons.phone,
+                          color: Theme.of(context).primaryColor),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    enabled: false,
+                    controller: textControllerEmail,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      prefixIcon: Icon(Icons.email,
+                          color: Theme.of(context).primaryColor),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    enabled: false,
+                    controller: myLogic.textControllerFoto,
+                    decoration: InputDecoration(
+                      labelText: 'Foto',
+                      prefixIcon: Icon(Icons.photo,
+                          color: Theme.of(context).primaryColor),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: myLogic.textControllerFacebook,
+                    decoration: InputDecoration(
+                      labelText: 'Facebook',
+                      prefixIcon: Icon(Icons.facebook, color: Colors.blue),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: myLogic.textControllerInstagram,
+                    decoration: InputDecoration(
+                      labelText: 'Instagram',
+                      prefixIcon: Icon(Icons.camera_alt, color: Colors.pink),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: myLogic.textControllerWebsite,
+                    decoration: InputDecoration(
+                      labelText: 'Website',
+                      prefixIcon: Icon(Icons.language,
+                          color: Theme.of(context).primaryColor),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 2,
+                    controller: myLogic.textControllerUbicacion,
+                    decoration: InputDecoration(
+                      labelText: 'Ubicación',
+                      prefixIcon: Icon(Icons.location_on,
+                          color: Theme.of(context).primaryColor),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              )
             ],
           ),
         ),
@@ -347,7 +396,7 @@ class _NuevoAcutalizacionUsuarioAppState
 
       cargandoImagen = false;
       const snackBar = SnackBar(
-        content: Text('FOTO CARGADA CON EXITO'),
+        content: Text('GUARDA CAMBIOS'),
       );
 
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -371,7 +420,6 @@ class _NuevoAcutalizacionUsuarioAppState
   }
 
   void _snackBarRealizado() {
-    const snackBar = SnackBar(content: Text('ACTUALIZACIÓN REALIZADA'));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    mensajeSuccess(context, 'ACTUALIZACIÓN REALIZADA');
   }
 }

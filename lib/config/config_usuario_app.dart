@@ -1,7 +1,9 @@
+import 'package:agendacitas/config/config.dart';
 import 'package:agendacitas/providers/Firebase/firebase_publicacion_online.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -19,7 +21,7 @@ class ConfigUsuarioApp extends StatefulWidget {
   State<ConfigUsuarioApp> createState() => _ConfigUsuarioAppState();
 }
 
-class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
+class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> with RouteAware {
   String foto = '';
   bool visibleIndicator = false;
   bool? _iniciadaSesionUsuario;
@@ -53,28 +55,52 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    mRouteObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    mRouteObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    setState(() {});
+    super.didPopNext();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-      // appBar: AppBar(),
-      floatingActionButton: FloatingActionButton.extended(
-        label: const Text(
-          'EDITAR PERFIL',
-        ),
-        isExtended: floatExtended,
-        icon: const Icon(Icons.edit),
-        onPressed: () async {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => NuevoAcutalizacionUsuarioApp(
-                perfilUsuarioApp: perfilUsuarioApp,
-                usuarioAPP: _emailSesionUsuario,
-              ),
-            ),
-          );
-        },
+      appBar: AppBar(
+        title: const Text('PERFIL'),
+        actions: [
+          ElevatedButton.icon(
+            label: const Text('EDITAR'),
+            style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(
+              Theme.of(context).primaryColor,
+            )),
+            onPressed: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NuevoAcutalizacionUsuarioApp(
+                    perfilUsuarioApp: perfilUsuarioApp,
+                    usuarioAPP: _emailSesionUsuario,
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(Icons.edit),
+          )
+        ],
       ),
+
       /* */
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -94,25 +120,7 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
               const SizedBox(
                 height: 20,
               ),
-              //################ BOTON PARA RESTABLECER LOS DATOS DEL DISPOSITIVO CON LOS DE FIREBASE
-              /*       ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 241, 59, 59),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 10),
-                      textStyle: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
-                  onPressed: () {
-                    _restablecerApp();
 
-                    setState(() {
-                      visibleIndicator = false;
-                    });
-                    _snackBarFinalizado(context);
-                  },
-                  icon: const Icon(Icons.download),
-                  label: const Text(
-                      'Restablece los datos de tu dispositivo con los guardados en la nube')), */
               visibleIndicator ? const LinearProgressIndicator() : Container(),
               const SizedBox(
                 height: 50,
@@ -149,67 +157,131 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _fotoEncabezado(data),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 _etiquetaPublicacionWeb(),
-                const SizedBox(height: 10),
-                ListTile(
-                  title: Text(
-                    data!.denominacion.toString(),
-                    style: tituloEstilo,
+                const SizedBox(height: 20),
+
+                // Denominación del negocio
+                Card(
+                  elevation: 5,
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: ListTile(
+                    title: Text(
+                      data!.denominacion.toString(),
+                      style: tituloEstilo,
+                    ),
+                    leading: const Icon(Icons.business, color: Colors.blue),
                   ),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.phone),
-                  title: Text(
-                    data.telefono.toString(),
+
+                // Teléfono de contacto
+                Card(
+                  elevation: 5,
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: ListTile(
+                    leading: const Icon(Icons.phone, color: Colors.green),
+                    title: Text(data.telefono.toString()),
                   ),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.email),
-                  title: Text(
-                    _emailSesionUsuario.toString(),
+
+                // Email
+                Card(
+                  elevation: 5,
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: ListTile(
+                    leading: const Icon(Icons.email, color: Colors.red),
+                    title: Text(_emailSesionUsuario.toString()),
                   ),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.web),
-                  title: Text(
-                    data.website.toString(),
+
+                // Website
+                Card(
+                  elevation: 5,
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: ListTile(
+                    leading:
+                        const Icon(Icons.language, color: Colors.blueAccent),
+                    title: Text(data.website.toString()),
                   ),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.photo),
-                  title: Text(
-                    data.instagram.toString(),
+
+                // Instagram
+                Card(
+                  elevation: 5,
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: ListTile(
+                    leading: const Icon(Icons.photo, color: Colors.pink),
+                    title: Text(data.instagram.toString()),
                   ),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.facebook),
-                  title: Text(
-                    data.facebook.toString(),
+
+                // Facebook
+                Card(
+                  elevation: 5,
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: ListTile(
+                    leading: const Icon(Icons.facebook, color: Colors.blue),
+                    title: Text(data.facebook.toString()),
                   ),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.location_city),
-                  title: Text(
-                    data.ubicacion.toString(),
+
+                // Ubicación
+                Card(
+                  elevation: 5,
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: ListTile(
+                    leading:
+                        const Icon(Icons.location_city, color: Colors.orange),
+                    title: Text(data.ubicacion.toString()),
                   ),
                 ),
+
                 const Divider(),
-                ListTile(
-                  onTap: () async {
-                    _alertaCerrado();
-                    await PagoProvider().guardaPagado(
-                        _iniciadaSesionUsuario!, _emailSesionUsuario!);
-                    await FirebaseAuth.instance.signOut();
-                    _irHome();
-                  },
-                  /* shape: RoundedRectangleBorder(
-                    side: const BorderSide(color: Colors.black, width: 1),
-                    borderRadius: BorderRadius.circular(5),
-                  ), */
-                  iconColor: Colors.blue,
-                  title: const Text('CERRAR SESION'),
-                  leading: const Icon(Icons.exit_to_app),
+
+                // Botón de Cerrar Sesión
+                Card(
+                  color: Colors.red[100],
+                  elevation: 5,
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: ListTile(
+                    onTap: () async {
+                      _alertaCerrado();
+                      await PagoProvider().guardaPagado(
+                          _iniciadaSesionUsuario!, _emailSesionUsuario!);
+                      await FirebaseAuth.instance.signOut();
+                      _irHome();
+                    },
+                    iconColor: Colors.blue,
+                    title: const Text(
+                      'CERRAR SESIÓN',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    leading: const Icon(Icons.exit_to_app, color: Colors.red),
+                  ),
                 ),
               ],
             ),
@@ -220,36 +292,45 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> {
     );
   }
 
+  // Encabezado de la Foto del Perfil
   SizedBox _fotoEncabezado(PerfilModel? data) {
     return SizedBox(
       width: double.infinity,
-      height: 150,
-      child: Stack(
-        children: [
-          data!.foto != '' && data.foto != null
-              ? Image.network(
-                  data.foto.toString(),
-                  width: double.infinity, // Para que ocupe todo el ancho
-                  height: 150,
-                  fit: BoxFit.cover,
-                )
-              : Image.asset(
-                  "./assets/images/nofoto.jpg",
-                  width: double.infinity, // Para que ocupe todo el ancho
-                  height: 150,
-                  fit: BoxFit.cover,
-                ),
-          Positioned(
-            top: 10,
-            left: 10,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+      height: 180,
+      child: Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        clipBehavior: Clip
+            .antiAlias, // Asegura que la imagen respete los bordes redondeados
+        child: Stack(
+          children: [
+            data!.foto != '' && data.foto != null
+                ? Image.network(
+                    data.foto.toString(),
+                    width: double.infinity,
+                    height: 180,
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(
+                    "./assets/images/nofoto.jpg",
+                    width: double.infinity,
+                    height: 180,
+                    fit: BoxFit.cover,
+                  ),
+            Positioned(
+              top: 10,
+              left: 10,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

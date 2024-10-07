@@ -13,6 +13,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../models/notificacion_model.dart';
 import '../providers/providers.dart';
@@ -68,7 +69,7 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
     return Scaffold(
       appBar: AppBar(
         leading: Container(),
-        title: const Text('BUZÓN DE NOTIFICACIONES'),
+        title: const Text('NOTIFICACIONES'),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -95,22 +96,48 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
           ),
         ],
         bottom: TabBar(
-          controller: _tabController, // Asignamos el controlador de la TabBar
-          labelColor: const Color.fromARGB(255, 167, 144, 144),
-          indicatorColor: Colors.blue,
-          labelStyle: const TextStyle(fontSize: 10),
+          controller: _tabController,
+          labelColor: Colors
+              .white, // Color del texto cuando la pestaña está seleccionada
+          unselectedLabelColor: Colors
+              .grey.shade600, // Color cuando la pestaña no está seleccionada
+          indicator: BoxDecoration(
+            color: Colors.blue, // Color del fondo del indicador
+            borderRadius: BorderRadius.circular(
+                20), // Bordes redondeados para el indicador
+            boxShadow: [
+              BoxShadow(
+                color: Colors.blue.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 3), // sombra hacia abajo
+              ),
+            ],
+          ),
+          labelStyle: const TextStyle(
+            fontSize: 12,
+            fontWeight:
+                FontWeight.bold, // Mayor peso para el texto de las pestañas
+          ),
           tabs: [
             Tab(
-                icon: _icono(contNotifRecordatorios, Icons.notifications),
-                text: "recordatorios "),
+              icon: _icono(contNotifRecordatorios, Icons.notifications),
+              text: "Recordatorios",
+            ),
             Tab(
-                icon: _icono(contNotifCitaWeb, Icons.cloud_done),
-                text: "cita web"),
+              icon: _icono(contNotifCitaWeb, Icons.cloud_done),
+              text: "Cita Web",
+            ),
             Tab(
-                icon: _icono(
-                    contNotifAdministrador, Icons.admin_panel_settings_sharp),
-                text: "generales"),
+              icon: _icono(
+                  contNotifAdministrador, Icons.admin_panel_settings_sharp),
+              text: "Generales",
+            ),
           ],
+          indicatorSize:
+              TabBarIndicatorSize.tab, // Indicador del tamaño del tab completo
+          indicatorPadding: const EdgeInsets.symmetric(
+              horizontal: 10.0, vertical: 5), // Ajuste del tamaño del indicador
         ),
       ),
       body: TabBarView(
@@ -130,8 +157,8 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
         /* badgeContent */
         badgeStyle: badges.BadgeStyle(
           badgeColor: contNotifRecordatorios != 0
-              ? Colors.blue
-              : Colors.white, // Color del fondo del número
+              ? Colors.red
+              : Colors.transparent, // Color del fondo del número
         ),
         child: Icon(
           icono, // El ícono sobre el que se coloca el número
@@ -184,6 +211,8 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
                             visto: notificacion['visto'],
                             data: notificacion['data'],
                             vistoPor: notificacion['vistoPor'],
+                            texto: notificacion['texto'],
+                            link: notificacion['link'],
                           );
 
                           String fechaNotificacion = _formateaFecha(
@@ -500,7 +529,7 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
                   CrossAxisAlignment.start, // Alineación a la izquierda
               children: [
                 Text(
-                  'Detalles de la notificación', // Añadimos un título
+                  notificacion['data'], // Añadimos un título
                   style: TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.bold,
@@ -509,7 +538,7 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
                 ),
                 const SizedBox(height: 8.0), // Espacio entre título y contenido
                 Text(
-                  notificacion['data'],
+                  notificacion['texto'].toString(),
                   style: TextStyle(
                     fontSize: 14.0,
                     color: Colors.grey[600], // Texto más sutil
@@ -518,28 +547,34 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
                   ),
                 ),
                 const SizedBox(
-                    height: 12.0), // Espacio entre el texto y el botón
-                /*  Align(
-                  alignment: Alignment.centerRight,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Acción del botón aquí
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent, // Color del botón
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(12), // Botón redondeado
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10), // Tamaño del botón
-                    ),
-                    child: const Text(
-                      'Acción',
-                      style: TextStyle(fontSize: 14.0),
-                    ),
-                  ),
-                ), */
+                    height: 30.0), // Espacio entre el texto y el botón
+
+                notificacion['link'] != ''
+                    ? Align(
+                        alignment: Alignment.centerRight,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            launchUrlString(notificacion['link']);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Colors.blueAccent, // Color del botón
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(12), // Botón redondeado
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 10), // Tamaño del botón
+                          ),
+                          child: const Text(
+                            'Acción',
+                            style:
+                                TextStyle(fontSize: 14.0, color: Colors.white),
+                          ),
+                        ),
+                      )
+                    : Container(),
               ],
             ),
           ),

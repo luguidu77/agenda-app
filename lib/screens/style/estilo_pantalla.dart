@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-final tituloEstilo = GoogleFonts.bebasNeue(fontSize: 40);
+final tituloEstilo = GoogleFonts.bebasNeue(fontSize: 25);
 
 final subTituloEstilo = GoogleFonts.bebasNeue(
     fontSize: 20,

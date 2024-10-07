@@ -88,6 +88,8 @@ void guardaNotificacionAdministrador(RemoteMessage message) async {
     'fechaNotificacion': DateTime.now(),
     'visto': true,
     'vistoPor': [],
+    'texto': message.data['texto'],
+    'link': message.data['link'],
   });
 }
 
@@ -113,6 +115,8 @@ Future<List<Map<String, dynamic>>>
               'fechaNotificacion': element['fechaNotificacion'],
               'visto': element['visto'],
               'vistoPor': element['vistoPor'],
+              'texto': element['texto'],
+              'link': element['link'],
             })
           }
       });

@@ -1,3 +1,4 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/models.dart';
@@ -13,7 +14,7 @@ fotoPerfil(emailSesionUsuario) {
             final data = snapshot.data;
             return CircleAvatar(
               backgroundColor: Colors.transparent,
-              child: data!.foto != '' 
+              child: data!.foto != ''
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(100.0),
                       child: FadeInImage.assetNetwork(

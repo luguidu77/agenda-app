@@ -6,6 +6,7 @@ import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -82,11 +83,23 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
     _estadopago = estadoPagoProvider.estadoPagoApp;
   }
 
+  String imageUrl = '';
+  Future<String> obtenerImagenDesdeFirebase() async {
+    dynamic perfil =
+        await FirebaseProvider().cargarPerfilFB(_emailSesionUsuario);
+    setState(() {});
+    return perfil.foto;
+  }
+
+  imagenUrl() async {
+    imageUrl = await obtenerImagenDesdeFirebase();
+  }
+
   @override
   void initState() {
     // leerBasedatos();
     emailUsuario();
-
+    imagenUrl();
     version();
 
     super.initState();
@@ -94,113 +107,151 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      // Important: Remove any padding from the ListView.
-      padding: EdgeInsets.zero,
-      children: [
-        _iniciadaSesionUsuario
-            // CABECERA CUAN HAY UNA SESION INICIADA
-            ? _cabeceraConSesion(context)
+    return Container(
+      color: colorFondo,
+      child: ListView(
+        // Important: Remove any padding from the ListView.
+        padding: EdgeInsets.zero,
+        children: [
+          _iniciadaSesionUsuario
+              // CABECERA CUAN HAY UNA SESION INICIADA
+              ? _cabeceraConSesion(context)
 
-            // CABECERA CUANDO ES APP GRATUITA
-            : _cabeceraGratuita(),
+              // CABECERA CUANDO ES APP GRATUITA
+              : _cabeceraGratuita(),
 
-        // MENSAJE PARA LA PUBLICACION EN AGENDADECITAS.ONLINE
-        _iniciadaSesionUsuario
-            ? _mensajePublicacionOnline(context, _emailSesionUsuario)
-            : Container(),
+          // MENSAJE PARA LA PUBLICACION EN AGENDADECITAS.ONLINE
+          _iniciadaSesionUsuario
+              ? _mensajePublicacionOnline(context, _emailSesionUsuario)
+              : Container(),
 
-        // CONFIGURA LOS SERVICIOS QUE OFRECEN A CLIENTES
-        _serviciosQueOfrece(context),
+          // CONFIGURA LOS SERVICIOS QUE OFRECEN A CLIENTES
+          _serviciosQueOfrece(context),
 
-        //CONFIGURACION DE LA APP
-        _configuracion(context),
+          //CONFIGURACION DE LA APP
+          _configuracion(context),
 
-        // DISPONIBILIDAD SEMANAL
-        _disponiblidadSemanal(context),
+          // DISPONIBILIDAD SEMANAL
+          _disponiblidadSemanal(context),
 
-        // INFORMES GANANCIAS
-        _informes(context),
+          // INFORMES GANANCIAS
+          _informes(context),
 
-        const Divider(),
+          const Divider(),
 
-        /*  _estadopago == 'INITIAL' || _estadopago == 'GRATUITA'
-            ? _creaCuentaPruebas()
-            : const Text(''), */
+          /*  _estadopago == 'INITIAL' || _estadopago == 'GRATUITA'
+              ? _creaCuentaPruebas()
+              : const Text(''), */
 
-        // COMPRAR LA APLICACION
-        // _estadopago == 'COMPRADA' ? const Text('') : _comprarAPP(context),
+          // COMPRAR LA APLICACION
+          // _estadopago == 'COMPRADA' ? const Text('') : _comprarAPP(context),
 
-        // PLAN AMIGO
-        // _estadopago == 'COMPRADA' ? const Text('') : _planAmigo(context),
+          // PLAN AMIGO
+          // _estadopago == 'COMPRADA' ? const Text('') : _planAmigo(context),
 
-        //NOTIFICACIONES
-        _notificaciones(),
+          //NOTIFICACIONES
+          _notificaciones(),
 
-        //BLOG AGENDADECITAS.CLOUD
-        _blog(),
+          //BLOG AGENDADECITAS.CLOUD
+          _blog(),
 
-        // REPORTES Y SUGERENCIAS
-        _reportes(),
+          // REPORTES Y SUGERENCIAS
+          _reportes(),
 
-        //_pruebaEnvioEmail(context),
+          //_pruebaEnvioEmail(context),
 
-        //VALORAR LA APLICACION Y LA VERSION DISPONIBLE
-        // _valoracionApp(),
-      ],
+          //VALORAR LA APLICACION Y LA VERSION DISPONIBLE
+          // _valoracionApp(),
+        ],
+      ),
     );
   }
 
-  UserAccountsDrawerHeader _cabeceraConSesion(BuildContext context) {
-    return UserAccountsDrawerHeader(
-        decoration: BoxDecoration(
-            color: Theme.of(context)
-                .primaryColor), // Color.fromARGB(255, 122, 121, 197)),
-        currentAccountPicture: fotoPerfil(_emailSesionUsuario),
-        currentAccountPictureSize: const Size.square(95.0),
-        otherAccountsPictures: [
-          const ChangeThemeButtonWidget(),
-          IconButton(
-              color: Colors.white,
-              icon: const Icon(Icons.edit_square),
-              onPressed: () =>
-                  {Navigator.pushNamed(context, 'ConfigUsuarioApp')}),
-        ],
-        accountEmail: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              denominacionNegocio(_emailSesionUsuario),
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _estadopago == 'PRUEBA_ACTIVA'
-                        ? const Card(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 5.0),
-                              child: Text(
-                                'versión de prueba',
-                                style: TextStyle(
-                                    color: Color.fromARGB(255, 99, 11, 23),
-                                    fontSize: 12),
-                              ),
-                            ),
-                          )
-                        : Container(),
-                    Text(
-                      'versión $versionApp',
-                      style: const TextStyle(
-                          color: Color.fromARGB(255, 99, 11, 23), fontSize: 10),
-                    ),
-                  ],
-                ),
-              )
-            ],
+  _cabeceraConSesion(BuildContext context) {
+    return Stack(
+      children: [
+        // Imagen de fondo
+        Container(
+          height: 200.0, // Altura del header
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: NetworkImage(imageUrl), // Ruta de la imagen de fondo
+              fit: BoxFit.cover,
+            ),
           ),
         ),
-        accountName: const Text(''));
+        // Degradado encima de la imagen
+        Container(
+          height: 200.0, // La misma altura que el Container de la imagen
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight,
+              colors: [
+                Colors.white.withOpacity(0.6), // Negro semi-transparente arriba
+                Colors.white, // Transparente abajo
+              ],
+              stops: const [0.0, 1.0],
+            ),
+          ),
+        ),
+        // UserAccountsDrawerHeader
+        UserAccountsDrawerHeader(
+          decoration: const BoxDecoration(
+            color: Colors.transparent, // Para que el fondo sea transparente
+          ),
+          // currentAccountPicture: fotoPerfil(_emailSesionUsuario),
+          //currentAccountPictureSize: const Size.square(95.0),
+          otherAccountsPictures: [
+            const ChangeThemeButtonWidget(),
+            IconButton(
+              color: Colors.black,
+              icon: const Icon(Icons.edit_square),
+              onPressed: () =>
+                  {Navigator.pushNamed(context, 'ConfigUsuarioApp')},
+            ),
+          ],
+          accountEmail: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                denominacionNegocio(_emailSesionUsuario),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _estadopago == 'PRUEBA_ACTIVA'
+                          ? const Card(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 5.0),
+                                child: Text(
+                                  'versión de prueba',
+                                  style: TextStyle(
+                                    color: Color.fromARGB(255, 99, 11, 23),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(),
+                      Text(
+                        'versión $versionApp',
+                        style: const TextStyle(
+                          color: Color.fromARGB(255, 99, 11, 23),
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          accountName: const Text(''),
+        ),
+      ],
+    );
   }
 
   DrawerHeader _cabeceraGratuita() {

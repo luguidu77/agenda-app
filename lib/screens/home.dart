@@ -100,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
     print(message.data);
     if (message.data['categoria'] == 'administrador') {
       print('guarda en firebase notificacionesAdministrador');
-      guardaNotificacionAdministrador(message);
+      //guardaNotificacionAdministrador(message);
     } else {
       //*GUARDA LA NOTIFICACION EN FIRESTORE agendadecitasapp->notificaciones
       guardaNotificacionAlUsuarioApp(message);

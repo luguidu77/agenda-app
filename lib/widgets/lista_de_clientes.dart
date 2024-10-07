@@ -148,108 +148,137 @@ class _ListaClientesState extends State<ListaClientes> {
     return listaAux;
   }
 
-  verclientes(context, List<ClienteModel> listaClientes, fechaCita) {
+  verclientes(
+      BuildContext context, List<ClienteModel> listaClientes, fechaCita) {
     const double width = 80;
     const double height = 80;
     return ListView.builder(
-        itemCount: listaClientes.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            // SI SE ENCUENTRA EN LA PANTALLA DE CREACION DE CITAS => AÑADE CONTEXTO Y NAVEGA A SERVICIOS
-            onTap: widget.pantalla == 'creacion_cita'
-                ? () {
-                    contextoCreacionCita.setCitaElegida = {
-                      'FECHA': fechaCita,
-                      'HORAINICIO': fechaCita,
-                      'HORAFINAL': '',
-                    };
-                    contextoCreacionCita.setClienteElegido = {
-                      'ID': listaClientes[index].id.toString(),
-                      'NOMBRE': listaClientes[index].nombre.toString(),
-                      'TELEFONO': listaClientes[index].telefono.toString(),
-                      'EMAIL': listaClientes[index].email.toString(),
-                      'FOTO': listaClientes[index].foto.toString(),
-                    };
-                    Navigator.pushNamed(context, 'creacionCitaServicio',
-                        arguments: listaClientes[index]);
-                  }
-                : null,
+      itemCount: listaClientes.length,
+      itemBuilder: (context, index) {
+        return GestureDetector(
+          // Navegación al seleccionar un cliente
+          onTap: widget.pantalla == 'creacion_cita'
+              ? () {
+                  contextoCreacionCita.setCitaElegida = {
+                    'FECHA': fechaCita,
+                    'HORAINICIO': fechaCita,
+                    'HORAFINAL': '',
+                  };
+                  contextoCreacionCita.setClienteElegido = {
+                    'ID': listaClientes[index].id.toString(),
+                    'NOMBRE': listaClientes[index].nombre.toString(),
+                    'TELEFONO': listaClientes[index].telefono.toString(),
+                    'EMAIL': listaClientes[index].email.toString(),
+                    'FOTO': listaClientes[index].foto.toString(),
+                  };
+                  Navigator.pushNamed(context, 'creacionCitaServicio',
+                      arguments: listaClientes[index]);
+                }
+              : null,
 
-            // ==================TARJETA DE VISUALIZACION DE CLIENTES ==============================
-            child: Card(
-              child: ClipRect(
-                child: SizedBox(
-                  child: Column(
-                    children: [
-                      ListTile(
-                          leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(5.0),
-                            child: widget.iniciadaSesionUsuario &&
-                                    listaClientes[index].foto! != ''
-                                ? Image.network(
-                                    listaClientes[index].foto!,
-                                    width: width,
-                                    height: height,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Image.asset(
-                                    "./assets/images/nofoto.jpg",
-                                    width: width,
-                                    height: height,
-                                    fit: BoxFit.cover,
+          // ================== TARJETA DE VISUALIZACION DE CLIENTES ==============================
+          child: Card(
+            margin: const EdgeInsets.symmetric(
+                vertical: 10, horizontal: 15), // Margen entre tarjetas
+            elevation: 8, // Sombra más pronunciada
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15), // Bordes redondeados
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(
+                  15), // Asegurarse de que la imagen también tenga bordes redondeados
+              child: SizedBox(
+                child: Column(
+                  children: [
+                    ListTile(
+                      contentPadding:
+                          const EdgeInsets.all(10), // Espaciado interno
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(10.0),
+                        child: widget.iniciadaSesionUsuario &&
+                                listaClientes[index].foto!.isNotEmpty
+                            ? Image.network(
+                                listaClientes[index].foto!,
+                                width: width,
+                                height: height,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.asset(
+                                "./assets/images/nofoto.jpg",
+                                width: width,
+                                height: height,
+                                fit: BoxFit.cover,
+                              ),
+                      ),
+                      title: Text(
+                        listaClientes[index].nombre.toString(),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87, // Color de texto más oscuro
+                        ),
+                      ),
+                      subtitle: Text(
+                        listaClientes[index].telefono.toString(),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600], // Color de texto más claro
+                        ),
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(
+                          FontAwesomeIcons.circleInfo,
+                          color: Colors.blue, // Color del ícono
+                        ),
+                        onPressed: () async {
+                          await showModalBottomSheet(
+                            isScrollControlled: true,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Container(
+                                height: 300,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(
+                                        20), // Bordes redondeados en la parte superior
                                   ),
-                          ),
-                          title: Text(
-                            listaClientes[index].nombre.toString(),
-                            style: subTituloEstilo,
-                          ),
-                          subtitle: Text(
-                            listaClientes[index].telefono.toString(),
-                            style: textoTelefonoEstilo,
-                          ),
-                          trailing: InkWell(
-                              onTap: () async {
-                                await showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return Container(
-                                      height: 300,
-                                      color: Colors.white,
-                                      child: Center(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: <Widget>[
-                                            Text(
-                                              listaClientes[index]
-                                                  .nombre
-                                                  .toString(),
-                                              style: titulo,
-                                            ),
-                                            const Divider(),
-                                            MenuConfigCliente(
-                                                cliente: listaClientes[index]),
-
-                                            //_opciones(context, cliente)
-                                          ],
+                                ),
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Text(
+                                        listaClientes[index].nombre.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black, // Color de texto
                                         ),
                                       ),
-                                    );
-                                  },
-                                );
+                                      const Divider(),
+                                      MenuConfigCliente(
+                                          cliente: listaClientes[index]),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
 
-                                setState(() {});
-                              },
-                              child: const Icon(FontAwesomeIcons.circleInfo))),
-                    ],
-                  ),
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
   cargaClientesFirebase(String emailSesionUsuario) async {

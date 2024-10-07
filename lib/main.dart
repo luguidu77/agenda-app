@@ -21,6 +21,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:provider/provider.dart';
 
+import 'config/.configuraciones.dart';
 import 'models/models.dart';
 import 'providers/providers.dart';
 import 'screens/screens.dart';
@@ -57,7 +58,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     return;
   }
 
-  guardaNotificacionAdministrador(message);
+  //guardaNotificacionAdministrador(message);
 }
 
 void main() async {
@@ -198,6 +199,7 @@ class _MyAppState extends State<MyApp> {
       ],
       builder: (context, _) {
         return MaterialApp(
+            navigatorObservers: [mRouteObserver],
             theme: ThemeData(
               useMaterial3: true,
             ),

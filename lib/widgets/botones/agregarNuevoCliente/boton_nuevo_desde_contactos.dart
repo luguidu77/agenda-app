@@ -49,14 +49,37 @@ class _BotonNuevoDesdeContactoState extends State<BotonNuevoDesdeContacto> {
 
   GestureDetector botonClienteTelefono(BuildContext context) {
     return GestureDetector(
-        onTap: () {
-          _iniciadaSesionUsuario
-              ? _showContactList(context)
-              : mensajeError(context, 'No disponible en versión gratuita');
-        },
-        child: const BotonAgrega(
-          texto: 'TUS CONTACTOS',
-        ));
+      onTap: () {
+        _iniciadaSesionUsuario
+            ? _showContactList(context)
+            : mensajeError(context, 'No disponible en versión gratuita');
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.green, // Color de fondo
+          borderRadius: BorderRadius.circular(30), // Bordes redondeados
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26, // Sombra sutil
+              blurRadius: 6,
+              offset: Offset(0, 2), // Desplazamiento de la sombra
+            ),
+          ],
+        ),
+        padding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Relleno
+        child: const Center(
+          child: Text(
+            'TUS CONTACTOS',
+            style: const TextStyle(
+              color: Colors.white, // Color del texto
+              fontSize: 16, // Tamaño del texto
+              fontWeight: FontWeight.bold, // Peso del texto
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   _showContactList(context) async {

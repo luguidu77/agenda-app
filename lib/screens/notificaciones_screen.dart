@@ -513,7 +513,7 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
   Padding _tarjetaDescripcionAdministracion(notificacion) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-      child: Container(
+      child: SizedBox(
         width: double.infinity,
         child: Card(
           elevation: 6, // Aumentar la sombra para más profundidad
@@ -622,7 +622,7 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
                     Text(nombre),
                   ],
                 ),
-              _ => Text(''),
+              _ => const Text(''),
             },
             trailing: switch (notificacion['categoria']) {
               'administrador' => BotoLeidoNotifAdministrador(
@@ -693,7 +693,7 @@ Text _obtieneTextoTitulo(String categoria, String data, double size) {
   }
   String truncarTexto(String texto, int maxCaracteres) {
     if (texto.length > maxCaracteres) {
-      return texto.substring(0, maxCaracteres) + '...';
+      return '${texto.substring(0, maxCaracteres)}...';
     } else {
       return texto;
     }
@@ -732,9 +732,5 @@ Text _obtieneTextoTitulo(String categoria, String data, double size) {
 
 ({String serv}) _obtieneServicio(data) {
   String servicio = data['servicio'];
-  if (servicio != null) {
-    return (serv: servicio,);
-  } else {
-    return (serv: 'servicio',);
-  }
+  return (serv: servicio,);
 }

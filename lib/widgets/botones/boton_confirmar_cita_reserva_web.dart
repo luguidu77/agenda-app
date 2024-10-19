@@ -1,9 +1,11 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/Firebase/notificaciones.dart';
+import 'package:agendacitas/providers/providers.dart';
 
 import 'package:agendacitas/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class BotonConfirmarCitaWeb extends StatefulWidget {
   final dynamic cita;
@@ -20,12 +22,12 @@ class BotonConfirmarCitaWeb extends StatefulWidget {
 }
 
 class _BotonConfirmarCitaWebState extends State<BotonConfirmarCitaWeb> {
-  bool _visto = false;
+  bool _citaconfirmada = false;
   bool _cargando = false;
 
   @override
   void initState() {
-    _visto = widget.cita['confirmada'] == 'true' ? true : false;
+    _citaconfirmada = widget.cita['confirmada'] == 'true' ? true : false;
     super.initState();
   }
 
@@ -35,23 +37,38 @@ class _BotonConfirmarCitaWebState extends State<BotonConfirmarCitaWeb> {
         widget.cita['tokenWebCliente'] != '' ? true : false;
 
     return ListTile(
-        title: _visto
-            ? const Text('🗓️ CONFIRMADA')
-            : const Text(
-                '❌ NO CONFIRMADA',
+        title: _citaconfirmada
+            ? const Text('CITA CONFIRMADA',
                 style: TextStyle(
-                    color: Colors.red,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12))
+            : const Text(
+                'CITA SIN CONFIRMAR',
+                style: TextStyle(
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 12),
               ),
-        trailing: ElevatedButton(
+        trailing: FloatingActionButton(
+          mini: true,
+          backgroundColor: _citaconfirmada ? Colors.redAccent : Colors.blue,
+          onPressed: _cambiaEstadoConfirmacion,
+          child: _cargando
+              ? const SizedBox(
+                  width: 15, height: 15, child: CircularProgressIndicator())
+              : Icon(_citaconfirmada ? Icons.cancel : Icons.check,
+                  color: Colors.white),
+        ));
+
+    /*   ElevatedButton(
           // color: _visto ? Colors.blueGrey : Colors.blue,
           onPressed: _cambiaEstadoConfirmacion,
           child: _cargando
               ? const SizedBox(
                   width: 15, height: 15, child: LinearProgressIndicator())
               : Text(_visto ? 'Anular' : 'Confirmar'),
-        ));
+        )); */
   }
 
   _cambiaEstadoConfirmacion() async {
@@ -74,7 +91,11 @@ class _BotonConfirmarCitaWebState extends State<BotonConfirmarCitaWeb> {
 
     // Cambiar estado local
     setState(() {
-      _visto = !_visto;
+      final citaconfirmada =
+          Provider.of<EstadoConfirmacionCita>(context, listen: false);
+      citaconfirmada.setEstadoCita(!_citaconfirmada);
+
+      _citaconfirmada = citaconfirmada.estadoCita;
       _cargando = false; // Oculta el indicador de carga
     });
   }

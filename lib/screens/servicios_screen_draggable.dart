@@ -243,8 +243,8 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
         newListIndex != 0 ? newItemIndex + newListIndex * 100 : newItemIndex;
     final int oldIndexAdaptado =
         oldListIndex != 0 ? oldItemIndex + oldListIndex * 100 : oldItemIndex; */
-    final oldIndexAdaptado = 100;
-    final newIndexAdaptado = 101;
+    const oldIndexAdaptado = 100;
+    const newIndexAdaptado = 101;
     var oldIdServicio = await buscaDocumento(oldIndexAdaptado);
     var newIdServicio = await buscaDocumento(newIndexAdaptado);
 
@@ -271,8 +271,8 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
       debugPrint(
           'newItemIndes: INDECE ITEM NEW POSICION adaptado:  ${newIndexAdaptado.toString()}');
 
-      debugPrint(' oldIdServicio: ID DEL SERVICIO INICIO ${oldIdServicio}');
-      debugPrint(' oldIdServicio: ID DEL SERVICIO FIANL ${newIdServicio}');
+      debugPrint(' oldIdServicio: ID DEL SERVICIO INICIO $oldIdServicio');
+      debugPrint(' oldIdServicio: ID DEL SERVICIO FIANL $newIdServicio');
       //---------------------- ACTUALIZA LISTA EN FIREBASE ----------------------------
 
       if (oldListIndex == newListIndex) {

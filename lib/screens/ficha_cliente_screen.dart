@@ -348,90 +348,105 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
     );
   }
 
-  _historial(context, List<Map<String, dynamic>> citas, String idCliente) {
+  _historial(BuildContext context, List<Map<String, dynamic>> citas,
+      String idCliente) {
     return FutureBuilder<dynamic>(
-        future: _iniciadaSesionUsuario
-            ? FirebaseProvider()
-                .cargarCitasPorCliente(_emailSesionUsuario, idCliente)
-            : CitaListProvider().cargarCitasPorCliente(int.parse(idCliente)),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return SkeletonParagraph(
-              style: SkeletonParagraphStyle(
-                  lines: 5,
-                  spacing: 6,
-                  lineStyle: SkeletonLineStyle(
-                    // randomLength: true,
-                    height: 80,
-                    borderRadius: BorderRadius.circular(5),
-                    // minLength: MediaQuery.of(context).size.width,
-                    // maxLength: MediaQuery.of(context).size.width,
-                  )),
-            );
-          } else if (snapshot.connectionState == ConnectionState.active ||
-              snapshot.connectionState == ConnectionState.done) {
-            //#### SNAPSHOT TRAE LAS CITAS, LAS CUALES LAS PASO POR ORDEN DE FECHAS A LA VARIABLE  citas
-            List citas = listaCitasOrdenadasPorFecha(snapshot.data);
+      future: _iniciadaSesionUsuario
+          ? FirebaseProvider()
+              .cargarCitasPorCliente(_emailSesionUsuario, idCliente)
+          : CitaListProvider().cargarCitasPorCliente(int.parse(idCliente)),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return SkeletonParagraph(
+            style: SkeletonParagraphStyle(
+              lines: 5,
+              spacing: 6,
+              lineStyle: SkeletonLineStyle(
+                height: 80,
+                borderRadius: BorderRadius.circular(5),
+              ),
+            ),
+          );
+        } else if (snapshot.connectionState == ConnectionState.active ||
+            snapshot.connectionState == ConnectionState.done) {
+          List citas = listaCitasOrdenadasPorFecha(snapshot.data);
 
-            if (snapshot.hasError) {
-              return const Text('Error');
-
-              //###################    SI HAY DATOS Y LA CITAS NO ESTA VACIA ###########################
-            } else if (snapshot.hasData && citas.isNotEmpty) {
-              return Flexible(
+          if (snapshot.hasError) {
+            return const Center(
+                child: Text('Error',
+                    style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)));
+          } else if (snapshot.hasData && citas.isNotEmpty) {
+            return Flexible(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0), // Agrega padding general
                 child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start, // Alinear al inicio
                   children: [
-                    SizedBox(
-                      // tarjeta con numero de citas concertadas
-
-                      child: Text('${citas.length} citas concertadas ',
-                          style: subTituloEstilo),
-                    ),
-                    SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: 350,
-                            child: ListView.builder(
+                    Text('${citas.length} citas concertadas',
+                        style: subTituloEstilo.copyWith(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                    const SizedBox(
+                        height: 16), // Espacio entre el título y la lista
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            ListView.builder(
+                              physics:
+                                  const NeverScrollableScrollPhysics(), // Para evitar scroll en ListView dentro de SingleChildScrollView
+                              shrinkWrap:
+                                  true, // Asegura que el ListView ocupe solo el espacio necesario
                               itemCount: citas.length,
                               itemBuilder: (context, index) {
-                                print(
-                                    '55555555555555555555555555555555555555555555555555555555555555555555');
-                                print(citas[index]);
                                 return Card(
+                                  elevation: 4, // Sombra en la tarjeta
+                                  margin: const EdgeInsets.symmetric(
+                                      vertical:
+                                          8), // Margen vertical entre tarjetas
                                   color: (DateTime.now().isBefore(
                                           DateTime.parse(citas[index]['dia'])))
                                       ? const Color.fromARGB(255, 245, 197, 194)
-                                      : null,
+                                      : Colors.white,
                                   child: Padding(
                                     padding: const EdgeInsets.all(15.0),
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceAround,
+                                      crossAxisAlignment: CrossAxisAlignment
+                                          .start, // Alinear contenido a la izquierda
                                       children: [
-                                        Row(
-                                          children: [
-                                            //? FECHA LARGA EN ESPAÑOL
-
-                                            Text(DateFormat.MMMMEEEEd('es_ES')
-                                                .format(DateTime.parse(
-                                                    citas[index]['dia']
-                                                        .toString()))),
-                                          ],
+                                        Text(
+                                          DateFormat.MMMMEEEEd('es_ES').format(
+                                              DateTime.parse(citas[index]['dia']
+                                                  .toString())),
+                                          style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600),
                                         ),
                                         const SizedBox(
-                                          height: 10,
-                                        ),
+                                            height:
+                                                8), // Espacio entre fecha y otros datos
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text(citas[index]['servicio']
-                                                /*  .toString()
-                                                .toUpperCase() */
-                                                ),
                                             Text(
-                                                '${citas[index]['precio'].toString()} ${personaliza.moneda}'),
+                                              citas[index]['servicio'],
+                                              style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                            Text(
+                                              '${citas[index]['precio'].toString()} ${personaliza.moneda}',
+                                              style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.green),
+                                            ),
                                           ],
                                         )
                                       ],
@@ -440,37 +455,39 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
                                 );
                               },
                             ),
-                          ),
-                          SizedBox(
-                            height: 50,
-                          )
-                        ],
+                            const SizedBox(
+                                height: 16), // Espacio adicional al final
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-              );
-            } else {
-              return Column(
+              ),
+            );
+          } else {
+            return Center(
+              child: Column(
+                mainAxisAlignment:
+                    MainAxisAlignment.center, // Centra el contenido
                 children: [
-                  const SizedBox(
-                    height: 50,
-                  ),
-                  const Text('No tienes citas para este cliente'),
-                  const SizedBox(
-                    height: 50,
-                  ),
+                  const Text('No tienes citas para este cliente',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                  const SizedBox(height: 16),
                   Image.asset(
                     'assets/images/caja-vacia.png',
                     width: MediaQuery.of(context).size.width - 250,
                   ),
                 ],
-              );
-            }
-          } else {
-            return Text('State: ${snapshot.connectionState}');
+              ),
+            );
           }
-        });
+        } else {
+          return Center(child: Text('State: ${snapshot.connectionState}'));
+        }
+      },
+    );
   }
 
   List listaCitasOrdenadasPorFecha(List<dynamic> citas) {

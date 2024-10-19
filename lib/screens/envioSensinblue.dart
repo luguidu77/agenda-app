@@ -14,7 +14,7 @@ class _EnvioSensinblueState extends State<EnvioSensinblue> {
     return Center(
         child: Container(
       child: ElevatedButton(
-        child: Text('enviar email'),
+        child: const Text('enviar email'),
         onPressed: () => sendEmail(),
       ),
     ));

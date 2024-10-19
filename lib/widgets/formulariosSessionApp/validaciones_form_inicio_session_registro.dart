@@ -52,7 +52,6 @@ creaCuentaUsuarioApp(context, email, password) async {
     return true;
   } on FirebaseAuthException catch (e) {
     if (e.code == 'email-already-in-use') {
-     
       mensajeError(context, 'El usuario ya existe');
     }
     return false;

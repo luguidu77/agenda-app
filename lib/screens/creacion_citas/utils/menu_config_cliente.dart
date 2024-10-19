@@ -6,7 +6,6 @@ import '../../../mylogic_formularios/mylogic.dart';
 import '../../../providers/providers.dart';
 import '../../../utils/utils.dart';
 import '../../screens.dart';
-import '../style/.estilos_creacion_cita.dart';
 
 class MenuConfigCliente extends StatefulWidget {
   var cliente;

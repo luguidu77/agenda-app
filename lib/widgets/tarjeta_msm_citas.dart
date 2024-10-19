@@ -61,8 +61,8 @@ Future tarjetaModificarMsm(context, contextoPersonalizaFirebase, emailUsuario,
                                 },
                                 // modificaDato(),
                                 await PersonalizaProviderFirebase()
-                                    .actualizarPersonaliza(context,
-                                        emailUsuario, ctrl_1.text),
+                                    .actualizarPersonaliza(
+                                        context, emailUsuario, ctrl_1.text),
                                 Navigator.pop(context)
                               },
                           },
@@ -70,8 +70,7 @@ Future tarjetaModificarMsm(context, contextoPersonalizaFirebase, emailUsuario,
                       label: const Text('Validar')),
                   ElevatedButton.icon(
                       style: const ButtonStyle(
-                          backgroundColor:
-                              MaterialStatePropertyAll(Colors.red)),
+                          backgroundColor: WidgetStatePropertyAll(Colors.red)),
                       onPressed: () async => {
                             if (formKey.currentState!.validate())
                               {Navigator.pop(context)},

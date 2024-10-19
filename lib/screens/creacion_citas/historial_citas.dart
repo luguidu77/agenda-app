@@ -82,7 +82,7 @@ class _HistorialCitasState extends State<HistorialCitas> {
                               DateFormat.MMMMEEEEd('es_ES').format(
                                   DateTime.parse(
                                       citas[index]['dia'].toString())),
-                              style: TextStyle(fontSize: 10),
+                              style: const TextStyle(fontSize: 10),
                             ),
                             Text('${citas[index]['servicio']}'),
                             Text(

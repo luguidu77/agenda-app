@@ -41,7 +41,7 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
   Color colorbotones = const Color.fromARGB(255, 96, 125, 139);
 
   //CONTACTOS DEL TELEFONO
-  Iterable<Contact> _contacts = [];
+  final Iterable<Contact> _contacts = [];
 
   List<int> numCitas = [];
   TextEditingController busquedaController = TextEditingController();

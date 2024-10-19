@@ -31,7 +31,7 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
   }
 
   SpeedDial _botonSpeedDial(BuildContext context) {
-    final _leerEstadoBotonIndisponibilidad =
+    final leerEstadoBotonIndisponibilidad =
         Provider.of<BotonAgregarIndisponibilidadProvider>(context);
     var renderOverlay = true;
     var visible = true;
@@ -119,7 +119,7 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
           label: 'Crea una cita',
           onTap: () {
             mensajeInfo(context, 'SELECCIONA UNA HORA EN EL CALENDARIO');
-            _leerEstadoBotonIndisponibilidad
+            leerEstadoBotonIndisponibilidad
                 .setBotonPulsadoIndisponibilidad(false);
             /*   Navigator.push(
               context,
@@ -136,7 +136,7 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
           foregroundColor: Colors.white,
           label: 'No disponible',
           onTap: () {
-            _leerEstadoBotonIndisponibilidad
+            leerEstadoBotonIndisponibilidad
                 .setBotonPulsadoIndisponibilidad(true);
 
             /*  // formulario de no disponibilidad

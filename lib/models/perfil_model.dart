@@ -91,8 +91,7 @@ class PerfilModel {
         "normas": normas,
         "latitud": latitud,
         "longitud": longitud,
-        "fechaRegistro":
-            fechaRegistro != null ? fechaRegistro!.toIso8601String() : null,
+        "fechaRegistro": fechaRegistro?.toIso8601String(),
         "appPagada": appPagada,
         "email": email, // Nuevo campo
       };

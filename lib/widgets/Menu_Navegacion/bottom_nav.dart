@@ -134,7 +134,7 @@ class _BNavigatorState extends State<BNavigator> with WidgetsBindingObserver {
     int contNotif = contadorNotificaciones.contadorNotificaciones;
 
     print(
-        '**************************************hay notificaciones no leidas ?   ${contadorNotificaciones}');
+        '**************************************hay notificaciones no leidas ?   $contadorNotificaciones');
 
     contNotif != 0
         ? iconoNotificaciones = Icons.notifications_active_outlined

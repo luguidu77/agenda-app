@@ -40,7 +40,7 @@ class ActualizacionCita {
       nuevaHoraDateTime = fechaDroppintTime;
 
       textoFecha =
-          '${nuevaHoraDateTime!.year}-${nuevaHoraDateTime.month.toString().padLeft(2, '0')}-${nuevaHoraDateTime.day.toString().padLeft(2, '0')}';
+          '${nuevaHoraDateTime.year}-${nuevaHoraDateTime.month.toString().padLeft(2, '0')}-${nuevaHoraDateTime.day.toString().padLeft(2, '0')}';
     } else {
       nuevaHoraDateTime = horaInicioProgramable;
 

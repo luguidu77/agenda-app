@@ -70,7 +70,7 @@ class _BotonNuevoClienteManualState extends State<BotonNuevoClienteManual> {
         child: const Center(
           child: Text(
             'NUEVO',
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white, // Color del texto
               fontSize: 16, // Tamaño del texto
               fontWeight: FontWeight.bold, // Peso del texto

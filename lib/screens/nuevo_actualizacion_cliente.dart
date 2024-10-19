@@ -103,233 +103,205 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
         'email cliente:${cliente.email} telefono cliente ${cliente.telefono}// pagado : $pagado // usuarioAPP: $_emailSesionUsuario ');
 
     return Scaffold(
-      appBar: AppBar(),
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text(
-          nuevoCliente ? 'NUEVO CLIENTE' : 'ACTUALIZAR CLIENTE',
-        ),
-        isExtended: floatExtended,
-        icon: nuevoCliente
-            ? const Icon(Icons.add)
-            : const Icon(Icons.change_circle_outlined),
-        onPressed: () async {
-          if (_formKey.currentState!.validate()) {
-            if (!cargandoImagen) {
-              cliente = await clienteDatos();
-              setState(() {});
-              nuevoCliente
-                  ? _nuevoCliente(_emailSesionUsuario, cliente, pagado, myLogic)
-                  : _refrescaFicha(
-                      _emailSesionUsuario, cliente, pagado, myLogic);
-            } else {
-              mensajeError(context, 'NO ACTUALIZADO, CARGANDO FOTO');
-            }
-          }
-        },
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: ListView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          children: [
-            /*   Row(
-              //BOTON X PARA CERRAR FORMULARIO
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const SizedBox(
-                  width: 50,
+        appBar: AppBar(
+          actions: [
+            ElevatedButton.icon(
+                style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(
+                  Theme.of(context).primaryColor,
+                )),
+                label: Text(
+                  nuevoCliente ? 'NUEVO CLIENTE' : 'ACTUALIZAR CLIENTE',
                 ),
-                IconButton(
-                    onPressed: () => nuevoCliente
-                        ? Navigator.pop(context)
-                        : Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => FichaClienteScreen(
-                                      clienteParametro: ClienteModel(
-                                          id: cliente.id,
-                                          nombre: cliente.nombre,
-                                          telefono: cliente.telefono,
-                                          email: cliente.email,
-                                          foto: myLogic.textControllerFoto.text,
-                                          nota: cliente.nota),
-                                    )),
-                          ),
-                    icon: const Icon(
-                      Icons.close,
-                      size: 50,
-                      color: Color.fromARGB(167, 114, 136, 150),
-                    )),
-              ],
-            ), */
-            /*  const SizedBox(
-              height: 50,
-            ), */
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                !cargandoImagen // espera a que la imagen se cargue
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(10.0),
-                        child:
-                            // ##### si hay sesion y foto guadada la carga de firebase con al ruta de textControllerFoto.text(no visible al usuario) #####
-                            _iniciadaSesionUsuario &&
-                                    myLogic.textControllerFoto.text != ''
-                                ? Image.network(
-                                    myLogic.textControllerFoto.text,
-                                    width: 100,
-                                    height: 100,
-                                    fit: BoxFit.cover,
-                                  )
-                                // ### si no hay foto  o  no hay usuario, muestra imagen nofoto.jpg
-                                : Image.asset(
-                                    "./assets/images/nofoto.jpg",
-                                    width: 100,
-                                    height: 100,
-                                    fit: BoxFit.cover,
-                                  ),
-                      )
-                    : ClipRRect(
-                        borderRadius: BorderRadius.circular(150.0),
-                        child: const CircularProgressIndicator(),
-                      ),
-                const SizedBox(width: 10),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    ElevatedButton.icon(
-                        label: const Text('MI IMAGENES   '),
-                        onPressed: () async {
-                          if (_iniciadaSesionUsuario) {
-                            setState(() {
-                              cargandoImagen = true;
-                            });
-
-                            final image = await getImageGaleria(
-                                _emailSesionUsuario,
-                                cliente.telefono != null
-                                    ? cliente.telefono!
-                                    : '',
-                                cliente);
-                            myLogic.textControllerFoto.text = image;
-
-                            setState(() {
-                              cargandoImagen = false;
-                            });
-
-                            //  /utils/alertaNodisponible.dart
-                          } else {
-                            mensajeInfo(
-                                context, 'NO DISPONIBLE SIN INICIAR SESION');
-                          }
-                        },
-                        icon: const Icon(Icons.image)),
-                    ElevatedButton.icon(
-                        label: const Text('HAZ UNA FOTO'),
-                        onPressed: () async {
-                          if (_iniciadaSesionUsuario) {
-                            setState(() {
-                              cargandoImagen = true;
-                            });
-
-                            final image = await getImageFoto(
-                                _emailSesionUsuario,
-                                cliente.telefono != null
-                                    ? cliente.telefono!
-                                    : '');
-                            myLogic.textControllerFoto.text = image;
-                            setState(() {
-                              cargandoImagen = false;
-                            });
-
-                            //  /utils/alertaNodisponible.dar
-                          } else {
-                            mensajeInfo(
-                                context, 'NO DISPONIBLE SIN INICIAR SESION');
-                          }
-                        },
-                        icon: const Icon(Icons.photo_camera)),
-                  ],
-                )
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      maxLength: 25,
-                      style: Theme.of(context).textTheme.titleMedium,
-                      validator: (value) => _validacion(value),
-                      controller: myLogic.textControllerNombre,
-                      decoration: InputDecoration(
-                          labelText: 'Nombre',
-                          labelStyle:
-                              TextStyle(color: Theme.of(context).primaryColor)),
-                    ),
-                    TextFormField(
-                      onChanged: (value) {
-                        setState(() {
-                          numtelefono = value;
-                          // Validar el formato del correo electrónico
-                          isTelfValido = isPhoneNumberValid(value);
-                        });
-                      },
-                      style: Theme.of(context).textTheme.titleLarge,
-                      validator: (value) => _validacion(value),
-                      keyboardType: TextInputType.number,
-                      controller: myLogic.textControllerTelefono,
-                      decoration: InputDecoration(
-                        labelText: 'Telefono',
-                        errorText: isTelfValido
-                            ? null
-                            : 'Formato de teléfono inválido',
-                      ),
-                    ),
-                    TextFormField(
-                      onChanged: (value) {
-                        setState(() {
-                          email = value;
-                          // Validar el formato del correo electrónico
-                          isEmailValid = isEmailValido(value);
-                        });
-                      },
-                      style: Theme.of(context).textTheme.titleLarge,
-                      //validator: (value) => _validacion(value),
-                      keyboardType: TextInputType.emailAddress,
-                      controller: myLogic.textControllerEmail,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        errorText:
-                            isEmailValid ? null : 'Formato de correo inválido',
-                      ),
-                    ),
-
-                    /*  TextField(
-                //todo: quitar en produccion
-                enabled: false,
-                controller: myLogic.textControllerFoto,
-                decoration: const InputDecoration(labelText: 'Foto'),
-              ), */
-                    TextFormField(
-                      maxLength: 25,
-                      style: Theme.of(context).textTheme.titleSmall,
-                      controller: myLogic.textControllerNota,
-                      decoration: const InputDecoration(labelText: 'Notas'),
-                    ),
-                    const SizedBox(
-                      height: 200,
-                    ),
-                  ],
-                ),
-              ),
-            )
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    if (!cargandoImagen) {
+                      cliente = await clienteDatos();
+                      setState(() {});
+                      nuevoCliente
+                          ? _nuevoCliente(
+                              _emailSesionUsuario, cliente, pagado, myLogic)
+                          : _refrescaFicha(
+                              _emailSesionUsuario, cliente, pagado, myLogic);
+                    } else {
+                      mensajeError(context, 'NO ACTUALIZADO, CARGANDO FOTO');
+                    }
+                  }
+                },
+                icon: const Icon(Icons.save))
           ],
         ),
-      ),
-    );
+        body: Padding(
+          padding: const EdgeInsets.all(18.0),
+          child: ListView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Carga de imagen o indicador de carga
+                  !cargandoImagen
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: _iniciadaSesionUsuario &&
+                                  myLogic.textControllerFoto.text.isNotEmpty
+                              ? Image.network(
+                                  myLogic.textControllerFoto.text,
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.asset(
+                                  "./assets/images/nofoto.jpg",
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                        )
+                      : const CircularProgressIndicator(),
+                  const SizedBox(width: 10),
+                  // Botones para seleccionar imagen
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton.icon(
+                          label: const Text('MI IMÁGENES'),
+                          onPressed: () async {
+                            if (_iniciadaSesionUsuario) {
+                              setState(() {
+                                cargandoImagen = true;
+                              });
+
+                              final image = await getImageGaleria(
+                                  _emailSesionUsuario,
+                                  cliente.telefono ?? '',
+                                  cliente);
+                              myLogic.textControllerFoto.text = image;
+
+                              setState(() {
+                                cargandoImagen = false;
+                              });
+                            } else {
+                              mensajeInfo(
+                                  context, 'NO DISPONIBLE SIN INICIAR SESIÓN');
+                            }
+                          },
+                          icon: const Icon(Icons.image),
+                        ),
+                        const SizedBox(height: 10),
+                        ElevatedButton.icon(
+                          label: const Text('HAZ UNA FOTO'),
+                          onPressed: () async {
+                            if (_iniciadaSesionUsuario) {
+                              setState(() {
+                                cargandoImagen = true;
+                              });
+
+                              final image = await getImageFoto(
+                                  _emailSesionUsuario, cliente.telefono ?? '');
+                              myLogic.textControllerFoto.text = image;
+
+                              setState(() {
+                                cargandoImagen = false;
+                              });
+                            } else {
+                              mensajeInfo(
+                                  context, 'NO DISPONIBLE SIN INICIAR SESIÓN');
+                            }
+                          },
+                          icon: const Icon(Icons.photo_camera),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                  height: 20), // Espacio entre la fila y el formulario
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        maxLength: 25,
+                        style: Theme.of(context).textTheme.titleMedium,
+                        validator: (value) => _validacion(value),
+                        controller: myLogic.textControllerNombre,
+                        decoration: InputDecoration(
+                          labelText: 'Nombre',
+                          labelStyle:
+                              TextStyle(color: Theme.of(context).primaryColor),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16), // Espacio entre campos
+                      TextFormField(
+                        onChanged: (value) {
+                          setState(() {
+                            numtelefono = value;
+                            isTelfValido = isPhoneNumberValid(value);
+                          });
+                        },
+                        style: Theme.of(context).textTheme.titleLarge,
+                        validator: (value) => _validacion(value),
+                        keyboardType: TextInputType.number,
+                        controller: myLogic.textControllerTelefono,
+                        decoration: InputDecoration(
+                          labelText: 'Teléfono',
+                          errorText: isTelfValido
+                              ? null
+                              : 'Formato de teléfono inválido',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16), // Espacio entre campos
+                      TextFormField(
+                        onChanged: (value) {
+                          setState(() {
+                            email = value;
+                            isEmailValid = isEmailValido(value);
+                          });
+                        },
+                        style: Theme.of(context).textTheme.titleLarge,
+                        keyboardType: TextInputType.emailAddress,
+                        controller: myLogic.textControllerEmail,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          errorText: isEmailValid
+                              ? null
+                              : 'Formato de correo inválido',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16), // Espacio entre campos
+                      TextFormField(
+                        maxLength: 25,
+                        style: Theme.of(context).textTheme.titleSmall,
+                        controller: myLogic.textControllerNota,
+                        decoration: InputDecoration(
+                          labelText: 'Notas',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 200), // Espacio adicional al final
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ));
   }
 
   _actualizarClienteFB(usuarioAPP, cliente) {

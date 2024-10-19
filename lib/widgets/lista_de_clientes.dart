@@ -212,7 +212,7 @@ class _ListaClientesState extends State<ListaClientes> {
                       ),
                       title: Text(
                         listaClientes[index].nombre.toString(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87, // Color de texto más oscuro
@@ -239,7 +239,7 @@ class _ListaClientesState extends State<ListaClientes> {
                                 height: 300,
                                 decoration: const BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: const BorderRadius.vertical(
+                                  borderRadius: BorderRadius.vertical(
                                     top: Radius.circular(
                                         20), // Bordes redondeados en la parte superior
                                   ),

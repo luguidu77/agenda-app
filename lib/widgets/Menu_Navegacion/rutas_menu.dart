@@ -1,6 +1,5 @@
 import 'package:agendacitas/screens/calendario_screen.dart';
 import 'package:agendacitas/screens/clientes_screen.dart';
-import 'package:agendacitas/screens/informes_screen.dart';
 import 'package:agendacitas/screens/menu_aplicacion.dart';
 import 'package:agendacitas/screens/notificaciones_screen.dart';
 import 'package:flutter/material.dart';

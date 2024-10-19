@@ -23,7 +23,7 @@ class BotoLeidoNotifAdministrador extends StatefulWidget {
 class _BotoLeidoNotifAdministradorState
     extends State<BotoLeidoNotifAdministrador> {
   bool _visto = false;
-  bool _cargando = false;
+  final bool _cargando = false;
 
   @override
   void initState() {

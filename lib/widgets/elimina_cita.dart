@@ -45,7 +45,7 @@ mensajeAlerta(context, int index, citas, bool iniciadaSesionUsuario,
                 children: [
                   ElevatedButton.icon(
                       style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
+                          backgroundColor: WidgetStateProperty.all<Color>(
                               Colors.red.shade100)),
                       onPressed: () {
                         iniciadaSesionUsuario
@@ -64,7 +64,7 @@ mensajeAlerta(context, int index, citas, bool iniciadaSesionUsuario,
                   ),
                   ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, '/');
+                        Navigator.pop(context);
                       },
                       child: const Text(
                         ' No ',

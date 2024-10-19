@@ -27,7 +27,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
   List<Appointment> meetings = <Appointment>[];
   String _emailSesionUsuario = '';
   bool _iniciadaSesionUsuario = false;
-  bool _leerEstadoBotonIndisponibilidad = false;
+  final bool _leerEstadoBotonIndisponibilidad = false;
   emailUsuarioApp() async {
     final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
     _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
@@ -43,15 +43,15 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
   @override
   Widget build(BuildContext context) {
-    final _leerEstadoBotonIndisponibilidad =
+    final leerEstadoBotonIndisponibilidad =
         Provider.of<BotonAgregarIndisponibilidadProvider>(context).botonPulsado;
     print(
-        'este es el estado del boton de indisponibilidad $_leerEstadoBotonIndisponibilidad  <__________________________');
+        'este es el estado del boton de indisponibilidad $leerEstadoBotonIndisponibilidad  <__________________________');
     int tiempoServicios = 1;
 
     return Scaffold(
         body: SfCalendar(
-      backgroundColor: _leerEstadoBotonIndisponibilidad
+      backgroundColor: leerEstadoBotonIndisponibilidad
           ? Colors.red.withOpacity(0.1)
           : Colors.white,
 
@@ -105,7 +105,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           }
         } else {
           //############# CREACION DE HORARIO NO DISPONIBLE --  ########################
-          if (_leerEstadoBotonIndisponibilidad) {
+          if (leerEstadoBotonIndisponibilidad) {
             Navigator.push(
                 context,
                 PageRouteBuilder(

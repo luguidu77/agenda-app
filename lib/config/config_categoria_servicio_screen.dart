@@ -219,7 +219,7 @@ class _ConfigCategoriaServiciosScreenState
         future: FirebaseProvider().cargarCategorias(_emailSesionUsuario),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Text('Error al cargar los datos');
+            return const Text('Error al cargar los datos');
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {

@@ -4,8 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/models.dart';
-import '../../providers/Firebase/emailHtml/emails_html.dart';
-import '../formatear.dart';
 
 class Comunicaciones {
   static void hacerLlamadaTelefonica(String phoneNumber) async {
@@ -141,7 +139,8 @@ class Comunicaciones {
       String clienta,
       String email,
       String fecha,
-      String servicio, String precio) async {
+      String servicio,
+      String precio) async {
     //***           ENVIOS EMAIL AUTOMATICOS SERVICIO FIREBASE ******************************** */
     PerfilModel negocio = PerfilModel(
         denominacion: perfilUsuarioApp.denominacion,
@@ -150,7 +149,10 @@ class Comunicaciones {
     List<String> textListServicio = servicio.split(', ');
 
     CitaModelFirebase cita = CitaModelFirebase(
-        horaInicio: fecha, email: email, idservicio: textListServicio, precio: precio);
+        horaInicio: fecha,
+        email: email,
+        idservicio: textListServicio,
+        precio: precio);
 
     print(
         '***************************************** ${textListServicio.toString()}');

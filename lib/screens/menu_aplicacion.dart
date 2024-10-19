@@ -1,12 +1,10 @@
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/providers/Firebase/firebase_publicacion_online.dart';
-import 'package:agendacitas/screens/notificaciones_screen.dart';
 import 'package:agendacitas/screens/servicios_screen.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +13,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../providers/providers.dart';
 import '../screens/screens.dart';
 import '../utils/utils.dart';
-import '../widgets/change_theme_button.dart';
 import '../widgets/widgets.dart';
 
 class MenuAplicacion extends StatefulWidget {
@@ -203,7 +200,10 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
           // currentAccountPicture: fotoPerfil(_emailSesionUsuario),
           //currentAccountPictureSize: const Size.square(95.0),
           otherAccountsPictures: [
-            const ChangeThemeButtonWidget(),
+            // light/dark
+            //  const ChangeThemeButtonWidget(),
+
+            // editar perfil
             IconButton(
               color: Colors.black,
               icon: const Icon(Icons.edit_square),

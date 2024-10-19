@@ -20,7 +20,7 @@ class FinalizacionPrueba extends StatefulWidget {
 }
 
 class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
-  InAppPurchase _inAppPurchase = InAppPurchase.instance;
+  final InAppPurchase _inAppPurchase = InAppPurchase.instance;
   late StreamSubscription<dynamic> _streamSubscription;
   List<ProductDetails> _products = [];
   final _variant = {"agenda"}; // id del producto googleplay console
@@ -57,6 +57,7 @@ class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
     });
   }
 
+  //!!!!! COMPRA CON GOOGLEPAY !!!!!!!
   _buy() {
     final PurchaseParam param = PurchaseParam(productDetails: _products[0]);
     _inAppPurchase.buyConsumable(purchaseParam: param);

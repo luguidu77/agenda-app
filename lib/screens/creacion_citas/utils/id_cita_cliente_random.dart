@@ -1,9 +1,10 @@
 import 'dart:math';
 
 String generarCadenaAleatoria(int longitud) {
-  const String _chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  Random _rnd = Random();
+  const String chars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  Random rnd = Random();
 
   return String.fromCharCodes(Iterable.generate(
-      longitud, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+      longitud, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
 }

@@ -20,7 +20,7 @@ class CreacionCitaConfirmar extends StatefulWidget {
 }
 
 class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
-  Duration sumaTiempos = Duration();
+  Duration sumaTiempos = const Duration();
   DateTime horafinal = DateTime.now();
   late DateTime horainicio;
   String totalTiempo = "0 h 0 m";

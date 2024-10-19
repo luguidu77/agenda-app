@@ -53,7 +53,7 @@ class HorarioElegidoCarrusel extends ChangeNotifier {
 }
 
 class ControladorTarjetasAsuntos extends ChangeNotifier {
-  PageController _pageController;
+  final PageController _pageController;
   int _paginaActual = 0; // Almacena la página actual
 
   ControladorTarjetasAsuntos()

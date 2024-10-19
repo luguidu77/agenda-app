@@ -19,7 +19,7 @@ StreamBuilder<PerfilModel> denominacionNegocio(emailSesionUsuario,
               color: color,
               shadows: [
                 Shadow(
-                  offset: Offset(2.0, 2.0), // Desplazamiento de la sombra
+                  offset: const Offset(2.0, 2.0), // Desplazamiento de la sombra
                   blurRadius: 5.0, // Radio de desenfoque de la sombra
                   color: Colors.black.withOpacity(0.5), // Color de la sombra
                 ),

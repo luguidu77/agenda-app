@@ -150,9 +150,9 @@ class _NuevoAcutalizacionUsuarioAppState
                           cargandoImagen = false;
                         },
                         style: ElevatedButton.styleFrom(
-                          shape: CircleBorder(),
+                          shape: const CircleBorder(),
                           backgroundColor: Colors.blue, // Color del botón
-                          padding: EdgeInsets.all(16), // Tamaño del botón
+                          padding: const EdgeInsets.all(16), // Tamaño del botón
                           elevation: 5,
                         ),
                         child: const Icon(Icons.image,
@@ -253,7 +253,8 @@ class _NuevoAcutalizacionUsuarioAppState
                     controller: myLogic.textControllerFacebook,
                     decoration: InputDecoration(
                       labelText: 'Facebook',
-                      prefixIcon: Icon(Icons.facebook, color: Colors.blue),
+                      prefixIcon:
+                          const Icon(Icons.facebook, color: Colors.blue),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15.0),
                       ),
@@ -266,7 +267,8 @@ class _NuevoAcutalizacionUsuarioAppState
                     controller: myLogic.textControllerInstagram,
                     decoration: InputDecoration(
                       labelText: 'Instagram',
-                      prefixIcon: Icon(Icons.camera_alt, color: Colors.pink),
+                      prefixIcon:
+                          const Icon(Icons.camera_alt, color: Colors.pink),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15.0),
                       ),

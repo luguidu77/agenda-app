@@ -29,7 +29,7 @@ import 'widgets/formulariosSessionApp/registro_usuario_screen.dart'; //utilizado
 
 //! DESPLEGAR EN PLAY STORE :
 
-//?   flutter clean
+//?
 //?   CAMBIAR  Version EN Android/app/build.gradle  ingrementa versionCode y versionName
 //?            version base de datos DB Provider.
 //?            quitar PAGADO DEL home.dart -->> PagoProvider().guardaPagado(true);
@@ -53,7 +53,7 @@ git push
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Payload recibido en segundo plano: ${message.data}");
 
-  if (message.data == null || message.data.isEmpty) {
+  if (message.data.isEmpty) {
     print("El payload no contiene datos.");
     return;
   }
@@ -196,6 +196,8 @@ class _MyAppState extends State<MyApp> {
             create: (BuildContext context) => TextoTituloIndispuesto()),
         ChangeNotifierProvider(
             create: (BuildContext context) => TabNotifiacionesScreenProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => EstadoConfirmacionCita()),
       ],
       builder: (context, _) {
         return MaterialApp(
@@ -261,7 +263,8 @@ class _MyAppState extends State<MyApp> {
                     email: '',
                     password: '',
                   ),
-              'finalizacionPruebaScreen': (context) => FinalizacionPrueba(),
+              'finalizacionPruebaScreen': (context) =>
+                  const FinalizacionPrueba(),
             });
       },
     );

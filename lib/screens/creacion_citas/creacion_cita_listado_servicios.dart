@@ -421,7 +421,7 @@ class _CreacionServiciosListadoServiciosState
               actions: [
                 ElevatedButton(
                     style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
+                        backgroundColor: WidgetStateProperty.all(
                             const Color.fromARGB(255, 245, 75, 75))),
                     onPressed: () async {
                       //ELIMINA SERVICIO DEL DISPOSITIVO

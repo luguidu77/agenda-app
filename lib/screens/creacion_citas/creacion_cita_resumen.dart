@@ -1,15 +1,11 @@
 // ignore_for_file: file_names
 
-import 'package:agendacitas/models/perfil_usuarioapp_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/appBar.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:agendacitas/providers/cita_list_provider.dart';
 import 'package:agendacitas/providers/recordatorios_provider.dart';
 import 'package:agendacitas/widgets/compartirCliente/compartir_cita_a_cliente.dart';
 
@@ -18,7 +14,6 @@ import 'package:agendacitas/utils/notificaciones/recordatorio_local/recordatorio
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../firebase_options.dart';
 import '../../models/models.dart';
 import '../../mylogic_formularios/mylogic.dart';
 import '../../utils/formatear.dart';

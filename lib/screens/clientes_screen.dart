@@ -31,7 +31,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
   }
 
   //CONTACTOS DEL TELEFONO
-  Iterable<Contact> _contacts = [];
+  final Iterable<Contact> _contacts = [];
 
   late MyLogicCliente myLogic;
 

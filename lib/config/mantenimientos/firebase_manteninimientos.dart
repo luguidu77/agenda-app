@@ -2,7 +2,6 @@
 
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/models/perfil_model.dart';
-import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

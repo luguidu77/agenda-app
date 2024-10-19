@@ -114,7 +114,7 @@ class NotificationService {
         title,
         body,
         tz.TZDateTime(location, year, month, day, hour, minute, 0, 0, 0)
-            .add(Duration(minutes: 1)),
+            .add(const Duration(minutes: 1)),
         NotificationDetails(
             android: AndroidNotificationDetails(channel.id, channel.name,
                 channelDescription: channel.description)),

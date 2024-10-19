@@ -36,7 +36,7 @@ class _EnviosRecordatoriosState extends State<EnviosRecordatorios> {
     var fecha = dateFormat.format(widget.fechaElegida);
     _citasPorFecha(fecha);
 
-    print(' lista de citas para enviar recordatorios :    ${listaCitas}');
+    print(' lista de citas para enviar recordatorios :    $listaCitas');
 
     return Container(
       color: Theme.of(context).primaryColor,
@@ -44,7 +44,7 @@ class _EnviosRecordatoriosState extends State<EnviosRecordatorios> {
       child: Column(
         children: [
           const SizedBox(height: 15),
-          Text('Envía recordatorios para las citas de este día'),
+          const Text('Envía recordatorios para las citas de este día'),
           Wrap(spacing: 5, children: [
             const SizedBox(height: 30),
             FilterChip(

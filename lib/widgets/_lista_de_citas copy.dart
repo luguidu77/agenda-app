@@ -6,7 +6,6 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../models/personaliza_model.dart';
 import '../providers/providers.dart';
-import '../screens/screens.dart';
 import '../utils/utils.dart';
 
 class ListaCitas extends StatefulWidget {
@@ -195,7 +194,7 @@ class _ListaCitasState extends State<ListaCitas> {
                           child: GestureDetector(
                             onTap: () {
                               if (compruebafechaDisponible) {
-                               /*  Navigator.push(
+                                /*  Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>

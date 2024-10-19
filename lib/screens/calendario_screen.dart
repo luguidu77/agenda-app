@@ -23,7 +23,8 @@ class CalendarioCitasScreen extends StatefulWidget {
   State<CalendarioCitasScreen> createState() => _CalendarioCitasScreenState();
 }
 
-class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
+class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
+    with RouteAware {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   late CreacionCitaProvider contextoCreacionCita;
@@ -69,6 +70,23 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
   String calen = '';
 
   String filter = 'none';
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    mRouteObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    mRouteObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    setState(() {});
+    super.didPopNext();
+  }
 
   @override
   void initState() {
@@ -98,7 +116,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final _leerEstadoBotonIndisponibilidad =
+    final leerEstadoBotonIndisponibilidad =
         Provider.of<BotonAgregarIndisponibilidadProvider>(context).botonPulsado;
     //* HERRAMIENTA PARA AGREGAR Y MODIFICAR DATOS FIREBASE PARA CORRECION DE ERRORES
     // FirebaseProvider().modificaEstructura();
@@ -162,11 +180,11 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
               ), */
               // ---------------agrego tarjeta de alerta Señala indisponibilidad cuando se ha pulsado del boton del boton_speed_dial.dart No Disponibles -----------------
               Visibility(
-                visible: _leerEstadoBotonIndisponibilidad,
+                visible: leerEstadoBotonIndisponibilidad,
                 child: Card(
                     color: Colors.red,
                     child: Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -459,7 +477,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen> {
     return calendarioProvider.visibleCalendario
         // FECHA ELEGIDA CON SELECTORES AUMENTO/DECREMENTO DIAS(VISIBLE CUANDO NO SE VE EL CALENDARIO)
         ? Container()
-        : Container(
+        : SizedBox(
             width: MediaQuery.of(context).size.width,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

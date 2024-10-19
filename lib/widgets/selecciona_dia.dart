@@ -44,7 +44,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
   Color? color;
   CitaModel cita = CitaModel();
   final _formKey = GlobalKey<FormState>();
-  bool _pagado = false;
+  final bool _pagado = false;
   bool _iniciadaSesionUsuario =
       false; // ?  VARIABLE PARA VERIFICAR SI HAY USUARIO CON INCIO DE SESION
   String _emailSesionUsuario = '';
@@ -395,7 +395,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
         debugPrint('hora final cita cogida $horaFinalEstablecida');
 
         horaInicioProgramable = DateTime.parse(textoFechaHora);
-        horaFinalProgramable = horaInicioProgramable!.add(Duration(
+        horaFinalProgramable = horaInicioProgramable.add(Duration(
             hours: tiempoServicioHoras, minutes: tiempoServicioMinutos));
 
         debugPrint('hora INICIO nueva cita $horaInicioProgramable');
@@ -424,11 +424,11 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
 
         //  ?  SI ENCUENTRA UNA CITA EN LA HORA ELEGIDA, COMPRUEBA QUE NO SE TRATE DE LA MISMA CITA (ID IGUALES)
 
-        bool valIpIn = horaInicioEstablecida.isBefore(horaInicioProgramable!);
-        bool valFpIn = horaFinalEstablecida.isBefore(horaInicioProgramable!) ||
+        bool valIpIn = horaInicioEstablecida.isBefore(horaInicioProgramable);
+        bool valFpIn = horaFinalEstablecida.isBefore(horaInicioProgramable) ||
             horaFinalEstablecida == horaInicioProgramable;
-        bool valIpFn = horaInicioEstablecida.isAfter(horaFinalProgramable!) ||
-            horaInicioEstablecida.isAtSameMomentAs(horaFinalProgramable!);
+        bool valIpFn = horaInicioEstablecida.isAfter(horaFinalProgramable) ||
+            horaInicioEstablecida.isAtSameMomentAs(horaFinalProgramable);
 
         //? COMPROBACION FINAL
         if (valIpIn) {
@@ -513,9 +513,9 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
           }
         },
         style: ButtonStyle(
-          iconColor: MaterialStateProperty.all<Color>(Colors.white),
+          iconColor: WidgetStateProperty.all<Color>(Colors.white),
           backgroundColor:
-              MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
+              WidgetStateProperty.all<Color>(Theme.of(context).primaryColor),
         ),
         label: const Text(
           'Validar',

@@ -1,4 +1,3 @@
-import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -38,8 +37,8 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
   }
 
   getPersonalizaFirebase(emailSesionUsuario) async {
-    Map<String, dynamic> data =
-        await PersonalizaProviderFirebase().cargarPersonaliza(emailSesionUsuario);
+    Map<String, dynamic> data = await PersonalizaProviderFirebase()
+        .cargarPersonaliza(emailSesionUsuario);
 
     if (data.isEmpty) {
       await PersonalizaProviderFirebase()
@@ -57,7 +56,7 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
   @override
   void initState() {
     // inicializaProviderEstadoPagoEmail();
-   // getPersonaliza(); 
+    // getPersonaliza();
     //? no lo inicializo aqui porque primeramente me trael el usuario de la app vacio
     //? tengo un poco de cacao aqui en las inicializaciones de la app
     //getPersonalizaFirebase(widget.usuarioAPP);
@@ -95,7 +94,8 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
                 'inicio_config_app.dart ----------------> LOGEADO EN FIREBASE');
 
             return HomeScreen(
-              index: 0, myBnB: 0,
+              index: 0,
+              myBnB: 0,
             );
           } else {
             // NO LOGUEADO EN FIREBASE

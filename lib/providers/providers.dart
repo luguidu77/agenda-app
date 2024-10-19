@@ -16,3 +16,4 @@ export '../../providers/Firebase/firebase_provider.dart';
 export '../../providers/personaliza_provider.dart';
 
 export '../../providers/estado_creacion_indisponibilidad.dart';
+export '../../providers/estado_confirmacion_cita.dart';

@@ -4,9 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
 import '../../providers/providers.dart';
-import '../../screens/screens.dart';
 import '../../utils/utils.dart';
-import '../widgets.dart';
 
 class CompartirCitaConCliente extends StatefulWidget {
   final String cliente;
@@ -102,110 +100,99 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
     contextoPersonalizaFirebase = context.read<PersonalizaProviderFirebase>();
     final personalizaprovider = contextoPersonalizaFirebase.getPersonaliza;
     textoActual = personalizaprovider['MENSAJE_CITA'].toString();
-
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const Text(
-            'Comparte la cita con tu client@',
-            style: TextStyle(
-                color: Colors.blueGrey,
-                fontWeight: FontWeight.bold,
-                fontSize: 15),
-          ),
-          // VISIBLE UNA TARJETA INFO SI NO HAY DENOMINACION DEL PERFIL DE USUARIO
-          if (perfilUsuarioApp.denominacion == '')
-            TarjetaInfo(
-                colorTexto: Colors.white,
-                colorTarjeta: const Color.fromARGB(83, 64, 88, 226),
-                icono: const FaIcon(FontAwesomeIcons.exclamation),
-                titulo: 'SUGERENCIA',
-                texto: 'Edita tu perfil para que se comparta en las citas',
-                accion: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ConfigUsuarioApp()))),
-          const SizedBox(
-            height: 10,
-          ),
-          GestureDetector(
-            onTap: () {
-              Comunicaciones().compartirCitaWhatsapp(
-                perfilUsuarioApp,
-                textoActual,
-                widget.cliente,
-                telefonoCodpais!,
-                widget.fechaCita,
-                widget.servicio,
-              );
-            },
-            child: const Card(
-              child: ListTile(
-                title: Text('Whatsapp'),
-                trailing: FaIcon(FontAwesomeIcons.whatsapp),
-              ),
+    /* // Muestra tarjeta de sugerencia si no hay denominación del perfil de usuario
+        if (perfilUsuarioApp.denominacion == '')
+          TarjetaInfo(
+            colorTexto: Colors.white,
+            colorTarjeta: const Color.fromARGB(83, 64, 88, 226),
+            icono: const FaIcon(FontAwesomeIcons.exclamation),
+            titulo: 'SUGERENCIA',
+            texto: 'Edita tu perfil para que se comparta en las citas',
+            accion: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ConfigUsuarioApp()),
             ),
-          ),
-          // LA PANTALLA DETALLES DE LA CITA DEVUELVE UN ESPACIO CUANDO NO HAY EMAIL
-          // LA PANTALLA DE CITA CONFIRMADA NO TIENE ESPACIO EN EMAIL VACIO
-          widget.email != ' ' && widget.email != ''
-              ? GestureDetector(
-                  onTap: () {
-                    animarIcon = true; // animado el icono
+          ), */
+
+    return
+        /*  */
+        // Botones de acciones flotantes
+        Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        FloatingActionButton(
+          mini: true,
+          onPressed: () {
+            Comunicaciones().compartirCitaWhatsapp(
+              perfilUsuarioApp,
+              textoActual,
+              widget.cliente,
+              telefonoCodpais!,
+              widget.fechaCita,
+              widget.servicio,
+            );
+          },
+          backgroundColor: Colors.green,
+          child: const FaIcon(FontAwesomeIcons.whatsapp),
+        ),
+        FloatingActionButton(
+          mini: true,
+          onPressed: () {
+            pagado
+                ? Comunicaciones().compartirCitaSms(
+                    perfilUsuarioApp,
+                    textoActual,
+                    widget.cliente,
+                    widget.telefono,
+                    widget.fechaCita,
+                    widget.servicio)
+                : alerta(context); // Mostrar alerta si no está pagado
+          },
+          backgroundColor: Colors.orange,
+          child: const FaIcon(FontAwesomeIcons.commentSms),
+        ),
+        widget.email != ' ' && widget.email != ''
+            ? FloatingActionButton(
+                mini: true,
+                onPressed: () {
+                  animarIcon = true;
+                  setState(() {});
+
+                  Future.delayed(const Duration(seconds: 3), () {
+                    animarIcon = false;
                     setState(() {});
+                  });
 
-                    Future.delayed(const Duration(seconds: 3), () {
-                      animarIcon = false; // para la animacion del icono
-                      setState(() {});
-                    });
-                    pagado
-                        ? Comunicaciones().compartirCitaEmail(
-                            context,
-                            perfilUsuarioApp,
-                            textoActual,
-                            widget.cliente,
-                            widget.email,
-                            widget.fechaCita,
-                            widget.servicio,
-                            widget.precio)
-                        : alerta(context);
-                  },
-                  child: Card(
-                    child: ListTile(
-                      title: const Text('Email (envío automático )'),
-                      trailing: animarIcon
-                          ? const CircularProgressIndicator()
-                          : const FaIcon(FontAwesomeIcons.envelope),
-                    ),
-                  ),
-                )
-              : Container(),
-          GestureDetector(
-            onTap: () {
-              pagado
-                  ? Comunicaciones().compartirCitaSms(
-                      perfilUsuarioApp,
-                      textoActual,
-                      widget.cliente,
-                      widget.telefono,
-                      widget.fechaCita,
-                      widget.servicio)
-                  : alerta(context); //  /utils/alertaNodisponible.dart
-            },
-            child: const Card(
-              child: ListTile(
-                title: Text('SMS'),
-                subtitle: Text(
-                  'El coste de SMS dependerá de su operadora telefónica',
-                  style: TextStyle(fontSize: 12, color: Colors.red),
-                ),
-                trailing: FaIcon(FontAwesomeIcons.commentSms),
-              ),
-            ),
-          ),
-        ],
-      ),
+                  pagado
+                      ? Comunicaciones().compartirCitaEmail(
+                          context,
+                          perfilUsuarioApp,
+                          textoActual,
+                          widget.cliente,
+                          widget.email,
+                          widget.fechaCita,
+                          widget.servicio,
+                          widget.precio)
+                      : alerta(context);
+                },
+                backgroundColor: Colors.blue,
+                child: animarIcon
+                    ? const CircularProgressIndicator()
+                    : const FaIcon(FontAwesomeIcons.envelope),
+              )
+            : Container(),
+      ],
     );
+    /*  const SizedBox(height: 20),
+        const Text(
+          'El coste de SMS dependerá de su operadora telefónica',
+          style: TextStyle(fontSize: 12, color: Colors.red),
+        ),
+        const Text(
+          '',
+          style: TextStyle(fontSize: 12, color: Colors.red),
+        ),
+      ], */
   }
 }
 

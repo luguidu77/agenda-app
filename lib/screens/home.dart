@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool temaDefecto = true;
 
-  bool _iniciadaSesionUsuario = false;
+  final bool _iniciadaSesionUsuario = false;
   String _emailSesionUsuario = '';
 
   ThemeProvider themeProvider = ThemeProvider();
@@ -381,9 +381,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.all(8.0),
                           child: ElevatedButton(
                             style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Colors.green)),
+                                backgroundColor: WidgetStateProperty.all<Color>(
+                                    Colors.green)),
                             onPressed: () => Navigator.of(context).pop(false),
                             child: const Text('No'),
                           ),
@@ -392,9 +391,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.all(8.0),
                           child: ElevatedButton(
                             style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Colors.blueGrey)),
+                                backgroundColor: WidgetStateProperty.all<Color>(
+                                    Colors.blueGrey)),
                             onPressed: () {
                               FirebaseAuth.instance.signOut();
                               Navigator.of(context).pop(true);
@@ -405,7 +403,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 100,
                     )
                   ],
@@ -451,7 +449,7 @@ Widget textoConTituloNegrita(String titulo, String texto) {
       children: [
         TextSpan(
           text: titulo,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold, // Poner el título en negrita
             color: Colors
                 .black, // Asegúrate de que el color del texto sea el correcto
@@ -459,7 +457,7 @@ Widget textoConTituloNegrita(String titulo, String texto) {
         ),
         TextSpan(
           text: '\n$texto', // El texto normal debajo del título
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white, // El color del texto
           ),
         ),

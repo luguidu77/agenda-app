@@ -117,10 +117,15 @@ class FirebaseProvider extends ChangeNotifier {
       idCitaCliente) async {
     // Crear una lista de futuros a partir de la lista de ids de servicio
     List<Map<String, dynamic>> listaServiciosAux = [];
-    for (var element in idServicios) {
-      final servicio = await FirebaseProvider()
-          .cargarServicioPorId(emailUsuarioAPP, element);
-      listaServiciosAux.add(servicio);
+    bool esCita = true;
+    if (idServicios.contains('indispuesto')) {
+      esCita = false;
+    } else {
+      for (var element in idServicios) {
+        final servicio = await FirebaseProvider()
+            .cargarServicioPorId(emailUsuarioAPP, element);
+        listaServiciosAux.add(servicio);
+      }
     }
 
     final Map<String, dynamic> cita = ({
@@ -130,7 +135,9 @@ class FirebaseProvider extends ChangeNotifier {
       'precio': precio,
       'comentario': comentario,
       'idcliente': idCliente,
-      'idservicio': listaServiciosAux.map((e) => e['idServicio']),
+      'idservicio': esCita
+          ? listaServiciosAux.map((e) => e['idServicio'])
+          : ['indispuesto'],
       'idempleado': idEmpleado,
       'confirmada': true,
       'idCitaCliente': idCitaCliente,
@@ -722,9 +729,9 @@ class FirebaseProvider extends ChangeNotifier {
 
     QuerySnapshot queryCat = await docRef.get();
 
-    queryCat.docs.forEach((element) {
+    for (var element in queryCat.docs) {
       listaCategoriaServicios.add(element.data());
-    });
+    }
 
     return listaCategoriaServicios;
   }
@@ -1359,8 +1366,6 @@ class FirebaseProvider extends ChangeNotifier {
 
         estadoActual = data['confirmada'];
 
-        // cambia el estado
-        estadoActual = !estadoActual;
         List<String> serviciosNom = [];
 
         //*****************    email al cliente del estado de la cita ************ */
@@ -1394,6 +1399,9 @@ class FirebaseProvider extends ChangeNotifier {
           mensajeSuccess(
               context, 'Hemos envíado un email al cliente anulando la cita');
         }
+
+        // cambia el estado
+        estadoActual = !estadoActual;
 
         //3º ACTUALIAZO EL DATO
 

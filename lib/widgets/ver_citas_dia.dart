@@ -58,7 +58,7 @@ class _ListaCitasState extends State<ListaCitas> {
 
   vercitas(context, List<Map<String, dynamic>> citas) {
     int contadorCitas = 0;
-    final _leerEstadoBotonIndisponibilidad =
+    final leerEstadoBotonIndisponibilidad =
         Provider.of<BotonAgregarIndisponibilidadProvider>(context).botonPulsado;
 
     // ············DESCUENTA DE LAS CITAS LOS INDISPUESTOS ............................... ;
@@ -73,7 +73,7 @@ class _ListaCitasState extends State<ListaCitas> {
       children: [
         // ########## TEXTO SUMA DE GANANCIAS DIARIAS  ##############################
         Visibility(
-            visible: !_leerEstadoBotonIndisponibilidad,
+            visible: !leerEstadoBotonIndisponibilidad,
             child: gananciaDiaria(citas, numCitas)),
 
         // ########## TARJETAS DE LAS CITAS CONCERTADAS ##############################

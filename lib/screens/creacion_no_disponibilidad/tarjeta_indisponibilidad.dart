@@ -22,7 +22,8 @@ class TarjetaIndisponibilidad extends StatefulWidget {
 }
 
 class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
-  int _selectedIndex = 0; // Variable para almacenar el índice seleccionado
+  final int _selectedIndex =
+      0; // Variable para almacenar el índice seleccionado
   DateTime? dateTimeElegido;
   Duration? selectedDateTime;
   String? selectedTimeOption;

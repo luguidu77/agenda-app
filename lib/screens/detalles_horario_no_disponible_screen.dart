@@ -126,7 +126,7 @@ class _DetallesHorarioNoDisponibleScreenState
         ElevatedButton.icon(
             style: ButtonStyle(
               backgroundColor:
-                  MaterialStateProperty.all<Color>(Colors.red.shade100),
+                  WidgetStateProperty.all<Color>(Colors.red.shade100),
             ),
             onPressed: () async {
               final res = await mensajeAlerta(

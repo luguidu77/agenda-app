@@ -287,7 +287,7 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> with RouteAware {
             ),
           );
         }
-        return SizedBox(); // Retornar un SizedBox si no hay datos
+        return const SizedBox(); // Retornar un SizedBox si no hay datos
       },
     );
   }

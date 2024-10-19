@@ -1,7 +1,6 @@
 import 'package:agendacitas/widgets/dialogos/dialogo_linealpregessindicator.dart';
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';

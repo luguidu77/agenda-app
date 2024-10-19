@@ -71,7 +71,7 @@ class _BotonNuevoDesdeContactoState extends State<BotonNuevoDesdeContacto> {
         child: const Center(
           child: Text(
             'TUS CONTACTOS',
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white, // Color del texto
               fontSize: 16, // Tamaño del texto
               fontWeight: FontWeight.bold, // Peso del texto

@@ -1,5 +1,4 @@
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
-import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';
 
 class DialogoContactoElegido extends StatefulWidget {

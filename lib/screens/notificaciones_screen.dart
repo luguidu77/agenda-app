@@ -6,7 +6,10 @@ import 'package:agendacitas/providers/buttom_nav_notificaciones_provider.dart';
 import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
 import 'package:agendacitas/utils/notificaciones/recordatorio_local/recordatorio_local.dart';
 import 'package:agendacitas/widgets/botones/boton_leido_notif_administrador.dart';
+import 'package:agendacitas/widgets/no_hay_coincidencias.dart';
+import 'package:agendacitas/widgets/tarjeta_noticias.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -129,9 +132,8 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
               text: "Cita Web",
             ),
             Tab(
-              icon: _icono(
-                  contNotifAdministrador, Icons.admin_panel_settings_sharp),
-              text: "Generales",
+              icon: _icono(contNotifAdministrador, Icons.newspaper),
+              text: "Noticias",
             ),
           ],
           indicatorSize:
@@ -193,71 +195,78 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
                       padding: const EdgeInsets.only(top: 58.0),
                       child: SizedBox(
                           height: 200,
-                          width: 200,
-                          child: Image.asset('assets/images/caja-vacia.png')),
+                          width: double.infinity,
+                          child:
+                              NoNotificationsContainer()), // Image.asset('assets/images/caja-vacia.png')),
                     )
-                  : Expanded(
-                      child: ListView.separated(
-                        itemCount: notificaciones.length,
-                        separatorBuilder: (context, index) => const Divider(),
-                        itemBuilder: (context, index) {
-                          final notificacion = notificaciones[index];
+                  : categoria == 'administrador'
+                      ? TarjetaNoticias(
+                          notificaciones: notificaciones,
+                          emailSesionUsuario: _emailSesionUsuario,
+                        )
+                      : Expanded(
+                          child: ListView.separated(
+                            itemCount: notificaciones.length,
+                            separatorBuilder: (context, index) =>
+                                const Divider(),
+                            itemBuilder: (context, index) {
+                              final notificacion = notificaciones[index];
 
-                          final notificacionModelo = NotificacionModel(
-                            id: notificacion['id'],
-                            fechaNotificacion:
-                                notificacion['fechaNotificacion'],
-                            iconoCategoria: notificacion['categoria'],
-                            visto: notificacion['visto'],
-                            data: notificacion['data'],
-                            vistoPor: notificacion['vistoPor'],
-                            texto: notificacion['texto'],
-                            link: notificacion['link'],
-                          );
+                              final notificacionModelo = NotificacionModel(
+                                id: notificacion['id'],
+                                fechaNotificacion:
+                                    notificacion['fechaNotificacion'],
+                                iconoCategoria: notificacion['categoria'],
+                                visto: notificacion['visto'],
+                                data: notificacion['data'],
+                                vistoPor: notificacion['vistoPor'],
+                                texto: notificacion['texto'],
+                                link: notificacion['link'],
+                              );
 
-                          String fechaNotificacion = _formateaFecha(
-                              notificacionModelo.fechaNotificacion);
+                              String fechaNotificacion = _formateaFecha(
+                                  notificacionModelo.fechaNotificacion);
 
-                          String fechacita = '';
-                          String horacita = '';
-                          String nombreCliente = '';
-                          String telefonoCliente = '';
-                          String emailCliente = '';
-                          String servicio = '';
+                              String fechacita = '';
+                              String horacita = '';
+                              String nombreCliente = '';
+                              String telefonoCliente = '';
+                              String emailCliente = '';
+                              String servicio = '';
 
-                          if (notificacion['categoria'] == 'citaweb' ||
-                              notificacion['categoria'] == 'cita' ||
-                              notificacion['categoria'] == 'recordatorio') {
-                            Map<String, dynamic> data =
-                                jsonDecode(notificacionModelo.data);
-                            final (:nombre, :telefono, :email) =
-                                _obtieneCliente(data);
-                            final (:fecha, :hora) = _obtieneCita(data);
-                            final (:serv) = _obtieneServicio(data);
-                            fechacita = fecha;
-                            horacita = hora;
-                            nombreCliente = nombre;
-                            telefonoCliente = telefono;
-                            emailCliente = email;
-                            servicio = serv;
-                          }
+                              if (notificacion['categoria'] == 'citaweb' ||
+                                  notificacion['categoria'] == 'cita' ||
+                                  notificacion['categoria'] == 'recordatorio') {
+                                Map<String, dynamic> data =
+                                    jsonDecode(notificacionModelo.data);
+                                final (:nombre, :telefono, :email) =
+                                    _obtieneCliente(data);
+                                final (:fecha, :hora) = _obtieneCita(data);
+                                final (:serv) = _obtieneServicio(data);
+                                fechacita = fecha;
+                                horacita = hora;
+                                nombreCliente = nombre;
+                                telefonoCliente = telefono;
+                                emailCliente = email;
+                                servicio = serv;
+                              }
 
-                          return dialogoDescripcionNotificacion(
-                            context,
-                            fechaNotificacion,
-                            notificacion,
-                            fechacita,
-                            horacita,
-                            nombreCliente,
-                            telefonoCliente,
-                            _emailSesionUsuario,
-                            emailCliente,
-                            servicio,
-                            notificacionModelo.data,
-                          );
-                        },
-                      ),
-                    ),
+                              return dialogoDescripcionNotificacion(
+                                context,
+                                fechaNotificacion,
+                                notificacion,
+                                fechacita,
+                                horacita,
+                                nombreCliente,
+                                telefonoCliente,
+                                _emailSesionUsuario,
+                                emailCliente,
+                                servicio,
+                                notificacionModelo.data,
+                              );
+                            },
+                          ),
+                        ),
             ],
           );
         } else {
@@ -366,8 +375,6 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
                             telefonoCliente,
                             emailCliente,
                             servicio),
-                      'administrador' =>
-                        _tarjetaDescripcionAdministracion(notificacion),
                       _ => Container()
                     }
 
@@ -503,80 +510,6 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // NOTIFICACION DEL ADMINISTRADOR        ////////////////////////////////////
-  Padding _tarjetaDescripcionAdministracion(notificacion) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-      child: SizedBox(
-        width: double.infinity,
-        child: Card(
-          elevation: 6, // Aumentar la sombra para más profundidad
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20), // Bordes más redondeados
-          ),
-          shadowColor:
-              Colors.black.withOpacity(0.2), // Color de sombra más suave
-          child: Padding(
-            padding: const EdgeInsets.all(20.0), // Espaciado interno más amplio
-            child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start, // Alineación a la izquierda
-              children: [
-                Text(
-                  notificacion['data'], // Añadimos un título
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[800],
-                  ),
-                ),
-                const SizedBox(height: 8.0), // Espacio entre título y contenido
-                Text(
-                  notificacion['texto'].toString(),
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.grey[600], // Texto más sutil
-                    height:
-                        1.5, // Espaciado entre líneas para mayor legibilidad
-                  ),
-                ),
-                const SizedBox(
-                    height: 30.0), // Espacio entre el texto y el botón
-
-                notificacion['link'] != ''
-                    ? Align(
-                        alignment: Alignment.centerRight,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            launchUrlString(notificacion['link']);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Colors.blueAccent, // Color del botón
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(12), // Botón redondeado
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 10), // Tamaño del botón
-                          ),
-                          child: const Text(
-                            'Acción',
-                            style:
-                                TextStyle(fontSize: 14.0, color: Colors.white),
-                          ),
-                        ),
-                      )
-                    : Container(),
-              ],
-            ),
           ),
         ),
       ),

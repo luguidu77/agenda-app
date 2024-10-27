@@ -72,18 +72,14 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
 
-  # PAGOS CON STRIPE GOOGLE PAY
-  flutter_stripe: ^10.0.0
-  stripe_android: ^10.0.0
-  # stripe_platform_interface: ^7.0.0
-  pay: ^1.1.0
+
 
   # BASE DE DATOS EN LA NUBE FIREBASE
   firebase_core: ^2.12.0
   firebase_auth: ^4.6.0
   firebase_storage: ^11.2.0
   cloud_firestore: ^4.7.0
-  recaptcha_enterprise_flutter: ^18.4.2
+ 
   # NOTIFICACIONES FIREBASE
   firebase_messaging: ^14.6.5
   

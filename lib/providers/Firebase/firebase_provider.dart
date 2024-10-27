@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:agendacitas/models/empleado_model.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:agendacitas/firebase_options.dart';
@@ -265,7 +266,8 @@ class FirebaseProvider extends ChangeNotifier {
     await docRef.doc('mensajeCita').set(newPersonaliza);
   }
 
-  getCitasHoraOrdenadaPorFecha(emailUsuario, fecha) async {
+  Future<List<Map<String, dynamic>>> getCitasHoraOrdenadaPorFecha(
+      emailUsuario, fecha) async {
     List<Map<String, dynamic>> data = [];
 
     dynamic verifica;
@@ -1097,7 +1099,8 @@ class FirebaseProvider extends ChangeNotifier {
 
   leerBasedatosFirebase(emailUsuarioApp, fecha) async {
     print(fecha);
-    List<Map<String, dynamic>> citasFirebase = [];
+    List<CitaModelFirebase> citasFirebase = [];
+
     Map<String, dynamic> clienteFirebase = {};
 
     //?TRAE LAS CITAS POR FECHA ELEGIDA ///////////////////////////////////////
@@ -1106,59 +1109,91 @@ class FirebaseProvider extends ChangeNotifier {
 
     debugPrint('citas traidas de firebase : ${citas.toString()}');
 
-    for (var cita in citas) {
-      List<Map<String, dynamic>> servicioFirebase = []; //reseteo de la lista
-      if (cita['idServicio'].first != '999') {
+    for (Map<String, dynamic> cita in citas) {
+      // Inicializamos citaFirebase correctamente dentro del ciclo
+
+      List<String> servicioFirebase = []; //reseteo de la lista
+
+      /*  if (cita.idservicio!.first != '999') {
         //? TRAE CLIENTE POR SU IDCLIENTE //////////////////////////////////////
         var cliente0 = await FirebaseProvider()
-            .getClientePorId(emailUsuarioApp, cita['idCliente']);
+            .getClientePorId(emailUsuarioApp, cita.idcliente!);
         clienteFirebase = cliente0;
         print('clientes ------------------------------$clienteFirebase');
         //? TRAE SERVICIO POR SU IDSERVICIOS ////////////////////////////////////
-        for (var servicio in cita['idServicio']) {
+        /*   for (var servicio in cita.idservicio!) {
           var servicioID = await FirebaseProvider()
               .cargarServicioPorId(emailUsuarioApp, servicio);
           servicioFirebase.add(servicioID);
         }
-
+         */
         debugPrint(
             'servicio traidas de firebase : ${servicioFirebase.toString()}');
       } else {
         // EN EL CASO QUE SEA UN NO DISPONIBLE, ASIGNAMOS NULL A LOS ID SERVICIO Y ID CLIENTE
-        servicioFirebase.first['idServicio'] = null;
-        clienteFirebase['idCliente'] = null;
+        /*  servicioFirebase.first['idServicio'] = null;
+        clienteFirebase['idCliente'] = null; */
+      } */
+      //? TRAE CLIENTE POR SU IDCLIENTE //////////////////////////////////////
+      var cliente = await FirebaseProvider()
+          .getClientePorId(emailUsuarioApp, cita['idCliente']);
+      //? TRAE SERVICIO POR SU IDSERVICIOS ////////////////////////////////////
+      for (var servicio in cita['idServicio']) {
+        var servicioAux = await FirebaseProvider()
+            .cargarServicioPorId(emailUsuarioApp, servicio);
+        servicioFirebase.add(servicioAux['servicio']);
       }
 
-      citasFirebase.add({
-        //empleado
-        'idEmpleado': cita['idEmpleado'],
-        //cita
-        'id': cita['id'],
-        'horaInicio': cita['horaInicio'],
-        'horaFinal': cita['horaFinal'],
-        'comentario': cita['comentario'],
-        'precio': cita['precio'],
-        'confirmada': cita['confirmada'],
-        'idCitaCliente': cita['idCitaCliente'],
-        'tokenWebCliente': cita['tokenWebCliente'],
-        //cliente
-        'idCliente': cita['idCliente'],
-        'nombre': clienteFirebase['nombre'],
-        'foto': clienteFirebase['foto'],
-        'telefono': clienteFirebase['telefono'],
-        'email': clienteFirebase['email'],
-        'nota': clienteFirebase['nota'],
-        //servicio
-        'idServicio': servicioFirebase,
-        // 'servicio': servicioFirebase.first['servicio'],
-        // 'detalle': servicioFirebase.first['detalle'],
-      });
+      //? TRAE EMPLEADO POR SU IDCLIENTE //////////////////////////////////////
+      var empleado = await FirebaseProvider()
+          .getEmpleadoporId(emailUsuarioApp, cita['idEmpleado']);
+
+      print('clientes ------------------------------$cliente');
+      // Crea el objeto solo con los datos que tienes
+      var citaFirebase = CitaModelFirebase(
+        id: cita['id'],
+        dia: cita['dia'],
+        horaInicio: cita['horaInicio'],
+        horaFinal: cita['horaFinal'],
+        comentario: cita['comentario'],
+        email: cita['email'],
+        idcliente: cita['idCliente'],
+        idservicio: servicioFirebase,
+        idEmpleado: cita['idEmpleado'],
+        nombreEmpleado: empleado.nombre,
+        precio: cita['precio'],
+        confirmada: cita['confirmada'],
+        tokenWebCliente: cita['tokenWebCliente'],
+        idCitaCliente: cita['idCitaCliente'],
+        // Nuevos campos de cliente, solo los asignas si existen
+        nombreCliente: cliente['nombre'],
+        fotoCliente: cliente['foto'],
+        telefonoCliente: cliente['telefono'],
+        emailCliente: cliente['email'],
+        notaCliente: cliente['nota'],
+      );
+
+      citasFirebase.add(citaFirebase);
+      /*  nombreCliente: clienteFirebase['nombre'],
+        fotoCliente: clienteFirebase['foto'],
+        telefonoCliente: clienteFirebase['telefono'],
+        emailCliente: clienteFirebase['email'],
+        notaCliente: clienteFirebase['nota'], */
+      //servicio
+      /* citaFirebase.idservicio = cita[
+          'idServicio']; //servicioFirebase.map((e) => e.values.toString()).toList(),
+
+      // 'servicio': servicioFirebase.first['servicio'],
+      // 'detalle': servicioFirebase.first['detalle'],
+      citasFirebase.add(citaFirebase); */
     }
 
     citasFirebase.sort((a, b) {
-      return DateTime.parse(a['horaInicio'])
-          .compareTo(DateTime.parse(b['horaInicio']));
+      return DateTime.parse(a.horaInicio!)
+          .compareTo(DateTime.parse(b.horaInicio!));
     });
+    print('oooooooooooooooooooooofiltradas oooooooooooooooooooooooooo');
+
     return citasFirebase;
   }
 
@@ -1166,9 +1201,9 @@ class FirebaseProvider extends ChangeNotifier {
     await Future.delayed(const Duration(seconds: 1));
     //precio total diario
     double gananciaDiaria = 0;
-    List<Map<String, dynamic>> aux = citas;
+    List<CitaModelFirebase> aux = citas;
     List precios = aux.map((value) {
-      return (value['precio'] != '') ? double.parse(value['precio']) : 0.0;
+      return (value.precio! != '') ? double.parse(value.precio!) : 0.0;
     }).toList(); //todo: este campo está pendiende de añadir a tabla cita de firebase
 
     for (double element in precios) {
@@ -1515,7 +1550,7 @@ class FirebaseProvider extends ChangeNotifier {
     // ****** citas ******
     final citaGenerada = await collectionRef.set({
       'confirmada': true,
-      'fechaHora': fechaHora,
+      'fecIhaHora': fechaHora,
       'fecha': fechaCita,
       'hora': horaFormateada,
       'idNegocio': negocio.id,
@@ -1529,5 +1564,76 @@ class FirebaseProvider extends ChangeNotifier {
     });
 
     //return citaGenerada.id;
+  }
+
+  Future<EmpleadoModel> getEmpleadoporId(
+      String email, String idempleado) async {
+    // Inicializar un empleado vacío
+    final empleado = EmpleadoModel(
+      id: '',
+      nombre: '',
+      disponibilidad: [],
+      email: '',
+      telefono: '',
+      categoriaServicios: [],
+      foto: '',
+    );
+
+    // Inicializar Firebase
+    await _iniFirebase();
+
+    // Obtener la referencia del documento de empleados
+    final docRef = await _referenciaDocumento(email, 'empleados');
+
+    // Buscar el documento del empleado por su ID
+    await docRef.get().then((QuerySnapshot snapshot) {
+      for (var element in snapshot.docs) {
+        // Si el ID del documento coincide con el ID del empleado, asignar valores
+        if (element.id == idempleado) {
+          empleado.nombre = element['nombre'] ?? '';
+          empleado.foto = element['foto'] ?? '';
+          empleado.telefono = element['telefono'] ?? ''; // Corregido aquí
+          empleado.email = element['email'] ?? '';
+          empleado.disponibilidad =
+              List<dynamic>.from(element['disponibilidadSemanal'] ?? []);
+          empleado.categoriaServicios =
+              List<dynamic>.from(element['categoriaServicios'] ?? []);
+        }
+      }
+    });
+
+    return empleado;
+  }
+
+  Future<List<EmpleadoModel>> getTodosEmpleados(String email) async {
+    List<EmpleadoModel> listaEmpleados = [];
+    // Inicializar un empleado vacío
+
+    // Inicializar Firebase
+    await _iniFirebase();
+
+    // Obtener la referencia del documento de empleados
+    final docRef = await _referenciaDocumento(email, 'empleados');
+
+    // Buscar el documento del empleado por su ID
+    await docRef.get().then((QuerySnapshot snapshot) {
+      for (var element in snapshot.docs) {
+        var empleado = EmpleadoModel(
+          id: element.id,
+          nombre: element['nombre'] ?? '',
+          disponibilidad:
+              List<dynamic>.from(element['disponibilidadSemanal'] ?? []),
+          email: element['email'] ?? '',
+          telefono: element['telefono'] ?? '',
+          categoriaServicios:
+              List<dynamic>.from(element['categoriaServicios'] ?? []),
+          foto: element['foto'] ?? '',
+        );
+
+        listaEmpleados.add(empleado);
+      }
+    });
+
+    return listaEmpleados;
   }
 }

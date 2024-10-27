@@ -159,13 +159,11 @@ class Comunicaciones {
 
     await emailEstadoCita('Cita confirmada', cita, perfilUsuarioApp.email)
         .then((mailId) {
-      mensajeInfo(context, 'Enviando email');
-
       Future.delayed(const Duration(seconds: 10), () async {
         dynamic statusEnvio = await comprueStatusEmail(mailId);
         switch (statusEnvio) {
           case 'SUCCESS':
-            mensajeInfo(context, 'Email entregado correctamente');
+            mensajeInfo(context, 'Email enviado');
 
           default:
             mensajeError(context, 'No se ha entregado el email');

@@ -84,10 +84,18 @@ class CitaModelFirebase {
   String? idcliente;
   List<String>? idservicio;
   String? idEmpleado;
+  String? nombreEmpleado;
   String? precio;
   bool? confirmada;
   String? tokenWebCliente;
   String? idCitaCliente;
+
+  // Nuevos campos añadidos
+  String? nombreCliente;
+  String? fotoCliente;
+  String? telefonoCliente;
+  String? emailCliente;
+  String? notaCliente;
 
   CitaModelFirebase({
     this.id,
@@ -99,41 +107,63 @@ class CitaModelFirebase {
     this.idcliente,
     this.idservicio,
     this.idEmpleado,
+    this.nombreEmpleado,
     this.precio,
     this.confirmada,
     this.tokenWebCliente,
     this.idCitaCliente,
+    // Inicialización de los nuevos campos
+    this.nombreCliente,
+    this.fotoCliente,
+    this.telefonoCliente,
+    this.emailCliente,
+    this.notaCliente,
   });
 
   factory CitaModelFirebase.fromJson(Map<String, dynamic> json) =>
       CitaModelFirebase(
           id: json["id"],
           dia: json["dia"],
-          horaInicio: json["horainicio"],
-          horaFinal: json["horafinal"],
+          horaInicio: json["horaInicio"],
+          horaFinal: json["horaFinal"],
           comentario: json["comentario"],
           email: json["email"],
-          idcliente: json["id_cliente"],
-          idservicio: json["id_servicio"],
-          idEmpleado: json["id_empleado"],
+          idcliente: json["idCliente"],
+          idservicio: ["idServicio"], // Adaptación de array
+          idEmpleado: json["idEmpleado"],
+          nombreEmpleado: json["nombreEmpleado"],
           precio: json["precio"],
           confirmada: json["confirmada"],
           tokenWebCliente: json["tokenWebCliente"],
-          idCitaCliente: json["idCitaCliente"]);
+          idCitaCliente: json["idCitaCliente"],
+          // Mapeo de los nuevos campos
+          nombreCliente: json["nombreCliente"],
+          fotoCliente: json["fotoCliente"],
+          telefonoCliente: json["telefonoCliente"],
+          emailCliente: json["emailCliente"],
+          notaCliente: json["notaCliente"]);
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "dia": dia,
-        "horainicio": horaInicio,
-        "horafinal": horaFinal,
+        "horaInicio": horaInicio,
+        "horaFinal": horaFinal,
         "comentario": comentario,
         "email": email,
-        "id_cliente": idcliente,
-        "id_servicio": idservicio,
-        "id_empleado": idEmpleado,
+        "idCliente": idcliente,
+        "idServicio": idservicio,
+        "idEmpleado": idEmpleado,
+        "nombreEmpleado": nombreEmpleado,
         "precio": precio,
         "confirmada": confirmada,
         "tokenWebCliente": tokenWebCliente,
+        "idCitaCliente": idCitaCliente,
+        // Nuevos campos añadidos al JSON
+        "nombreCliente": nombreCliente,
+        "fotoCliente": fotoCliente,
+        "telefonoCliente": telefonoCliente,
+        "emailCliente": emailCliente,
+        "notaCliente": notaCliente,
       };
 }
 

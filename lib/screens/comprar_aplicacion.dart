@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:agendacitas/screens/screens.dart';
+/* import 'package:agendacitas/screens/screens.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -423,3 +423,4 @@ class _ComprarAplicacionState extends State<ComprarAplicacion> {
     }
   }
 }
+ */

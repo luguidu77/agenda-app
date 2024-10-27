@@ -182,7 +182,7 @@ class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
     );
   }
 
-  _irPaginaCompra() {
+/*   _irPaginaCompra() {
     // compra con pagina Stripe
     Navigator.pushReplacement(
       context,
@@ -191,7 +191,7 @@ class _FinalizacionPruebaState extends State<FinalizacionPrueba> {
               // usuarioAPP: email,
               )),
     );
-  }
+  } */
 
   _irPaginaInicio() {
     Navigator.pushReplacement(

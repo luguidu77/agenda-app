@@ -90,6 +90,7 @@ void guardaNotificacionAdministrador(RemoteMessage message) async {
     'vistoPor': [],
     'texto': message.data['texto'],
     'link': message.data['link'],
+    'textoBoton': message.data['textoBoton']
   });
 }
 
@@ -117,6 +118,7 @@ Future<List<Map<String, dynamic>>>
               'vistoPor': element['vistoPor'],
               'texto': element['texto'],
               'link': element['link'],
+              'textoBoton': element['textoBoton']
             })
           }
       });

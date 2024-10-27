@@ -173,8 +173,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     estadoPagoEmailApp();
     cargarTema();
-
     personaliza();
+    empleados();
     personalizaFirebase();
 
     // ####### GUARDA EL TOKEN PARA ENVIOS DE NOTIFICACIONES
@@ -313,6 +313,15 @@ class _HomeScreenState extends State<HomeScreen> {
       await PersonalizaProvider().nuevoPersonaliza(0, 34, '', '', '€');
       personaliza();
     }
+  }
+
+  void empleados() async {
+    // TRAE LOS EMPLEADOS Y LOS SETEA EN EL PROVIDER
+    final empleadosProvider =
+        Provider.of<EmpleadosProvider>(context, listen: false);
+    FirebaseProvider().getTodosEmpleados(_emailSesionUsuario).then((empleados) {
+      empleadosProvider.setTodosLosEmpleados(empleados);
+    });
   }
 
   void personalizaFirebase() async {

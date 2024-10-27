@@ -395,7 +395,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
     );
   }
 
-  ListTile _comprarAPP(BuildContext context) {
+  /*  ListTile _comprarAPP(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.monetization_on),
       title: Text(
@@ -413,7 +413,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
         //  _quitarPublicidad(context, enviosugerencia);
       },
     );
-  }
+  } */
 
   ListTile _informes(BuildContext context) {
     return ListTile(

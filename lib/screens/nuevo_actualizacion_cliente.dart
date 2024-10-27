@@ -107,9 +107,12 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
           actions: [
             ElevatedButton.icon(
                 style: ButtonStyle(
+                    foregroundColor: const WidgetStatePropertyAll(
+                      Colors.white,
+                    ),
                     backgroundColor: WidgetStatePropertyAll(
-                  Theme.of(context).primaryColor,
-                )),
+                      Theme.of(context).primaryColor,
+                    )),
                 label: Text(
                   nuevoCliente ? 'NUEVO CLIENTE' : 'ACTUALIZAR CLIENTE',
                 ),

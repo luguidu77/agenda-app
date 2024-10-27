@@ -1,6 +1,8 @@
+import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/screens/screens.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/widgets/botones/boton_confirmar_cita_reserva_web.dart';
+import 'package:agendacitas/widgets/empleado/empleado.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -168,9 +170,23 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              color: citaconfirmada
-                  ? const Color.fromARGB(255, 43, 91, 173)
-                  : Colors.red,
+              gradient: citaconfirmada
+                  ? const LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 37, 98, 204), // Azul
+                        Color.fromARGB(255, 94, 176, 243), // Blanco
+                      ],
+                      begin: Alignment.center,
+                      end: Alignment.topRight,
+                    )
+                  : const LinearGradient(
+                      colors: [
+                        Colors.pink, //
+                        Color.fromARGB(255, 238, 175, 80),
+                      ],
+                      begin: Alignment.center,
+                      end: Alignment.bottomLeft,
+                    ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.5),
@@ -200,6 +216,25 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
 
                 // Detalles del cliente
                 _cliente(reserva),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    const Text(
+                      'Concertada con ',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    EmpleadoWidget(
+                      emailUsuario: widget.emailUsuario,
+                      idEmpleado: cita['idEmpleado'].toString(),
+                    ),
+                  ],
+                ),
+
                 const SizedBox(height: 10),
 
                 // Fecha larga
@@ -212,6 +247,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
+                // Empleado
 
                 // Servicio
                 Text(

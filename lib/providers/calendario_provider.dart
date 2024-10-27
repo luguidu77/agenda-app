@@ -6,8 +6,18 @@ class CalendarioProvider extends ChangeNotifier {
 
   // SELECIONAR LA FECHA
   DateTime get fechaSeleccionada => _fechaSeleccionada;
-  set setFechaSeleccionada(DateTime fecha) {
+  setFechaSeleccionada(DateTime fecha) {
     _fechaSeleccionada = fecha;
+    notifyListeners();
+  }
+
+  incrementaUnDia() {
+    _fechaSeleccionada = _fechaSeleccionada.add(const Duration(days: 1));
+    notifyListeners();
+  }
+
+  decrementaUnDia() {
+    _fechaSeleccionada = _fechaSeleccionada.subtract(const Duration(days: 1));
     notifyListeners();
   }
 

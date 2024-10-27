@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
+
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:provider/provider.dart';
@@ -33,9 +33,10 @@ import 'widgets/formulariosSessionApp/registro_usuario_screen.dart'; //utilizado
 //?   CAMBIAR  Version EN Android/app/build.gradle  ingrementa versionCode y versionName
 //?            version base de datos DB Provider.
 //?            quitar PAGADO DEL home.dart -->> PagoProvider().guardaPagado(true);
-//?            comprobar pago STRIPE en PRODUCTION google_pay_payment_profile.json y variables en wallet/ tarjetaPago.dart
+//?
 //?   flutter build appbundle
 //?            - C:\PROYECTOS FLUTTER\agenda_app\build\app\outputs\bundle\release
+
 //      VER SOLUCIONES DE ERRORES README.md
 //! GITHUB :
 /* 
@@ -68,7 +69,6 @@ void main() async {
   // initializeDateFormatting().then((_) {
 
   MobileAds.instance.initialize();
-  Stripe.publishableKey = stripePublishableKey;
 
   //});
   // Registra el background handler
@@ -198,6 +198,8 @@ class _MyAppState extends State<MyApp> {
             create: (BuildContext context) => TabNotifiacionesScreenProvider()),
         ChangeNotifierProvider(
             create: (BuildContext context) => EstadoConfirmacionCita()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => EmpleadosProvider()),
       ],
       builder: (context, _) {
         return MaterialApp(

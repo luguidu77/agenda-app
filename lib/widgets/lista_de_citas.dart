@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:math';
 
+import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/screens/creacion_no_disponibilidad/tarjeta_indisponibilidad.dart';
 import 'package:agendacitas/screens/detalles_horario_no_disponible_screen.dart';
 import 'package:agendacitas/utils/extraerServicios.dart';
+import 'package:agendacitas/widgets/empleado/empleado.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +21,7 @@ class ListaCitasNuevo extends StatefulWidget {
   const ListaCitasNuevo(
       {super.key, required this.fechaElegida, required this.citas});
   final DateTime fechaElegida;
-  final List<Map<String, dynamic>> citas;
+  final List<CitaModelFirebase> citas;
   @override
   _ListaCitasNuevoState createState() => _ListaCitasNuevoState();
 }
@@ -34,11 +37,63 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
     _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
   }
 
+  List<CalendarResource> _employeeCollection = [];
+  List<TimeRegion> _specialTimeRegions = [];
+
   @override
   void initState() {
     emailUsuarioApp();
 
+    _employeeCollection = <CalendarResource>[];
+    _addResources();
+    //_addSpecialRegions(); // agrega zonas de descansos ejemplo HORA DE COMER
+
     super.initState();
+  }
+
+  void _addResources() {
+    final empleadosProvider =
+        Provider.of<EmpleadosProvider>(context, listen: false);
+    List<EmpleadoModel> empleados = empleadosProvider.getEmpleados;
+
+    for (var i = 0; i < empleados.length; i++) {
+      print(empleados[i].nombre);
+
+      _employeeCollection.add(CalendarResource(
+        displayName: empleados[i].nombre,
+        id: empleados[i].id,
+        color: Colors.white,
+      ));
+    }
+  }
+
+  // agrega horas de descansos
+  void _addSpecialRegions() {
+    final DateTime date = DateTime.now();
+    Random random = Random();
+    for (int i = 0; i < _employeeCollection.length; i++) {
+      _specialTimeRegions.add(TimeRegion(
+          startTime: DateTime(date.year, date.month, date.day, 13, 0, 0),
+          endTime: DateTime(date.year, date.month, date.day, 14, 0, 0),
+          text: 'Lunch',
+          resourceIds: <Object>[_employeeCollection[i].id],
+          recurrenceRule: 'FREQ=DAILY;INTERVAL=1'));
+
+      if (i % 2 == 0) {
+        continue;
+      }
+
+      final DateTime startDate = DateTime(DateTime.now().year,
+          DateTime.now().month, DateTime.now().day, 7, 0, 0);
+
+      _specialTimeRegions.add(TimeRegion(
+        startTime: startDate,
+        endTime: startDate.add(Duration(hours: 3)),
+        text: 'Not Available',
+        enablePointerInteraction: false,
+        resourceIds: <Object>[_employeeCollection[i].id],
+      ));
+    }
   }
 
   @override
@@ -55,10 +110,47 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           ? Colors.red.withOpacity(0.1)
           : Colors.white,
 
+      view: CalendarView
+          .day, //············· CAMBIA LA VISTA: VISUALIZA EMPLEADOS :timelineDay ------------------------------------------------
+
+      specialRegions:
+          _specialTimeRegions, // tramos especiales como descansos entre turnos (comidas, descansos..)
+      allowedViews: const [
+        CalendarView.day,
+        CalendarView.timelineDay,
+      ],
+
+      resourceViewSettings: ResourceViewSettings(
+          showAvatar: false,
+          visibleResourceCount: _employeeCollection.length,
+          size: 55,
+          displayNameTextStyle: const TextStyle(
+              fontStyle: FontStyle.italic,
+              fontSize: 9,
+              fontWeight: FontWeight.w400)),
+      resourceViewHeaderBuilder:
+          (BuildContext context, ResourceViewHeaderDetails details) {
+        return Container(
+          color: Color.fromARGB(71, 6, 79, 236),
+          child: Text(details.resource.displayName),
+        );
+      },
+      // DETECTO LA FECHA ELEGIDA AL DESPLAZAR LAS PAGINAS DEL CALENDARIO
+      onViewChanged: (ViewChangedDetails details) {
+        DateTime fechaVisibleInicio = details.visibleDates.first;
+        DateTime fechaVisibleFin = details.visibleDates.last;
+        var calendarioProvider =
+            Provider.of<CalendarioProvider>(context, listen: false);
+        calendarioProvider.setFechaSeleccionada(fechaVisibleFin);
+
+        print("Fecha visible de inicio: $fechaVisibleInicio");
+        print("Fecha visible de fin: $fechaVisibleFin");
+      },
+
       // appointmentBuilder: appointmentBuilder,//? ########### CUSTOMIZACION DE LAS TARJETAS
       // ················   Config calendario ······································
 
-      // CONFIGURA VISTA TIEMPO
+      // CONFIGURA HORARIO
       timeSlotViewSettings: const TimeSlotViewSettings(
         timeFormat: 'HH:mm', // FORMATO 24H
         startHour: 7, // INICIO LABORAL
@@ -68,12 +160,17 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
       ),
       //cellBorderColor: Colors.deepOrange,
 
-      viewNavigationMode: ViewNavigationMode.none,
+      viewNavigationMode: ViewNavigationMode
+          .snap, // permite pasar fechas arrastrando a los lados
+
       appointmentTextStyle: const TextStyle(
           color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
       headerHeight: 0, // oculta fecha
       allowDragAndDrop: true,
+      onLongPress: (calendarLongPressDetails) => print('fdfdf'),
+
       onTap: (CalendarTapDetails details) async {
+        print('object');
         // DateTime date = details.date!;
         dynamic appointments = details.appointments;
         // CalendarElement view = details.targetElement;
@@ -167,118 +264,132 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           mensajeError(context, 'No disponible para esta versión');
         }
       },
-      view: CalendarView.day,
+
       initialDisplayDate: widget.fechaElegida,
-      dataSource: MeetingDataSource(getAppointments()),
+      dataSource: MeetingDataSource(getAppointments(), _employeeCollection),
     ));
   }
 
   List<Appointment> getAppointments() {
     for (var cita in widget.citas) {
+      print('oooooooooooooooooooooo veo las citas oooooooooooooooooooooooooo');
+      print(cita.nombreCliente);
       String horaInicio =
-          FormatearFechaHora().formatearHora(cita['horaInicio'].toString());
+          FormatearFechaHora().formatearHora(cita.horaInicio.toString());
       String horaFinal =
-          FormatearFechaHora().formatearHora(cita['horaFinal'].toString());
+          FormatearFechaHora().formatearHora(cita.horaFinal.toString());
       print('@@@@@@@@@@@@@@@@@@@@@@');
-      print(cita['id']);
+      print(cita.id);
 
-      final DateTime fechaInicio = DateTime.parse(cita['horaInicio']);
-      final DateTime fechaFinal = DateTime.parse(cita['horaFinal']);
+      final DateTime fechaInicio = DateTime.parse(cita.horaInicio!);
+      final DateTime fechaFinal = DateTime.parse(cita.horaFinal!);
       final DateTime startTime = DateTime(fechaInicio.year, fechaInicio.month,
           fechaInicio.day, fechaInicio.hour, fechaInicio.minute, 0);
       final DateTime endTime = DateTime(fechaFinal.year, fechaFinal.month,
           fechaFinal.day, fechaFinal.hour, fechaFinal.minute, 0);
       bool citaConfirmada = _iniciadaSesionUsuario
-          ? cita['confirmada'].toString() == 'true'
+          ? cita.confirmada.toString() == 'true'
               ? true
               : false
           : true;
 
       //SERVICIOS DEPENDENRA DE SI ES CON SESION O EN DISPOSITIVO
-      var servicios = _iniciadaSesionUsuario
-          ? cita['idServicio'].map((serv) => serv['servicio']).join(', ')
-          : cita['servicio'];
+      var servicios;
+      if (_iniciadaSesionUsuario) {
+        final List<String> employeeIds = [];
+        for (var i = 0; i < _employeeCollection.length; i++) {
+          if (cita.idEmpleado == _employeeCollection[i].id) {
+            employeeIds.add(_employeeCollection[i].id.toString());
+          }
+        }
 
-      // **** DONDE CREAMOS LA NOTA QUE TRAE TODOS LOS DATOS NECESARIOS PARA LA GESTION DE CITA ****************
-      //
+        // **** DONDE CREAMOS LA NOTA QUE TRAE TODOS LOS DATOS NECESARIOS PARA LA GESTION DE CITA ****************
+        meetings.add(Appointment(
+            // TRAEMOS TODOS LOS DATOS QUE NOS HARA FALTA PARA TRABAJAR CON ELLOS POSTERIORMENTE en Detalles de la cita
+            notes: '''
+                     {
+                         "id": "${cita.id}",
+                         "idCliente": "${cita.idcliente}",
+                         "idEmpleado": "${cita.idEmpleado}",
+                         "nombreEmpleado" :  "${cita.nombreEmpleado}",
+                         "idServicio": "${cita.idservicio}",
+                         "nombre": "${cita.nombreCliente}",
+                         "nota": "${cita.notaCliente}",
+                         "horaInicio": "${cita.horaInicio}",
+                         "horaFinal": "${cita.horaFinal}",
+                         "telefono": "${cita.telefonoCliente}",
+                         "email": "${cita.email}",
+                         "servicio": "$servicios",
+                         "detalle": "${cita.comentario.toString()}",
+                         "precio": "${cita.precio}",
+                         "foto": "${cita.fotoCliente}",
+                         "comentario": "${cita.comentario}",
+                         "confirmada": "${cita.confirmada.toString()}",
+                         "idCitaCliente": "${cita.idCitaCliente.toString()}",
+                         "tokenWebCliente": "${cita.tokenWebCliente.toString()}"
+                    }
+                    ''',
+            resourceIds: employeeIds,
+            id: cita.id,
+            startTime: startTime,
+            endTime: endTime,
+            // DATOS QUE SE VISUALIZAN EN EL CALENDARIO DE LA CITA
+            subject: textoCita(cita),
 
-      meetings.add(Appointment(
-          // TRAEMOS TODOS LOS DATOS QUE NOS HARA FALTA PARA TRABAJAR CON ELLOS POSTERIORMENTE en Detalles de la cita
-          notes: '''
-{
-  "id": "${cita['id']}",
-  "idCliente": "${cita['idCliente']}",
-  "idEmpleado": "${cita['idEmpleado']}",
-  "idServicio": "${cita['idServicio']}",
-  "nombre": "${cita['nombre']}",
-  "nota": "${cita['nota']}",
-  "horaInicio": "${cita['horaInicio']}",
-  "horaFinal": "${cita['horaFinal']}",
-  "telefono": "${cita['telefono']}",
-  "email": "${cita['email']}",
-  "servicio": "$servicios",
-  "detalle": "${cita['detalle'].toString()}",
-  "precio": "${cita['precio']}",
-  "foto": "${cita['foto']}",
-  "comentario": "${cita['comentario']}",
-  "confirmada": "${cita['confirmada'].toString()}",
-  "idCitaCliente": "${cita['idCitaCliente'].toString()}",
-  "tokenWebCliente": "${cita['tokenWebCliente'].toString()}"
-}
-''',
-          id: cita['id'],
-          startTime: startTime,
-          endTime: endTime,
-          // DATOS QUE SE VISUALIZAN EN EL CALENDARIO DE LA CITA
-          subject: textoCita(cita),
+            //location: 'es-ES',
+            color: cita.idservicio == 999 ||
+                    cita.idservicio ==
+                        null //todo: comprueba solo el primer servicio de la lista
+                ? const Color.fromARGB(255, 113, 151, 102)
+                : !citaConfirmada
+                    ? const Color.fromARGB(255, 133, 130, 130)
+                    : fechaFinal.isBefore(DateTime.now())
+                        ? const Color.fromARGB(255, 247, 125, 116)
+                        : const Color.fromARGB(255, 100, 127, 172)));
 
-          //location: 'es-ES',
-          color: cita['idServicio'] == 999 ||
-                  cita['idServicio'] ==
-                      null //todo: comprueba solo el primer servicio de la lista
-              ? const Color.fromARGB(255, 113, 151, 102)
-              : !citaConfirmada
-                  ? const Color.fromARGB(255, 133, 130, 130)
-                  : fechaFinal.isBefore(DateTime.now())
-                      ? const Color.fromARGB(255, 247, 125, 116)
-                      : const Color.fromARGB(255, 100, 127, 172)));
+        servicios = cita.idservicio!.map((serv) => serv).join(', ');
+      }
     }
+
     debugPrint(meetings.toString());
     return meetings;
   }
 
-  String textoCita(cita) {
+  String textoCita(CitaModelFirebase cita) {
     bool citaConfirmada = _iniciadaSesionUsuario
-        ? cita['confirmada'].toString() == 'true'
+        ? cita.confirmada.toString() == 'true'
             ? true
             : false
         : true;
 
     // print('$citaConfirmada ---- $_iniciadaSesionUsuario');
+
     String textoConfirmada =
-        citaConfirmada ? 'CONFIRMADA' : 'PENDIENTE CONFIRMAR';
+        citaConfirmada ? '✔️ cofirmada' : '❌ sin confirmar';
     var servicios = _iniciadaSesionUsuario
-        ? cita['idServicio'].map((serv) => serv['servicio']).join(', ')
-        : cita['servicio'];
+        ? cita.idservicio!.map((serv) => serv).join(', ')
+        : cita.idservicio;
 
     // ###### COMPROBACION SI SE TRATA DE UNA CITA O UNA HORA INDISPONIBLE
-    return (cita['nombre'] != null)
+    return (cita.nombreCliente != null)
 
         // ------------TARJETA CITA RESERVADA         ---------------------
-        ? '${textoConfirmada.padLeft(60)}'
-            '\n😀 ${cita['nombre']}'
+        ? '$textoConfirmada con ${cita.nombreEmpleado}'
+            '\n 🧒 ${cita.nombreCliente}'
             '\n 🤝 $servicios' //.join(', ') => para que no quitar los ()
-            '\n 📇 ${cita['comentario']}'
-            '\n 💰 ${cita['precio']}'
+            '\n 🗨️ ${cita.comentario}'
+            '\n 💰 ${cita.precio}'
 
         // ------------TARJETA HORARIO NO DISPONIBLE ---------------------
-        : ' ${cita['comentario']}';
+        : ' ${cita.comentario}';
   }
 }
 
 class MeetingDataSource extends CalendarDataSource {
-  MeetingDataSource(List<Appointment> source) {
+  MeetingDataSource(
+      List<Appointment> source, List<CalendarResource> resourceColl) {
     appointments = source;
+    resources = resourceColl;
   }
 }
 

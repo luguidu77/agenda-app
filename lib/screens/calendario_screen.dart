@@ -480,10 +480,12 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
         : SizedBox(
             width: MediaQuery.of(context).size.width,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                // BOTON CAMBIAR VISTAS
+                IconButton(onPressed: null, icon: Icon(Icons.menu)),
                 // BOTON DEL DIA ANTERIOR
-                _botonAnteriorDia(calendarioProvider),
+                //_botonAnteriorDia(calendarioProvider),
                 // TARJETA PARA VER LA FECHA
                 GestureDetector(
                   onTap: () => setState(() {
@@ -493,18 +495,13 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
                 ),
                 // BOTON SIGUIENTE DIA
 
-                _botonSiguienteDia(calendarioProvider),
+                // _botonSiguienteDia(calendarioProvider),
               ],
             ),
           );
   }
 
   _tarjetadelafechaelegida() {
-    // Convierte ambas fechas a la misma zona horaria (UTC) para comparar solo las fechas
-    DateTime fechaEspecificaSoloFecha =
-        DateTime.utc(fechaElegida.year, fechaElegida.month, fechaElegida.day);
-    DateTime fechaActualSoloFecha = DateTime.utc(
-        DateTime.now().year, DateTime.now().month, DateTime.now().day);
     return SizedBox(
       // width: MediaQuery.of(context).size.width - 120,
       height: 50,
@@ -517,21 +514,18 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
             const SizedBox(
               width: 5,
             ),
-            fechaActualSoloFecha.isAtSameMomentAs(fechaEspecificaSoloFecha)
-                ? const Icon(Icons.today)
-                : const Icon(Icons.calendar_month),
+            Icon(Icons.arrow_drop_down)
           ],
         ),
       ),
     );
   }
 
-  _botonSiguienteDia(calendarioProvider) {
+  _botonSiguienteDia(CalendarioProvider calendarioProvider) {
     return IconButton(
       onPressed: () => {
         setState(() {
-          calendarioProvider.setFechaSeleccionada =
-              fechaElegida.add(const Duration(days: 1));
+          calendarioProvider.incrementaUnDia();
           fechaTextoAno =
               formatAno.format(fechaElegida.add(const Duration(days: 1)));
           fechaTextoMes =
@@ -549,12 +543,11 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
     );
   }
 
-  _botonAnteriorDia(calendarioProvider) {
+  _botonAnteriorDia(CalendarioProvider calendarioProvider) {
     return IconButton(
       onPressed: () => {
         setState(() {
-          calendarioProvider.setFechaSeleccionada =
-              fechaElegida.subtract(const Duration(days: 1));
+          calendarioProvider.decrementaUnDia();
           fechaTextoAno =
               formatAno.format(fechaElegida.subtract(const Duration(days: 1)));
           fechaTextoMes =
@@ -608,10 +601,22 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
   }
 
   _fecha() {
+    // Convierte ambas fechas a la misma zona horaria (UTC) para comparar solo las fechas
+    DateTime fechaEspecificaSoloFecha =
+        DateTime.utc(fechaElegida.year, fechaElegida.month, fechaElegida.day);
+    DateTime fechaActualSoloFecha = DateTime.utc(
+        DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+    String fechaMesCorto = fechaTextoMes.substring(0, 3);
     return Text(
-      '$fechaTextoSemana $fechaTextoDia $fechaTextoMes $fechaTextoAno',
-      style: const TextStyle(
-          fontSize: 12, color: Colors.blueGrey, fontWeight: FontWeight.bold),
+      '$fechaTextoSemana $fechaTextoDia $fechaMesCorto',
+      style: TextStyle(
+        fontSize: 14,
+        color: fechaActualSoloFecha.isAtSameMomentAs(fechaEspecificaSoloFecha)
+            ? Colors.black
+            : Colors.blueGrey,
+        fontWeight: FontWeight.bold,
+      ),
       textAlign: TextAlign.center,
     );
   }

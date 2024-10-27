@@ -1,3 +1,4 @@
+import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/widgets/lista_de_citas.dart';
 import 'package:flutter/material.dart';
@@ -56,14 +57,17 @@ class _ListaCitasState extends State<ListaCitas> {
     }
   }
 
-  vercitas(context, List<Map<String, dynamic>> citas) {
+  vercitas(context, List<CitaModelFirebase> citas) {
+    /*  print(
+        'oooooooooooooooooooooo veo todas las citas oooooooooooooooooooooooooo');
+    print(citas); */
     int contadorCitas = 0;
     final leerEstadoBotonIndisponibilidad =
         Provider.of<BotonAgregarIndisponibilidadProvider>(context).botonPulsado;
 
     // ············DESCUENTA DE LAS CITAS LOS INDISPUESTOS ............................... ;
     for (var cita in citas) {
-      if (cita['idCliente'] != '999') {
+      if (cita.idcliente != '999') {
         contadorCitas++;
       }
     }
@@ -86,7 +90,7 @@ class _ListaCitasState extends State<ListaCitas> {
   }
 
   FutureBuilder<dynamic> gananciaDiaria(
-      List<Map<String, dynamic>> citas, int numCitas) {
+      List<CitaModelFirebase> citas, int numCitas) {
     return FutureBuilder<dynamic>(
         future: widget.iniciadaSesionUsuario
             ? FirebaseProvider().calculaGananciaDiariasFB(citas)
@@ -165,9 +169,10 @@ class _ListaCitasState extends State<ListaCitas> {
           );
         } else if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
-            return const Text('Error');
+            return const Text('Error todas las citas');
           } else if (snapshot.hasData) {
             final data = snapshot.data;
+
             // SI TENGO DATOS LOS VISUALIZO EN PANTALLA  DATA TRAE TODAS LAS CITAS
 
             return vercitas(context, data);
@@ -183,8 +188,8 @@ class _ListaCitasState extends State<ListaCitas> {
 
   listaCitasFiltrada(fecha) {
     DateTime ahoraUtcLocal = DateTime.now().toUtc().toLocal();
-    List<Map<String, dynamic>> listaFiltrada = [];
-    List<Map<String, dynamic>> listaFiltradaAux = [];
+    List<CitaModelFirebase> listaFiltrada = [];
+    List<CitaModelFirebase> listaFiltradaAux = [];
     return FutureBuilder<dynamic>(
       future: widget.iniciadaSesionUsuario
           //? TRAE LAS CITAS DEL DISPOSITIVO O DE FIREBASE CON LA CONDICION INICIO DE SESION
@@ -214,9 +219,11 @@ class _ListaCitasState extends State<ListaCitas> {
           );
         } else if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
-            return const Text('Error');
+            return const Text('Error conexion firebase');
           } else if (snapshot.hasData) {
             final data = snapshot.data;
+            print('oooooooooooooooooooooofiltradas oooooooooooooooooooooooooo');
+            print(data);
             // SI TENGO DATOS LOS VISUALIZO EN PANTALLA  DATA TRAE TODAS LAS CITAS
 
             // FILTRO DE LAS CITAS SEGUN SELECCION FILTRO (TODAS, SOLO PENDIENTES)
@@ -225,7 +232,7 @@ class _ListaCitasState extends State<ListaCitas> {
 
             listaFiltradaAux.addAll(data);
             for (var element in listaFiltradaAux) {
-              if (DateTime.parse(element['horaInicio'])
+              if (DateTime.parse(element.horaInicio!)
                   .toUtc()
                   .isAfter(ahoraUtcLocal)) {
                 listaFiltrada.add(element);

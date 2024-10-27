@@ -82,9 +82,12 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> with RouteAware {
           ElevatedButton.icon(
             label: const Text('EDITAR'),
             style: ButtonStyle(
+                foregroundColor: const WidgetStatePropertyAll(
+                  Colors.white,
+                ),
                 backgroundColor: WidgetStatePropertyAll(
-              Theme.of(context).primaryColor,
-            )),
+                  Theme.of(context).primaryColor,
+                )),
             onPressed: () async {
               Navigator.push(
                 context,

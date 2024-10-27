@@ -165,8 +165,6 @@ class CitaListProvider extends ChangeNotifier {
 
     citas = await CitaListProvider().cargarCitasPorFecha(fechaElegida);
 
-   
-
     //?CREA NUEVA LISTA citas ORDENADAS POR hora de inicio
     citas.sort((a, b) {
       return DateTime.parse(a['horaInicio'])
@@ -176,16 +174,15 @@ class CitaListProvider extends ChangeNotifier {
     return citas;
   }
 
-  Future<String> calculaGananciasDiarias(
-      List<Map<String, dynamic>> citas) async {
+  Future<String> calculaGananciasDiarias(List<CitaModelFirebase> citas) async {
     await Future.delayed(const Duration(seconds: 1));
 
     //precio total diario
     double gananciaDiaria = 0;
-    List<Map<String, dynamic>> aux = citas;
+    List<CitaModelFirebase> aux = citas;
 
     List precios = aux.map((value) {
-      return value['precio'];
+      return value.precio;
     }).toList();
 
     for (var element in precios) {

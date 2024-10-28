@@ -59,10 +59,13 @@ class ActualizacionCita {
     List<String> idServicios =
         extraerIdServiciosdeCadenaTexto(cita['idServicio']);
 
+    print(
+        '------------------------------dfdfd------------------------ ${cita['idServicio'].runtimeType}');
+
     // si la funcion anterior trae una lista vacía, quiere decir que no hay servicios y por lo tanto sera una tarjeta de No DISPONIBLE
-    if (idServicios.isEmpty) {
+    /* if (idServicios.isEmpty) {
       idServicios = ['indispuesto'];
-    }
+    } */
 
     CitaModelFirebase newCita = CitaModelFirebase();
 
@@ -75,6 +78,7 @@ class ActualizacionCita {
         cita['comentario'] + ' 🔃​'; //todo añadir un nuevo campo REPROGRAMACION
     newCita.idcliente = cita['idCliente'];
     newCita.idservicio = idServicios;
+
     newCita.idEmpleado = cita['idEmpleado'];
     newCita.confirmada =
         cita['confirmada'] == 'true'; // Convertir cadena a booleano

@@ -82,7 +82,8 @@ class CitaModelFirebase {
   String? comentario;
   String? email;
   String? idcliente;
-  List<String>? idservicio;
+  List<dynamic>? idservicio;
+  List<String>? servicios;
   String? idEmpleado;
   String? nombreEmpleado;
   String? precio;
@@ -106,6 +107,7 @@ class CitaModelFirebase {
     this.email,
     this.idcliente,
     this.idservicio,
+    this.servicios,
     this.idEmpleado,
     this.nombreEmpleado,
     this.precio,
@@ -130,6 +132,7 @@ class CitaModelFirebase {
           email: json["email"],
           idcliente: json["idCliente"],
           idservicio: ["idServicio"], // Adaptación de array
+          servicios: ["servicios"], // Adaptación de array
           idEmpleado: json["idEmpleado"],
           nombreEmpleado: json["nombreEmpleado"],
           precio: json["precio"],
@@ -152,6 +155,7 @@ class CitaModelFirebase {
         "email": email,
         "idCliente": idcliente,
         "idServicio": idservicio,
+        "servicios": servicios,
         "idEmpleado": idEmpleado,
         "nombreEmpleado": nombreEmpleado,
         "precio": precio,

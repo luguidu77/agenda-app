@@ -289,6 +289,7 @@ class FirebaseProvider extends ChangeNotifier {
                       // Agrega los datos con el campo 'confirmada'
                       data.add({
                         'id': element.id,
+                        'dia': element['dia'],
                         'precio': element['precio'],
                         'comentario': element['comentario'],
                         'horaInicio': element['horaInicio'],
@@ -1120,13 +1121,8 @@ class FirebaseProvider extends ChangeNotifier {
             .getClientePorId(emailUsuarioApp, cita.idcliente!);
         clienteFirebase = cliente0;
         print('clientes ------------------------------$clienteFirebase');
-        //? TRAE SERVICIO POR SU IDSERVICIOS ////////////////////////////////////
-        /*   for (var servicio in cita.idservicio!) {
-          var servicioID = await FirebaseProvider()
-              .cargarServicioPorId(emailUsuarioApp, servicio);
-          servicioFirebase.add(servicioID);
-        }
-         */
+       
+        
         debugPrint(
             'servicio traidas de firebase : ${servicioFirebase.toString()}');
       } else {
@@ -1134,21 +1130,49 @@ class FirebaseProvider extends ChangeNotifier {
         /*  servicioFirebase.first['idServicio'] = null;
         clienteFirebase['idCliente'] = null; */
       } */
-      //? TRAE CLIENTE POR SU IDCLIENTE //////////////////////////////////////
-      var cliente = await FirebaseProvider()
-          .getClientePorId(emailUsuarioApp, cita['idCliente']);
-      //? TRAE SERVICIO POR SU IDSERVICIOS ////////////////////////////////////
-      for (var servicio in cita['idServicio']) {
-        var servicioAux = await FirebaseProvider()
-            .cargarServicioPorId(emailUsuarioApp, servicio);
-        servicioFirebase.add(servicioAux['servicio']);
+
+      var cliente;
+      var empleado;
+      var serv;
+
+      if (cita['idCliente'] != "999") {
+        // si no es indispuesto
+
+        //? TRAE CLIENTE POR SU IDCLIENTE //////////////////////////////////////
+        cliente = await FirebaseProvider()
+            .getClientePorId(emailUsuarioApp, cita['idCliente']);
+        //? TRAE EMPLEADO POR SU IDCLIENTE //////////////////////////////////////
+        empleado = await FirebaseProvider()
+            .getEmpleadoporId(emailUsuarioApp, cita['idEmpleado']);
+
+        //? TRAE SERVICIO POR SU IDSERVICIOS ////////////////////////////////////
+        for (var servicio in cita['idServicio']) {
+          serv = await FirebaseProvider()
+              .cargarServicioPorId(emailUsuarioApp, servicio);
+          servicioFirebase.add(serv['servicio']);
+        }
+      } else {
+        // es un indisponible
+        empleado = EmpleadoModel(
+          id: '',
+          nombre: '',
+          disponibilidad: [],
+          email: '',
+          telefono: '',
+          categoriaServicios: [],
+          foto: '',
+        );
+        cliente = {
+          'nombre': '',
+          'foto': '',
+          'telefono': '',
+          'email': '',
+          'nota': ''
+        };
       }
 
-      //? TRAE EMPLEADO POR SU IDCLIENTE //////////////////////////////////////
-      var empleado = await FirebaseProvider()
-          .getEmpleadoporId(emailUsuarioApp, cita['idEmpleado']);
-
       print('clientes ------------------------------$cliente');
+      print(servicioFirebase);
       // Crea el objeto solo con los datos que tienes
       var citaFirebase = CitaModelFirebase(
         id: cita['id'],
@@ -1156,9 +1180,10 @@ class FirebaseProvider extends ChangeNotifier {
         horaInicio: cita['horaInicio'],
         horaFinal: cita['horaFinal'],
         comentario: cita['comentario'],
-        email: cita['email'],
+        // email: cita['email'],
         idcliente: cita['idCliente'],
-        idservicio: servicioFirebase,
+        idservicio: cita['idServicio'], // servicioFirebase,
+        servicios: servicioFirebase,
         idEmpleado: cita['idEmpleado'],
         nombreEmpleado: empleado.nombre,
         precio: cita['precio'],
@@ -1174,11 +1199,7 @@ class FirebaseProvider extends ChangeNotifier {
       );
 
       citasFirebase.add(citaFirebase);
-      /*  nombreCliente: clienteFirebase['nombre'],
-        fotoCliente: clienteFirebase['foto'],
-        telefonoCliente: clienteFirebase['telefono'],
-        emailCliente: clienteFirebase['email'],
-        notaCliente: clienteFirebase['nota'], */
+
       //servicio
       /* citaFirebase.idservicio = cita[
           'idServicio']; //servicioFirebase.map((e) => e.values.toString()).toList(),

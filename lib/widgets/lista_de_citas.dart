@@ -27,6 +27,7 @@ class ListaCitasNuevo extends StatefulWidget {
 }
 
 class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
+  var servicios;
   List<Appointment> meetings = <Appointment>[];
   String _emailSesionUsuario = '';
   bool _iniciadaSesionUsuario = false;
@@ -137,13 +138,13 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
       },
       // DETECTO LA FECHA ELEGIDA AL DESPLAZAR LAS PAGINAS DEL CALENDARIO
       onViewChanged: (ViewChangedDetails details) {
-        DateTime fechaVisibleInicio = details.visibleDates.first;
+        // DateTime fechaVisibleInicio = details.visibleDates.first;
         DateTime fechaVisibleFin = details.visibleDates.last;
         var calendarioProvider =
             Provider.of<CalendarioProvider>(context, listen: false);
         calendarioProvider.setFechaSeleccionada(fechaVisibleFin);
 
-        print("Fecha visible de inicio: $fechaVisibleInicio");
+        //  print("Fecha visible de inicio: $fechaVisibleInicio");
         print("Fecha visible de fin: $fechaVisibleFin");
       },
 
@@ -179,7 +180,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         if (appointments != null) {
           Map<String, dynamic> cita = json.decode(appointments[0].notes);
           print(cita);
-          if (cita['nombre'] != 'null') {
+          if (cita['nombre'] != '') {
             // print(cita);
             //############# DETALLE DE LA CITA                   ########################
 
@@ -294,7 +295,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           : true;
 
       //SERVICIOS DEPENDENRA DE SI ES CON SESION O EN DISPOSITIVO
-      var servicios;
+
       if (_iniciadaSesionUsuario) {
         final List<String> employeeIds = [];
         for (var i = 0; i < _employeeCollection.length; i++) {
@@ -302,6 +303,10 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
             employeeIds.add(_employeeCollection[i].id.toString());
           }
         }
+
+        servicios = cita.servicios!.map((serv) => serv).join(', ');
+
+        print(servicios);
 
         // **** DONDE CREAMOS LA NOTA QUE TRAE TODOS LOS DATOS NECESARIOS PARA LA GESTION DE CITA ****************
         meetings.add(Appointment(
@@ -312,14 +317,14 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
                          "idCliente": "${cita.idcliente}",
                          "idEmpleado": "${cita.idEmpleado}",
                          "nombreEmpleado" :  "${cita.nombreEmpleado}",
-                         "idServicio": "${cita.idservicio}",
+                         "idServicio": "${cita.idservicio}",  
+                         "servicios":  "${cita.servicios}",                   
                          "nombre": "${cita.nombreCliente}",
                          "nota": "${cita.notaCliente}",
                          "horaInicio": "${cita.horaInicio}",
                          "horaFinal": "${cita.horaFinal}",
                          "telefono": "${cita.telefonoCliente}",
-                         "email": "${cita.email}",
-                         "servicio": "$servicios",
+                         "email": "${cita.email}",               
                          "detalle": "${cita.comentario.toString()}",
                          "precio": "${cita.precio}",
                          "foto": "${cita.fotoCliente}",
@@ -337,17 +342,13 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
             subject: textoCita(cita),
 
             //location: 'es-ES',
-            color: cita.idservicio == 999 ||
-                    cita.idservicio ==
-                        null //todo: comprueba solo el primer servicio de la lista
+            color: cita.idcliente == '999'
                 ? const Color.fromARGB(255, 113, 151, 102)
                 : !citaConfirmada
                     ? const Color.fromARGB(255, 133, 130, 130)
                     : fechaFinal.isBefore(DateTime.now())
                         ? const Color.fromARGB(255, 247, 125, 116)
                         : const Color.fromARGB(255, 100, 127, 172)));
-
-        servicios = cita.idservicio!.map((serv) => serv).join(', ');
       }
     }
 
@@ -366,12 +367,9 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
     String textoConfirmada =
         citaConfirmada ? '✔️ cofirmada' : '❌ sin confirmar';
-    var servicios = _iniciadaSesionUsuario
-        ? cita.idservicio!.map((serv) => serv).join(', ')
-        : cita.idservicio;
 
     // ###### COMPROBACION SI SE TRATA DE UNA CITA O UNA HORA INDISPONIBLE
-    return (cita.nombreCliente != null)
+    return (cita.nombreCliente != '')
 
         // ------------TARJETA CITA RESERVADA         ---------------------
         ? '$textoConfirmada con ${cita.nombreEmpleado}'

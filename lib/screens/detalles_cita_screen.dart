@@ -251,7 +251,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
 
                 // Servicio
                 Text(
-                  cita['servicio'].toString(),
+                  cita['servicios'].replaceAll(RegExp(r'[\[\]\s]'), ''),
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

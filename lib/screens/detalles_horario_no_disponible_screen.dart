@@ -1,11 +1,7 @@
 import 'package:agendacitas/models/personaliza_model.dart';
-import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/personaliza_provider.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
-import 'package:agendacitas/widgets/botones/boton_confirmar_cita_reserva_web.dart';
-import 'package:agendacitas/widgets/botones/form_reprogramar_reserva.dart';
-import 'package:agendacitas/widgets/compartirCliente/compartir_cita_a_cliente.dart';
 import 'package:agendacitas/widgets/elimina_cita.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -172,31 +168,39 @@ class _DetallesHorarioNoDisponibleScreenState
           SizedBox(
             width: double.infinity,
             // height: 250,
-            child: Card(
-              // color: Colors.deepPurple[300],
-              child: Padding(
-                padding: miPadding,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Divider(),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                        // fechaLarga!,
-                        fechaLarga.toString(),
-                        style: textoEstilo),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Notas: ${cita['comentario'].toString()}',
-                      style: subTituloEstilo,
-                    ),
-                    const SizedBox(height: 40),
-                    _botonesCita(reserva)
-                  ],
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(
+                      color: Colors.grey[300]!, width: 1), // Borde gris tenue
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.all(10),
+                child: Padding(
+                  padding: miPadding,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                          // fechaLarga!,
+                          fechaLarga.toString(),
+                          style: textoEstilo),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'Notas: ${cita['comentario'].toString()}',
+                        style: subTituloEstilo,
+                      ),
+                      const SizedBox(height: 40),
+                      _botonesCita(reserva)
+                    ],
+                  ),
                 ),
               ),
             ),

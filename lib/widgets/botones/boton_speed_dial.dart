@@ -55,21 +55,20 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Visibility(
+        SpeedDial(
           visible: fechaProvider.fechaSeleccionada.day != DateTime.now().day,
-          child: SpeedDial(
-            onPress: () {
-              fechaProvider.setFechaSeleccionada(DateTime.now());
-              setState(() {});
-            },
-            icon: Icons.calendar_today_outlined,
-            activeIcon: Icons.close,
-            spacing: 3,
-            mini: mini,
-            openCloseDial: isDialOpen,
-            childPadding: const EdgeInsets.all(5),
-            spaceBetweenChildren: 4,
-          ),
+          backgroundColor: Colors.white,
+          onPress: () {
+            fechaProvider.setFechaSeleccionada(DateTime.now());
+            setState(() {});
+          },
+          icon: Icons.today,
+          activeIcon: Icons.close,
+          spacing: 3,
+          mini: mini,
+          openCloseDial: isDialOpen,
+          childPadding: const EdgeInsets.all(5),
+          spaceBetweenChildren: 4,
         ),
         const SizedBox(
           height: 10,

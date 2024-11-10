@@ -31,7 +31,7 @@ class CompartirCitaConCliente extends StatefulWidget {
 class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
   bool animarIcon = false;
   String _emailSesionUsuario = '';
-  PerfilModel perfilUsuarioApp = PerfilModel();
+  late PerfilModel perfilUsuarioApp;
   bool pagado =
       true; //deshabilitado, por defecto la variable pagado=true; podria usarlo por ejemplo para hacer una alerta de comprar la app
   String? telefonoCodpais;
@@ -39,6 +39,7 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
   bool visible = true;
 
   late PersonalizaProviderFirebase contextoPersonalizaFirebase;
+  PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
   late String textoActual;
 
   compruebaPago() async {
@@ -55,18 +56,22 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
   }
 
   _getCodPais() async {
-    List<PersonalizaModel> data =
-        await PersonalizaProvider().cargarPersonaliza();
+    final personalizaProvider =
+        Provider.of<PersonalizaProviderFirebase>(context, listen: false);
+    PersonalizaModelFirebase personaliza = personalizaProvider.getPersonaliza;
     //COMPRUEBO QUE HAY UN CODIGO DE PAIS ESTABLECIDO PREVIAMENTE, SI NO , ESTABLEZCO EL 34 POR DEFECTO
 
-    return (data.isNotEmpty) ? data[0].codpais : 34;
+    return (personaliza.codpais!.isNotEmpty)
+        ? int.parse(personaliza.codpais!)
+        : 34;
   }
 
   _estableceCodPais() async {
-    int codPais = await _getCodPais();
+    int codPais = 34;
+    await _getCodPais();
 
     telefonoCodpais = codPais.toString() + widget.telefono;
-    //print('telefono -------------$telefonoTexto');
+    print('telefono -------------$telefonoCodpais');
   }
 
   _perfilUsuarioApp() async {
@@ -77,7 +82,7 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
 
     //traigo perfil del usuariode la app desde firebase
     await FirebaseProvider().cargarPerfilFB(_emailSesionUsuario).then((value) {
-      setState(() {});
+      //setState(() {});
       return perfilUsuarioApp = value;
     });
   }
@@ -94,12 +99,12 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
 
   @override
   Widget build(BuildContext context) {
-    print(perfilUsuarioApp.telefono);
+    // print(perfilUsuarioApp.telefono);
 
     // rescat el texto par enviar a los clientes desde firebase
     contextoPersonalizaFirebase = context.read<PersonalizaProviderFirebase>();
-    final personalizaprovider = contextoPersonalizaFirebase.getPersonaliza;
-    textoActual = personalizaprovider['MENSAJE_CITA'].toString();
+    personaliza = contextoPersonalizaFirebase.getPersonaliza;
+    textoActual = personaliza.mensaje.toString();
     /* // Muestra tarjeta de sugerencia si no hay denominación del perfil de usuario
         if (perfilUsuarioApp.denominacion == '')
           TarjetaInfo(
@@ -123,14 +128,32 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
         FloatingActionButton(
           mini: true,
           onPressed: () {
-            Comunicaciones().compartirCitaWhatsapp(
-              perfilUsuarioApp,
-              textoActual,
-              widget.cliente,
-              telefonoCodpais!,
-              widget.fechaCita,
-              widget.servicio,
-            );
+            print('comparte whatsapp');
+            /*   print(perfilUsuarioApp.email);
+            print(textoActual);
+            print(widget.cliente);
+            print(telefonoCodpais);
+            print(widget.fechaCita);
+            print(widget.servicio) */
+            ;
+            try {
+              Comunicaciones().compartirCitaWhatsapp(
+                perfilUsuarioApp,
+                textoActual,
+                widget.cliente,
+                telefonoCodpais!,
+                widget.fechaCita,
+                widget.servicio,
+              );
+            } catch (e) {
+              debugPrint(
+                  'error de datos al compartir por whatsapp. compartir_cita_a_cliente.dart: ${e.toString()}');
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(
+                    'Error al compartir por whatsapp. compartir_cita_a_cliente.dart: ${e.toString()}'),
+                duration: const Duration(seconds: 6),
+              ));
+            }
           },
           backgroundColor: Colors.green,
           child: const FaIcon(FontAwesomeIcons.whatsapp),
@@ -138,20 +161,30 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
         FloatingActionButton(
           mini: true,
           onPressed: () {
-            pagado
-                ? Comunicaciones().compartirCitaSms(
-                    perfilUsuarioApp,
-                    textoActual,
-                    widget.cliente,
-                    widget.telefono,
-                    widget.fechaCita,
-                    widget.servicio)
-                : alerta(context); // Mostrar alerta si no está pagado
+            try {
+              pagado
+                  ? Comunicaciones().compartirCitaSms(
+                      perfilUsuarioApp,
+                      textoActual,
+                      widget.cliente,
+                      widget.telefono,
+                      widget.fechaCita,
+                      widget.servicio)
+                  : alerta(context); // Mostrar alerta si no está pagado
+            } catch (e) {
+              debugPrint(
+                  'error de datos al compartir por sms. compartir_cita_a_cliente.dart: ${e.toString()}');
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(
+                    'Error al compartir por sms. compartir_cita_a_cliente.dart: ${e.toString()}'),
+                duration: const Duration(seconds: 6),
+              ));
+            }
           },
           backgroundColor: Colors.orange,
           child: const FaIcon(FontAwesomeIcons.commentSms),
         ),
-        widget.email != ' ' && widget.email != ''
+        widget.email != '' && widget.email != ''
             ? FloatingActionButton(
                 mini: true,
                 onPressed: () {
@@ -162,18 +195,27 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
                     animarIcon = false;
                     setState(() {});
                   });
-
-                  pagado
-                      ? Comunicaciones().compartirCitaEmail(
-                          context,
-                          perfilUsuarioApp,
-                          textoActual,
-                          widget.cliente,
-                          widget.email,
-                          widget.fechaCita,
-                          widget.servicio,
-                          widget.precio)
-                      : alerta(context);
+                  try {
+                    pagado
+                        ? Comunicaciones().compartirCitaEmail(
+                            context,
+                            perfilUsuarioApp,
+                            textoActual,
+                            widget.cliente,
+                            widget.email,
+                            widget.fechaCita,
+                            widget.servicio,
+                            widget.precio)
+                        : alerta(context);
+                  } catch (e) {
+                    debugPrint(
+                        'error de datos al compartir por email. compartir_cita_a_cliente.dart: ${e.toString()}');
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                          'Error al compartir por email. compartir_cita_a_cliente.dart: ${e.toString()}'),
+                      duration: const Duration(seconds: 6),
+                    ));
+                  }
                 },
                 backgroundColor: Colors.blue,
                 child: animarIcon

@@ -34,18 +34,16 @@ class _ServicioStepState extends State<ServicioStep> {
 
   String _emailSesionUsuario = '';
   bool _iniciadaSesionUsuario = false;
-  PersonalizaModel personaliza = PersonalizaModel();
+  PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
 
   getPersonaliza() async {
-    List<PersonalizaModel> data =
-        await PersonalizaProvider().cargarPersonaliza();
+    final personalizaProvider =
+        Provider.of<PersonalizaProviderFirebase>(context, listen: false);
+    personaliza = personalizaProvider.getPersonaliza;
 
-    if (data.isNotEmpty) {
-      personaliza.codpais = data[0].codpais;
-      personaliza.moneda = data[0].moneda;
+    // TODO  COMPROBAR SI ES NECESARIO SETESTATE O CAMBIAR LA POSICION DEL PROVIDER
 
-      setState(() {});
-    }
+    setState(() {});
   }
 
   emailUsuario() async {

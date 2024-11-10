@@ -172,8 +172,6 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(
             create: (BuildContext context) => CreacionCitaProvider()),
         ChangeNotifierProvider(
-            create: (BuildContext context) => PersonalizaProvider()),
-        ChangeNotifierProvider(
             create: (BuildContext context) => PersonalizaProviderFirebase()),
         ChangeNotifierProvider(
             create: (BuildContext context) => FormularioBusqueda()),

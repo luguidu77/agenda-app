@@ -1,4 +1,4 @@
-import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/widgets/lista_de_citas.dart';
 import 'package:flutter/material.dart';
@@ -6,9 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
 
-import '../models/personaliza_model.dart';
 import '../providers/providers.dart';
-
 import '../utils/utils.dart';
 
 class ListaCitas extends StatefulWidget {
@@ -30,18 +28,29 @@ class ListaCitas extends StatefulWidget {
 }
 
 class _ListaCitasState extends State<ListaCitas> {
-  late PersonalizaProvider contextoPersonaliza;
+  late PersonalizaProviderFirebase personalizaProvider;
+  PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
+
   DateFormat dateFormat = DateFormat("yyyy-MM-dd");
-  PersonalizaModel personaliza = PersonalizaModel();
+  getpersonaliza() {
+    print('oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo');
+    print('oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo');
+    print('oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo');
+    print(personaliza.moneda);
+    // setState(() {});
+  }
 
   @override
   void initState() {
+    getpersonaliza();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    contextoPersonaliza = context.read<PersonalizaProvider>();
+    personalizaProvider =
+        Provider.of<PersonalizaProviderFirebase>(context, listen: true);
+    personaliza = personalizaProvider.getPersonaliza;
     var fecha = dateFormat.format(widget.fechaElegida);
     // CITAS SEGUN SELECCION FILTRO (TODAS, SOLO PENDIENTES)
     if (widget.filter == 'TODAS') {
@@ -125,9 +134,7 @@ class _ListaCitasState extends State<ListaCitas> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('${numCitas.toString()} citas', style: textoEstilo),
-                  Text(
-                      '- $data ${contextoPersonaliza.getPersonaliza['MONEDA']}',
-                      style: textoEstilo)
+                  Text('- $data ${personaliza.moneda}', style: textoEstilo)
                 ],
               );
             } else {

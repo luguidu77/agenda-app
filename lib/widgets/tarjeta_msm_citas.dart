@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../providers/personaliza_provider.dart';
 
-Future tarjetaModificarMsm(context, contextoPersonalizaFirebase, emailUsuario,
-    textoActual, String valor) {
+Future tarjetaModificarMsm(
+    context,
+    PersonalizaProviderFirebase contextoPersonalizaFirebase,
+    emailUsuario,
+    textoActual,
+    String valor) {
   TextEditingController ctrl_1 = TextEditingController();
   final formKey = GlobalKey<FormState>();
   // rescat el texto par enviar a los clientes desde firebase
 
   final personalizaprovider = contextoPersonalizaFirebase.getPersonaliza;
-  textoActual = personalizaprovider['MENSAJE_CITA'].toString();
+  textoActual = personalizaprovider.mensaje.toString();
   late String textoInput, hintText, simbolo;
   late TextInputType textInputType;
   // late Function modificaDato;
@@ -56,9 +60,9 @@ Future tarjetaModificarMsm(context, contextoPersonalizaFirebase, emailUsuario,
                       onPressed: () async => {
                             if (formKey.currentState!.validate())
                               {
-                                contextoPersonalizaFirebase.setPersonaliza = {
-                                  'MENSAJE_CITA': ctrl_1.text,
-                                },
+                                personalizaprovider.mensaje = ctrl_1.text,
+                                contextoPersonalizaFirebase
+                                    .setPersonaliza(personalizaprovider),
                                 // modificaDato(),
                                 await PersonalizaProviderFirebase()
                                     .actualizarPersonaliza(

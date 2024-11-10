@@ -27,12 +27,14 @@ class _BotonConfirmarCitaWebState extends State<BotonConfirmarCitaWeb> {
 
   @override
   void initState() {
-    _citaconfirmada = widget.cita['confirmada'] == 'true' ? true : false;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final citaconfirmada =
+        Provider.of<EstadoConfirmacionCita>(context, listen: true);
+    _citaconfirmada = citaconfirmada.estadoCita;
     bool clienteTieneToken =
         widget.cita['tokenWebCliente'] != '' ? true : false;
 
@@ -78,7 +80,7 @@ class _BotonConfirmarCitaWebState extends State<BotonConfirmarCitaWeb> {
 
     //** 1 modifica el estado de confirmada en perfil  del cliente (clienteAgendoWeb)*/
 
-    FirebaseProvider().cambiarEstadoConfirmacionCitaCliente(
+    await FirebaseProvider().cambiarEstadoConfirmacionCitaCliente(
         context, widget.cita, widget.emailUsuario);
     //
     //** cambian el estado de confirmada la cita en agendadecitas */

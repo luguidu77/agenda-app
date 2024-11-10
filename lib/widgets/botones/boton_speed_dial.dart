@@ -125,7 +125,7 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
           onClose: () => debugPrint('DIAL CLOSED'),
           useRotationAnimation: useRAnimation,
           // tooltip: 'Open Speed Dial',
-          // heroTag: 'speed-dial-hero-tag',
+          // heroTag: 'speed-dial-personaliza = personalizaProvider.getPersonaliza;-tag',
           // foregroundColor: Colors.black,
           // backgroundColor: Colors.white,
           // activeForegroundColor: Colors.red,

@@ -109,7 +109,7 @@ class Comunicaciones {
   ) async {
     print(
         'compartir =============================================================');
-    print(textoActual);
+    //print(textoActual);
 
     String? fechaLarga;
     DateTime resFecha =

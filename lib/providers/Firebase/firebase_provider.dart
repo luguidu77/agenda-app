@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:agendacitas/models/empleado_model.dart';
+import 'package:agendacitas/providers/personaliza_provider.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:agendacitas/firebase_options.dart';
@@ -15,6 +16,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../utils/utils.dart';
 
@@ -351,6 +353,7 @@ class FirebaseProvider extends ChangeNotifier {
     return data; //retorna una lista de todas las citas(CitaModelFirebase)
   }
 
+  // PERSONALIZA
   void nuevoAsuntoIndispuestos(
       emailUsuario, Map<String, dynamic> asunto) async {
     await _iniFirebase();
@@ -833,27 +836,57 @@ class FirebaseProvider extends ChangeNotifier {
     return cliente;
   }
 
-  cargarPersonaliza(String emailUsuario) async {
-    Map<String, dynamic> personaliza = {};
-    dynamic data;
+  Future<void> cargarPersonaliza(
+      BuildContext context, String emailUsuario) async {
+    // Inicializamos el modelo vacío con valores predeterminados
+    PersonalizaModelFirebase personaliza = PersonalizaModelFirebase(
+      codpais: '',
+      moneda: '',
+      mensaje: '',
+      colorTema: '',
+      tiempoRecordatorio: '',
+    );
+
+    // Inicialización de Firebase y referencia al documento
     await _iniFirebase();
-
     final docRef = await _referenciaDocumento(emailUsuario, 'personaliza');
-    // await docRef.get();
-    await docRef.get().then((QuerySnapshot snapshot) => {
-          data = snapshot.docs,
-          for (var element in snapshot.docs)
-            if (element.id == 'mensajeCita')
-              {
-                personaliza = {
-                  //AGREGA DATOS
 
-                  'mensaje': element['mensaje'],
-                }
-              }
-        });
+    // Obtenemos los datos del documento
+    final snapshot = await docRef.get();
 
-    return personaliza; //retorna una lista de personaliza(PersonalizaModelFirebase)
+    // Procesamos los documentos en una sola pasada
+    for (var element in snapshot.docs) {
+      if (element.id == 'configuracion') {
+        personaliza.codpais = element['codPais'] ?? '';
+        personaliza.moneda = element['moneda'] ?? '';
+        personaliza.colorTema = element['colorTema'] ?? '';
+        personaliza.tiempoRecordatorio = element['tiempoRecordatorio'] ?? '';
+      } else if (element.id == 'mensajeCita') {
+        personaliza.mensaje = element['mensaje'] ?? '';
+      }
+    }
+
+    print('Personaliza cargado: ${personaliza.moneda}');
+
+    // Establecemos el objeto en el provider
+    final personalizaProvider =
+        Provider.of<PersonalizaProviderFirebase>(context, listen: false);
+    personalizaProvider.setPersonaliza(personaliza);
+  }
+
+  Future<void> actualizaPersonaliza(context, String emailUsuario,
+      PersonalizaModelFirebase personaliza) async {
+    Map<String, Object?> newPersonaliza = {
+      'codPais': personaliza.codpais,
+      'colorTema': personaliza.colorTema,
+      'moneda': personaliza.moneda,
+      'tiempoRecordatorio': personaliza.tiempoRecordatorio,
+    };
+
+    // Inicialización de Firebase y referencia al documento
+    await _iniFirebase();
+    final docRef = await _referenciaDocumento(emailUsuario, 'personaliza');
+    await docRef.doc('configuracion').update(newPersonaliza);
   }
 
   elimarCita(String emailUsuarioAPP, id) async {
@@ -1180,7 +1213,7 @@ class FirebaseProvider extends ChangeNotifier {
         horaInicio: cita['horaInicio'],
         horaFinal: cita['horaFinal'],
         comentario: cita['comentario'],
-        // email: cita['email'],
+        email: cita['email'],
         idcliente: cita['idCliente'],
         idservicio: cita['idServicio'], // servicioFirebase,
         servicios: servicioFirebase,

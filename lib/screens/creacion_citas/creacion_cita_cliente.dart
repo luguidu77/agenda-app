@@ -29,6 +29,7 @@ class CreacionCitaCliente extends StatefulWidget {
 
 class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
   late CreacionCitaProvider contextoCreacionCita;
+  PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
   final estilo = const TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
 
   @override
@@ -73,8 +74,8 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
     // LEER MICONTEXTO DE CreacionCitaProvider
     contextoCreacionCita = context.read<CreacionCitaProvider>();
     //LEE CODIGO PAIS PARA PODER QUITARLO DEL TELEFONO DE LA AGENDA
-    final contextoPersonaliza = context.read<PersonalizaProvider>();
-    codPais = contextoPersonaliza.getPersonaliza['CODPAIS'];
+    final contextoPersonaliza = context.read<PersonalizaProviderFirebase>();
+    personaliza = contextoPersonaliza.getPersonaliza;
 
     // LEE FORMULARIO DE BUSQUEDA
     final contextoFormularioBusqueda = context.watch<FormularioBusqueda>();

@@ -1,3 +1,4 @@
+import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/widgets/line_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,7 +16,7 @@ class InformesScreen extends StatefulWidget {
 }
 
 class _InformesScreenState extends State<InformesScreen> {
-  PersonalizaModel personaliza = PersonalizaModel();
+  PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
   late Color colorBotonFlecha;
 
   List citas = [];
@@ -44,15 +45,11 @@ class _InformesScreenState extends State<InformesScreen> {
   int contador = 0;
 
   getPersonaliza() async {
-    List<PersonalizaModel> data =
-        await PersonalizaProvider().cargarPersonaliza();
+    final personalizaProvider =
+        Provider.of<PersonalizaProviderFirebase>(context, listen: false);
+    personaliza = personalizaProvider.getPersonaliza;
 
-    if (data.isNotEmpty) {
-      personaliza.codpais = data[0].codpais;
-      personaliza.moneda = data[0].moneda;
-
-      setState(() {});
-    }
+    setState(() {});
   }
 
   leerBasedatos() async {

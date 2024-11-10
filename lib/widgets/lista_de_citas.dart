@@ -324,7 +324,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
                          "horaInicio": "${cita.horaInicio}",
                          "horaFinal": "${cita.horaFinal}",
                          "telefono": "${cita.telefonoCliente}",
-                         "email": "${cita.email}",               
+                         "email": "${cita.emailCliente}",               
                          "detalle": "${cita.comentario.toString()}",
                          "precio": "${cita.precio}",
                          "foto": "${cita.fotoCliente}",

@@ -1,3 +1,4 @@
+import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/screens/servicios_screen_draggable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +17,8 @@ class ServiciosCreacionCita extends StatefulWidget {
 }
 
 class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
-  late PersonalizaProvider contextoPersonaliza;
+  late PersonalizaProviderFirebase personalizaProvider;
+  PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
   late CreacionCitaProvider contextoCreacionCita;
   String? _emailSesionUsuario;
 
@@ -38,8 +40,6 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
   List<String> listIdCategoriaServicios = [];
   bool hayServicios = false;
 
-  PersonalizaModel personaliza = PersonalizaModel();
-
   emailUsuario() async {
     final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
     _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
@@ -59,7 +59,9 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
   void initState() {
     emailUsuario();
     // TRAE CONTEXTO PERSONALIZA ( MONEDA ). ES NECESARIO INIZIALIZARLA ANTES DE LLAMAR A  buildList DONDE SE UTILIZA EL CONTEXTO PARA LA MONEDA
-    contextoPersonaliza = context.read<PersonalizaProvider>();
+    personalizaProvider = context.read<PersonalizaProviderFirebase>();
+    personaliza = personalizaProvider.getPersonaliza;
+
     contextoCreacionCita = context.read<CreacionCitaProvider>();
     super.initState();
   }
@@ -253,7 +255,7 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
                       ),
                       //leading: Text(item.leading),
                       subtitle: Text(
-                        '${dataServicios[index].precio} ${contextoPersonaliza.getPersonaliza['MONEDA']} ',
+                        '${dataServicios[index].precio} ${personaliza.moneda} ',
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 10,

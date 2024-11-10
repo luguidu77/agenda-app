@@ -71,8 +71,9 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         tRecordatorioGuardado.add(value[0].tiempo.toString());
         debugPrint('hay tiempo recordatorio establecido');
       } else {
-        await addTiempo();
-        tRecordatorioGuardado.add('00:30');
+        print('no hay tiempo establecido');
+        /*  await addTiempo();
+        tRecordatorioGuardado.add('00:30'); */
       }
     });
 

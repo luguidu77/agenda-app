@@ -1,3 +1,4 @@
+import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -16,8 +17,8 @@ class HistorialCitas extends StatefulWidget {
 }
 
 class _HistorialCitasState extends State<HistorialCitas> {
-  late PersonalizaProvider contextoPersonaliza;
-  PersonalizaModel personaliza = PersonalizaModel();
+  late PersonalizaProviderFirebase personalizaProvider;
+  PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
   final List<Map<String, dynamic>> _citas = [];
   bool pagado = false;
   String _emailSesionUsuario = '';
@@ -33,7 +34,8 @@ class _HistorialCitasState extends State<HistorialCitas> {
   @override
   Widget build(BuildContext context) {
     // TRAE CONTEXTO PERSONALIZA ( MONEDA )
-    contextoPersonaliza = context.read<PersonalizaProvider>();
+    personalizaProvider = context.read<PersonalizaProviderFirebase>();
+    personaliza = personalizaProvider.getPersonaliza;
     return Scaffold(
       body: _historial(context, _citas, widget.clienteParametro.id),
     );
@@ -86,7 +88,7 @@ class _HistorialCitasState extends State<HistorialCitas> {
                             ),
                             Text('${citas[index]['servicio']}'),
                             Text(
-                                '${citas[index]['precio']} ${contextoPersonaliza.getPersonaliza['MONEDA']}')
+                                '${citas[index]['precio']} ${personaliza.moneda}')
                           ],
                         ),
                       ),

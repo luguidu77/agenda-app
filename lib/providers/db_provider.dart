@@ -181,14 +181,14 @@ class DBProvider {
     return res;
   }
 
-  Future<int> guardarPersonaliza(PersonalizaModel nuevoPersonaliza) async {
+  /*  Future<int> guardarPersonaliza(PersonalizaModel nuevoPersonaliza) async {
     // Verifica la base de datos
     final db = await database;
     final res = await db!.insert('Personaliza', nuevoPersonaliza.toJson());
 
     // RES Es el ID del último registro guardado
     return res;
-  }
+  } */
 
   Future<int> guardaPago(PagoModel guardapago) async {
     print('pago que se cuarda :  ${guardapago.pago}');
@@ -387,13 +387,13 @@ class DBProvider {
     return RecordatorioModel.fromJson(res.first);
   }
 
-  Future<List<PersonalizaModel>> getPersonaliza() async {
+/*   Future<List<PersonalizaModel>> getPersonaliza() async {
     final db = await database;
     final res = await db!.query('Personaliza');
     return res.isNotEmpty
         ? res.map((s) => PersonalizaModel.fromJson(s)).toList()
         : [];
-  }
+  } */
 
   eliminaTodoslasCitas() async {
     final db = await database;
@@ -533,7 +533,7 @@ class DBProvider {
     return res;
   }
 
-  actualizarPersonaliza(PersonalizaModel personaliza) async {
+  /* actualizarPersonaliza(PersonalizaModel personaliza) async {
     Map<String, Object?> newPersonaliza = {
       'id': 0,
       'codpais': personaliza.codpais,
@@ -547,5 +547,5 @@ class DBProvider {
     final res = await db!.update('Personaliza', newPersonaliza);
 
     return res;
-  }
+  } */
 }

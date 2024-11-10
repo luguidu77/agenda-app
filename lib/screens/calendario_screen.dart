@@ -282,34 +282,6 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
                           iniciadaSesionUsuario: _iniciadaSesionUsuario,
                           filter: filter, // envia 'TODAS' O 'PENDIENTES'
                         ),
-
-                  /* BackdropFilterCitas(
-                            backLayer: Container()
-                            /*  EnviosRecordatorios( 
-                              usuarioAPP: _emailSesionUsuario,
-                              fechaElegida: fechaElegida
-          
-                             
-                            ) */
-                            ,
-                            frontLayer: // ListaCitasNuevo(),
-          
-                                ListaCitas(
-                              emailusuario: _emailSesionUsuario,
-                              fechaElegida: fechaElegida,
-                              iniciadaSesionUsuario: _iniciadaSesionUsuario,
-                              filter: filter, // envia 'TODAS' O 'PENDIENTES'
-                            ),
-                            backTitle: const Text(
-                              'RECORDATOIOS',
-                              style: TextStyle(fontSize: 14),
-                            ),
-                            frontTitle: Text(
-                              'Citas para ${_emailSesionUsuario.toString().split('@')[0]}',
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                            usuarioAPP: _emailSesionUsuario,
-                          )  */ //_vercitas(usuarioAPP)),
                 ),
               )
             ],

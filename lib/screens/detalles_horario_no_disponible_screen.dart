@@ -1,3 +1,4 @@
+import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/personaliza_provider.dart';
@@ -21,7 +22,7 @@ class DetallesHorarioNoDisponibleScreen extends StatefulWidget {
 class _DetallesHorarioNoDisponibleScreenState
     extends State<DetallesHorarioNoDisponibleScreen> {
   bool visibleFormulario = false;
-  PersonalizaModel personaliza = PersonalizaModel();
+  PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
   EdgeInsets miPadding = const EdgeInsets.all(18.0);
   late Map<String, dynamic> reserva;
   double altura = 300;
@@ -30,15 +31,11 @@ class _DetallesHorarioNoDisponibleScreenState
   bool _iniciadaSesionUsuario = false;
 
   getPersonaliza() async {
-    List<PersonalizaModel> data =
-        await PersonalizaProvider().cargarPersonaliza();
+    final personalizaProvider =
+        Provider.of<PersonalizaProviderFirebase>(context, listen: false);
+    personaliza = personalizaProvider.getPersonaliza;
 
-    if (data.isNotEmpty) {
-      personaliza.codpais = data[0].codpais;
-      personaliza.moneda = data[0].moneda;
-
-      setState(() {});
-    }
+    setState(() {});
   }
 
   emailUsuario() async {

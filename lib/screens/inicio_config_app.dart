@@ -27,24 +27,14 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     }
   } */
 
-  getPersonaliza() async {
+/*   getPersonaliza() async {
     List<PersonalizaModel> data =
         await PersonalizaProvider().cargarPersonaliza();
 
     if (data.isEmpty) {
       await PersonalizaProvider().nuevoPersonaliza(0, 34, '', '', '€');
     }
-  }
-
-  getPersonalizaFirebase(emailSesionUsuario) async {
-    Map<String, dynamic> data = await PersonalizaProviderFirebase()
-        .cargarPersonaliza(emailSesionUsuario);
-
-    if (data.isEmpty) {
-      await PersonalizaProviderFirebase()
-          .nuevoPersonaliza('prueba@a.es', 'texto inicial');
-    }
-  }
+  } */
 
   getDisponibilidadSemanal(emailSesionUsuario) async {
     final disponibilidadSemanalProvider = await SincronizarFirebase()
@@ -56,10 +46,9 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
   @override
   void initState() {
     // inicializaProviderEstadoPagoEmail();
-    // getPersonaliza();
+
     //? no lo inicializo aqui porque primeramente me trael el usuario de la app vacio
     //? tengo un poco de cacao aqui en las inicializaciones de la app
-    //getPersonalizaFirebase(widget.usuarioAPP);
 
     super.initState();
   }
@@ -71,27 +60,28 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
-            final User data = snapshot.data;
-
+            // LOGEADO EN FIREBASE
             debugPrint(
-                'seteando provider email:(inicio_config_app) ${data.email.toString()}');
+                'inicio_config_app.dart ----------------> LOGEADO EN FIREBASE');
+
+            final User data = snapshot.data;
 
             // ############### SETEA LOS PROVIDER
             // EMAIL
             final estadoProvider =
                 Provider.of<EstadoPagoAppProvider>(context, listen: false);
-
             estadoProvider.estadoPagoEmailApp(data.email.toString());
+
+            // ###############  PERSONALIZA
+            FirebaseProvider()
+                .cargarPersonaliza(context, data.email.toString());
 
             // ###############  DISPONIBILIDAD SEMANAL
             //invocado DispoSemanalProvider
+            //TODO PASAR ESTO AL FIREBASE PROVIDER Y
             final dDispoSemanal = context.read<DispoSemanalProvider>();
             DisponibilidadSemanal.disponibilidadSemanal(
                 dDispoSemanal, data.email.toString());
-
-            // LOGEADO EN FIREBASE
-            debugPrint(
-                'inicio_config_app.dart ----------------> LOGEADO EN FIREBASE');
 
             return HomeScreen(
               index: 0,

@@ -1,3 +1,4 @@
+import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/screens/home.dart';
 import 'package:agendacitas/screens/servicios_screen_draggable.dart';
 import 'package:flutter/material.dart';
@@ -39,18 +40,14 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
   List<String> listIdCategoriaServicios = [];
   bool hayServicios = false;
 
-  PersonalizaModel personaliza = PersonalizaModel();
+  PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
 
   getPersonaliza() async {
-    List<PersonalizaModel> data =
-        await PersonalizaProvider().cargarPersonaliza();
+    final personalizaProvider =
+        Provider.of<PersonalizaProviderFirebase>(context, listen: false);
+    personaliza = personalizaProvider.getPersonaliza;
 
-    if (data.isNotEmpty) {
-      personaliza.codpais = data[0].codpais;
-      personaliza.moneda = data[0].moneda;
-
-      setState(() {});
-    }
+    setState(() {});
   }
 
   emailUsuario() async {

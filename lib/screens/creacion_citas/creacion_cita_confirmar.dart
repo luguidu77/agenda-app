@@ -1,3 +1,4 @@
+import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_resumen.dart';
 import 'package:agendacitas/screens/creacion_citas/servicios_creacion_cita.dart';
 import 'package:agendacitas/utils/utils.dart';
@@ -25,7 +26,8 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
   late DateTime horainicio;
   String totalTiempo = "0 h 0 m";
   var totalPrecio = 0.0;
-  late PersonalizaProvider contextoPersonaliza;
+  late PersonalizaProviderFirebase personalizaProvider;
+  PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
   late CreacionCitaProvider contextoCreacionCita;
   ClienteModel cliente = ClienteModel();
   bool _iniciadaSesionUsuario =
@@ -49,7 +51,8 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
     // LLEER MICONTEXTO DE CreacionCitaProvider
     contextoCreacionCita = context.read<CreacionCitaProvider>();
     // TRAE CONTEXTO PERSONALIZA ( MONEDA )
-    contextoPersonaliza = context.read<PersonalizaProvider>();
+    personalizaProvider = context.read<PersonalizaProviderFirebase>();
+    personaliza = personalizaProvider.getPersonaliza;
 
     cliente.nombre = contextoCreacionCita.getClienteElegido['NOMBRE'];
     cliente.telefono = contextoCreacionCita.getClienteElegido['TELEFONO'];
@@ -192,7 +195,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                     ],
                   ),
                   Text(
-                      '${contextoCreacionCita.getServiciosElegidos[index]['PRECIO']} ${contextoPersonaliza.getPersonaliza['MONEDA']}'),
+                      '${contextoCreacionCita.getServiciosElegidos[index]['PRECIO']} ${personaliza.moneda}'),
                 ],
               ),
               IconButton(

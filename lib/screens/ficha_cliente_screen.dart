@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/screens/nuevo_actualizacion_cliente.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -33,7 +34,7 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
   String _emailSesionUsuario = '';
   bool _iniciadaSesionUsuario = false;
   XFile? _image;
-  PersonalizaModel personaliza = PersonalizaModel();
+  PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
 
   List<bool> isSelected = [true, false];
   TabController? tabController;
@@ -41,15 +42,10 @@ class _FichaClienteScreenState extends State<FichaClienteScreen>
   bool floatExtended = false;
 
   getPersonaliza() async {
-    List<PersonalizaModel> data =
-        await PersonalizaProvider().cargarPersonaliza();
-
-    if (data.isNotEmpty) {
-      personaliza.codpais = data[0].codpais;
-      personaliza.moneda = data[0].moneda;
-
-      setState(() {});
-    }
+    final personalizaProvider =
+        Provider.of<PersonalizaProviderFirebase>(context, listen: false);
+    personaliza = personalizaProvider.getPersonaliza;
+    setState(() {});
   }
 
   compruebaPago() async {

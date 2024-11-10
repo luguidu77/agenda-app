@@ -1,6 +1,7 @@
-
+import 'package:agendacitas/models/models.dart';
 import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/personaliza_provider.dart';
@@ -38,6 +39,7 @@ List<Contact> ordenadoFavoritos = [];
 class _SelectionDialogState extends State<SelectionDialogContacts> {
   /// this is useful for filtering purpose
   List<Contact> filteredElements = [];
+  PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
 
   late int codPais;
 
@@ -141,8 +143,8 @@ class _SelectionDialogState extends State<SelectionDialogContacts> {
   void initState() {
     ordenar(widget.elements);
     //LEE CODIGO PAIS PARA PODER QUITARLO DEL TELEFONO DE LA AGENDA
-    final contextoPersonaliza = context.read<PersonalizaProvider>();
-    codPais = contextoPersonaliza.getPersonaliza['CODPAIS'];
+    final contextoPersonaliza = context.read<PersonalizaProviderFirebase>();
+    personaliza = contextoPersonaliza.getPersonaliza;
 
     // filteredElements = widget.elements;
     // Antes de construir los elementos del diálogo, ordena la lista por orden alfabético.
@@ -229,8 +231,9 @@ class _SelectionDialogState extends State<SelectionDialogContacts> {
     );
 
     // TELEFONO CONTACTO quito el codigo pais
-    String telefono =
-        data['telefono'].replaceAll(' ', '').replaceFirst('+$codPais', '');
+    String telefono = data['telefono']
+        .replaceAll(' ', '')
+        .replaceFirst('+${personaliza.codpais}', '');
 
     // EMAIL CONTACTO
     String email = data['email'];
@@ -239,6 +242,5 @@ class _SelectionDialogState extends State<SelectionDialogContacts> {
     print(data);
     Navigator.pop(
         context, {'nombre': nombre, 'telefono': telefono, 'email': email});
-
   }
 }

@@ -1,10 +1,18 @@
+import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/models/tiempo_record_model.dart';
+import 'package:agendacitas/providers/estado_pago_app_provider.dart';
+import 'package:agendacitas/providers/personaliza_provider.dart';
 import 'package:agendacitas/providers/recordatorios_provider.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 TiempoRecordatorioModel nuevoRecordatorio = TiempoRecordatorioModel();
-tarjetaTiempoRecord(context, String tGuardado) {
+late PersonalizaProviderFirebase personalizaProvider;
+late PersonalizaModelFirebase personaliza;
+tarjetaTiempoRecord(context, emailUsuario, String tGuardado) {
+  //traigo email del usuario, para si es de pago, pasarlo como parametro al sincronizar
+
   return showModalBottomSheet(
     isDismissible: false,
     shape: const RoundedRectangleBorder(
@@ -35,7 +43,8 @@ tarjetaTiempoRecord(context, String tGuardado) {
                     );
                   }).toList(),
                   onChanged: (value) {
-                    botonActualizarRecordatorio(context, value.toString());
+                    botonActualizarRecordatorio(
+                        context, emailUsuario, value.toString());
                     Navigator.pop(context);
                   },
                 )
@@ -48,21 +57,31 @@ tarjetaTiempoRecord(context, String tGuardado) {
   );
 }
 
-botonActualizarRecordatorio(context, String minutos) async {
+botonActualizarRecordatorio(context, emailUsuario, String minutos) async {
   String nuevahora = '00:$minutos';
   if (minutos == '24') {
     nuevahora = '24:00';
   }
-  
+
   nuevoRecordatorio.id = 0;
   nuevoRecordatorio.tiempo = nuevahora;
 
-  await updateTiempo(context, nuevoRecordatorio);
+  await updateTiempo(context, emailUsuario, nuevoRecordatorio);
 }
 
-updateTiempo(context, TiempoRecordatorioModel recordatorio) async {
-  await RecordatoriosProvider().acutalizarTiempo(recordatorio);
-  mensajeModificado(context, '🕑 tiempo recordatorio actualizado');
+updateTiempo(
+    context, emailUsuario, TiempoRecordatorioModel recordatorio) async {
+  personalizaProvider =
+      Provider.of<PersonalizaProviderFirebase>(context, listen: false);
+  personaliza = personalizaProvider.getPersonaliza;
+  personaliza.tiempoRecordatorio = recordatorio.tiempo;
+
+  // Establecemos el objeto en el provider
+
+  personalizaProvider.setPersonaliza(personaliza);
+
+  await RecordatoriosProvider()
+      .acutalizarTiempo(context, emailUsuario, personaliza);
 }
 
 void mensajeModificado(context, String texto) {

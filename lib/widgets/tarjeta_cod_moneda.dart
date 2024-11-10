@@ -1,8 +1,16 @@
+import 'package:agendacitas/models/models.dart';
+import 'package:agendacitas/providers/recordatorios_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../providers/personaliza_provider.dart';
 
-Future tarjetaModificarValores(context, personaliza, String valor) {
+Future tarjetaModificarValores(
+  context,
+  emailSesionUsuario,
+  PersonalizaModelFirebase personaliza,
+  String valor,
+) {
   TextEditingController ctrl_1 = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
@@ -16,7 +24,7 @@ Future tarjetaModificarValores(context, personaliza, String valor) {
       hintText = '34';
       simbolo = '+';
       textInputType = TextInputType.number;
-      modificaDato = () => personaliza.codpais = int.parse(ctrl_1.text);
+      modificaDato = () => personaliza.codpais = ctrl_1.text;
       break;
     case 'monedaPais':
       textoInput = 'Moneda país: ';
@@ -36,6 +44,8 @@ Future tarjetaModificarValores(context, personaliza, String valor) {
             topLeft: Radius.circular(10), topRight: Radius.circular(10))),
     context: context,
     builder: (context) {
+      final PersonalizaProviderFirebase personalizaProvider =
+          Provider.of<PersonalizaProviderFirebase>(context, listen: false);
       return Padding(
         padding: const EdgeInsets.all(18.0),
         child: Column(
@@ -70,8 +80,13 @@ Future tarjetaModificarValores(context, personaliza, String valor) {
                       if (formKey.currentState!.validate())
                         {
                           modificaDato(),
-                          await PersonalizaProvider()
-                              .actualizarPersonaliza(personaliza),
+
+                          // ACUTALIZO BASE DE DATOS FIREBASE
+                          RecordatoriosProvider().acutalizarTiempo(
+                              context, emailSesionUsuario, personaliza),
+                          //TODO  ACUTALIZO EL PROVIDER PERO NO GUARDO EN BASE DE DATOS FIREBASE
+                          personalizaProvider.setPersonaliza(personaliza),
+
                           Navigator.pop(context)
                         },
                     },

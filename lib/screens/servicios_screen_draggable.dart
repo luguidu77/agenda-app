@@ -1,3 +1,4 @@
+import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:collection/collection.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
@@ -53,7 +54,8 @@ class ServiciosScreenDraggable extends StatefulWidget {
 }
 
 class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
-  late PersonalizaProvider contextoPersonaliza;
+  late PersonalizaProviderFirebase contextoPersonaliza;
+  PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
   late CreacionCitaProvider contextoCreacionCita;
   late List<DragAndDropList> listCategorias;
   late List<DraggableList> convertedListCategorias = [];
@@ -92,7 +94,8 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
   void initState() {
     super.initState();
     // TRAE CONTEXTO PERSONALIZA ( MONEDA ). ES NECESARIO INIZIALIZARLA ANTES DE LLAMAR A  buildList DONDE SE UTILIZA EL CONTEXTO PARA LA MONEDA
-    contextoPersonaliza = context.read<PersonalizaProvider>();
+    contextoPersonaliza = context.read<PersonalizaProviderFirebase>();
+    personaliza = contextoPersonaliza.getPersonaliza;
 
     adaptacionListas();
     allLists = convertedListCategorias;
@@ -201,7 +204,7 @@ class _ServiciosScreenDraggableState extends State<ServiciosScreenDraggable> {
                       ),
                       //leading: Text(item.leading),
                       subtitle: Text(
-                        '${item.subtitle.toString()} ${contextoPersonaliza.getPersonaliza['MONEDA']} ',
+                        '${item.subtitle.toString()} ${personaliza.moneda} ',
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 10,

@@ -1,4 +1,6 @@
+import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/models/tiempo_record_model.dart';
+import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/db_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -38,7 +40,9 @@ class RecordatoriosProvider extends ChangeNotifier {
     return tiempoGuardado;
   }
 
-  acutalizarTiempo(TiempoRecordatorioModel recordatorio) async {
-    await DBProvider.db.actualizarRecordatorio(recordatorio);
+  acutalizarTiempo(
+      context, emailUsuario, PersonalizaModelFirebase personaliza) async {
+    await FirebaseProvider()
+        .actualizaPersonaliza(context, emailUsuario, personaliza);
   }
 }

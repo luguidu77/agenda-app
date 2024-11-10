@@ -1,3 +1,4 @@
+import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/screens/home.dart';
 import 'package:agendacitas/widgets/tarjeta_msm_citas.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class ConfigPersonalizar extends StatefulWidget {
 
 class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
   // contextoPersonaliza es la variable para actuar con este contexto
-  late PersonalizaProvider contextoPersonaliza;
+  late PersonalizaProviderFirebase contextoPersonaliza;
   late PersonalizaProviderFirebase contextoPersonalizaFirebase;
   late String textoActual;
 
@@ -38,7 +39,7 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
     Color.fromARGB(255, 255, 149, 28),
   ];
 
-  PersonalizaModel personaliza = PersonalizaModel();
+  PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
 
   String cerrado = '';
   Color color = Colors.blue;
@@ -51,45 +52,30 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
   }
 
   getPersonaliza() async {
-    List<PersonalizaModel> data =
-        await PersonalizaProvider().cargarPersonaliza();
-
-    if (data.isNotEmpty) {
-      contextoPersonaliza.setPersonaliza = {
-        'CODPAIS': data[0].codpais,
-        'MONEDA': data[0].moneda
-      };
-      personaliza.codpais = data[0].codpais;
-      personaliza.moneda = data[0].moneda;
-      // mensajeModificado('dato actualizado');
-      setState(() {});
-    } else {
-      await PersonalizaProvider().nuevoPersonaliza(0, 34, '', '', '€');
-      getPersonaliza();
-    }
+    final personalizaProvider =
+        Provider.of<PersonalizaProviderFirebase>(context, listen: false);
+    personaliza = personalizaProvider.getPersonaliza;
   }
 
   @override
   Widget build(BuildContext context) {
-    contextoPersonaliza = context.read<PersonalizaProvider>();
     final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
     String emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
     bool iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
     // rescat el texto par enviar a los clientes desde firebase
-    contextoPersonalizaFirebase = context.read<PersonalizaProviderFirebase>();
+    contextoPersonalizaFirebase = context.watch<PersonalizaProviderFirebase>();
     final personalizaprovider = contextoPersonalizaFirebase.getPersonaliza;
-    print(personalizaprovider['MENSAJE_CITA']);
 
     // ESTA CONDICION SOLO SIRVE PARA LAS INSTALACIONES DE VERSIONES ANTERIORES A LA CREACION MODIFICACION DE TEXTO CONFIRMACION DE CITA
-    if (personalizaprovider['MENSAJE_CITA'] == null) {
+    /*  if (personalizaprovider.mensaje == '') {
       // SI ES NULO EL MENSAJE => CREAMOS PERSONALIZA Y MENSAJE DE EJEMPLO EN FIREBASE
       _creaPersonaliza(emailSesionUsuario, contextoPersonalizaFirebase);
 
       setState(() {});
-    }
-    textoActual = personalizaprovider['MENSAJE_CITA'].toString();
+    } */
 
-    print(contextoPersonaliza.getPersonaliza['CODPAIS']);
+    textoActual = personalizaprovider.mensaje.toString();
+
     return SafeArea(
       child: Scaffold(
         body: Padding(
@@ -108,11 +94,17 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
                 const SizedBox(height: 100),
                 _recordatorios(context),
                 const SizedBox(height: 30),
-                _tema(context),
+                //  _tema(context),
                 const SizedBox(height: 30),
-                _codigoPais(context),
+                _codigoPais(
+                  context,
+                  emailSesionUsuario,
+                ),
                 const SizedBox(height: 30),
-                _monedaPais(context),
+                _monedaPais(
+                  context,
+                  emailSesionUsuario,
+                ),
                 const SizedBox(height: 30),
                 _textoMensajes(context, contextoPersonalizaFirebase,
                     emailSesionUsuario, iniciadaSesionUsuario)
@@ -138,7 +130,9 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
     );
   }
 
-  _tema(BuildContext context) {
+  _tema(
+    BuildContext context,
+  ) {
     final themeProvider = context.watch<ThemeProvider>();
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -238,7 +232,10 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
     );
   }
 
-  _codigoPais(BuildContext context) {
+  _codigoPais(
+    BuildContext context,
+    emailSesionUsuario,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -249,8 +246,8 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
             minimumSize: Size(MediaQuery.of(context).size.width / 4, 50),
           ),
           onPressed: () async {
-            await tarjetaModificarValores(context, personaliza, 'codPais')
-                .whenComplete(() => actualizar(context));
+            await tarjetaModificarValores(
+                context, emailSesionUsuario, personaliza, 'codPais');
           },
           child: Text('+${personaliza.codpais}'),
         )
@@ -258,7 +255,10 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
     );
   }
 
-  _monedaPais(BuildContext context) {
+  _monedaPais(
+    BuildContext context,
+    emailSesionUsuario,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -268,7 +268,8 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
             minimumSize: Size(MediaQuery.of(context).size.width / 4, 50),
           ),
           onPressed: () async {
-            await tarjetaModificarValores(context, personaliza, 'monedaPais')
+            await tarjetaModificarValores(
+                    context, emailSesionUsuario, personaliza, 'monedaPais')
                 .whenComplete(() => actualizar(context));
           },
           child: Text('${personaliza.moneda}'),
@@ -308,7 +309,7 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
   }
 
   actualizar(context) {
-    getPersonaliza();
+    //getPersonaliza();
   }
 
   void mensajeModificado(String texto) {
@@ -343,17 +344,17 @@ class _ConfigPersonalizarState extends State<ConfigPersonalizar> {
     );
   }
 
-  void getPersonalizaFirebase(emailSesionUsuario, con) async {
+  /*  void getPersonalizaFirebase(emailSesionUsuario, con) async {
     await FirebaseProvider().cargarPersonaliza(emailSesionUsuario);
-  }
+  } */
 
   void _creaPersonaliza(emailSesionUsuario, contextoPersonalizaFirebase) async {
     String mensaje =
         '📢Hola \$cliente,%su cita ha sido reservada con \$denominacion para el día \$fecha h.%Servicio a realizar : \$servicio.%%🙏Si no pudieras asistir cancelala para que otra persona pueda aprovecharla.%%Telefono: \$telefono%Web: \$web%Facebook: \$facebook%Instagram: \$instagram%Dónde estamos: \$ubicacion%';
     await FirebaseProvider().nuevoPersonaliza(emailSesionUsuario, mensaje);
 
-    contextoPersonalizaFirebase.setPersonaliza = {
+    /*   contextoPersonalizaFirebase.setPersonaliza = {
       'MENSAJE_CITA': mensaje,
-    };
+    }; */
   }
 }

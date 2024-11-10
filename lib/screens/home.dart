@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
       GlobalKey<ScaffoldMessengerState>();
 
   // contextoPersonaliza es la variable para actuar con este contexto
-  late PersonalizaProvider contextoPersonaliza;
+
   late PersonalizaProviderFirebase contextoPersonalizaFirebase;
   int tabRegordatorios = 0;
   //trae mediante funcion de BNavigator el index de la pagina menu de abajo , myBnB
@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     estadoPagoEmailApp();
     cargarTema();
-    personaliza();
+
     empleados();
     personalizaFirebase();
 
@@ -185,10 +185,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    contextoPersonaliza = context.read<PersonalizaProvider>();
     contextoPersonalizaFirebase = context.read<PersonalizaProviderFirebase>();
 
-    print(contextoPersonaliza.getPersonaliza['CODPAIS']);
     themeProvider = context.watch<ThemeProvider>();
 
     return MaterialApp(
@@ -297,24 +295,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void personaliza() async {
-    List<PersonalizaModel> data =
-        await PersonalizaProvider().cargarPersonaliza();
-
-    if (data.isNotEmpty) {
-      contextoPersonaliza.setPersonaliza = {
-        'CODPAIS': data[0].codpais,
-        'MONEDA': data[0].moneda
-      };
-
-      // mensajeModificado('dato actualizado');
-      // setState(() {});
-    } else {
-      await PersonalizaProvider().nuevoPersonaliza(0, 34, '', '', '€');
-      personaliza();
-    }
-  }
-
   void empleados() async {
     // TRAE LOS EMPLEADOS Y LOS SETEA EN EL PROVIDER
     final empleadosProvider =
@@ -325,19 +305,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void personalizaFirebase() async {
-    Map<String, dynamic> data = await PersonalizaProviderFirebase()
+    /*  Map<String, dynamic> data = await PersonalizaProviderFirebase()
         .cargarPersonaliza(_emailSesionUsuario);
 
     if (data.isNotEmpty) {
-      contextoPersonalizaFirebase.setPersonaliza = {
-        'MENSAJE_CITA': data['mensaje'],
-      };
+      //contextoPersonalizaFirebase.setPersonaliza( data['mensaje']);
+
+      ;
 
       //
     } else {
       //await PersonalizaProvider().nuevoPersonaliza(0, 34, '', '', '€');
-      personaliza();
-    }
+      //personaliza();
+    } */
   }
 
   tarjetaSalirAplicacion() {

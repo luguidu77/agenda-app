@@ -198,6 +198,8 @@ class _MyAppState extends State<MyApp> {
             create: (BuildContext context) => EstadoConfirmacionCita()),
         ChangeNotifierProvider(
             create: (BuildContext context) => EmpleadosProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => VistaProvider()),
       ],
       builder: (context, _) {
         return MaterialApp(

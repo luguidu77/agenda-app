@@ -239,7 +239,8 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
       telefono: widget.reserva['telefono']!,
       email: widget.reserva['email'],
       fechaCita: widget.reserva['horaInicio'],
-      servicio: widget.reserva['servicios'].replaceAll(RegExp(r'[\[\]]'), ''),
+      servicio: widget.reserva['servicios'].replaceAll(RegExp(r'[\[\]]'),
+          ''), // [servicio1, servicio2] por lo que le quito los corchetes
       precio: widget.reserva['precio'],
     );
   }

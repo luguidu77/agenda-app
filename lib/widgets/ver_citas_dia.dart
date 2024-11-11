@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../providers/providers.dart';
 import '../utils/utils.dart';
@@ -67,6 +68,9 @@ class _ListaCitasState extends State<ListaCitas> {
   }
 
   vercitas(context, List<CitaModelFirebase> citas) {
+    var vistaProvider = Provider.of<VistaProvider>(context, listen: false);
+
+    var vistaActual = vistaProvider.vista;
     /*  print(
         'oooooooooooooooooooooo veo todas las citas oooooooooooooooooooooooooo');
     print(citas); */
@@ -87,13 +91,51 @@ class _ListaCitasState extends State<ListaCitas> {
         // ########## TEXTO SUMA DE GANANCIAS DIARIAS  ##############################
         Visibility(
             visible: !leerEstadoBotonIndisponibilidad,
-            child: gananciaDiaria(citas, numCitas)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                cambioVistaCalendario(vistaProvider, vistaActual),
+                gananciaDiaria(citas, numCitas),
+              ],
+            )),
 
         // ########## TARJETAS DE LAS CITAS CONCERTADAS ##############################
         //  SYNCFUSION
         Expanded(
             child: ListaCitasNuevo(
                 fechaElegida: widget.fechaElegida, citas: citas)),
+      ],
+    );
+  }
+
+  Stack cambioVistaCalendario(
+      VistaProvider vistaProvider, CalendarView vistaActual) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.black, width: 2), // Contorno negro
+          ),
+          child: const CircleAvatar(
+            minRadius: 20,
+            backgroundColor: Colors.white, // Fondo blanco
+          ),
+        ),
+        IconButton(
+          onPressed: () {
+            vistaProvider.setVistaCalendario(
+              vistaActual == CalendarView.day
+                  ? CalendarView.timelineDay
+                  : CalendarView.day,
+            );
+            setState(() {});
+          },
+          icon: vistaActual == CalendarView.day
+              ? const Icon(Icons.groups_outlined)
+              : const Icon(Icons.person_2_outlined),
+        ),
       ],
     );
   }
@@ -134,7 +176,7 @@ class _ListaCitasState extends State<ListaCitas> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('${numCitas.toString()} citas', style: textoEstilo),
-                  Text('- $data ${personaliza.moneda}', style: textoEstilo)
+                  Text(' $data ${personaliza.moneda}', style: textoEstilo)
                 ],
               );
             } else {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class CalendarioProvider extends ChangeNotifier {
   DateTime _fechaSeleccionada = DateTime.now();
@@ -23,8 +24,19 @@ class CalendarioProvider extends ChangeNotifier {
 
   // VISIBLE/OCULTAR CALENDARIO
   bool get visibleCalendario => _visibleCalendario;
-  set setVisibleCalendario(bool visible) {
+  setVisibleCalendario(bool visible) {
     _visibleCalendario = visible;
+    notifyListeners();
+  }
+}
+
+class VistaProvider extends ChangeNotifier {
+  CalendarView _vista = CalendarView.day;
+
+  // SELECIONAR LA FECHA
+  CalendarView get vista => _vista;
+  setVistaCalendario(CalendarView vista) {
+    _vista = vista;
     notifyListeners();
   }
 }

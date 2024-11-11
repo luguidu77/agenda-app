@@ -179,6 +179,6 @@ class _CalendarioState extends State<Calendario> {
         Provider.of<CalendarioProvider>(context, listen: false);
     calendarioProvider.setFechaSeleccionada(day);
 
-    calendarioProvider.setVisibleCalendario = false;
+    calendarioProvider.setVisibleCalendario(false);
   }
 }

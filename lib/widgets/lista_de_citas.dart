@@ -99,6 +99,10 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
   @override
   Widget build(BuildContext context) {
+    var calendarioProvider =
+        Provider.of<CalendarioProvider>(context, listen: true);
+    var vistaProvider = Provider.of<VistaProvider>(context, listen: true);
+
     final leerEstadoBotonIndisponibilidad =
         Provider.of<BotonAgregarIndisponibilidadProvider>(context).botonPulsado;
     print(
@@ -111,8 +115,8 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           ? Colors.red.withOpacity(0.1)
           : Colors.white,
 
-      view: CalendarView
-          .day, //············· CAMBIA LA VISTA: VISUALIZA EMPLEADOS :timelineDay ------------------------------------------------
+      view: vistaProvider
+          .vista, //············· CAMBIA LA VISTA: VISUALIZA EMPLEADOS :timelineDay ------------------------------------------------
 
       specialRegions:
           _specialTimeRegions, // tramos especiales como descansos entre turnos (comidas, descansos..)
@@ -140,9 +144,11 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
       onViewChanged: (ViewChangedDetails details) {
         // DateTime fechaVisibleInicio = details.visibleDates.first;
         DateTime fechaVisibleFin = details.visibleDates.last;
-        var calendarioProvider =
-            Provider.of<CalendarioProvider>(context, listen: false);
-        calendarioProvider.setFechaSeleccionada(fechaVisibleFin);
+
+        // Llama a la función externa que decide si actualizar o no
+        Future.delayed(Duration.zero, () {
+          actualizarFechaSeleccionada(fechaVisibleFin, calendarioProvider);
+        });
 
         //  print("Fecha visible de inicio: $fechaVisibleInicio");
         print("Fecha visible de fin: $fechaVisibleFin");
@@ -419,4 +425,12 @@ Widget appointmentBuilder(BuildContext context,
       )
     ],
   );
+}
+
+void actualizarFechaSeleccionada(
+    DateTime nuevaFecha, CalendarioProvider calendarioProvider) {
+  if (calendarioProvider.fechaSeleccionada == null ||
+      calendarioProvider.fechaSeleccionada != nuevaFecha) {
+    calendarioProvider.setFechaSeleccionada(nuevaFecha);
+  }
 }

@@ -251,7 +251,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
               Visibility(
                 visible: !visibleCalendario,
                 child: Expanded(
-                  flex: 8,
+                  flex: 9,
                   child: diasNoDisponibles.contains(fechaElegida.weekday)
                       ? Column(
                           children: [
@@ -446,31 +446,34 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
         formatSemana.format(DateTime.parse(fechaElegida.toString()));
     fechaTextoDia = formatDia.format(DateTime.parse(fechaElegida.toString()));
 
-    return calendarioProvider.visibleCalendario
+    return
         // FECHA ELEGIDA CON SELECTORES AUMENTO/DECREMENTO DIAS(VISIBLE CUANDO NO SE VE EL CALENDARIO)
-        ? Container()
-        : SizedBox(
-            width: MediaQuery.of(context).size.width,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                // BOTON CAMBIAR VISTAS
-                IconButton(onPressed: null, icon: Icon(Icons.menu)),
-                // BOTON DEL DIA ANTERIOR
-                //_botonAnteriorDia(calendarioProvider),
-                // TARJETA PARA VER LA FECHA
-                GestureDetector(
-                  onTap: () => setState(() {
-                    calendarioProvider.setVisibleCalendario = true;
-                  }),
-                  child: _tarjetadelafechaelegida(),
-                ),
-                // BOTON SIGUIENTE DIA
 
-                // _botonSiguienteDia(calendarioProvider),
-              ],
+        Visibility(
+      visible: !calendarioProvider.visibleCalendario,
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            // BOTON CAMBIAR VISTAS
+            IconButton(onPressed: null, icon: Icon(Icons.menu)),
+            // BOTON DEL DIA ANTERIOR
+            //_botonAnteriorDia(calendarioProvider),
+            // TARJETA PARA VER LA FECHA
+            GestureDetector(
+              onTap: () => setState(() {
+                calendarioProvider.setVisibleCalendario(true);
+              }),
+              child: _tarjetadelafechaelegida(),
             ),
-          );
+            // BOTON SIGUIENTE DIA
+
+            // _botonSiguienteDia(calendarioProvider),
+          ],
+        ),
+      ),
+    );
   }
 
   _tarjetadelafechaelegida() {

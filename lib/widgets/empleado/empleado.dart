@@ -35,31 +35,41 @@ class EmpleadoWidget extends StatelessWidget {
         // Mostrar los datos del empleado una vez que están listos
         if (snapshot.hasData) {
           EmpleadoModel empleado = snapshot.data!;
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                empleado.nombre,
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(width: 16),
+                // Mostrar la foto del empleado si existe
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                        color: Colors.black, width: 2), // Contorno negro
+                  ),
+                  child: empleado.foto.isNotEmpty
+                      ? CircleAvatar(
+                          radius: 20,
+                          backgroundImage: NetworkImage(empleado.foto),
+                        )
+                      : const CircleAvatar(
+                          radius: 20,
+                          backgroundImage:
+                              AssetImage('assets/images/nofoto.jpg'),
+                        ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              // Mostrar la foto del empleado si existe
-              empleado.foto.isNotEmpty
-                  ? CircleAvatar(
-                      radius: 20,
-                      backgroundImage: NetworkImage(empleado.foto),
-                    )
-                  : const CircleAvatar(
-                      radius: 20,
-                      backgroundImage: AssetImage('assets/images/nofoto.jpg'),
-                    ),
-
-              // Mostrar el nombre y el email del empleado
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  empleado.nombre,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
           );
         }
 

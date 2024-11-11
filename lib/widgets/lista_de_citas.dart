@@ -61,9 +61,10 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
       print(empleados[i].nombre);
 
       _employeeCollection.add(CalendarResource(
+        image: NetworkImage(empleados[i].foto),
         displayName: empleados[i].nombre,
         id: empleados[i].id,
-        color: Colors.white,
+        color: Colors.black,
       ));
     }
   }
@@ -126,7 +127,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
       ],
 
       resourceViewSettings: ResourceViewSettings(
-          showAvatar: false,
+          showAvatar: true,
           visibleResourceCount: _employeeCollection.length,
           size: 55,
           displayNameTextStyle: const TextStyle(
@@ -136,9 +137,23 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
       resourceViewHeaderBuilder:
           (BuildContext context, ResourceViewHeaderDetails details) {
         return Container(
-          color: Color.fromARGB(71, 6, 79, 236),
-          child: Text(details.resource.displayName),
-        );
+            color: Colors.white,
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundImage: (details.resource.image),
+                ),
+                Text(
+                  details.resource.displayName,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ));
       },
       // DETECTO LA FECHA ELEGIDA AL DESPLAZAR LAS PAGINAS DEL CALENDARIO
       onViewChanged: (ViewChangedDetails details) {

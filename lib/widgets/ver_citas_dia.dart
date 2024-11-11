@@ -1,5 +1,7 @@
+import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
+import 'package:agendacitas/widgets/empleado/empleado.dart';
 import 'package:agendacitas/widgets/lista_de_citas.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -92,9 +94,16 @@ class _ListaCitasState extends State<ListaCitas> {
         Visibility(
             visible: !leerEstadoBotonIndisponibilidad,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 cambioVistaCalendario(vistaProvider, vistaActual),
+                const SizedBox(width: 16),
+                ...empleados(
+                  context,
+                  vistaActual,
+                  citas,
+                ),
+                const SizedBox(width: 56),
                 gananciaDiaria(citas, numCitas),
               ],
             )),
@@ -108,33 +117,80 @@ class _ListaCitasState extends State<ListaCitas> {
     );
   }
 
-  Stack cambioVistaCalendario(
-      VistaProvider vistaProvider, CalendarView vistaActual) {
-    return Stack(
-      alignment: Alignment.center,
+  List<dynamic> empleados(context, CalendarView vistaActual, citas) {
+    final estadoPagoProvider =
+        Provider.of<EstadoPagoAppProvider>(context, listen: false);
+    String emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+
+    final empleadosProvider =
+        Provider.of<EmpleadosProvider>(context, listen: false);
+    List<EmpleadoModel> empleados = empleadosProvider.getEmpleados;
+
+    List<dynamic> todos = empleados.map((empleado) {
+      return Stack(
+        alignment: Alignment.topRight,
+        children: [
+          FutureBuilder(
+            future:
+                FirebaseProvider().calculaCitasPorEmpleado(citas, empleado.id),
+            initialData: 0,
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              int numCitas = snapshot.data;
+              return Badge.count(
+                isLabelVisible: numCitas != 0,
+                count: numCitas,
+                backgroundColor: Colors.blue,
+              );
+            },
+          ),
+          EmpleadoWidget(
+              emailUsuario: emailSesionUsuario, idEmpleado: empleado.id),
+        ],
+      );
+    }).toList();
+
+    return vistaActual == CalendarView.day ? todos : [];
+  }
+
+  cambioVistaCalendario(VistaProvider vistaProvider, CalendarView vistaActual) {
+    return Column(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.black, width: 2), // Contorno negro
-          ),
-          child: const CircleAvatar(
-            minRadius: 20,
-            backgroundColor: Colors.white, // Fondo blanco
-          ),
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border:
+                    Border.all(color: Colors.black, width: 2), // Contorno negro
+              ),
+              child: const CircleAvatar(
+                radius: 21,
+                backgroundColor: Colors.white, // Fondo blanco
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                vistaProvider.setVistaCalendario(
+                  vistaActual == CalendarView.day
+                      ? CalendarView.timelineDay
+                      : CalendarView.day,
+                );
+                setState(() {});
+              },
+              icon: vistaActual == CalendarView.day
+                  ? const Icon(Icons.groups_outlined)
+                  : const Icon(Icons.person_2_outlined),
+            ),
+          ],
         ),
-        IconButton(
-          onPressed: () {
-            vistaProvider.setVistaCalendario(
-              vistaActual == CalendarView.day
-                  ? CalendarView.timelineDay
-                  : CalendarView.day,
-            );
-            setState(() {});
-          },
-          icon: vistaActual == CalendarView.day
-              ? const Icon(Icons.groups_outlined)
-              : const Icon(Icons.person_2_outlined),
+        const Text(
+          'Vista',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 9,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ],
     );
@@ -143,52 +199,64 @@ class _ListaCitasState extends State<ListaCitas> {
   FutureBuilder<dynamic> gananciaDiaria(
       List<CitaModelFirebase> citas, int numCitas) {
     return FutureBuilder<dynamic>(
-        future: widget.iniciadaSesionUsuario
-            ? FirebaseProvider().calculaGananciaDiariasFB(citas)
-            : CitaListProvider().calculaGananciasDiarias(citas),
-        builder: (
-          BuildContext context,
-          AsyncSnapshot<dynamic> snapshot,
-        ) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return SizedBox(
-                width: 160,
-                child: SkeletonParagraph(
-                  style: SkeletonParagraphStyle(
-                      lines: 1,
-                      spacing: 1,
-                      lineStyle: SkeletonLineStyle(
-                        // randomLength: true,
-                        height: 10,
-                        borderRadius: BorderRadius.circular(5),
-                        // minLength: MediaQuery.of(context).size.width,
-                        // maxLength: MediaQuery.of(context).size.width,
-                      )),
-                ));
-          } else if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasError) {
-              return const Text('');
-            } else if (snapshot.hasData) {
-              final data = snapshot.data;
+      future: widget.iniciadaSesionUsuario
+          ? FirebaseProvider().calculaGananciaDiariasFB(citas)
+          : CitaListProvider().calculaGananciasDiarias(citas),
+      builder: (
+        BuildContext context,
+        AsyncSnapshot<dynamic> snapshot,
+      ) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return SizedBox(
+            width: 70,
+            child: SkeletonParagraph(
+              style: SkeletonParagraphStyle(
+                lines: 1,
+                spacing: 1,
+                lineStyle: SkeletonLineStyle(
+                  height: 35,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+            ),
+          );
+        } else if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            return const Text('');
+          } else if (snapshot.hasData) {
+            final data = snapshot.data;
 
-              // SI TENGO DATOS LOS VISUALIZO EN PANTALLA // TEXTO 3 CITAS - 75,00 €
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('${numCitas.toString()} citas', style: textoEstilo),
-                  Text(' $data ${personaliza.moneda}', style: textoEstilo)
-                ],
-              );
-            } else {
-              return const Text('Empty data');
-            }
+            // Fondo rectangular con el borde izquierdo redondeado
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.grey[200], // Color de fondo
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  bottomLeft: Radius.circular(12),
+                ),
+              ),
+              child: Text(
+                ' $data ${personaliza.moneda}',
+                style: textoEstilo,
+              ),
+            );
           } else {
-            return const Text('fdfd');
+            return const Text('Empty data');
           }
-        });
+        } else {
+          return const Text('fdfd');
+        }
+      },
+    );
   }
 
   todasLasCitas(fecha) {
+    EmpleadosProvider empleadoProvider =
+        Provider.of<EmpleadosProvider>(context, listen: false);
+
+    List<dynamic> empleados = empleadoProvider.getEmpleados;
+
     return FutureBuilder<dynamic>(
       future: widget.iniciadaSesionUsuario
           //? TRAE LAS CITAS DEL DISPOSITIVO O DE FIREBASE CON LA CONDICION INICIO DE SESION
@@ -199,23 +267,7 @@ class _ListaCitasState extends State<ListaCitas> {
         AsyncSnapshot<dynamic> snapshot,
       ) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 15.0),
-            child: SizedBox(
-                child: Center(
-                    child: SkeletonParagraph(
-              style: SkeletonParagraphStyle(
-                  lines: 12,
-                  spacing: 6,
-                  lineStyle: SkeletonLineStyle(
-                    // randomLength: true,
-                    height: 40,
-                    borderRadius: BorderRadius.circular(5),
-                    // minLength: MediaQuery.of(context).size.width,
-                    // maxLength: MediaQuery.of(context).size.width,
-                  )),
-            ))),
-          );
+          return _skeletonEmpleados(empleados);
         } else if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
             return const Text('Error todas las citas');
@@ -232,6 +284,56 @@ class _ListaCitasState extends State<ListaCitas> {
           return Text('State: ${snapshot.connectionState}');
         }
       },
+    );
+  }
+
+  /// widget skeleton de la vista
+
+  Padding _skeletonEmpleados(List<dynamic> empleados) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10.0),
+      child: Column(
+        children: [
+          Row(children: [
+            const SizedBox(
+              // separacion izquierda de los circulos cambio de vista y empleados
+              width: 40,
+            ),
+
+            //// circulos segun numero de empleados
+            ...empleados.map((e) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                child: SkeletonAvatar(
+                  style: SkeletonAvatarStyle(
+                    shape: BoxShape.circle,
+                    width: 50,
+                    height: 50,
+                  ),
+                ),
+              );
+            })
+          ]),
+
+          const SizedBox(
+            // separacion entre los circulos empleados y las lineas del calendario
+            height: 40,
+          ),
+          /////  lineas de calendario
+          SkeletonParagraph(
+            style: SkeletonParagraphStyle(
+                lines: 14,
+                spacing: 6,
+                lineStyle: SkeletonLineStyle(
+                  // randomLength: true,
+                  height: 30,
+                  borderRadius: BorderRadius.circular(5),
+                  // minLength: MediaQuery.of(context).size.width,
+                  // maxLength: MediaQuery.of(context).size.width,
+                )),
+          ),
+        ],
+      ),
     );
   }
 

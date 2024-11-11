@@ -1268,6 +1268,18 @@ class FirebaseProvider extends ChangeNotifier {
     return gananciaD.toString();
   }
 
+  Future<int> calculaCitasPorEmpleado(citas, idEmpleado) async {
+    // await Future.delayed(const Duration(seconds: 1));
+    //precio total diario
+    int numCitas = 0;
+    List<CitaModelFirebase> aux = citas;
+    aux.map((value) {
+      return (value.idEmpleado! == idEmpleado) ? numCitas++ : numCitas;
+    }).toList(); //todo: este campo está pendiende de añadir a tabla cita de firebase
+
+    return numCitas;
+  }
+
   Future<bool> compruebaPagoFB(usuarioAPP) async {
     late bool pago;
     await _iniFirebase();

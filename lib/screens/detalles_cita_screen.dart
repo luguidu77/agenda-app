@@ -2,6 +2,7 @@ import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/screens/screens.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/widgets/botones/boton_confirmar_cita_reserva_web.dart';
+import 'package:agendacitas/widgets/empleado/empleado.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -328,24 +329,19 @@ class _EmpleadoInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final estadoPagoProvider =
+        Provider.of<EstadoPagoAppProvider>(context, listen: false);
+    String emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
     return Row(
       children: [
         const Text(
           'Concertada con ',
           style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
         ),
-        EmpleadoAvatar(
-          empleado: EmpleadoModel(
-            id: '',
-            nombre: reserva['nombreEmpleado'],
-            telefono: '',
-            foto: '',
-            disponibilidad: [],
-            email: '',
-            categoriaServicios: [],
-          ),
-          esFichaEmpleado: true,
-        ),
+        EmpleadoWidget(
+          emailUsuario: emailSesionUsuario,
+          idEmpleado: reserva['idEmpleado'],
+        )
       ],
     );
   }

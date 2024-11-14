@@ -1,4 +1,3 @@
-import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/screens/home.dart';
 import 'package:agendacitas/screens/servicios_screen_draggable.dart';
 import 'package:flutter/material.dart';

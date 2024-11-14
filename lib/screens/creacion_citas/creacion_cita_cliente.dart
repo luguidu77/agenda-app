@@ -1,5 +1,4 @@
 import 'package:agendacitas/providers/FormularioBusqueda/formulario_busqueda_provider.dart';
-import 'package:agendacitas/providers/db_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 
 import 'package:fast_contacts/fast_contacts.dart';
@@ -71,8 +70,9 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
   Widget build(BuildContext context) {
     //fecha y hora de inicio elegida
     final fecha = ModalRoute.of(context)?.settings.arguments;
-    // LEER MICONTEXTO DE CreacionCitaProvider
-    contextoCreacionCita = context.read<CreacionCitaProvider>();
+
+    DateTime fechaTime = DateTime.parse(fecha!.toString());
+
     //LEE CODIGO PAIS PARA PODER QUITARLO DEL TELEFONO DE LA AGENDA
     final contextoPersonaliza = context.read<PersonalizaProviderFirebase>();
     personaliza = contextoPersonaliza.getPersonaliza;
@@ -106,7 +106,7 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
 
             // LISTA DE CLIENTES ####################################
             ListaClientes(
-                fecha: fecha!,
+                fecha: fechaTime,
                 iniciadaSesionUsuario: _iniciadaSesionUsuario,
                 emailSesionUsuario: _emailSesionUsuario,
                 busquedaController: contextoFormularioBusqueda.textoBusqueda,

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:agendacitas/screens/comprar_aplicacion.dart';
 import 'package:agendacitas/screens/home.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';

@@ -149,7 +149,7 @@ class Comunicaciones {
     List<String> textListServicio = servicio.split(', ');
 
     CitaModelFirebase cita = CitaModelFirebase(
-        horaInicio: fecha,
+        horaInicio: DateTime.parse(fecha),
         email: email,
         idservicio: textListServicio,
         precio: precio);

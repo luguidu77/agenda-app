@@ -457,7 +457,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             // BOTON CAMBIAR VISTAS
-            IconButton(onPressed: null, icon: Icon(Icons.menu)),
+            const IconButton(onPressed: null, icon: Icon(Icons.menu)),
             // BOTON DEL DIA ANTERIOR
             //_botonAnteriorDia(calendarioProvider),
             // TARJETA PARA VER LA FECHA
@@ -489,7 +489,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
             const SizedBox(
               width: 5,
             ),
-            Icon(Icons.arrow_drop_down)
+            const Icon(Icons.arrow_drop_down)
           ],
         ),
       ),

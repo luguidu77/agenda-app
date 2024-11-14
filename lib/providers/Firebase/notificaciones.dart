@@ -209,8 +209,8 @@ eliminaLeidas(emailUsuario) async {
 Future<dynamic> emailEstadoCita(
     String estado, CitaModelFirebase cita, emailnegocio) async {
   //? FECHA LARGA EN ESPAÑOL
-  String fechaLarga = formateaFechaLarga(cita.horaInicio);
-  cita.horaInicio = fechaLarga;
+  /*  String fechaLarga = formateaFechaLarga(cita.horaInicio);
+  cita.horaInicio = fechaLarga; */
 
   // obtengo el perfil del negocio
   PerfilModel negocio = await FirebaseProvider().cargarPerfilFB(emailnegocio);

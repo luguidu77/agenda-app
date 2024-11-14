@@ -55,7 +55,7 @@ mensajeAlerta(context, int index, citas, bool iniciadaSesionUsuario,
                             : _eliminarCita(context, idCita, textoNombre);
 
                         respuesta = true;
-                        Navigator.pop(context);
+                        Navigator.pushNamed(context, "/");
                       },
                       icon: const Icon(Icons.delete_forever_outlined),
                       label: const Text('Eliminar')),

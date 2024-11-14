@@ -1,22 +1,17 @@
 import 'dart:convert';
 
-import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/providers/Firebase/notificaciones.dart';
 import 'package:agendacitas/providers/buttom_nav_notificaciones_provider.dart';
 import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
-import 'package:agendacitas/utils/notificaciones/recordatorio_local/recordatorio_local.dart';
 import 'package:agendacitas/widgets/botones/boton_leido_notif_administrador.dart';
 import 'package:agendacitas/widgets/no_hay_coincidencias.dart';
 import 'package:agendacitas/widgets/tarjeta_noticias.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 import '../models/notificacion_model.dart';
 import '../providers/providers.dart';

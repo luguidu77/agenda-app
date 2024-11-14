@@ -1,4 +1,3 @@
-import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:collection/collection.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';

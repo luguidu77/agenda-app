@@ -5,7 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 Future<String> validateLoginInput(context, email, password) async {
-  var data;
+  String data = "";
   try {
     //INICIALIZA FIREBASE
     await Firebase.initializeApp(

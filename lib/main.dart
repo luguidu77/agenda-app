@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:agendacitas/.env.dart';
-import 'package:agendacitas/providers/Firebase/notificaciones.dart';
 import 'package:agendacitas/providers/FormularioBusqueda/formulario_busqueda_provider.dart';
 import 'package:agendacitas/providers/buttom_nav_notificaciones_provider.dart';
 import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';

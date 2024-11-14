@@ -1,6 +1,5 @@
 import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/models/tiempo_record_model.dart';
-import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/personaliza_provider.dart';
 import 'package:agendacitas/providers/recordatorios_provider.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';

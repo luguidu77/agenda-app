@@ -39,7 +39,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
   }
 
   List<CalendarResource> _employeeCollection = [];
-  List<TimeRegion> _specialTimeRegions = [];
+  final List<TimeRegion> _specialTimeRegions = [];
 
   @override
   void initState() {
@@ -90,7 +90,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
       _specialTimeRegions.add(TimeRegion(
         startTime: startDate,
-        endTime: startDate.add(Duration(hours: 3)),
+        endTime: startDate.add(const Duration(hours: 3)),
         text: 'Not Available',
         enablePointerInteraction: false,
         resourceIds: <Object>[_employeeCollection[i].id],
@@ -166,7 +166,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         });
 
         //  print("Fecha visible de inicio: $fechaVisibleInicio");
-        print("Fecha visible de fin: $fechaVisibleFin");
+        print("Fecha visible de fin: ${fechaVisibleFin.toString()}");
       },
 
       // appointmentBuilder: appointmentBuilder,//? ########### CUSTOMIZACION DE LAS TARJETAS
@@ -303,8 +303,8 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
       print('@@@@@@@@@@@@@@@@@@@@@@');
       print(cita.id);
 
-      final DateTime fechaInicio = DateTime.parse(cita.horaInicio!);
-      final DateTime fechaFinal = DateTime.parse(cita.horaFinal!);
+      final DateTime fechaInicio = cita.horaInicio!;
+      final DateTime fechaFinal = cita.horaFinal!;
       final DateTime startTime = DateTime(fechaInicio.year, fechaInicio.month,
           fechaInicio.day, fechaInicio.hour, fechaInicio.minute, 0);
       final DateTime endTime = DateTime(fechaFinal.year, fechaFinal.month,
@@ -444,8 +444,7 @@ Widget appointmentBuilder(BuildContext context,
 
 void actualizarFechaSeleccionada(
     DateTime nuevaFecha, CalendarioProvider calendarioProvider) {
-  if (calendarioProvider.fechaSeleccionada == null ||
-      calendarioProvider.fechaSeleccionada != nuevaFecha) {
+  if (calendarioProvider.fechaSeleccionada != nuevaFecha) {
     calendarioProvider.setFechaSeleccionada(nuevaFecha);
   }
 }

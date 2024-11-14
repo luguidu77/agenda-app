@@ -1,4 +1,3 @@
-import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/screens/servicios_screen_draggable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -232,6 +231,7 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
                         //idCategoria: item.categoria,
                         /*    index: item.index */
                       );
+
                       contextoCreacionCita.setAgregaAListaServiciosElegidos = [
                         {
                           'ID': dataServicios[index].id.toString(),

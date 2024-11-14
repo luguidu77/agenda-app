@@ -29,7 +29,7 @@ String textoHTML(
     String estadoCita, PerfilModel negocio, CitaModelFirebase cita) {
   String negocioNombre = negocio.denominacion!;
   String negocioDireccion = '${negocio.ubicacion} '; /* - ${negocio.ciudad} */
-  String fechaCita = cita.horaInicio!; //formatearFecha(cita.horaInicio!);
+  String fechaCita = formatearFecha(cita.horaInicio.toString());
   // String horaCita = cita.horaInicio!; // formatearHora(cita.horaInicio!);
   String precioTotal = cita.precio.toString();
 

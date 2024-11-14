@@ -107,17 +107,8 @@ class FirebaseProvider extends ChangeNotifier {
     await docRef.doc().set(newCliente);
   }
 
-  nuevaCita(
-      String emailUsuarioAPP,
-      String dia,
-      String horaInicio,
-      String horaFinal,
-      String precio,
-      String comentario,
-      String idCliente,
-      List<String> idServicios,
-      String idEmpleado,
-      idCitaCliente) async {
+  nuevaCita(String emailUsuarioAPP, CitaModelFirebase citaElegida,
+      List<String> idServicios) async {
     // Crear una lista de futuros a partir de la lista de ids de servicio
     List<Map<String, dynamic>> listaServiciosAux = [];
     bool esCita = true;
@@ -132,18 +123,18 @@ class FirebaseProvider extends ChangeNotifier {
     }
 
     final Map<String, dynamic> cita = ({
-      'dia': dia,
-      'horaInicio': horaInicio,
-      'horaFinal': horaFinal,
-      'precio': precio,
-      'comentario': comentario,
-      'idcliente': idCliente,
+      'dia': citaElegida.dia,
+      'horaInicio': citaElegida.horaInicio.toString(),
+      'horaFinal': citaElegida.horaFinal.toString(),
+      'precio': citaElegida.precio.toString(), //precio
+      'comentario': citaElegida.comentario!,
+      'idcliente': citaElegida.idcliente!,
       'idservicio': esCita
           ? listaServiciosAux.map((e) => e['idServicio'])
           : ['indispuesto'],
-      'idempleado': idEmpleado,
+      'idempleado': citaElegida.idEmpleado!,
       'confirmada': true,
-      'idCitaCliente': idCitaCliente,
+      'idCitaCliente': citaElegida.idCitaCliente,
       'tokenWebCliente': '',
     });
     //rinicializa Firebase
@@ -1165,7 +1156,7 @@ class FirebaseProvider extends ChangeNotifier {
       } */
 
       var cliente;
-      var empleado;
+      EmpleadoModel empleado;
       var serv;
 
       if (cita['idCliente'] != "999") {
@@ -1210,8 +1201,8 @@ class FirebaseProvider extends ChangeNotifier {
       var citaFirebase = CitaModelFirebase(
         id: cita['id'],
         dia: cita['dia'],
-        horaInicio: cita['horaInicio'],
-        horaFinal: cita['horaFinal'],
+        horaInicio: DateTime.parse(cita['horaInicio']),
+        horaFinal: DateTime.parse(cita['horaFinal']),
         comentario: cita['comentario'],
         email: cita['email'],
         idcliente: cita['idCliente'],
@@ -1243,8 +1234,7 @@ class FirebaseProvider extends ChangeNotifier {
     }
 
     citasFirebase.sort((a, b) {
-      return DateTime.parse(a.horaInicio!)
-          .compareTo(DateTime.parse(b.horaInicio!));
+      return a.horaInicio!.compareTo(b.horaInicio!);
     });
     print('oooooooooooooooooooooofiltradas oooooooooooooooooooooooooo');
 
@@ -1563,7 +1553,7 @@ class FirebaseProvider extends ChangeNotifier {
     String emailnegocio,
     CitaModelFirebase cita,
   ) async {
-    DateTime horaInicio = DateTime.parse(cita.horaInicio!);
+    DateTime horaInicio = cita.horaInicio!;
 
     Map<String, dynamic> formateo =
         FormatearFechaHora.formatearFechaYHora(horaInicio);
@@ -1656,6 +1646,7 @@ class FirebaseProvider extends ChangeNotifier {
       for (var element in snapshot.docs) {
         // Si el ID del documento coincide con el ID del empleado, asignar valores
         if (element.id == idempleado) {
+          empleado.id = element.id;
           empleado.nombre = element['nombre'] ?? '';
           empleado.foto = element['foto'] ?? '';
           empleado.telefono = element['telefono'] ?? ''; // Corregido aquí

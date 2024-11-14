@@ -135,7 +135,6 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
             print(telefonoCodpais);
             print(widget.fechaCita);
             print(widget.servicio) */
-            ;
             try {
               Comunicaciones().compartirCitaWhatsapp(
                 perfilUsuarioApp,

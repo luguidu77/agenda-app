@@ -36,7 +36,7 @@ class ConfirmarStep extends StatefulWidget {
 
 class _ConfirmarStepState extends State<ConfirmarStep> {
   late CreacionCitaProvider contextoCreacionCita;
-  Map<String, dynamic> citaElegida = {};
+
   List<String> tRecordatorioGuardado = [];
   String tiempoTextoRecord = '';
   var tiempoEstablecido = RecordatoriosProvider();
@@ -101,19 +101,19 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
   guardalacita() async {
     // LLEER MICONTEXTO DE CreacionCitaProvider
     contextoCreacionCita = context.read<CreacionCitaProvider>();
-    debugPrint('cita elegida ${contextoCreacionCita.getCitaElegida}');
-    var clienta = contextoCreacionCita.getClienteElegido;
-    clientaTexto = clienta['NOMBRE'];
-    telefono = clienta['TELEFONO'];
-    email = clienta['EMAIL'];
+    debugPrint('cita elegida ${contextoCreacionCita.contextoCita.toString()}');
+    var citaElegida = contextoCreacionCita.contextoCita;
+    clientaTexto = citaElegida.nombreCliente!;
+    telefono = citaElegida.telefonoCliente!;
+    email = citaElegida.emailCliente!;
 
     List<Map<String, dynamic>> listaServicios =
         contextoCreacionCita.getServiciosElegidos;
 
-    citaElegida = contextoCreacionCita.getCitaElegida;
+    citaElegida = contextoCreacionCita.contextoCita;
 
     DateTime cita = DateTime.parse(
-      citaElegida['HORAINICIO'].toString(),
+      citaElegida.horaInicio.toString(),
     );
 
     if (tiempoTextoRecord != '') {
@@ -142,13 +142,13 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     }
 
     String fecha =
-        '${DateTime.parse(citaElegida['HORAINICIO'].toString()).day.toString().padLeft(2, '0')}/${DateTime.parse(citaElegida['HORAINICIO'].toString()).month.toString().padLeft(2, '0')}';
+        '${DateTime.parse(citaElegida.horaInicio.toString()).day.toString().padLeft(2, '0')}/${DateTime.parse(citaElegida.horaInicio.toString()).month.toString().padLeft(2, '0')}';
 
     //todo: pasar por la clase formater hora y fecha
     String textoHoraInicio =
-        '${DateTime.parse(citaElegida['HORAINICIO'].toString()).hour.toString().padLeft(2, '0')}:${DateTime.parse(citaElegida['HORAINICIO'].toString()).minute.toString().padLeft(2, '0')}';
+        '${DateTime.parse(citaElegida.horaInicio.toString()).hour.toString().padLeft(2, '0')}:${DateTime.parse(citaElegida.horaInicio.toString()).minute.toString().padLeft(2, '0')}';
     String textoHoraFinal =
-        '${DateTime.parse(citaElegida['HORAFINAL'].toString()).hour.toString().padLeft(2, '0')}:${DateTime.parse(citaElegida['HORAFINAL'].toString()).minute.toString().padLeft(2, '0')}';
+        '${DateTime.parse(citaElegida.horaFinal.toString()).hour.toString().padLeft(2, '0')}:${DateTime.parse(citaElegida.horaFinal.toString()).minute.toString().padLeft(2, '0')}';
 
     //VARIABLES PARA PRESENTARLA EN PANTALLA AL USUARIO
     //todo: SUMAR TODOS LOS SERVICIOS ELEGIDOS -------------------------------------??????
@@ -160,22 +160,22 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     horaFinalTexto = textoHoraFinal;
 
     citaConfirmadaMes =
-        (citaElegida['FECHA']).month.toString().padLeft(2, '0').toString();
+        (citaElegida.horaInicio!).month.toString().padLeft(2, '0').toString();
     citaConfirmadaDia =
-        (citaElegida['FECHA']).day.toString().padLeft(2, '0').toString();
+        (citaElegida.horaInicio!).day.toString().padLeft(2, '0').toString();
 
     //? FECHA LARGA EN ESPAÑOL
     final String fechaLargaEspa = DateFormat.MMMMEEEEd('es_ES')
         .add_jm()
-        .format(DateTime.parse(citaElegida['HORAINICIO'].toString()));
+        .format(DateTime.parse(citaElegida.horaInicio.toString()));
     // print(fechaLargaEspa);
     fechaTexto = fechaLargaEspa;
 
     fechaMesEspa = DateFormat.MMM('es_ES')
-        .format(DateTime.parse(citaElegida['HORAINICIO'].toString()));
+        .format(DateTime.parse(citaElegida.horaInicio.toString()));
     // print(fechaMesEspa); // something ago, sep...
     fechaTexto = fechaLargaEspa;
-    DateTime dateTime = citaElegida['HORAINICIO'];
+    DateTime dateTime = citaElegida.horaInicio!;
     String dateOnlyString =
         '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
 
@@ -187,15 +187,15 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         context,
         fecha,
         textoHoraInicio,
-        //citaElegida,
+        citaElegida,
         dateOnlyString,
-        citaElegida['HORAINICIO'].toString(),
-        citaElegida['HORAFINAL'].toString(),
-        citaElegida['COMENTARIO'].toString(),
-        clienta['ID'],
+        /*  citaElegida.horaInicio.toString(),
+        citaElegida.horaFinal.toString(),
+        citaElegida.comentario.toString(),
+        citaElegida.idcliente!, */
         listaServicios.map((e) => e['ID'].toString()).toList(),
-        clienta['NOMBRE'],
-        clienta['TELEFONO'],
+        /*  citaElegida.nombreCliente!,
+        citaElegida.telefonoCliente!, */
         listaServicios.first['SERVICIO'],
         precioTexto,
         idCitaCliente);
@@ -210,7 +210,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
     // Formatear la fecha al formato deseado
     Map<String, dynamic> resultado =
-        formatearFechaYHora(citaElegida['HORAINICIO']);
+        formatearFechaYHora(citaElegida.horaInicio!);
 
     String fechaFormateada = resultado['fechaFormateada'];
     String horaFormateada = resultado['horaFormateada'];
@@ -238,12 +238,12 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
       //******************************************('AGREGA LA CITA AL CLIENTE')****************
       await FirebaseProvider().creaNuevacitaAdministracionCliente(
         negocio,
-        citaElegida['HORAINICIO'],
+        citaElegida.horaInicio,
         fechaFormateada,
         horaFormateada,
         duracion,
         servicios,
-        clienta['EMAIL'],
+        citaElegida.emailCliente!,
         idCitaCliente,
         precioTexto,
       );
@@ -278,6 +278,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
   @override
   Widget build(BuildContext context) {
+    final contextoCreacionCita = context.read<CreacionCitaProvider>();
+    final citaElegida = contextoCreacionCita.contextoCita;
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
@@ -338,7 +340,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
                                 cliente: clientaTexto,
                                 telefono: telefono,
                                 email: email,
-                                fechaCita: citaElegida['HORAINICIO'].toString(),
+                                fechaCita: citaElegida.horaInicio.toString(),
                                 servicio: servicioTexto,
                                 precio: precioTexto),
                             const SizedBox(height: 20),
@@ -381,52 +383,49 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
       context,
       fechaTexto,
       horaIniciotexto,
-      //CitaListProvider citaElegida,
+      CitaModelFirebase citaElegida,
       String fecha,
-      String horaInicio,
+      /* String horaInicio,
       String horaFinal,
       String comentario,
-      var idCliente,
+      var idCliente, */
       List<String> idServicios,
-      String nombreCliente,
-      String telefonoCliente,
+      /* String nombreCliente,
+      String telefonoCliente, */
       String nombreServicio,
       String precio,
       idCitaCliente) async {
     String title = 'Tienes cita $fechaTexto-$horaIniciotexto h';
     String body =
-        '$nombreCliente se va a hacer $nombreServicio ¡ganarás $precio ! 🤑';
+        '${citaElegida.nombreCliente} se va a hacer $nombreServicio ¡ganarás $precio ! 🤑';
     debugPrint('hora recordatorio $horaRecordatorio');
     debugPrint('hora actual ${DateTime.now().toString()}');
 
     int idCita = 0;
     if (_iniciadaSesionUsuario) {
-      String idEmpleado = '55';
+      List<Map<String, dynamic>> servicios =
+          contextoCreacionCita.getServiciosElegidos;
+
+      List<String> idServicios = servicios.map((ser) {
+        return ser['ID'].toString();
+      }).toList();
+
       //###### CREA CITA Y TRAE ID CITA CREADA EN FIREBASE PARA ID DEL RECORDATORIO
-      idCita = await FirebaseProvider().nuevaCita(
-          _emailSesionUsuario,
-          fecha,
-          horaInicio,
-          horaFinal,
-          precio,
-          comentario,
-          idCliente,
-          idServicios,
-          idEmpleado,
-          idCitaCliente);
+      idCita = await FirebaseProvider()
+          .nuevaCita(_emailSesionUsuario, citaElegida, idServicios);
 
       //###### CREA RECORDATORIO EN FIREBASE //######//######//######//######
       await FirebaseProvider().creaRecordatorio(
           _emailSesionUsuario,
           fecha,
-          horaInicio,
+          citaElegida.horaInicio.toString(),
           precio,
-          comentario,
-          nombreCliente,
-          telefonoCliente,
+          citaElegida.comentario!,
+          citaElegida.nombreCliente!,
+          citaElegida.telefonoCliente!,
           email,
           idServicios,
-          idEmpleado,
+          citaElegida.idEmpleado!,
           idCitaCliente);
     } else {
       /*   print('id servicio sin sesion ***********************************');

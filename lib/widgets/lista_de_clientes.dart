@@ -1,4 +1,3 @@
-import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -7,7 +6,6 @@ import 'package:skeletons/skeletons.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
 import '../screens/creacion_citas/provider/creacion_cita_provider.dart';
-import '../screens/creacion_citas/style/.estilos_creacion_cita.dart';
 import '../screens/creacion_citas/utils/menu_config_cliente.dart';
 
 class ListaClientes extends StatefulWidget {
@@ -29,7 +27,6 @@ class ListaClientes extends StatefulWidget {
 }
 
 class _ListaClientesState extends State<ListaClientes> {
-  late CreacionCitaProvider contextoCreacionCita;
   final estilo = const TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
 
   late bool _iniciadaSesionUsuario;
@@ -58,7 +55,6 @@ class _ListaClientesState extends State<ListaClientes> {
 
   @override
   Widget build(BuildContext context) {
-    contextoCreacionCita = context.read<CreacionCitaProvider>();
     return _listaClientes(widget.fecha);
   }
 
@@ -149,28 +145,32 @@ class _ListaClientesState extends State<ListaClientes> {
   }
 
   verclientes(
-      BuildContext context, List<ClienteModel> listaClientes, fechaCita) {
+    BuildContext context,
+    List<ClienteModel> listaClientes,
+    DateTime fechaCita,
+  ) {
     const double width = 80;
     const double height = 80;
     return ListView.builder(
       itemCount: listaClientes.length,
       itemBuilder: (context, index) {
+        final edicionCita = CitaModelFirebase(
+          dia: fechaCita.toString(),
+          horaInicio: fechaCita,
+          idcliente: listaClientes[index].id.toString(),
+          nombreCliente: listaClientes[index].nombre.toString(),
+          telefonoCliente: listaClientes[index].telefono.toString(),
+          emailCliente: listaClientes[index].email.toString(),
+          fotoCliente: listaClientes[index].foto.toString(),
+        );
         return GestureDetector(
           // Navegación al seleccionar un cliente
           onTap: widget.pantalla == 'creacion_cita'
               ? () {
-                  contextoCreacionCita.setCitaElegida = {
-                    'FECHA': fechaCita,
-                    'HORAINICIO': fechaCita,
-                    'HORAFINAL': '',
-                  };
-                  contextoCreacionCita.setClienteElegido = {
-                    'ID': listaClientes[index].id.toString(),
-                    'NOMBRE': listaClientes[index].nombre.toString(),
-                    'TELEFONO': listaClientes[index].telefono.toString(),
-                    'EMAIL': listaClientes[index].email.toString(),
-                    'FOTO': listaClientes[index].foto.toString(),
-                  };
+                  final contextoCreacionCita =
+                      context.read<CreacionCitaProvider>();
+                  contextoCreacionCita.setContextoCita(edicionCita);
+
                   Navigator.pushNamed(context, 'creacionCitaServicio',
                       arguments: listaClientes[index]);
                 }

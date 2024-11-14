@@ -1,4 +1,3 @@
-import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 
 import 'package:flutter/material.dart';
@@ -6,7 +5,6 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/providers.dart';
-import '../../screens/screens.dart';
 
 class BotonSpeedDial extends StatefulWidget {
   const BotonSpeedDial({Key? key}) : super(key: key);

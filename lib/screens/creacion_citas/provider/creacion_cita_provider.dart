@@ -1,6 +1,44 @@
+import 'package:agendacitas/models/cita_model.dart';
 import 'package:flutter/material.dart';
 
 class CreacionCitaProvider extends ChangeNotifier {
+  CitaModelFirebase _contextoCita = CitaModelFirebase();
+
+  CitaModelFirebase get contextoCita => _contextoCita;
+
+  setContextoCita(CitaModelFirebase edicionContextoCita) {
+    // Actualizar solo los campos que no sean null en edicionContextoCita
+    _contextoCita = CitaModelFirebase(
+      id: edicionContextoCita.id ?? _contextoCita.id,
+      dia: edicionContextoCita.dia ?? _contextoCita.dia,
+      horaInicio: edicionContextoCita.horaInicio ?? _contextoCita.horaInicio,
+      horaFinal: edicionContextoCita.horaFinal ?? _contextoCita.horaFinal,
+      comentario: edicionContextoCita.comentario ?? _contextoCita.comentario,
+      email: edicionContextoCita.email ?? _contextoCita.email,
+      idcliente: edicionContextoCita.idcliente ?? _contextoCita.idcliente,
+      idservicio: edicionContextoCita.idservicio ?? _contextoCita.idservicio,
+      servicios: edicionContextoCita.servicios ?? _contextoCita.servicios,
+      idEmpleado: edicionContextoCita.idEmpleado ?? _contextoCita.idEmpleado,
+      nombreEmpleado:
+          edicionContextoCita.nombreEmpleado ?? _contextoCita.nombreEmpleado,
+      precio: edicionContextoCita.precio ?? _contextoCita.precio,
+      confirmada: edicionContextoCita.confirmada ?? _contextoCita.confirmada,
+      tokenWebCliente:
+          edicionContextoCita.tokenWebCliente ?? _contextoCita.tokenWebCliente,
+      idCitaCliente:
+          edicionContextoCita.idCitaCliente ?? _contextoCita.idCitaCliente,
+      nombreCliente:
+          edicionContextoCita.nombreCliente ?? _contextoCita.nombreCliente,
+      fotoCliente: edicionContextoCita.fotoCliente ?? _contextoCita.fotoCliente,
+      telefonoCliente:
+          edicionContextoCita.telefonoCliente ?? _contextoCita.telefonoCliente,
+      emailCliente:
+          edicionContextoCita.emailCliente ?? _contextoCita.emailCliente,
+      notaCliente: edicionContextoCita.notaCliente ?? _contextoCita.notaCliente,
+    );
+
+    notifyListeners();
+  }
   // CONTEXTO servicioElegido ############################
 
 /*   Map<String, dynamic> _servicioElegido = {
@@ -42,7 +80,7 @@ class CreacionCitaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // CONTEXTO citaElegida ############################
+/*   // CONTEXTO citaElegida ############################
   Map<String, dynamic> _citaElegida = {
     'FECHA': '',
     'HORAINICIO': '',
@@ -72,5 +110,5 @@ class CreacionCitaProvider extends ChangeNotifier {
   set setClienteElegido(Map<String, dynamic> nuevoCliente) {
     _clienteElegido = nuevoCliente;
     notifyListeners();
-  }
+  } */
 }

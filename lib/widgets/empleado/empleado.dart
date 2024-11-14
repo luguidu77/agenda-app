@@ -1,6 +1,10 @@
+import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart';
 
 class EmpleadoWidget extends StatelessWidget {
   final String emailUsuario;
@@ -34,6 +38,8 @@ class EmpleadoWidget extends StatelessWidget {
 
         // Mostrar los datos del empleado una vez que están listos
         if (snapshot.hasData) {
+          final contextoCreacionCita = context.watch<CreacionCitaProvider>();
+
           EmpleadoModel empleado = snapshot.data!;
           return Padding(
             padding: const EdgeInsets.all(8.0),
@@ -42,22 +48,38 @@ class EmpleadoWidget extends StatelessWidget {
               children: [
                 const SizedBox(width: 16),
                 // Mostrar la foto del empleado si existe
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                        color: Colors.black, width: 2), // Contorno negro
+                InkWell(
+                  onTap: () {
+                    CitaModelFirebase edicionCita =
+                        CitaModelFirebase(idEmpleado: empleado.id);
+                    contextoCreacionCita.setContextoCita(edicionCita);
+                    debugPrint(
+                        'agregado el empleado al contexto de la Creacion de la cita: ${empleado.nombre}');
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                          color: empleado.id ==
+                                  contextoCreacionCita.contextoCita.idEmpleado
+                              ? const Color.fromARGB(255, 2, 78, 139)
+                              : Colors.black,
+                          width: empleado.id ==
+                                  contextoCreacionCita.contextoCita.idEmpleado
+                              ? 6
+                              : 2), // Contorno negro
+                    ),
+                    child: empleado.foto.isNotEmpty
+                        ? CircleAvatar(
+                            radius: 20,
+                            backgroundImage: NetworkImage(empleado.foto),
+                          )
+                        : const CircleAvatar(
+                            radius: 20,
+                            backgroundImage:
+                                AssetImage('assets/images/nofoto.jpg'),
+                          ),
                   ),
-                  child: empleado.foto.isNotEmpty
-                      ? CircleAvatar(
-                          radius: 20,
-                          backgroundImage: NetworkImage(empleado.foto),
-                        )
-                      : const CircleAvatar(
-                          radius: 20,
-                          backgroundImage:
-                              AssetImage('assets/images/nofoto.jpg'),
-                        ),
                 ),
                 const SizedBox(height: 4),
                 Text(

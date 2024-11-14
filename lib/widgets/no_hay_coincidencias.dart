@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class NoNotificationsContainer extends StatelessWidget {
+  const NoNotificationsContainer({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Padding(

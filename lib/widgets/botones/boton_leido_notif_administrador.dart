@@ -1,9 +1,5 @@
-import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
-
 import 'package:agendacitas/utils/utils.dart';
 import 'package:flutter/material.dart';
-
-import '../../providers/Firebase/notificaciones.dart';
 
 class BotoLeidoNotifAdministrador extends StatefulWidget {
   final Map<String, dynamic> notificacion;

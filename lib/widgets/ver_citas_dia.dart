@@ -296,8 +296,15 @@ class _ListaCitasState extends State<ListaCitas> {
         children: [
           Row(children: [
             const SizedBox(
-              // separacion izquierda de los circulos cambio de vista y empleados
+              // separacion izquierda de los circulos Todos los empleados y empleados
               width: 40,
+            ),
+            const SkeletonAvatar(
+              style: SkeletonAvatarStyle(
+                shape: BoxShape.circle,
+                width: 50,
+                height: 50,
+              ),
             ),
 
             //// circulos segun numero de empleados
@@ -383,9 +390,7 @@ class _ListaCitasState extends State<ListaCitas> {
 
             listaFiltradaAux.addAll(data);
             for (var element in listaFiltradaAux) {
-              if (DateTime.parse(element.horaInicio!)
-                  .toUtc()
-                  .isAfter(ahoraUtcLocal)) {
+              if ((element.horaInicio!).toUtc().isAfter(ahoraUtcLocal)) {
                 listaFiltrada.add(element);
               }
             }

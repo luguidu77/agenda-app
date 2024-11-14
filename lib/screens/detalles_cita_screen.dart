@@ -160,20 +160,33 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // BOTON CONFIRMAR DE LA CITA---------------------------------------------
                 _buildConfirmationButton(),
+                // CLIENTE DE LA CITA-----------------------------------------------------
                 _ClienteInfoWidget(reserva: widget.reserva),
+                // EMPLEADO ASIGNADO DE LA CITA-------------------------------------------
                 _EmpleadoInfoWidget(reserva: widget.reserva),
+
+                // FECHA DE LA CITA ------------------------------------------------------
                 Text(widget.fechaLarga,
                     style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white)),
                 const SizedBox(height: 10),
+
+                // SERVICIOS DE LA CITA----------------------------------------------------
+                Text('servicios: ${widget.reserva['servicios']}',
+                    style:
+                        const TextStyle(fontSize: 14, color: Colors.white54)),
+                // PRECIO DE LA CITA------------------------------------------------------
                 Text(
                   'PRECIO: ${widget.reserva['precio']} ${widget.personaliza.moneda}',
                   style: const TextStyle(fontSize: 16, color: Colors.white70),
                 ),
                 const SizedBox(height: 10),
+
+                // NOTAS DE LA CITA---------------------------
                 Text('Notas: ${widget.reserva['comentario']}',
                     style:
                         const TextStyle(fontSize: 14, color: Colors.white54)),
@@ -366,7 +379,8 @@ class EmpleadoAvatar extends StatelessWidget {
   final EmpleadoModel empleado;
   final bool esFichaEmpleado;
 
-  const EmpleadoAvatar({required this.empleado, this.esFichaEmpleado = false});
+  const EmpleadoAvatar(
+      {super.key, required this.empleado, this.esFichaEmpleado = false});
 
   @override
   Widget build(BuildContext context) {
@@ -387,9 +401,9 @@ class EmpleadoAvatar extends StatelessWidget {
               style: const TextStyle(
                   color: Colors.white, fontWeight: FontWeight.bold),
             ),
-            if (esFichaEmpleado && empleado.telefono != null)
+            if (esFichaEmpleado)
               Text(
-                empleado.telefono!,
+                empleado.telefono,
                 style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
           ],
@@ -402,7 +416,7 @@ class EmpleadoAvatar extends StatelessWidget {
 class TarjetaCliente extends StatelessWidget {
   final Map<String, dynamic> cliente;
 
-  const TarjetaCliente({required this.cliente, required reserva});
+  const TarjetaCliente({super.key, required this.cliente, required reserva});
 
   @override
   Widget build(BuildContext context) {

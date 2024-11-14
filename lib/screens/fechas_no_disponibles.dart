@@ -306,9 +306,18 @@ class _FechasNoDisponiblesState extends State<FechasNoDisponibles> {
 
 //? solo se guarda UN DIA , por lo que antes debo programar para guardar cada dia,desde fecha inicio hasta fecha fin
     if (_iniciadaSesionUsuario) {
+      final citaEdicion = CitaModelFirebase(
+          dia: fecha,
+          horaInicio: horaInicio,
+          horaFinal: horaFinal,
+          comentario: comentario,
+          idcliente: idCliente,
+          idservicio: idServicio,
+          idEmpleado: 'idEmpleado',
+          idCitaCliente: '');
       //SI HAY INICIADA SESION SE GUARDA EN FIREBASE
-      await FirebaseProvider().nuevaCita(_emailSesionUsuario, fecha, horaInicio,
-          horaFinal, '', comentario, idCliente, idServicio, 'idEmpleado', '');
+      await FirebaseProvider()
+          .nuevaCita(_emailSesionUsuario, citaEdicion, idServicio);
     } else {
       //SI NO HAY INICIADA SESION SE GUARDA EN DISPOSITIVO
       var citaElegida = Provider.of<CitaListProvider>(context, listen: false);

@@ -1,4 +1,3 @@
-import 'package:agendacitas/models/cita_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:twilio_flutter/twilio_flutter.dart';

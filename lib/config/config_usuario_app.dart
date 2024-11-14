@@ -3,7 +3,6 @@ import 'package:agendacitas/providers/Firebase/firebase_publicacion_online.dart'
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';

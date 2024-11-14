@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:agendacitas/models/pago_model.dart';
-import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/models/plan_amigo_model.dart';
 import 'package:agendacitas/models/recordatorio_model.dart';
 import 'package:agendacitas/models/tema_model.dart';

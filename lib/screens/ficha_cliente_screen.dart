@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/screens/nuevo_actualizacion_cliente.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
@@ -12,7 +11,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
 
-import '../models/personaliza_model.dart';
 import '../providers/providers.dart';
 import '../utils/utils.dart';
 

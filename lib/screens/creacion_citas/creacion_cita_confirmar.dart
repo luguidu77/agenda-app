@@ -1,4 +1,3 @@
-import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_resumen.dart';
 import 'package:agendacitas/screens/creacion_citas/servicios_creacion_cita.dart';
 import 'package:agendacitas/utils/utils.dart';
@@ -29,7 +28,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
   late PersonalizaProviderFirebase personalizaProvider;
   PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
   late CreacionCitaProvider contextoCreacionCita;
-  ClienteModel cliente = ClienteModel();
+
   bool _iniciadaSesionUsuario =
       false; // ?  VARIABLE PARA VERIFICAR SI HAY USUARIO CON INCIO DE SESION
   Color colorBotonFlecha = Colors.blueGrey;
@@ -50,13 +49,10 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
   Widget build(BuildContext context) {
     // LLEER MICONTEXTO DE CreacionCitaProvider
     contextoCreacionCita = context.read<CreacionCitaProvider>();
+    CitaModelFirebase citaElegida = contextoCreacionCita.contextoCita;
     // TRAE CONTEXTO PERSONALIZA ( MONEDA )
     personalizaProvider = context.read<PersonalizaProviderFirebase>();
     personaliza = personalizaProvider.getPersonaliza;
-
-    cliente.nombre = contextoCreacionCita.getClienteElegido['NOMBRE'];
-    cliente.telefono = contextoCreacionCita.getClienteElegido['TELEFONO'];
-    cliente.foto = contextoCreacionCita.getClienteElegido['FOTO'];
 
     Color color = Theme.of(context).primaryColor;
 
@@ -76,7 +72,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                     //Text( 'SERVICIOS : ${contextoCreacionCita.getServiciosElegidos}'),
                     _barraProgreso().progreso(context, 0.90, Colors.amber),
                     const SizedBox(height: 20),
-                    _vercliente(context, cliente),
+                    _vercliente(context, citaElegida),
                     const SizedBox(height: 15),
                     _agregaNotas(),
                     const SizedBox(height: 15),
@@ -117,12 +113,12 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
         Column(
           children: [
             Text(DateFormat.MMMMEEEEd('es_ES').format(DateTime.parse(
-                contextoCreacionCita.getCitaElegida['FECHA'].toString()))),
+                contextoCreacionCita.contextoCita.dia.toString()))),
             Row(
               children: [
                 Text(
                   DateFormat.Hm('es_ES').format(DateTime.parse(
-                      contextoCreacionCita.getCitaElegida['FECHA'].toString())),
+                      contextoCreacionCita.contextoCita.dia.toString())),
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
@@ -220,7 +216,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
     );
   }
 
-  _vercliente(context, ClienteModel cliente) {
+  _vercliente(context, CitaModelFirebase citaElegida) {
     return Card(
       child: ClipRect(
         child: SizedBox(
@@ -228,26 +224,27 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
           child: Column(
             children: [
               ListTile(
-                leading: _emailSesionUsuario != '' && cliente.foto != ''
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(150.0),
-                        child: Image.network(
-                          cliente.foto!,
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                        ))
-                    : ClipRRect(
-                        borderRadius: BorderRadius.circular(150.0),
-                        child: Image.asset(
-                          "./assets/images/nofoto.jpg",
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                title: Text(cliente.nombre!.toString()),
-                subtitle: Text(cliente.telefono!.toString()),
+                leading:
+                    _emailSesionUsuario != '' && citaElegida.fotoCliente != ''
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(150.0),
+                            child: Image.network(
+                              citaElegida.fotoCliente.toString(),
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            ))
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(150.0),
+                            child: Image.asset(
+                              "./assets/images/nofoto.jpg",
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                title: Text(citaElegida.nombreCliente.toString()),
+                subtitle: Text(citaElegida.telefonoCliente.toString()),
               ),
             ],
           ),
@@ -382,15 +379,22 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
     totalTiempo = sumarTiempo(tiempos);
 
     // SUMA A HORA DE INICIO EL TIEMPO DEL O LOS SERVICIOS
-    horainicio = contextoCreacionCita.getCitaElegida['HORAINICIO'];
+    horainicio = contextoCreacionCita.contextoCita.horaInicio!;
     horafinal = horainicio.add(sumaTiempos);
 
     //actualiza contexto de la cita
-    contextoCreacionCita.setCitaElegida = {
+    CitaModelFirebase edicionCita = CitaModelFirebase(
+      dia: contextoCreacionCita.contextoCita.dia,
+      horaInicio: horainicio,
+      horaFinal: horafinal,
+    );
+    contextoCreacionCita.setContextoCita(edicionCita);
+
+    /*   contextoCreacionCita.setCitaElegida = {
       'FECHA': contextoCreacionCita.getCitaElegida['FECHA'],
       'HORAINICIO': horainicio,
       'HORAFINAL': horafinal
-    };
+    }; */
 
     setState(() {});
   }
@@ -411,7 +415,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
     );
   }
 
-  TextEditingController comentarioController = TextEditingController();
+  TextEditingController comentarioController = TextEditingController(text: '');
 
   bool _visible = false;
   late String textoNotas = '';
@@ -419,9 +423,9 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
   _agregaNotas() {
     // LLEER MICONTEXTO DE CreacionCitaProvider
     contextoCreacionCita = context.read<CreacionCitaProvider>();
-    // inicializo COMENTARIO A '' PARA QUE NO QUEDE EN NULL
-    contextoCreacionCita.getCitaElegida['COMENTARIO'] =
-        comentarioController.text;
+    CitaModelFirebase citaEdicion =
+        CitaModelFirebase(comentario: comentarioController.text);
+    contextoCreacionCita.setContextoCita(citaEdicion);
 
     return Card(
       child: ClipRect(
@@ -463,8 +467,8 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                       setState(() {
                         textoNotas = comentarioController.text;
                       });
-                      contextoCreacionCita.getCitaElegida['COMENTARIO'] =
-                          comentarioController.text;
+                      /*  contextoCreacionCita.contextoCita.comentario =
+                          comentarioController.text; */
                     },
                     controller: comentarioController,
                     decoration: const InputDecoration(

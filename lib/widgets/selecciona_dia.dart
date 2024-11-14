@@ -83,7 +83,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SizedBox(
+          const SizedBox(
             height: 50,
           ),
           //SELECCION DE DIA //////////////////////////////////
@@ -114,7 +114,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
                   label: const Text(''))
             ]),
           ),
-          SizedBox(
+          const SizedBox(
             height: 30,
           ),
           //SELECCION DE HORA//////////////////////////////////

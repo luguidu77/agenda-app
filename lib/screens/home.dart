@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_cliente.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_confirmar.dart';
@@ -8,8 +6,6 @@ import 'package:agendacitas/screens/detalles_cita_screen.dart';
 import 'package:agendacitas/screens/notificaciones_screen.dart';
 
 import 'package:agendacitas/screens/servicios_screen.dart';
-import 'package:agendacitas/utils/alertasSnackBar.dart';
-import 'package:agendacitas/utils/notificaciones/recordatorio_local/recordatorio_local.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';

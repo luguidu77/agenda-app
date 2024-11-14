@@ -72,8 +72,8 @@ class ActualizacionCita {
     newCita.email = cita['email'];
     newCita.id = cita['id'];
     newCita.dia = textoFecha;
-    newCita.horaInicio = textoFechaHoraInicio;
-    newCita.horaFinal = textoFechaHoraFinal;
+    newCita.horaInicio = nuevaHoraDateTime;
+    newCita.horaFinal = DateTime.parse(textoFechaHoraFinal);
     newCita.comentario =
         cita['comentario'] + ' 🔃​'; //todo añadir un nuevo campo REPROGRAMACION
     newCita.idcliente = cita['idCliente'];

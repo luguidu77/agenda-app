@@ -1149,9 +1149,18 @@ class _BotonGuardarState extends State<BotonGuardar> {
         child: InkWell(
             onTap: condicionBotonActivado()
                 ? () async {
+                    final citaEdicion = CitaModelFirebase(
+                        dia: dia,
+                        horaInicio: horaInicio,
+                        horaFinal: horaFin,
+                        comentario: textoTitulo,
+                        idcliente: '999',
+                        idEmpleado: 'idEmpleado',
+                        idCitaCliente: '');
+
                     await FirebaseProvider().nuevaCita(
-                        _emailSesionUsuario,
-                        dia,
+                        _emailSesionUsuario, citaEdicion, ['indispuesto']
+                        /*   dia,
                         horaInicioTexto,
                         horaFinTexto,
                         '0', // precio
@@ -1159,7 +1168,7 @@ class _BotonGuardarState extends State<BotonGuardar> {
                         '999', // idcliente
                         ['indispuesto'], // idServicio
                         'idEmpleado',
-                        '' // idCitaCliente
+                        '' // idCitaCliente */
                         );
 
                     cerrar();

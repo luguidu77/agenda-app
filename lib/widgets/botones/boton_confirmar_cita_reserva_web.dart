@@ -1,9 +1,5 @@
-import 'package:agendacitas/models/cita_model.dart';
-import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
-import 'package:agendacitas/providers/Firebase/notificaciones.dart';
 import 'package:agendacitas/providers/providers.dart';
 
-import 'package:agendacitas/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

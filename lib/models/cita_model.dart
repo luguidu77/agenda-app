@@ -77,8 +77,8 @@ class CitaModel {
 class CitaModelFirebase {
   var id;
   String? dia;
-  String? horaInicio;
-  String? horaFinal;
+  DateTime? horaInicio;
+  DateTime? horaFinal;
   String? comentario;
   String? email;
   String? idcliente;
@@ -98,29 +98,51 @@ class CitaModelFirebase {
   String? emailCliente;
   String? notaCliente;
 
-  CitaModelFirebase({
-    this.id,
-    this.dia,
-    this.horaInicio,
-    this.horaFinal,
-    this.comentario,
-    this.email,
-    this.idcliente,
-    this.idservicio,
-    this.servicios,
-    this.idEmpleado,
-    this.nombreEmpleado,
-    this.precio,
-    this.confirmada,
-    this.tokenWebCliente,
-    this.idCitaCliente,
-    // Inicialización de los nuevos campos
-    this.nombreCliente,
-    this.fotoCliente,
-    this.telefonoCliente,
-    this.emailCliente,
-    this.notaCliente,
-  });
+  CitaModelFirebase(
+      {this.id,
+      this.dia,
+      this.horaInicio,
+      this.horaFinal,
+      this.comentario,
+      this.email,
+      this.idcliente,
+      this.idservicio,
+      this.servicios,
+      this.idEmpleado,
+      this.nombreEmpleado,
+      this.precio,
+      this.confirmada,
+      this.tokenWebCliente,
+      this.idCitaCliente,
+      // Inicialización de los nuevos campos
+      this.nombreCliente,
+      this.fotoCliente,
+      this.telefonoCliente,
+      this.emailCliente,
+      this.notaCliente});
+
+  void actualizarParcialmente(CitaModelFirebase nuevosDatos) {
+    id = nuevosDatos.id ?? id;
+    dia = nuevosDatos.dia ?? dia;
+    horaInicio = nuevosDatos.horaInicio ?? horaInicio;
+    horaFinal = nuevosDatos.horaFinal ?? horaFinal;
+    comentario = nuevosDatos.comentario ?? comentario;
+    email = nuevosDatos.email ?? email;
+    idcliente = nuevosDatos.idcliente ?? idcliente;
+    idservicio = nuevosDatos.idservicio ?? idservicio;
+    servicios = nuevosDatos.servicios ?? servicios;
+    idEmpleado = nuevosDatos.idEmpleado ?? idEmpleado;
+    nombreEmpleado = nuevosDatos.nombreEmpleado ?? nombreEmpleado;
+    precio = nuevosDatos.precio ?? precio;
+    confirmada = nuevosDatos.confirmada ?? confirmada;
+    tokenWebCliente = nuevosDatos.tokenWebCliente ?? tokenWebCliente;
+    idCitaCliente = nuevosDatos.idCitaCliente ?? idCitaCliente;
+    nombreCliente = nuevosDatos.nombreCliente ?? nombreCliente;
+    fotoCliente = nuevosDatos.fotoCliente ?? fotoCliente;
+    telefonoCliente = nuevosDatos.telefonoCliente ?? telefonoCliente;
+    emailCliente = nuevosDatos.emailCliente ?? emailCliente;
+    notaCliente = nuevosDatos.notaCliente ?? notaCliente;
+  }
 
   factory CitaModelFirebase.fromJson(Map<String, dynamic> json) =>
       CitaModelFirebase(

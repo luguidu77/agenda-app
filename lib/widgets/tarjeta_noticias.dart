@@ -19,7 +19,7 @@ class TarjetaNoticias extends StatefulWidget {
 }
 
 class _TarjetaNoticiasState extends State<TarjetaNoticias> {
-  bool _visto = false;
+  final bool _visto = false;
   List<dynamic> pruebas = [];
 
   @override

@@ -387,14 +387,9 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
       dia: contextoCreacionCita.contextoCita.dia,
       horaInicio: horainicio,
       horaFinal: horafinal,
+      precio: totalPrecio.toString(),
     );
     contextoCreacionCita.setContextoCita(edicionCita);
-
-    /*   contextoCreacionCita.setCitaElegida = {
-      'FECHA': contextoCreacionCita.getCitaElegida['FECHA'],
-      'HORAINICIO': horainicio,
-      'HORAFINAL': horafinal
-    }; */
 
     setState(() {});
   }

@@ -102,15 +102,20 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     // LLEER MICONTEXTO DE CreacionCitaProvider
     contextoCreacionCita = context.read<CreacionCitaProvider>();
     debugPrint('cita elegida ${contextoCreacionCita.contextoCita.toString()}');
-    var citaElegida = contextoCreacionCita.contextoCita;
+    // GENERO UN ID PARA LA CITA(idCitaCliente); // Ejemplo: b7gjR3jNuMRomunRo6SJ
+    String idCitaCliente = generarCadenaAleatoria(20);
+    // GUARDA EN EL CONTEXTO DE LA CITA
+    CitaModelFirebase edicionCita =
+        CitaModelFirebase(idCitaCliente: idCitaCliente);
+    contextoCreacionCita.setContextoCita(edicionCita);
+
+    CitaModelFirebase citaElegida = contextoCreacionCita.contextoCita;
     clientaTexto = citaElegida.nombreCliente!;
     telefono = citaElegida.telefonoCliente!;
     email = citaElegida.emailCliente!;
 
     List<Map<String, dynamic>> listaServicios =
         contextoCreacionCita.getServiciosElegidos;
-
-    citaElegida = contextoCreacionCita.contextoCita;
 
     DateTime cita = DateTime.parse(
       citaElegida.horaInicio.toString(),
@@ -179,9 +184,6 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     String dateOnlyString =
         '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
 
-    // GENERO UN ID PARA LA CITA(idCitaCliente); // Ejemplo: b7gjR3jNuMRomunRo6SJ
-    String idCitaCliente = generarCadenaAleatoria(20);
-
     //GRABA LA CITA EN EL NEGOCIO
     await grabarCita(
         context,
@@ -197,8 +199,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         /*  citaElegida.nombreCliente!,
         citaElegida.telefonoCliente!, */
         listaServicios.first['SERVICIO'],
-        precioTexto,
-        idCitaCliente);
+        precioTexto);
 
     //* CLIENTE : comprobar si el cliente tiene cuenta en la web para agregarle la cita
 
@@ -380,21 +381,21 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
   }
 
   grabarCita(
-      context,
-      fechaTexto,
-      horaIniciotexto,
-      CitaModelFirebase citaElegida,
-      String fecha,
-      /* String horaInicio,
+    context,
+    fechaTexto,
+    horaIniciotexto,
+    CitaModelFirebase citaElegida,
+    String fecha,
+    /* String horaInicio,
       String horaFinal,
       String comentario,
       var idCliente, */
-      List<String> idServicios,
-      /* String nombreCliente,
+    List<String> idServicios,
+    /* String nombreCliente,
       String telefonoCliente, */
-      String nombreServicio,
-      String precio,
-      idCitaCliente) async {
+    String nombreServicio,
+    String precio,
+  ) async {
     String title = 'Tienes cita $fechaTexto-$horaIniciotexto h';
     String body =
         '${citaElegida.nombreCliente} se va a hacer $nombreServicio ¡ganarás $precio ! 🤑';
@@ -425,8 +426,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
           citaElegida.telefonoCliente!,
           email,
           idServicios,
-          citaElegida.idEmpleado!,
-          idCitaCliente);
+          citaElegida.idEmpleado!);
     } else {
       /*   print('id servicio sin sesion ***********************************');
       print(idServicio); */

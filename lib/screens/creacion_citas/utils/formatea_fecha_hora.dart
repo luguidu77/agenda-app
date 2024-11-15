@@ -22,3 +22,9 @@ String formatearHora(String hora) {
     return '$minutos minutos';
   }
 }
+
+// formato campo dia de las citas agendacitasapp
+String formatearFechaDiaCita(DateTime fechaOriginal) {
+  // Formatear la fecha en el formato deseado // fecha formateada para FIREBASE
+  return DateFormat('yyyy-MM-dd').format(fechaOriginal); // "2020-11-12"
+}

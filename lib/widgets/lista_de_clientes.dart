@@ -1,3 +1,4 @@
+import 'package:agendacitas/screens/creacion_citas/utils/formatea_fecha_hora.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -155,7 +156,7 @@ class _ListaClientesState extends State<ListaClientes> {
       itemCount: listaClientes.length,
       itemBuilder: (context, index) {
         final edicionCita = CitaModelFirebase(
-          dia: fechaCita.toString(),
+          dia: formatearFechaDiaCita(fechaCita), // "2020-11-12"
           horaInicio: fechaCita,
           idcliente: listaClientes[index].id.toString(),
           nombreCliente: listaClientes[index].nombre.toString(),

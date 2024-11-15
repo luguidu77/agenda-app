@@ -487,17 +487,17 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
                   _emailSesionUsuario,
                 );
                 await FirebaseProvider().creaRecordatorio(
-                    usuarioAP,
-                    fecha,
-                    horaInicioProgramable.toString(),
-                    'precio',
-                    'comentariocita',
-                    'nombrecliente',
-                    'telefonocliente',
-                    'emailcliente',
-                    ['PJg5m6iQQw3btkv1H4EX'],
-                    'idempleado',
-                    cita.id);
+                  usuarioAP,
+                  fecha,
+                  horaInicioProgramable.toString(),
+                  'precio',
+                  'comentariocita',
+                  'nombrecliente',
+                  'telefonocliente',
+                  'emailcliente',
+                  ['PJg5m6iQQw3btkv1H4EX'],
+                  'idempleado',
+                );
                 snackbar();
               } else {
                 //reprogramacion de fecha y hora de la cita

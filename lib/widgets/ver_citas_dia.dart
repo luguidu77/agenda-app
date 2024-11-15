@@ -33,6 +33,7 @@ class ListaCitas extends StatefulWidget {
 class _ListaCitasState extends State<ListaCitas> {
   late PersonalizaProviderFirebase personalizaProvider;
   PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
+  List<EmpleadoModel> empleados = [];
 
   DateFormat dateFormat = DateFormat("yyyy-MM-dd");
   getpersonaliza() {
@@ -46,6 +47,7 @@ class _ListaCitasState extends State<ListaCitas> {
   @override
   void initState() {
     getpersonaliza();
+    getEmpleados();
     super.initState();
   }
 
@@ -58,18 +60,18 @@ class _ListaCitasState extends State<ListaCitas> {
     // CITAS SEGUN SELECCION FILTRO (TODAS, SOLO PENDIENTES)
     if (widget.filter == 'TODAS') {
       //no hay aplicado filtro o filtro TODAS , VISUALIZA TODAS LAS CITAS
-      return todasLasCitas(fecha);
+      return todasLasCitas(fecha, empleados);
     } else if (widget.filter == 'PENDIENTES') {
       // SOLO VISIALIZA CITAS PENDIENTES
 
       return listaCitasFiltrada(fecha);
     } else {
       //no hay aplicado filtro
-      return todasLasCitas(fecha);
+      return todasLasCitas(fecha, empleados);
     }
   }
 
-  vercitas(context, List<CitaModelFirebase> citas) {
+  vercitas(context, List<CitaModelFirebase> citas, empleados) {
     var vistaProvider = Provider.of<VistaProvider>(context, listen: false);
 
     var vistaActual = vistaProvider.vista;
@@ -98,7 +100,7 @@ class _ListaCitasState extends State<ListaCitas> {
               children: [
                 cambioVistaCalendario(vistaProvider, vistaActual),
                 const SizedBox(width: 16),
-                ...empleados(
+                ..._empleados(
                   context,
                   vistaActual,
                   citas,
@@ -117,14 +119,10 @@ class _ListaCitasState extends State<ListaCitas> {
     );
   }
 
-  List<dynamic> empleados(context, CalendarView vistaActual, citas) {
+  List<dynamic> _empleados(context, CalendarView vistaActual, citas) {
     final estadoPagoProvider =
         Provider.of<EstadoPagoAppProvider>(context, listen: false);
     String emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
-
-    final empleadosProvider =
-        Provider.of<EmpleadosProvider>(context, listen: false);
-    List<EmpleadoModel> empleados = empleadosProvider.getEmpleados;
 
     List<dynamic> todos = empleados.map((empleado) {
       return Stack(
@@ -251,7 +249,7 @@ class _ListaCitasState extends State<ListaCitas> {
     );
   }
 
-  todasLasCitas(fecha) {
+  todasLasCitas(fecha, empleados) {
     EmpleadosProvider empleadoProvider =
         Provider.of<EmpleadosProvider>(context, listen: false);
 
@@ -276,7 +274,7 @@ class _ListaCitasState extends State<ListaCitas> {
 
             // SI TENGO DATOS LOS VISUALIZO EN PANTALLA  DATA TRAE TODAS LAS CITAS
 
-            return vercitas(context, data);
+            return vercitas(context, data, empleados);
           } else {
             return const Text('Empty data');
           }
@@ -395,7 +393,7 @@ class _ListaCitasState extends State<ListaCitas> {
               }
             }
 
-            return vercitas(context, listaFiltrada);
+            return vercitas(context, listaFiltrada, empleados);
           } else {
             return const Text('Empty data');
           }
@@ -408,5 +406,11 @@ class _ListaCitasState extends State<ListaCitas> {
 
   void eliminaRecordatorio(int id) async {
     await NotificationService().cancelaNotificacion(id);
+  }
+
+  void getEmpleados() {
+    final empleadosProvider =
+        Provider.of<EmpleadosProvider>(context, listen: false);
+    empleados = empleadosProvider.getEmpleados;
   }
 }

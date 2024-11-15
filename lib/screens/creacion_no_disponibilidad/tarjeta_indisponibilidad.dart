@@ -1,5 +1,6 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/mylogic_formularios/my_logic_cita.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/formatea_fecha_hora.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:agendacitas/utils/formatear.dart';
@@ -1115,8 +1116,7 @@ class _BotonGuardarState extends State<BotonGuardar> {
     // provider FECHA elegida
     final providerFechaElegida = Provider.of<FechaElegida>(context);
     fechaElegida = providerFechaElegida.fechaElegida;
-    dia = DateFormat('yyyy-MM-dd') // fecha formateada para FIREBASE
-        .format(fechaElegida!);
+    dia = formatearFechaDiaCita(fechaElegida!);
 
     // hora inicio
     horaInicio = providerHoraFinCarrusel.horaInicio;

@@ -155,17 +155,17 @@ class FirebaseProvider extends ChangeNotifier {
 
   //------------crea el recordatorio ----------------------------------------------
   creaRecordatorio(
-      String emailUsuarioAPP,
-      String dia,
-      String horaInicio,
-      String precio,
-      String comentario,
-      String nombreCliente,
-      String telfonoCliente,
-      String emailCliente,
-      List<String> idServicios,
-      String idEmpleado,
-      idCitaCliente) async {
+    String emailUsuarioAPP,
+    String dia,
+    String horaInicio,
+    String precio,
+    String comentario,
+    String nombreCliente,
+    String telfonoCliente,
+    String emailCliente,
+    List<String> idServicios,
+    String idEmpleado,
+  ) async {
     // Crear una lista de futuros a partir de la lista de ids de servicio
     List<String> listaServiciosAux = [];
     for (var element in idServicios) {

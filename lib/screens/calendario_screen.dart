@@ -1,5 +1,6 @@
 import 'package:agendacitas/config/mantenimientos/mantenimientos.dart';
 import 'package:agendacitas/firebase_options.dart';
+import 'package:agendacitas/models/empleado_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 

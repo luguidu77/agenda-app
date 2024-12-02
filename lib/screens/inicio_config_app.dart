@@ -1,7 +1,11 @@
+import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rive/math.dart';
 
 import '../providers/providers.dart';
 import '../screens/screens.dart';
@@ -42,6 +46,31 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     return disponibilidadSemanalProvider;
   }
 
+  void getTodasLasCitas(emailSesionUsuario) async {
+    final contextoCitas = context.read<CitasProvider>();
+    final contextoCreacionCita = context.read<CreacionCitaProvider>();
+
+    // Verifica si las citas ya están cargadas
+    if (!contextoCitas.citasCargadas) {
+      print('Cargando citas por primera vez...');
+
+      List<CitaModelFirebase> citas =
+          await FirebaseProvider().getTodasLasCitas(emailSesionUsuario);
+
+      // Establece las citas en el contexto
+      contextoCitas.setTodosLasLasCitas(citas);
+
+      CitaModelFirebase edicionContextoCita =
+          CitaModelFirebase(idEmpleado: 'TODOS_EMPLEADOS');
+
+      contextoCreacionCita.setContextoCita(edicionContextoCita);
+
+      print('Citas cargadas y añadidas al contexto');
+    } else {
+      print('Las citas ya están cargadas, no se vuelve a cargar.');
+    }
+  }
+
   @override
   void initState() {
     // inicializaProviderEstadoPagoEmail();
@@ -79,9 +108,11 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
             //invocado DispoSemanalProvider
             //TODO PASAR ESTO AL FIREBASE PROVIDER Y
             final dDispoSemanal = context.read<DispoSemanalProvider>();
+
             DisponibilidadSemanal.disponibilidadSemanal(
                 dDispoSemanal, data.email.toString());
 
+            getTodasLasCitas(data.email.toString());
             return HomeScreen(
               index: 0,
               myBnB: 0,

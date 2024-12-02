@@ -1,4 +1,5 @@
 import 'package:agendacitas/models/empleado_model.dart';
+import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/screens/screens.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/widgets/botones/boton_confirmar_cita_reserva_web.dart';
@@ -140,6 +141,7 @@ class _DetallesCitaWidget extends StatefulWidget {
 class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
   @override
   Widget build(BuildContext context) {
+    CitasProvider contextoCitaProvider = context.read<CitasProvider>();
     print('····························reserva·······························');
     print(widget.reserva);
     final citaconfirmada =
@@ -201,7 +203,7 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
               children: [
                 _buildShareButton(),
                 _buildReassignButton(),
-                _buildDeleteButton(context),
+                _buildDeleteButton(context, contextoCitaProvider),
               ],
             ),
           ),
@@ -284,13 +286,18 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
     );
   }
 
-  Widget _buildDeleteButton(BuildContext context) {
+  _buildDeleteButton(context, contextoCitaProvider) {
     return FloatingActionButton(
       mini: true,
       backgroundColor: Colors.redAccent,
       onPressed: () async {
-        final res = await mensajeAlerta(context, 0, widget.reserva,
-            (widget.emailUsuario == '') ? false : true, widget.emailUsuario);
+        final res = await mensajeAlerta(
+            context,
+            contextoCitaProvider,
+            0,
+            widget.reserva,
+            (widget.emailUsuario == '') ? false : true,
+            widget.emailUsuario);
 
         if (res == true) {
           await FirebaseProvider()

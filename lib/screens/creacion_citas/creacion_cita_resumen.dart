@@ -1,6 +1,9 @@
 // ignore_for_file: file_names
 
+import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
+import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/appBar.dart';
@@ -36,6 +39,7 @@ class ConfirmarStep extends StatefulWidget {
 
 class _ConfirmarStepState extends State<ConfirmarStep> {
   late CreacionCitaProvider contextoCreacionCita;
+  late EmpleadosProvider contextoEmpleado;
 
   List<String> tRecordatorioGuardado = [];
   String tiempoTextoRecord = '';
@@ -102,6 +106,12 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     // LLEER MICONTEXTO DE CreacionCitaProvider
     contextoCreacionCita = context.read<CreacionCitaProvider>();
     debugPrint('cita elegida ${contextoCreacionCita.contextoCita.toString()}');
+
+    // LEER EL idEmpleado , EMPLEADO SELECCIONADO
+    String idEmpleado = contextoCreacionCita.contextoCita.idEmpleado!;
+    EmpleadoModel empleado = await FirebaseProvider()
+        .getEmpleadoporId(_emailSesionUsuario, idEmpleado);
+
     // GENERO UN ID PARA LA CITA(idCitaCliente); // Ejemplo: b7gjR3jNuMRomunRo6SJ
     String idCitaCliente = generarCadenaAleatoria(20);
     // GUARDA EN EL CONTEXTO DE LA CITA
@@ -248,6 +258,17 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         idCitaCliente,
         precioTexto,
       );
+
+      //******************************************('AGREGA LA CITA AL PROVIDER')****************
+      List<String> serv = servicios.map((e) => e.servicio.toString()).toList();
+      citaElegida.confirmada = true;
+      citaElegida.idEmpleado = idEmpleado;
+      citaElegida.nombreEmpleado = empleado.nombre;
+      citaElegida.servicios = serv;
+
+      final citaProvider = context.read<CitasProvider>();
+
+      citaProvider.agregaCitaAlContexto(citaElegida);
     } catch (e) {
       // print('ERROR');
     }

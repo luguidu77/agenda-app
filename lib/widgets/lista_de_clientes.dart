@@ -17,7 +17,7 @@ class ListaClientes extends StatefulWidget {
       required this.emailSesionUsuario,
       required this.busquedaController,
       required this.pantalla});
-  final Object fecha;
+  final DateTime fecha;
   final bool iniciadaSesionUsuario;
   final String emailSesionUsuario;
   final String busquedaController;
@@ -163,6 +163,7 @@ class _ListaClientesState extends State<ListaClientes> {
           telefonoCliente: listaClientes[index].telefono.toString(),
           emailCliente: listaClientes[index].email.toString(),
           fotoCliente: listaClientes[index].foto.toString(),
+          notaCliente: listaClientes[index].nota.toString(),
         );
         return GestureDetector(
           // Navegación al seleccionar un cliente

@@ -1,3 +1,4 @@
+import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_cliente.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_confirmar.dart';
@@ -293,11 +294,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void empleados() async {
     // TRAE LOS EMPLEADOS Y LOS SETEA EN EL PROVIDER
-    final empleadosProvider =
-        Provider.of<EmpleadosProvider>(context, listen: false);
-    FirebaseProvider().getTodosEmpleados(_emailSesionUsuario).then((empleados) {
-      empleadosProvider.setTodosLosEmpleados(empleados);
-    });
+    final empleadosProvider = context.read<EmpleadosProvider>();
+
+// Verifica si los empleados ya están cargadas
+    if (!empleadosProvider.empleadosCargados) {
+      print('Cargando empleados por primera vez...');
+
+      FirebaseProvider()
+          .getTodosEmpleados(_emailSesionUsuario)
+          .then((empleados) {
+        // Establece las citas en el contexto
+        empleadosProvider.setTodosLosEmpleados(empleados);
+      });
+
+      debugPrint('empleados cargados y añadidas al contexto');
+    } else {
+      debugPrint('los empleados ya están cargadas, no se vuelve a cargar.');
+    }
   }
 
   void personalizaFirebase() async {

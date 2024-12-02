@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -20,7 +21,7 @@ class _CalendarioState extends State<Calendario> {
   bool _iniciadaSesionUsuario = false;
   String _emailSesionUsuario = '';
   late final ValueNotifier<List<Event>> selectedEvents;
-  List<Map<String, dynamic>> todasLasCitasFB = [];
+  List<CitaModelFirebase> todasLasCitasFB = [];
   List<CitaModel> todasLasCitasDispositivo = [];
   DateTime focusedDay = DateTime.now();
   DateTime? _selectedDay;
@@ -41,14 +42,9 @@ class _CalendarioState extends State<Calendario> {
 
   cargaCitas(emailSesionUsuario) async {
     if (_iniciadaSesionUsuario && mounted) {
-      await FirebaseProvider()
-          .getTodasLasCitas(emailSesionUsuario)
-          .then((citas) {
-        todasLasCitasFB = citas;
-        // print('citas $citas');
+      final contextoCitas = context.read<CitasProvider>();
 
-        setState(() {});
-      });
+      todasLasCitasFB = contextoCitas.getCitas;
     } else {
       await CitaListProvider().cargarCitas().then((citas) {
         todasLasCitasDispositivo = citas;
@@ -87,15 +83,15 @@ class _CalendarioState extends State<Calendario> {
     // COMPROBAR INICIO SESION PARA TRAER LAS CITAS DE FIREBASE O DISPOSITIVO
     if (_iniciadaSesionUsuario) {
       for (var item in todasLasCitasFB) {
-        fecha = DateTime.parse(item['dia']);
-        Event evento = Event(item['comentario'].toString());
+        fecha = DateTime.parse(item.dia!);
+        Event evento = Event(item.comentario.toString());
         debugPrint('fecha___________$day');
         debugPrint('lista de todas las fechas___________$listaFechas');
         debugPrint('fecha seleccionada _________________$fecha');
         debugPrint('evento seleccionada _________________$evento');
 
         // AÑADE EVENTO AL CALENDARIO CON SU FECHA CORRESPONDIENTE Y SIEMPRE QUE NO SEA UN NO DISPONIBLE('999')
-        if (fecha.day == day.day && item['idCliente'] != '999') {
+        if (fecha.day == day.day && item.idcliente != '999') {
           // LISTA DE EVENTOS:
           // {2023-03-09 00:00:00.000: [cervicalES], 2023-02-23 00:00:00.000: [cervicalES], 2023-02-14 00:00:00.000: [cervicalES], 2023-03-11 00:00:00.000: [cervicalES], 2023-03-05 00:00:00.000: [cervicalES], 2023-02-15 00:00:00.000: [cervicalES], 2023-02-21 00:00:00.000: [cervicalES]}
           listaEventos.add(evento);

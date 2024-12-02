@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:agendacitas/models/empleado_model.dart';
+import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/screens/creacion_no_disponibilidad/tarjeta_indisponibilidad.dart';
 import 'package:agendacitas/screens/detalles_horario_no_disponible_screen.dart';
 import 'package:agendacitas/utils/extraerServicios.dart';
@@ -100,6 +101,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
   @override
   Widget build(BuildContext context) {
+    final contextoCreacionCita = context.read<CreacionCitaProvider>();
     var calendarioProvider =
         Provider.of<CalendarioProvider>(context, listen: true);
     var vistaProvider = Provider.of<VistaProvider>(context, listen: true);
@@ -252,8 +254,15 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
                 arguments: details.date); */
           } else {
             //############# CREACION DE CITA -- ELECCION DE CLIENTE ########################
-            Navigator.pushNamed(context, 'creacionCitaCliente',
-                arguments: details.date);
+
+            // verifica que se ha seleccionado a un empleado antes de iniciar la creacion de cita
+            if (contextoCreacionCita.contextoCita.idEmpleado !=
+                'TODOS_EMPLEADOS') {
+              Navigator.pushNamed(context, 'creacionCitaCliente',
+                  arguments: details.date);
+            } else {
+              mensajeError(context, 'Selecciona un empleado');
+            }
           }
         }
       },
@@ -295,13 +304,6 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
   List<Appointment> getAppointments() {
     for (var cita in widget.citas) {
       print('oooooooooooooooooooooo veo las citas oooooooooooooooooooooooooo');
-      print(cita.nombreCliente);
-      String horaInicio =
-          FormatearFechaHora().formatearHora(cita.horaInicio.toString());
-      String horaFinal =
-          FormatearFechaHora().formatearHora(cita.horaFinal.toString());
-      print('@@@@@@@@@@@@@@@@@@@@@@');
-      print(cita.id);
 
       final DateTime fechaInicio = cita.horaInicio!;
       final DateTime fechaFinal = cita.horaFinal!;
@@ -325,9 +327,11 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           }
         }
 
-        servicios = cita.servicios!.map((serv) => serv).join(', ');
+        /*  servicios = cita.servicios!.map((serv) => serv).join(', ');
+      
 
-        print(servicios);
+        print(servicios); */
+        servicios = cita.servicios.toString().replaceAll(RegExp(r'[\[\]]'), '');
 
         // **** DONDE CREAMOS LA NOTA QUE TRAE TODOS LOS DATOS NECESARIOS PARA LA GESTION DE CITA ****************
         meetings.add(Appointment(
@@ -338,8 +342,9 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
                          "idCliente": "${cita.idcliente}",
                          "idEmpleado": "${cita.idEmpleado}",
                          "nombreEmpleado" :  "${cita.nombreEmpleado}",
+                         "colorEmpleado":"${cita.colorEmpleado}",
                          "idServicio": "${cita.idservicio}",  
-                         "servicios":  "${cita.servicios}",                   
+                         "servicios":  "$servicios",                   
                          "nombre": "${cita.nombreCliente}",
                          "nota": "${cita.notaCliente}",
                          "horaInicio": "${cita.horaInicio}",
@@ -363,13 +368,18 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
             subject: textoCita(cita),
 
             //location: 'es-ES',
-            color: cita.idcliente == '999'
+            color: const Color.fromARGB(255, 214, 193,
+                130))); /* cita.idcliente == '999' // no es un cita, es un indispuesto
                 ? const Color.fromARGB(255, 113, 151, 102)
                 : !citaConfirmada
-                    ? const Color.fromARGB(255, 133, 130, 130)
+                    // si la cita esta confirmada, obtiene el color asignado al empleado
+                    ? Color(cita.colorEmpleado!)
                     : fechaFinal.isBefore(DateTime.now())
-                        ? const Color.fromARGB(255, 247, 125, 116)
-                        : const Color.fromARGB(255, 100, 127, 172)));
+                        // si la cita es pasada
+                        ? Color.lerp(
+                            Color(cita.colorEmpleado!), Colors.white, 0.7)!
+                        // si la cita es futura
+                        : Color(cita.colorEmpleado!))); */
       }
     }
 

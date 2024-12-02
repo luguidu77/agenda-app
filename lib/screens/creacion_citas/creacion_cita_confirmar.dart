@@ -417,7 +417,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
 
   _agregaNotas() {
     // LLEER MICONTEXTO DE CreacionCitaProvider
-    contextoCreacionCita = context.read<CreacionCitaProvider>();
+    contextoCreacionCita = context.watch<CreacionCitaProvider>();
     CitaModelFirebase citaEdicion =
         CitaModelFirebase(comentario: comentarioController.text);
     contextoCreacionCita.setContextoCita(citaEdicion);

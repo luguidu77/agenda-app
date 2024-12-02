@@ -86,6 +86,7 @@ class CitaModelFirebase {
   List<String>? servicios;
   String? idEmpleado;
   String? nombreEmpleado;
+  int? colorEmpleado;
   String? precio;
   bool? confirmada;
   String? tokenWebCliente;
@@ -110,6 +111,7 @@ class CitaModelFirebase {
       this.servicios,
       this.idEmpleado,
       this.nombreEmpleado,
+      this.colorEmpleado,
       this.precio,
       this.confirmada,
       this.tokenWebCliente,
@@ -133,6 +135,7 @@ class CitaModelFirebase {
     servicios = nuevosDatos.servicios ?? servicios;
     idEmpleado = nuevosDatos.idEmpleado ?? idEmpleado;
     nombreEmpleado = nuevosDatos.nombreEmpleado ?? nombreEmpleado;
+    colorEmpleado = nuevosDatos.colorEmpleado ?? colorEmpleado;
     precio = nuevosDatos.precio ?? precio;
     confirmada = nuevosDatos.confirmada ?? confirmada;
     tokenWebCliente = nuevosDatos.tokenWebCliente ?? tokenWebCliente;
@@ -157,6 +160,7 @@ class CitaModelFirebase {
           servicios: ["servicios"], // Adaptación de array
           idEmpleado: json["idEmpleado"],
           nombreEmpleado: json["nombreEmpleado"],
+          colorEmpleado: json["colorEmpleado"],
           precio: json["precio"],
           confirmada: json["confirmada"],
           tokenWebCliente: json["tokenWebCliente"],
@@ -180,6 +184,7 @@ class CitaModelFirebase {
         "servicios": servicios,
         "idEmpleado": idEmpleado,
         "nombreEmpleado": nombreEmpleado,
+        "colorEmpleado": colorEmpleado,
         "precio": precio,
         "confirmada": confirmada,
         "tokenWebCliente": tokenWebCliente,

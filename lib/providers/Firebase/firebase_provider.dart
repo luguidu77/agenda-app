@@ -311,7 +311,8 @@ class FirebaseProvider extends ChangeNotifier {
   }
 
   getTodasLasCitas(emailUsuario) async {
-    List<Map<String, dynamic>> data = [];
+    List<CitaModelFirebase> data = [];
+    CitaModelFirebase cita = CitaModelFirebase();
     dynamic verifica;
     await _iniFirebase();
 
@@ -321,27 +322,103 @@ class FirebaseProvider extends ChangeNotifier {
           for (var element in snapshot.docs)
             {
               //AGREGA LAS CITAS
-              verifica = element
-                  .data(), // Accede a los datos del documento como un mapa
-              data.add({
-                'id': element.id,
-                'precio': element['precio'],
-                'dia': element['dia'],
-                'comentario': element['comentario'],
-                'horaInicio': element['horaInicio'],
-                'horaFinal': element['horaFinal'],
-                'idCliente': element['idcliente'],
-                'idServicio': element['idservicio'],
-                'idEmpleado': element['idempleado'],
-                // 'confirmada': element['confirmada'],
-                'confirmada': verifica.containsKey('confirmada')
-                    ? element['confirmada']
-                    : '',
-              })
+              verifica = element.data(),
+
+              cita = CitaModelFirebase(
+                  id: element.id,
+                  precio: element['precio'],
+                  dia: element['dia'],
+                  comentario: element['comentario'],
+                  horaInicio: DateTime.parse(element['horaInicio']),
+                  horaFinal: DateTime.parse(element['horaFinal']),
+                  idcliente: element['idcliente'],
+                  idservicio: element['idservicio'],
+                  idEmpleado: element['idempleado'],
+                  // 'confirmada': element['confirmada'],
+                  confirmada: verifica.containsKey('confirmada')
+                      ? element['confirmada']
+                      : '',
+                  idCitaCliente: element['idCitaCliente'],
+                  tokenWebCliente: verifica.containsKey('tokenWebCliente')
+                      ? element['tokenWebCliente']
+                      : ''),
+
+              data.add(cita)
             }
         });
 
-    return data; //retorna una lista de todas las citas(CitaModelFirebase)
+    List<CitaModelFirebase> citasFirebase = [];
+
+    for (var cita in data) {
+      // Variables iniciales
+      late EmpleadoModel empleado;
+      late Map<String, dynamic> cliente;
+      List<String> servicioFirebase = [];
+
+      if (cita.idcliente != "999") {
+        // Cliente no es indispuesto
+        cliente = await FirebaseProvider()
+            .getClientePorId(emailUsuario, cita.idcliente!);
+
+        empleado = await FirebaseProvider()
+            .getEmpleadoporId(emailUsuario, cita.idEmpleado!);
+
+        // Cargar servicios relacionados
+        for (var servicioId in cita.idservicio!) {
+          var serv = await FirebaseProvider()
+              .cargarServicioPorId(emailUsuario, servicioId);
+          servicioFirebase.add(serv['servicio']);
+        }
+      } else {
+        // Cliente indispuesto (datos predeterminados)
+        empleado = EmpleadoModel(
+          id: '',
+          nombre: '',
+          disponibilidad: [],
+          email: '',
+          telefono: '',
+          categoriaServicios: [],
+          foto: '',
+          color: 0xFF0000FF, // Color predeterminado
+        );
+        cliente = {
+          'nombre': '',
+          'foto': '',
+          'telefono': '',
+          'email': '',
+          'nota': '',
+        };
+      }
+
+      // Crear la cita con datos combinados
+      citasFirebase.add(CitaModelFirebase(
+        id: cita.id,
+        dia: cita.dia,
+        horaInicio: cita.horaInicio,
+        horaFinal: cita.horaFinal,
+        comentario: cita.comentario,
+        email: cita.email,
+        idcliente: cita.idcliente,
+        idservicio: cita.idservicio,
+        servicios: servicioFirebase,
+        idEmpleado: cita.idEmpleado,
+        nombreEmpleado: empleado.nombre,
+        colorEmpleado: empleado.color,
+        precio: cita.precio,
+        confirmada: cita.confirmada,
+        tokenWebCliente: cita.tokenWebCliente,
+        idCitaCliente: cita.idCitaCliente,
+        nombreCliente: cliente['nombre'],
+        fotoCliente: cliente['foto'],
+        telefonoCliente: cliente['telefono'],
+        emailCliente: cliente['email'],
+        notaCliente: cliente['nota'],
+      ));
+    }
+// Ordenar las citas por hora de inicio
+    citasFirebase.sort((a, b) => a.horaInicio!.compareTo(b.horaInicio!));
+
+    return citasFirebase;
   }
 
   // PERSONALIZA
@@ -953,10 +1030,16 @@ class FirebaseProvider extends ChangeNotifier {
   }
 
   actualizarCita(String usuarioAPP, CitaModelFirebase cita) async {
+// Formatear la fecha
+    String fechaInicioTexto =
+        DateFormat('yyyy-MM-dd HH:mm:ss.sss').format(cita.horaInicio!);
+    String fechaFinalTexto =
+        DateFormat('yyyy-MM-dd HH:mm:ss.sss').format(cita.horaFinal!);
+
     Map<String, Object?> newCita = {
       'dia': cita.dia,
-      'horaInicio': cita.horaInicio,
-      'horaFinal': cita.horaFinal,
+      'horaInicio': fechaInicioTexto,
+      'horaFinal': fechaFinalTexto,
       'comentario': cita.comentario,
       'idcliente': cita.idcliente,
       'idservicio': cita.idservicio,
@@ -1178,14 +1261,14 @@ class FirebaseProvider extends ChangeNotifier {
       } else {
         // es un indisponible
         empleado = EmpleadoModel(
-          id: '',
-          nombre: '',
-          disponibilidad: [],
-          email: '',
-          telefono: '',
-          categoriaServicios: [],
-          foto: '',
-        );
+            id: '',
+            nombre: '',
+            disponibilidad: [],
+            email: '',
+            telefono: '',
+            categoriaServicios: [],
+            foto: '',
+            color: 0xFF0000FF);
         cliente = {
           'nombre': '',
           'foto': '',
@@ -1210,6 +1293,7 @@ class FirebaseProvider extends ChangeNotifier {
         servicios: servicioFirebase,
         idEmpleado: cita['idEmpleado'],
         nombreEmpleado: empleado.nombre,
+        colorEmpleado: empleado.color,
         precio: cita['precio'],
         confirmada: cita['confirmada'],
         tokenWebCliente: cita['tokenWebCliente'],
@@ -1239,35 +1323,6 @@ class FirebaseProvider extends ChangeNotifier {
     print('oooooooooooooooooooooofiltradas oooooooooooooooooooooooooo');
 
     return citasFirebase;
-  }
-
-  Future<String> calculaGananciaDiariasFB(citas) async {
-    await Future.delayed(const Duration(seconds: 1));
-    //precio total diario
-    double gananciaDiaria = 0;
-    List<CitaModelFirebase> aux = citas;
-    List precios = aux.map((value) {
-      return (value.precio! != '') ? double.parse(value.precio!) : 0.0;
-    }).toList(); //todo: este campo está pendiende de añadir a tabla cita de firebase
-
-    for (double element in precios) {
-      gananciaDiaria = gananciaDiaria + element;
-    }
-    // Formatear el número con dos decimales
-    String gananciaD = NumberFormat("#.00").format(gananciaDiaria);
-    return gananciaD.toString();
-  }
-
-  Future<int> calculaCitasPorEmpleado(citas, idEmpleado) async {
-    // await Future.delayed(const Duration(seconds: 1));
-    //precio total diario
-    int numCitas = 0;
-    List<CitaModelFirebase> aux = citas;
-    aux.map((value) {
-      return (value.idEmpleado! == idEmpleado) ? numCitas++ : numCitas;
-    }).toList(); //todo: este campo está pendiende de añadir a tabla cita de firebase
-
-    return numCitas;
   }
 
   Future<bool> compruebaPagoFB(usuarioAPP) async {
@@ -1626,14 +1681,14 @@ class FirebaseProvider extends ChangeNotifier {
       String email, String idempleado) async {
     // Inicializar un empleado vacío
     final empleado = EmpleadoModel(
-      id: '',
-      nombre: '',
-      disponibilidad: [],
-      email: '',
-      telefono: '',
-      categoriaServicios: [],
-      foto: '',
-    );
+        id: '',
+        nombre: '',
+        disponibilidad: [],
+        email: '',
+        telefono: '',
+        categoriaServicios: [],
+        foto: '',
+        color: 0xFF0000FF);
 
     // Inicializar Firebase
     await _iniFirebase();
@@ -1655,6 +1710,7 @@ class FirebaseProvider extends ChangeNotifier {
               List<dynamic>.from(element['disponibilidadSemanal'] ?? []);
           empleado.categoriaServicios =
               List<dynamic>.from(element['categoriaServicios'] ?? []);
+          empleado.color = (element['color'] ?? 0xFFFFFFFF);
         }
       }
     });
@@ -1676,16 +1732,16 @@ class FirebaseProvider extends ChangeNotifier {
     await docRef.get().then((QuerySnapshot snapshot) {
       for (var element in snapshot.docs) {
         var empleado = EmpleadoModel(
-          id: element.id,
-          nombre: element['nombre'] ?? '',
-          disponibilidad:
-              List<dynamic>.from(element['disponibilidadSemanal'] ?? []),
-          email: element['email'] ?? '',
-          telefono: element['telefono'] ?? '',
-          categoriaServicios:
-              List<dynamic>.from(element['categoriaServicios'] ?? []),
-          foto: element['foto'] ?? '',
-        );
+            id: element.id,
+            nombre: element['nombre'] ?? '',
+            disponibilidad:
+                List<dynamic>.from(element['disponibilidadSemanal'] ?? []),
+            email: element['email'] ?? '',
+            telefono: element['telefono'] ?? '',
+            categoriaServicios:
+                List<dynamic>.from(element['categoriaServicios'] ?? []),
+            foto: element['foto'] ?? '',
+            color: element['color'] ?? 0xFFFFFFFF);
 
         listaEmpleados.add(empleado);
       }

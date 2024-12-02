@@ -1,12 +1,15 @@
+import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../providers/providers.dart';
 import '../utils/utils.dart';
 
-mensajeAlerta(context, int index, citas, bool iniciadaSesionUsuario,
-    String emailusuario) async {
+mensajeAlerta(context, contextoCitaProvider, int index, citas,
+    bool iniciadaSesionUsuario, String emailusuario) async {
   late String textoPregunta;
   bool respuesta = false;
   late String textoNombre;
@@ -50,7 +53,8 @@ mensajeAlerta(context, int index, citas, bool iniciadaSesionUsuario,
                       onPressed: () {
                         iniciadaSesionUsuario
                             //ELIMINA CITA EN FIREBASE
-                            ? _eliminarCitaFB(emailusuario, idCita)
+                            ? _eliminarCitaFB(context, contextoCitaProvider,
+                                emailusuario, idCita)
                             //ELIMINA CITA EN DISPOSITIVO
                             : _eliminarCita(context, idCita, textoNombre);
 
@@ -76,8 +80,11 @@ mensajeAlerta(context, int index, citas, bool iniciadaSesionUsuario,
   return respuesta;
 }
 
-void _eliminarCitaFB(usuarioAPP, id) {
+void _eliminarCitaFB(context, contextoCitaProvider, usuarioAPP, id) {
   SincronizarFirebase().eliminaCitaId(usuarioAPP, id.toString());
+
+  contextoCitaProvider.eliminacitaAlContexto(id);
+
   // convierto el id que viene como String en int
   int idEntero = convertirIdEnEntero(id);
   //elimina recordatorio de la cita

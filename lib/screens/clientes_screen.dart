@@ -87,7 +87,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
             ),
             const Divider(),
             ListaClientes(
-                fecha: '',
+                fecha: DateTime.now(), // cualquier DateTime
                 iniciadaSesionUsuario: _iniciadaSesionUsuario,
                 emailSesionUsuario: _emailSesionUsuario,
                 busquedaController: contextoFormularioBusqueda.textoBusqueda,

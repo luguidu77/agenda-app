@@ -6,6 +6,7 @@ class EmpleadoModel {
   String telefono;
   List<dynamic> categoriaServicios;
   String foto;
+  int color;
 
   // Constructor
   EmpleadoModel({
@@ -16,6 +17,7 @@ class EmpleadoModel {
     required this.telefono,
     required this.categoriaServicios,
     required this.foto,
+    required this.color,
   });
 
   // Factory constructor para crear una instancia de EmpleadoModel desde un mapa (por ejemplo, datos de Firebase)
@@ -28,6 +30,8 @@ class EmpleadoModel {
       telefono: map['telefono'] ?? '',
       categoriaServicios: List<dynamic>.from(map['categoriaServicios'] ?? []),
       foto: map['foto'] ?? '',
+      color: map['color'] ??
+          '#FFFFFF', // Valor por defecto para color si no está definido
     );
   }
 
@@ -41,6 +45,7 @@ class EmpleadoModel {
       'telefono': telefono,
       'categoriaServicios': categoriaServicios,
       'foto': foto,
+      'color': color, // Agregar color al mapa
     };
   }
 }

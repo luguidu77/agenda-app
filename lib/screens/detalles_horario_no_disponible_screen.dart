@@ -1,5 +1,6 @@
 import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/models/personaliza_model.dart';
+import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/personaliza_provider.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
@@ -56,6 +57,7 @@ class _DetallesHorarioNoDisponibleScreenState
 
   @override
   Widget build(BuildContext context) {
+    CitasProvider contextoCitaProvider = context.read<CitasProvider>();
     // final cita = widget.reserva; //widget.reserva;
     String? fechaLarga;
     DateTime resFecha = DateTime.parse(
@@ -90,6 +92,7 @@ class _DetallesHorarioNoDisponibleScreenState
             _detallesCita(
               reserva,
               fechaLarga,
+              contextoCitaProvider,
             ),
 
             /*  Visibility(
@@ -112,7 +115,7 @@ class _DetallesHorarioNoDisponibleScreenState
         ));
   }
 
-  _botonesCita(reserva) {
+  _botonesCita(reserva, contextoCitaProvider) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -124,6 +127,7 @@ class _DetallesHorarioNoDisponibleScreenState
             onPressed: () async {
               final res = await mensajeAlerta(
                   context,
+                  contextoCitaProvider,
                   0,
                   widget.reserva,
                   (widget.emailUsuario == '') ? false : true,
@@ -155,7 +159,7 @@ class _DetallesHorarioNoDisponibleScreenState
     );
   }
 
-  _detallesCita(Map<String, dynamic> cita, fechaLarga) {
+  _detallesCita(Map<String, dynamic> cita, fechaLarga, contextoCitaProvider) {
     print(
         'cita actual **************************************************************** $cita');
     return SizedBox(
@@ -195,7 +199,7 @@ class _DetallesHorarioNoDisponibleScreenState
                         style: subTituloEstilo,
                       ),
                       const SizedBox(height: 40),
-                      _botonesCita(reserva)
+                      _botonesCita(reserva, contextoCitaProvider)
                     ],
                   ),
                 ),

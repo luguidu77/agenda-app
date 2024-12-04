@@ -68,7 +68,7 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
               todasLasCitas,
             ),
             const SizedBox(width: 56),
-            gananciaDiaria(todasLasCitas),
+            // gananciaDiaria(todasLasCitas),
           ],
         ));
   }

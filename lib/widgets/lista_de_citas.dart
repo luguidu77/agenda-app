@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:agendacitas/models/empleado_model.dart';
+import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/screens/creacion_no_disponibilidad/tarjeta_indisponibilidad.dart';
 import 'package:agendacitas/screens/detalles_horario_no_disponible_screen.dart';
@@ -20,9 +21,9 @@ import '../utils/utils.dart';
 
 class ListaCitasNuevo extends StatefulWidget {
   const ListaCitasNuevo(
-      {super.key, required this.fechaElegida, required this.citas});
+      {super.key, required this.fechaElegida, required this.citasFiltradas});
   final DateTime fechaElegida;
-  final List<CitaModelFirebase> citas;
+  final List<CitaModelFirebase> citasFiltradas;
   @override
   _ListaCitasNuevoState createState() => _ListaCitasNuevoState();
 }
@@ -41,6 +42,8 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
   List<CalendarResource> _employeeCollection = [];
   final List<TimeRegion> _specialTimeRegions = [];
+
+  List<CitaModelFirebase> _citasFiltradas = [];
 
   @override
   void initState() {
@@ -65,7 +68,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         image: NetworkImage(empleados[i].foto),
         displayName: empleados[i].nombre,
         id: empleados[i].id,
-        color: Colors.black,
+        color: Color(empleados[i].color),
       ));
     }
   }
@@ -101,7 +104,9 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
   @override
   Widget build(BuildContext context) {
-    final contextoCreacionCita = context.read<CreacionCitaProvider>();
+    _citasFiltradas = widget.citasFiltradas;
+    final contextoCreacionCita = context.watch<CreacionCitaProvider>();
+
     var calendarioProvider =
         Provider.of<CalendarioProvider>(context, listen: true);
     var vistaProvider = Provider.of<VistaProvider>(context, listen: true);
@@ -280,16 +285,11 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           // extraemos los datos de (notes) para obtener la cita
           Map<String, dynamic> cita = json.decode(appointment.notes);
 
-          ////XXxxxx FUNCION actualizar la cita en Firebase  xxxxxXX
-          ActualizacionCita.actualizar(
-              context,
-              cita,
-              appointmentDragEndDetails.droppingTime!,
-              null,
-              null,
-              _emailSesionUsuario);
-
-          Navigator.pushNamed(context, '/');
+          _dialogoEsperayActualizarCita(
+                  context, cita, appointmentDragEndDetails, _emailSesionUsuario)
+              .whenComplete(() {
+            // Navigator.pushReplacementNamed(context, '/');
+          });
         } else {
           setState(() {});
           mensajeError(context, 'No disponible para esta versión');
@@ -302,41 +302,38 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
   }
 
   List<Appointment> getAppointments() {
-    for (var cita in widget.citas) {
-      print('oooooooooooooooooooooo veo las citas oooooooooooooooooooooooooo');
+    // **** DONDE CREAMOS LA NOTA QUE TRAE TODOS LOS DATOS NECESARIOS PARA LA GESTION DE CITA ****************
+    meetings = _citasFiltradas.map((cita) {
+      final List<String> employeeIds = [];
 
-      final DateTime fechaInicio = cita.horaInicio!;
-      final DateTime fechaFinal = cita.horaFinal!;
-      final DateTime startTime = DateTime(fechaInicio.year, fechaInicio.month,
-          fechaInicio.day, fechaInicio.hour, fechaInicio.minute, 0);
-      final DateTime endTime = DateTime(fechaFinal.year, fechaFinal.month,
-          fechaFinal.day, fechaFinal.hour, fechaFinal.minute, 0);
-      bool citaConfirmada = _iniciadaSesionUsuario
-          ? cita.confirmada.toString() == 'true'
-              ? true
-              : false
-          : true;
-
-      //SERVICIOS DEPENDENRA DE SI ES CON SESION O EN DISPOSITIVO
-
-      if (_iniciadaSesionUsuario) {
-        final List<String> employeeIds = [];
-        for (var i = 0; i < _employeeCollection.length; i++) {
-          if (cita.idEmpleado == _employeeCollection[i].id) {
-            employeeIds.add(_employeeCollection[i].id.toString());
-          }
+      for (var i = 0; i < _employeeCollection.length; i++) {
+        if (cita.idEmpleado == _employeeCollection[i].id) {
+          employeeIds.add(_employeeCollection[i].id.toString());
         }
+      }
 
-        /*  servicios = cita.servicios!.map((serv) => serv).join(', ');
+      /*  servicios = cita.servicios!.map((serv) => serv).join(', ');
       
 
         print(servicios); */
-        servicios = cita.servicios.toString().replaceAll(RegExp(r'[\[\]]'), '');
+      servicios = cita.servicios.toString().replaceAll(RegExp(r'[\[\]]'), '');
 
-        // **** DONDE CREAMOS LA NOTA QUE TRAE TODOS LOS DATOS NECESARIOS PARA LA GESTION DE CITA ****************
-        meetings.add(Appointment(
-            // TRAEMOS TODOS LOS DATOS QUE NOS HARA FALTA PARA TRABAJAR CON ELLOS POSTERIORMENTE en Detalles de la cita
-            notes: '''
+      /* cita.idcliente == '999' // no es un cita, es un indispuesto
+                ? const Color.fromARGB(255, 113, 151, 102)
+                : !citaConfirmada
+                    // si la cita esta confirmada, obtiene el color asignado al empleado
+                    ? Color(cita.colorEmpleado!)
+                    : fechaFinal.isBefore(DateTime.now())
+                        // si la cita es pasada
+                        ? Color.lerp(
+                            Color(cita.colorEmpleado!), Colors.white, 0.7)!
+                        // si la cita es futura
+                        : Color(cita.colorEmpleado!))); */
+      int colorEmpleado = cita.colorEmpleado ?? 0xFF000000;
+
+      return Appointment(
+          // TRAEMOS TODOS LOS DATOS QUE NOS HARA FALTA PARA TRABAJAR CON ELLOS POSTERIORMENTE en Detalles de la cita
+          notes: '''
                      {
                          "id": "${cita.id}",
                          "idCliente": "${cita.idcliente}",
@@ -360,28 +357,17 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
                          "tokenWebCliente": "${cita.tokenWebCliente.toString()}"
                     }
                     ''',
-            resourceIds: employeeIds,
-            id: cita.id,
-            startTime: startTime,
-            endTime: endTime,
-            // DATOS QUE SE VISUALIZAN EN EL CALENDARIO DE LA CITA
-            subject: textoCita(cita),
+          resourceIds: employeeIds,
+          id: cita.id,
+          startTime: cita.horaInicio!,
+          endTime: cita.horaFinal!,
+          // DATOS QUE SE VISUALIZAN EN EL CALENDARIO DE LA CITA
+          subject: textoCita(cita),
 
-            //location: 'es-ES',
-            color: const Color.fromARGB(255, 214, 193,
-                130))); /* cita.idcliente == '999' // no es un cita, es un indispuesto
-                ? const Color.fromARGB(255, 113, 151, 102)
-                : !citaConfirmada
-                    // si la cita esta confirmada, obtiene el color asignado al empleado
-                    ? Color(cita.colorEmpleado!)
-                    : fechaFinal.isBefore(DateTime.now())
-                        // si la cita es pasada
-                        ? Color.lerp(
-                            Color(cita.colorEmpleado!), Colors.white, 0.7)!
-                        // si la cita es futura
-                        : Color(cita.colorEmpleado!))); */
-      }
-    }
+          //location: 'es-ES',
+          color: Color(colorEmpleado));
+      // Aquí construyes cada Appointment
+    }).toList();
 
     debugPrint(meetings.toString());
     return meetings;
@@ -457,4 +443,40 @@ void actualizarFechaSeleccionada(
   if (calendarioProvider.fechaSeleccionada != nuevaFecha) {
     calendarioProvider.setFechaSeleccionada(nuevaFecha);
   }
+}
+
+Future<void> _dialogoEsperayActualizarCita(
+    context, cita, appointmentDragEndDetails, emailSesionUsuario) async {
+  return showDialog(
+    context: context,
+    barrierDismissible: false, // No permite cerrar el diálogo al tocar fuera.
+    builder: (BuildContext context) {
+      // Llama a la función actualizar la cita y cierra el dialogo.
+      _actualizaciondelacita(
+              context, cita, appointmentDragEndDetails, emailSesionUsuario)
+          .whenComplete(() {
+        // Una vez completada la tarea, cierra el diálogo.
+        Navigator.pop(context);
+        Navigator.pushReplacementNamed(context, '/');
+      });
+
+      return const AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Actualizando, por favor espera...'),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+Future<void> _actualizaciondelacita(BuildContext context, cita,
+    appointmentDragEndDetails, emailSesionUsuario) async {
+  ////XXxxxx FUNCION actualizar la cita en Firebase  xxxxxXX
+  await ActualizacionCita.actualizar(context, cita,
+      appointmentDragEndDetails.droppingTime!, null, null, emailSesionUsuario);
 }

@@ -1,12 +1,15 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
+import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 
 import 'package:agendacitas/utils/extraerServicios.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ActualizacionCita {
   static actualizar(
-    context,
+    BuildContext context,
     Map<String, dynamic> cita,
     DateTime?
         fechaDroppintTime, // fecha del calendario cuando se arrastra tarjeta
@@ -16,6 +19,7 @@ class ActualizacionCita {
 
     emailSesionUsuario,
   ) async {
+    final contextoCitas = context.read<CitasProvider>();
     String? textoFecha;
     String? textoFechaHoraInicio;
     String? textoFechaHoraFinal;
@@ -87,13 +91,20 @@ class ActualizacionCita {
     newCita.tokenWebCliente = cita['tokenWebCliente'];
     debugPrint('$textoFecha  $textoFechaHoraInicio $textoFechaHoraFinal');
 
+    // Establece las citas en el contexto, eliminando la antigua y agregandola modificada
+    // Asegúrate de que no intente notificar al Provider durante el proceso de construcción. Puedes usar Future.microtask para diferir la notificación:
+    Future.microtask(() {
+      contextoCitas.eliminacitaAlContexto(cita['id']);
+      contextoCitas.agregaCitaAlContexto(newCita);
+    });
+
     //* ACUTALIZA LAS BASE DE DATOS DE agandadecitaspp y clienteAgendoWeb
     await FirebaseProvider().actualizarCita(emailSesionUsuario, newCita);
 
-    // si es una tarjeta indisponibilidad, no actualiza clienteeAgendoWeb
-    if (idServicios != ['indispuesto']) {
+    // si es una tarjeta indisponibilidad, no actualiza clienteAgendoWeb
+    /*  if (idServicios != ['indispuesto']) {
       await FirebaseProvider().actualizaCitareasignada(
           emailSesionUsuario, newCita); // cliente Agendo Web
-    }
+    } */
   }
 }

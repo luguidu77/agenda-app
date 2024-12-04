@@ -82,7 +82,7 @@ class _ListaCitasState extends State<ListaCitas> {
         const SeccionEmpleados(),
 
         // ########## CALENDARIO DE CITAS             ##############################
-        todasLasCitas(fecha, empleados),
+        todasLasCitas(fecha),
       ],
     );
   }
@@ -110,7 +110,7 @@ class _ListaCitasState extends State<ListaCitas> {
         //  SYNCFUSION
         Expanded(
             child: ListaCitasNuevo(
-                fechaElegida: widget.fechaElegida, citas: citas));
+                fechaElegida: widget.fechaElegida, citasFiltradas: citas));
   }
 
   cambioVistaCalendario(VistaProvider vistaProvider, CalendarView vistaActual) {
@@ -157,66 +157,48 @@ class _ListaCitasState extends State<ListaCitas> {
     );
   }
 
-  Future<List<CitaModelFirebase>> getCitasPorFecha(String fecha) async {
-    var citasProvider = context.watch<CitasProvider>();
-    List<CitaModelFirebase> todasLasCitas = citasProvider.getCitas;
+  List<CitaModelFirebase> filtrarCitas({
+    required String fecha,
+    String? idEmpleado,
+  }) {
+    final citasProvider = context.watch<CitasProvider>();
+    List<CitaModelFirebase> citas = citasProvider.getCitas;
 
-    return todasLasCitas;
+    // Filtrar por fecha
+    List<CitaModelFirebase> citasFiltradas =
+        citas.where((cita) => cita.dia == fecha).toList();
+
+    // Filtrar por empleado si es necesario
+    if (idEmpleado != null) {
+      citasFiltradas = citasFiltradas
+          .where((cita) => cita.idEmpleado == idEmpleado)
+          .toList();
+    }
+
+    return citasFiltradas;
   }
 
-  todasLasCitas(String fecha, empleados) {
-    // OBTIENE TODOS LOS EMPLEADOS
-    EmpleadosProvider empleadoProvider =
-        Provider.of<EmpleadosProvider>(context, listen: false);
-    List<dynamic> empleados = empleadoProvider.getEmpleados;
-
-    // VERIFICO EMPLEADO SELECCIONADO PARA FILTRAR LAS CITAS
-
+  Widget todasLasCitas(String fecha) {
+    final citasProvider = context.watch<CitasProvider>();
     final contextoCreacionCita = context.watch<CreacionCitaProvider>();
+    print("Total citas en el contexto: ${citasProvider.getCitas.length}");
 
-    return FutureBuilder<dynamic>(
-      future: getCitasPorFecha(fecha),
-      builder: (
-        BuildContext context,
-        AsyncSnapshot<dynamic> snapshot,
-      ) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return skeleton();
-        } else if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasError) {
-            return const Text('Error todas las citas');
-          } else if (snapshot.hasData) {
-            List<CitaModelFirebase> citas = snapshot.data;
+    String idEmpleado =
+        contextoCreacionCita.contextoCita.idEmpleado ?? 'TODOS_EMPLEADOS';
 
-            // SI TENGO DATOS LOS VISUALIZO EN PANTALLA  DATA TRAE TODAS LAS CITAS
+    // Filtrar citas por fecha y empleado
+    List<CitaModelFirebase> citasFiltradas = filtrarCitas(
+      fecha: fecha,
+      idEmpleado: idEmpleado != 'TODOS_EMPLEADOS' ? idEmpleado : null,
+    );
+    print("Total citas filtradas: ${citasFiltradas.length}");
+    final empleados = context.read<EmpleadosProvider>().getEmpleados;
 
-            final contextoCita = contextoCreacionCita.contextoCita;
-            String idEmpleado = contextoCita.idEmpleado ?? '';
-
-            // si es ''  => trae todas las citas sin filtrar empleado
-            if (idEmpleado != 'TODOS_EMPLEADOS') {
-              // Filtrar por idEmpleado
-              List<CitaModelFirebase> citasFiltradas =
-                  filtrarPorEmpleado(citas, idEmpleado);
-
-              return vercitas(
-                context,
-                citasFiltradas,
-                empleados,
-                todasLasCitasConteoPorEmpleado: citas,
-              );
-            } else {
-              // SIN Filtrar por idEmpleado
-              return vercitas(context, citas, empleados,
-                  todasLasCitasConteoPorEmpleado: citas);
-            }
-          } else {
-            return const Text('Empty data');
-          }
-        } else {
-          return Text('State: ${snapshot.connectionState}');
-        }
-      },
+    return vercitas(
+      context,
+      citasFiltradas,
+      empleados,
+      todasLasCitasConteoPorEmpleado: citasProvider.getCitas,
     );
   }
 

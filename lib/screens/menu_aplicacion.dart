@@ -1,5 +1,6 @@
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/providers/Firebase/firebase_publicacion_online.dart';
+import 'package:agendacitas/screens/creacion_citas/empleados_screen.dart';
 import 'package:agendacitas/screens/servicios_screen.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
@@ -124,6 +125,9 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
 
           // CONFIGURA LOS SERVICIOS QUE OFRECEN A CLIENTES
           _serviciosQueOfrece(context),
+
+          // EMPLEADOS
+          _empleados(context),
 
           //CONFIGURACION DE LA APP
           _configuracion(context),
@@ -507,6 +511,20 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
           );
         },
       ),
+    );
+  }
+
+  ListTile _empleados(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.person),
+      title: Text('Tus empleados', style: estilo),
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const EmpleadosScreen(),
+            ));
+      },
     );
   }
 }

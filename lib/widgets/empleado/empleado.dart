@@ -35,7 +35,8 @@ class _EmpleadoWidgetState extends State<EmpleadoWidget> {
     telefono: '',
     categoriaServicios: [],
     foto: '',
-    color: 0xFFFFFFFF, // Color predeterminado
+    color: 0xFFFFFFFF,
+    codVerif: '',
   );
 
   getEmpleado(String emailUsuario, String idEmpleado) async {

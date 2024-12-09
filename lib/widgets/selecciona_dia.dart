@@ -557,14 +557,14 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
 
   void snackbar() {
     mensajeSuccess(context, 'CITA REPROGRAMADA');
-
-    Navigator.push(
+    Navigator.pushReplacementNamed(context, '/');
+    /*   Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => HomeScreen(
             index: 0,
             myBnB: 0,
           ),
-        ));
+        )); */
   }
 }

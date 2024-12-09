@@ -377,7 +377,8 @@ class FirebaseProvider extends ChangeNotifier {
           telefono: '',
           categoriaServicios: [],
           foto: '',
-          color: 0xFF0000FF, // Color predeterminado
+          color: 0xFF0000FF,
+          codVerif: '',
         );
         cliente = {
           'nombre': '',
@@ -1259,14 +1260,16 @@ class FirebaseProvider extends ChangeNotifier {
       } else {
         // es un indisponible
         empleado = EmpleadoModel(
-            id: '',
-            nombre: '',
-            disponibilidad: [],
-            email: '',
-            telefono: '',
-            categoriaServicios: [],
-            foto: '',
-            color: 0xFF0000FF);
+          id: '',
+          nombre: '',
+          disponibilidad: [],
+          email: '',
+          telefono: '',
+          categoriaServicios: [],
+          foto: '',
+          color: 0xFF0000FF,
+          codVerif: '',
+        );
         cliente = {
           'nombre': '',
           'foto': '',
@@ -1686,7 +1689,8 @@ class FirebaseProvider extends ChangeNotifier {
         telefono: '',
         categoriaServicios: [],
         foto: '',
-        color: 0xFF0000FF);
+        color: 0xFF0000FF,
+        codVerif: '');
 
     // Inicializar Firebase
     await _iniFirebase();
@@ -1709,6 +1713,7 @@ class FirebaseProvider extends ChangeNotifier {
           empleado.categoriaServicios =
               List<dynamic>.from(element['categoriaServicios'] ?? []);
           empleado.color = (element['color'] ?? 0xFFFFFFFF);
+          empleado.codVerif = element['cod_verif'];
         }
       }
     });
@@ -1739,7 +1744,8 @@ class FirebaseProvider extends ChangeNotifier {
             categoriaServicios:
                 List<dynamic>.from(element['categoriaServicios'] ?? []),
             foto: element['foto'] ?? '',
-            color: element['color'] ?? 0xFFFFFFFF);
+            color: element['color'] ?? 0xFFFFFFFF,
+            codVerif: element['cod_verif']);
 
         listaEmpleados.add(empleado);
       }

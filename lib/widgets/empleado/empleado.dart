@@ -35,7 +35,7 @@ class _EmpleadoWidgetState extends State<EmpleadoWidget> {
     foto: '',
     color: 0xFFFFFFFF,
     codVerif: '',
-    rol: [],
+    roles: [],
   );
 
   getEmpleado(String emailUsuario, String idEmpleado) async {

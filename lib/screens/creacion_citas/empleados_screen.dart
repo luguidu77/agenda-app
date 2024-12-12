@@ -1,7 +1,5 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/empleado_model.dart';
-import 'package:agendacitas/models/perfil_usuarioapp_model.dart';
-import 'package:agendacitas/providers/Firebase/foto_perfil_usuarioAPP.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/nuevo_editar_empleado.dart';
@@ -30,6 +28,7 @@ class _EmpleadosScreenState extends State<EmpleadosScreen> {
     final EmpleadosProvider empleadosProvider =
         context.watch<EmpleadosProvider>();
     empleados = empleadosProvider.getEmpleados;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gestión de personal'),
@@ -92,7 +91,10 @@ class _EmpleadosScreenState extends State<EmpleadosScreen> {
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
-                                    empleados[index].rol.join(', '),
+                                    empleados[index]
+                                        .roles
+                                        .map((rol) => rolEmpleadoToString(rol))
+                                        .join(', '),
                                     style: TextStyle(color: Colors.grey[600]),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -190,25 +192,51 @@ class _EmpleadosScreenState extends State<EmpleadosScreen> {
           horizontal: 16, vertical: 8), // Margen ajustado
       child: const Padding(
         padding: EdgeInsets.all(16.0), // Espaciado interno
-        child: Row(
-          mainAxisSize: MainAxisSize.min, // Ajusta el tamaño al contenido
+        child: Column(
           children: [
-            Icon(
-              Icons.warning_amber_rounded, // Ícono de advertencia
-              color: Colors.orange, // Color llamativo
-              size: 28,
-            ),
-            SizedBox(width: 12), // Espaciado entre el ícono y el texto
-            Flexible(
-              child: Text(
-                'Debe haber al menos un empleado para asignarle las citas',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black87, // Texto en un tono más moderno
-                  fontWeight: FontWeight.w500,
+            Row(
+              spacing: 12,
+              mainAxisSize: MainAxisSize.min, // Ajusta el tamaño al contenido
+              children: [
+                Icon(
+                  Icons.warning_amber_rounded, // Ícono de advertencia
+                  color: Colors.orange, // Color llamativo
+                  size: 28,
                 ),
-                textAlign: TextAlign.start,
-              ),
+                Flexible(
+                  child: Text(
+                    'Debe haber al menos un empleado con el rol personal para asignarle las citas.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87, // Texto en un tono más moderno
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.start,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              spacing: 12,
+              mainAxisSize: MainAxisSize.min, // Ajusta el tamaño al contenido
+              children: [
+                Icon(
+                  Icons.edit, // Ícono de advertencia
+                  color: Colors.orange, // Color llamativo
+                  size: 28,
+                ),
+                Flexible(
+                  child: Text(
+                    'Agregate como empleado con el mismo email de tu perfil',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87, // Texto en un tono más moderno
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.start,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -237,6 +265,19 @@ class _EmpleadosScreenState extends State<EmpleadosScreen> {
       // empleado y reasignarle todas las citas ya guardadas
 
       //  EmpleadoModel empleado = EmpleadoModel(id: 'id', nombre: nombre, disponibilidad: disponibilidad, email: email, telefono: telefono, categoriaServicios: categoriaServicios, foto: foto, color: color, codVerif: codVerif, rol: rol)
+    }
+  }
+
+  String rolEmpleadoToString(RolEmpleado rol) {
+    switch (rol) {
+      case RolEmpleado.personal:
+        return 'Personal';
+      case RolEmpleado.gerente:
+        return 'Gerente';
+      case RolEmpleado.administrador:
+        return 'Administrador';
+      default:
+        return 'Desconocido'; // Opcional para manejar casos inesperados
     }
   }
 }

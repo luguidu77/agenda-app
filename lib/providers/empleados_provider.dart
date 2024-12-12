@@ -3,21 +3,38 @@ import 'package:flutter/material.dart';
 
 class EmpleadosProvider extends ChangeNotifier {
   final List<EmpleadoModel> _empleados = <EmpleadoModel>[];
+  final List<EmpleadoModel> _empleadosStaff = <EmpleadoModel>[];
+
   bool _empleadosCargados = false;
 
   List<EmpleadoModel> get getEmpleados => _empleados;
+  List<EmpleadoModel> get getEmpleadosStaff => _empleadosStaff;
 
   bool get empleadosCargados => _empleadosCargados;
 
   void setTodosLosEmpleados(List<EmpleadoModel> todosEmpleados) {
-    _empleados.addAll(todosEmpleados);
-    _empleadosCargados = true;
+    _empleados.addAll(todosEmpleados); // carga todos los empleados
+
+    // filtra los empleadosStaff que su rol sea personal
+    List<EmpleadoModel> empleadosStaff = todosEmpleados
+        .where((e) => e.roles.contains(RolEmpleado.personal))
+        .toList();
+
+    _empleadosStaff.addAll(empleadosStaff); // carga los roles personal
+
+    _empleadosCargados = true; // bandera carga de empleados
+
     notifyListeners();
   }
 
   void agregaEmpleado(EmpleadoModel empleado) {
     print(empleado.id);
     _empleados.add(empleado);
+
+    /* if (empleado.roles.contains(RolEmpleado.personal)) {
+      _empleadosStaff.add(empleado);
+    } */
+
     notifyListeners();
   }
 
@@ -40,5 +57,17 @@ class EmpleadosProvider extends ChangeNotifier {
     } else {
       print('Empleado con ID ${empleadoEditado.id} no encontrado.');
     }
+  }
+
+  void setEmpleadosStaff() {
+    _empleadosStaff.clear();
+    // filtra los empleadosStaff que su rol sea personal
+    List<EmpleadoModel> empleadosStaff = _empleados
+        .where((e) => e.roles.contains(RolEmpleado.personal))
+        .toList();
+
+    _empleadosStaff.addAll(empleadosStaff); // carga los roles personal
+
+    notifyListeners();
   }
 }

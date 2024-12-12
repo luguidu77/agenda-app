@@ -26,7 +26,7 @@ class NotificationService {
     flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestPermission();
+        ?.areNotificationsEnabled();
 
     // comprueba las notificaciones pendientes
     List<PendingNotificationRequest>? pendientes =

@@ -17,6 +17,9 @@ class EmpleadoEdicion extends StatefulWidget {
 }
 
 class EmpleadoEdicionState extends State<EmpleadoEdicion> {
+  final controllerEmail = TextEditingController(text: '');
+  bool _isEmailFieldEnabled = true; // Controla si el campo está habilitado
+
   final _formKey = GlobalKey<FormState>();
   late String id;
   late String nombre;
@@ -28,7 +31,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
   late int color;
   late String codVerif;
 
-  late List<String> rolesEmpleados;
+  late List<RolEmpleado> rolesEmpleados;
 
   final ImagePicker _picker = ImagePicker();
 
@@ -37,11 +40,38 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
 
   List<String> servicios = [];
 
-  final List<String> roles = [
-    'Admin',
-    'Gerente',
-    'Staff',
+  final List<RolEmpleado> roles = [
+    RolEmpleado.administrador,
+    RolEmpleado.gerente,
+    RolEmpleado.personal,
   ];
+
+  String rolEmpleadoToString(RolEmpleado rol) {
+    switch (rol) {
+      case RolEmpleado.personal:
+        return 'personal';
+      case RolEmpleado.gerente:
+        return 'gerente';
+      case RolEmpleado.administrador:
+        return 'administrador';
+      default:
+        return 'Desconocido'; // Opcional para manejar casos inesperados
+    }
+  }
+
+  RolEmpleado stringToRolEmpleado(String role) {
+    switch (role) {
+      case 'personal':
+        return RolEmpleado.personal;
+      case 'gerente':
+        return RolEmpleado.gerente;
+      case 'administrador':
+        return RolEmpleado.administrador;
+      default:
+        throw ArgumentError('Rol desconocido: $role');
+    }
+  }
+
   final List<String> diasSemana = [
     'Lunes',
     'Martes',
@@ -82,7 +112,10 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
       foto = widget.empleado!.foto;
       color = widget.empleado!.color;
       codVerif = widget.empleado!.codVerif;
-      rolesEmpleados = List<String>.from(widget.empleado!.rol);
+      rolesEmpleados = List<RolEmpleado>.from(widget.empleado!.roles);
+
+      // Actualiza el controlador con el email del empleado
+      controllerEmail.text = email;
     } else {
       id = '';
       nombre = '';
@@ -94,6 +127,9 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
       color = 0xFFFFFFFF;
       codVerif = '';
       rolesEmpleados = [];
+
+      // Establece un valor inicial para el controlador
+      controllerEmail.text = '';
     }
   }
 
@@ -105,6 +141,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
           title: const Text('Selecciona un color'),
           content: SingleChildScrollView(
             child: Column(
+              spacing: 8,
               children: [
                 GestureDetector(
                   onTap: () => Navigator.pop(context, 0xFFFF0000),
@@ -114,7 +151,6 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                     width: 50,
                   ),
                 ),
-                const SizedBox(height: 8),
                 GestureDetector(
                   onTap: () => Navigator.pop(context, 0xFF00FF00),
                   child: Container(
@@ -123,7 +159,6 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                     width: 50,
                   ),
                 ),
-                const SizedBox(height: 8),
                 GestureDetector(
                   onTap: () => Navigator.pop(context, 0xFF0000FF),
                   child: Container(
@@ -132,7 +167,6 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                     width: 50,
                   ),
                 ),
-                const SizedBox(height: 8),
                 GestureDetector(
                   onTap: () => Navigator.pop(context, 0xFFFFFF00),
                   child: Container(
@@ -141,7 +175,6 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                     width: 50,
                   ),
                 ),
-                const SizedBox(height: 8),
                 GestureDetector(
                   onTap: () => Navigator.pop(context, 0xFFFF00FF),
                   child: Container(
@@ -170,15 +203,17 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
       builder: (BuildContext context) {
         return MultiSelectDialog(
           title: 'Selecciona sus roles',
-          items: roles,
-          initialSelectedItems: rolesEmpleados,
+          items: roles.map((rol) => rolEmpleadoToString(rol)).toList(),
+          initialSelectedItems:
+              rolesEmpleados.map((rol) => rolEmpleadoToString(rol)).toList(),
         );
       },
     );
 
     if (selectedRoles != null) {
       setState(() {
-        rolesEmpleados = selectedRoles;
+        rolesEmpleados =
+            selectedRoles.map((e) => stringToRolEmpleado(e)).toList();
       });
     }
   }
@@ -223,6 +258,16 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
 
   @override
   Widget build(BuildContext context) {
+    final EmpleadosProvider empleadosProvider =
+        context.read<EmpleadosProvider>();
+    List<EmpleadoModel> empleados = empleadosProvider.getEmpleados;
+
+    if (empleados.isEmpty) {
+      controllerEmail.text = _emailSesionUsuario;
+      setState(() {
+        _isEmailFieldEnabled = false;
+      });
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.empleado == null
@@ -265,6 +310,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                     radius: 50,
                   ),
                   Column(
+                    spacing: 16,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       InkWell(
@@ -278,7 +324,6 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                                 size: 40,
                               ),
                       ),
-                      const SizedBox(height: 16),
                       GestureDetector(
                         onTap: _selectColor,
                         child: Container(
@@ -319,7 +364,8 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
               ),
               const SizedBox(height: 16),
               TextFormField(
-                initialValue: email,
+                initialValue: controllerEmail.text,
+                enabled: _isEmailFieldEnabled,
                 decoration: const InputDecoration(
                   labelText: 'Email',
                   border: OutlineInputBorder(),
@@ -348,7 +394,6 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                 },
               ),
               const SizedBox(height: 16),
-              const Text('Rol:'),
               GestureDetector(
                 onTap: _selectRol,
                 child: Container(
@@ -359,11 +404,13 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                   ),
                   child: Text(rolesEmpleados.isEmpty
                       ? 'Selecciona rol'
-                      : rolesEmpleados.join(', ')),
+                      : rolesEmpleados
+                          .map((rol) => rolEmpleadoToString(rol))
+                          .toList()
+                          .join(', ')),
                 ),
               ),
               const SizedBox(height: 16),
-              const Text('Disponibilidad Semanal:'),
               GestureDetector(
                 onTap: _selectDisponibilidad,
                 child: Container(
@@ -378,7 +425,6 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text('Categoría de Servicios:'),
               GestureDetector(
                 onTap: _selectCategoriaServicios,
                 child: Container(
@@ -436,7 +482,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
       foto: pathFireStore,
       color: color,
       codVerif: codVerif,
-      rol: roles,
+      roles: roles,
     );
 
     try {
@@ -457,6 +503,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
 
         // contexto
         _editaContextoEmpleado(empleadoEditado);
+
         foto = pathFireStore;
         setState(() {
           cargandoFoto = false;
@@ -472,15 +519,26 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
   void _editaContextoEmpleado(EmpleadoModel empleadoEditado) {
     final providerEmpleado = context.read<EmpleadosProvider>();
     providerEmpleado.modificaEmpleado(empleadoEditado);
+
+    // final nuevo = providerEmpleado.getEmpleados;
+
+    providerEmpleado.setEmpleadosStaff();
   }
 
-  void _nuevoEmpleado(BuildContext context) {
-    final uuid = const Uuid();
-    // Genera un UUID
-    String uuidString = uuid.v4();
-    // Extraer solo letras de los primeros tres caracteres
-    String codigoVerificacion = uuidString.substring(0, 3).toUpperCase();
-    final empleadoEditado = EmpleadoModel(
+  void _nuevoEmpleado(BuildContext context) async {
+    String codigoVerificacion = 'verificado';
+
+    // SI EL EMAIL CORRESPONDE CON EL DEL USUARIO DE LA APP , LO DAMOS COMO VERIFICADO
+    if (email != _emailSesionUsuario) {
+      // GENERACION DE CODIGO DE VERIFICACION DE REGISTROS DE NUEVOS EMPLEADOS
+      const uuid = Uuid();
+      // Genera un UUID
+      String uuidString = uuid.v4();
+      // Extraer solo letras de los primeros tres caracteres
+      codigoVerificacion = uuidString.substring(0, 3).toUpperCase();
+    }
+
+    EmpleadoModel empleadoEditado = EmpleadoModel(
       id: id,
       nombre: nombre,
       disponibilidad: disponibilidad,
@@ -490,16 +548,17 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
       foto: foto,
       color: color,
       codVerif: codigoVerificacion,
-      rol: roles,
+      roles: rolesEmpleados,
     );
 
+    print(id);
     try {
       // firebase
-      _agregaEmpleadoFirebase(empleadoEditado);
-
-      // contexto
-      final providerEmpleado = context.read<EmpleadosProvider>();
-      providerEmpleado.agregaEmpleado(empleadoEditado);
+      String idEmpleadoGeneradoEnFirebase =
+          await _agregaEmpleadoFirebase(empleadoEditado);
+      EmpleadoModel empleadoConId =
+          empleadoEditado.copyWith(id: idEmpleadoGeneradoEnFirebase);
+      agregaEnContexto(empleadoConId);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al agregar el empleado: $e')),
@@ -508,6 +567,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
   }
 
   void _modificaEmpleado(BuildContext context) {
+    print('id del empleado en el contexto $id');
     final empleadoEditado = EmpleadoModel(
       id: id,
       nombre: nombre,
@@ -518,7 +578,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
       foto: foto,
       color: color,
       codVerif: codVerif,
-      rol: roles,
+      roles: rolesEmpleados,
     );
 
     try {
@@ -534,21 +594,29 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
     }
   }
 
-  void _agregaEmpleadoFirebase(empleadoEditado) async {
-    await FirebaseProvider()
+  Future<String> _agregaEmpleadoFirebase(empleadoEditado) async {
+    final idEmpleado = await FirebaseProvider()
         .agregaEmpleado(empleadoEditado, _emailSesionUsuario);
+
+    return idEmpleado;
   }
 
   void _editaEmpleadoFirebase(empleadoEditado) async {
     await FirebaseProvider()
         .editaEmpleado(empleadoEditado, _emailSesionUsuario);
   }
+
+  void agregaEnContexto(EmpleadoModel empleadoConId) {
+    // contexto
+    final providerEmpleado = context.read<EmpleadosProvider>();
+    providerEmpleado.agregaEmpleado(empleadoConId);
+  }
 }
 
 class MultiSelectDialog extends StatefulWidget {
   final String title;
-  final List<String> items;
-  final List<String> initialSelectedItems;
+  final List<dynamic> items;
+  final List<dynamic> initialSelectedItems;
 
   const MultiSelectDialog({
     super.key,

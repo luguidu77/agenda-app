@@ -23,15 +23,7 @@ class SeccionEmpleados extends StatefulWidget {
 }
 
 class _SeccionEmpleadosState extends State<SeccionEmpleados> {
-  List<EmpleadoModel> empleados = [];
-
-  void getEmpleados() {}
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    getEmpleados();
-  }
+  List<EmpleadoModel> empleadosStaff = [];
 
   @override
   Widget build(BuildContext context) {
@@ -50,18 +42,18 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
           );
         }
 
-        if (empleadosProvider.getEmpleados.isEmpty) {
+        if (empleadosProvider.getEmpleadosStaff.isEmpty) {
           // Mostrar mensaje o botón si no hay empleados
           return _botonNoHayEmpleados(context);
         }
 
         // Mostrar contenido si hay empleados
-        return SeccionEmpleados();
+        return seccionEmpleados();
       },
     );
   }
 
-  Visibility SeccionEmpleados() {
+  Visibility seccionEmpleados() {
     //bool leerEstadoBotonIndisponibilidad, VistaProvider vistaProvider, CalendarView vistaActual, context, List<CitaModelFirebase> todasLasCitasConteoPorEmpleado, List<CitaModelFirebase> citas, int numCitas
 
     final leerEstadoBotonIndisponibilidad =
@@ -71,9 +63,8 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
     var vistaActual = vistaProvider.vista;
     var citasProvider = Provider.of<CitasProvider>(context, listen: false);
     var todasLasCitas = citasProvider.getCitas;
-    final empleadosProvider =
-        Provider.of<EmpleadosProvider>(context, listen: true);
-    empleados = empleadosProvider.getEmpleados;
+    final empleadosProvider = context.watch<EmpleadosProvider>();
+    empleadosStaff = empleadosProvider.getEmpleadosStaff;
 
     return Visibility(
         visible: !leerEstadoBotonIndisponibilidad,
@@ -81,7 +72,12 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             // cambioVistaCalendario(vistaProvider, vistaActual),
-            verTodosLosEmpleados(vistaProvider, vistaActual),
+
+            Visibility(
+              visible: empleadosStaff.length != 1,
+              child: verTodosLosEmpleados(vistaProvider, vistaActual),
+            ),
+
             const SizedBox(width: 10),
 
             ..._empleados(
@@ -97,8 +93,18 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
 
   verTodosLosEmpleados(VistaProvider vistaProvider, CalendarView vistaActual) {
     final contextoCreacionCita = context.watch<CreacionCitaProvider>();
-    bool seleccionado =
-        'TODOS_EMPLEADOS' == contextoCreacionCita.contextoCita.idEmpleado;
+    bool seleccionado = false;
+
+    if (empleadosStaff.length <= 1) {
+      CitaModelFirebase edicionContextoCita =
+          CitaModelFirebase(idEmpleado: empleadosStaff[0].id);
+
+      contextoCreacionCita.setContextoCita(edicionContextoCita);
+    } else {
+      seleccionado =
+          'TODOS_EMPLEADOS' == contextoCreacionCita.contextoCita.idEmpleado;
+    }
+
     return Column(
       children: [
         Stack(
@@ -148,7 +154,7 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
     String emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
     List<Widget> empleadosWidget = [];
 
-    empleadosWidget = empleados.map((empleado) {
+    empleadosWidget = empleadosStaff.map((empleado) {
       return EmpleadoWidget(
           emailUsuario: emailSesionUsuario, idEmpleado: empleado.id);
     }).toList();
@@ -241,9 +247,9 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
         size: 20,
       ),
       label: const Text(
-        'Agrega un empleado', // Mensaje claro
+        'Agrega empleado con rol "personal" para asignarle citas', // Mensaje claro
         style: TextStyle(
-          fontSize: 16,
+          fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
       ),

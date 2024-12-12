@@ -517,7 +517,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
   ListTile _empleados(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.person),
-      title: Text('Tus empleados', style: estilo),
+      title: Text('Gestión de personal', style: estilo),
       onTap: () {
         Navigator.push(
             context,

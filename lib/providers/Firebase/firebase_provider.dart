@@ -27,6 +27,11 @@ class FirebaseProvider extends ChangeNotifier {
   FirebaseFirestore? db;
   List<Map<String, dynamic>> data = [];
 
+  // Método privado para convertir un RolEmpleado a String
+  String rolEmpleadoToString(RolEmpleado role) {
+    return role.name; // name es equivalente al String del Enum (ej. 'staff')
+  }
+
   //?INICIALIZA FIREBASE //////////////////////////////////////////
   _iniFirebase() async {
     await Firebase.initializeApp(
@@ -381,7 +386,7 @@ class FirebaseProvider extends ChangeNotifier {
           foto: '',
           color: 0xFF0000FF,
           codVerif: '',
-          rol: [],
+          roles: [],
         );
         cliente = {
           'nombre': '',
@@ -1272,7 +1277,7 @@ class FirebaseProvider extends ChangeNotifier {
           foto: '',
           color: 0xFF0000FF,
           codVerif: '',
-          rol: [],
+          roles: [],
         );
         cliente = {
           'nombre': '',
@@ -1695,7 +1700,7 @@ class FirebaseProvider extends ChangeNotifier {
       foto: '',
       color: 0xFF0000FF,
       codVerif: '',
-      rol: [],
+      roles: [],
     );
 
     // Inicializar Firebase
@@ -1720,7 +1725,7 @@ class FirebaseProvider extends ChangeNotifier {
               List<dynamic>.from(element['categoriaServicios'] ?? []);
           empleado.color = (element['color'] ?? 0xFFFFFFFF);
           empleado.codVerif = element['cod_verif'];
-          empleado.rol = List<dynamic>.from(element['rol'] ?? []);
+          empleado.roles = List<RolEmpleado>.from(element['rol'] ?? []);
         }
       }
     });
@@ -1731,6 +1736,25 @@ class FirebaseProvider extends ChangeNotifier {
   Future<List<EmpleadoModel>> getTodosEmpleados(String email) async {
     List<EmpleadoModel> listaEmpleados = [];
     // Inicializar un empleado vacío
+
+    List<RolEmpleado> procesarRoles(dynamic roles) {
+      if (roles is List) {
+        return roles.map<RolEmpleado>((rol) {
+          switch (rol) {
+            case 'personal':
+              return RolEmpleado.personal;
+            case 'gerente':
+              return RolEmpleado.gerente;
+            case 'administrador':
+              return RolEmpleado.administrador;
+            default:
+              throw ArgumentError('Rol desconocido: $rol');
+          }
+        }).toList();
+      } else {
+        throw ArgumentError('El campo roles no es una lista válida: $roles');
+      }
+    }
 
     // Inicializar Firebase
     await _iniFirebase();
@@ -1753,12 +1777,13 @@ class FirebaseProvider extends ChangeNotifier {
           foto: element['foto'] ?? '',
           color: element['color'] ?? 0xFFFFFFFF,
           codVerif: element['cod_verif'],
-          rol: element['rol'],
+          roles: procesarRoles(element['rol'] ?? []),
         );
 
         listaEmpleados.add(empleado);
       }
     });
+    // Función para procesar los roles
 
     return listaEmpleados;
   }
@@ -1780,12 +1805,13 @@ class FirebaseProvider extends ChangeNotifier {
       'foto': empleado.foto,
       'color': empleado.color,
       'cod_verif': empleado.codVerif,
-      'rol': empleado.rol,
+      'rol': empleado.roles.map((rol) => rolEmpleadoToString(rol)).toList(),
     };
+
     await collectRef.doc(empleado.id).update(empleadoEditado);
   }
 
-  Future<void> agregaEmpleado(EmpleadoModel empleado, String email) async {
+  Future<String> agregaEmpleado(EmpleadoModel empleado, String email) async {
     // Inicializar Firebase
     await _iniFirebase();
 
@@ -1802,9 +1828,10 @@ class FirebaseProvider extends ChangeNotifier {
       'foto': empleado.foto,
       'color': empleado.color,
       'cod_verif': empleado.codVerif,
-      'rol': empleado.rol,
+      'rol': empleado.roles.map((rol) => rolEmpleadoToString(rol)).toList(),
     };
-    await collectRef.doc().set(empleadoEditado);
+    DocumentReference docRef = await collectRef.add(empleadoEditado);
+    return docRef.id;
   }
 
   Future<String> subirImagenStorage(

@@ -48,9 +48,9 @@ dependencies:
   whatsapp_unilink: ^2.0.2
 
   permission_handler: ^10.2.0
-  fast_contacts: ^3.0.3
+  fast_contacts: ^4.0.0
 
-  flutter_local_notifications: ^14.0.1
+  flutter_local_notifications: ^18.0.1
   timezone: ^0.9.2
 
   #admob_flutter: ^3.0.0

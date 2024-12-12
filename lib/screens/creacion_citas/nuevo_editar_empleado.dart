@@ -517,11 +517,10 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
   }
 
   void _editaContextoEmpleado(EmpleadoModel empleadoEditado) {
+    //contexto empleados
     final providerEmpleado = context.read<EmpleadosProvider>();
     providerEmpleado.modificaEmpleado(empleadoEditado);
-
-    // final nuevo = providerEmpleado.getEmpleados;
-
+    // setea el contexto de empleados personal para acutalizar su lista
     providerEmpleado.setEmpleadosStaff();
   }
 
@@ -560,9 +559,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
           empleadoEditado.copyWith(id: idEmpleadoGeneradoEnFirebase);
       agregaEnContexto(empleadoConId);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al agregar el empleado: $e')),
-      );
+      debugPrint('Error al agregar el empleado: $e');
     }
   }
 
@@ -588,9 +585,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
       // contexto
       _editaContextoEmpleado(empleadoEditado);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al modificar el empleado: $e')),
-      );
+      debugPrint('Error al agregar el empleado: $e');
     }
   }
 
@@ -610,6 +605,8 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
     // contexto
     final providerEmpleado = context.read<EmpleadosProvider>();
     providerEmpleado.agregaEmpleado(empleadoConId);
+    // setea el contexto de empleados personal para acutalizar su lista
+    providerEmpleado.setEmpleadosStaff();
   }
 }
 

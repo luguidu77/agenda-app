@@ -16,7 +16,29 @@ class EmpleadosProvider extends ChangeNotifier {
   }
 
   void agregaEmpleado(EmpleadoModel empleado) {
+    print(empleado.id);
     _empleados.add(empleado);
     notifyListeners();
+  }
+
+  void modificaEmpleado(EmpleadoModel empleadoEditado) {
+    // Verificar el estado actual de la lista
+    if (_empleados.isEmpty) {
+      print('La lista de empleados está vacía.');
+      return;
+    }
+    // Buscar el índice del empleado a modificar
+    final index =
+        _empleados.indexWhere((empleado) => empleado.id == empleadoEditado.id);
+
+    if (index != -1) {
+      // Actualizar directamente al empleado en la posición encontrada
+      _empleados[index] = empleadoEditado;
+
+      // Notificar a los listeners para reflejar los cambios
+      notifyListeners();
+    } else {
+      print('Empleado con ID ${empleadoEditado.id} no encontrado.');
+    }
   }
 }

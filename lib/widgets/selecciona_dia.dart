@@ -1,4 +1,3 @@
-import 'package:agendacitas/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -9,7 +8,6 @@ import '../models/models.dart';
 import '../mylogic_formularios/mylogic.dart';
 import '../providers/providers.dart';
 import '../utils/extraerServicios.dart';
-import '../utils/publicidad.dart';
 import '../utils/utils.dart';
 
 class SeleccionaDia extends StatefulWidget {

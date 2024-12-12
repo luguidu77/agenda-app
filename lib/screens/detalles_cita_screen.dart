@@ -358,10 +358,32 @@ class _EmpleadoInfoWidget extends StatelessWidget {
           'Concertada con ',
           style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
         ),
+        const SizedBox(
+          width: 2,
+        ),
         EmpleadoWidget(
           emailUsuario: emailSesionUsuario,
           idEmpleado: reserva['idEmpleado'],
-        )
+          procede: 'detalles_cita',
+        ),
+        const SizedBox(
+          width: 15,
+        ),
+        /*  ElevatedButton(
+          onPressed: () {},
+          style: ButtonStyle(
+            shape: WidgetStateProperty.all(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(0), // Rectangular
+              ),
+            ),
+            side: WidgetStateProperty.all(
+              const BorderSide(
+                  color: Colors.black, width: 2), // Borde negro y ancho de 2
+            ),
+          ),
+          child: const Text('reasignar'),
+        ) */
       ],
     );
   }

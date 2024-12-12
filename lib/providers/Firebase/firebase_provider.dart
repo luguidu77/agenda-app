@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/personaliza_provider.dart';
@@ -11,6 +12,7 @@ import 'package:agendacitas/providers/db_provider.dart';
 import 'package:agendacitas/utils/extraerServicios.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -379,6 +381,7 @@ class FirebaseProvider extends ChangeNotifier {
           foto: '',
           color: 0xFF0000FF,
           codVerif: '',
+          rol: [],
         );
         cliente = {
           'nombre': '',
@@ -1269,6 +1272,7 @@ class FirebaseProvider extends ChangeNotifier {
           foto: '',
           color: 0xFF0000FF,
           codVerif: '',
+          rol: [],
         );
         cliente = {
           'nombre': '',
@@ -1682,21 +1686,23 @@ class FirebaseProvider extends ChangeNotifier {
       String email, String idempleado) async {
     // Inicializar un empleado vacío
     final empleado = EmpleadoModel(
-        id: '',
-        nombre: '',
-        disponibilidad: [],
-        email: '',
-        telefono: '',
-        categoriaServicios: [],
-        foto: '',
-        color: 0xFF0000FF,
-        codVerif: '');
+      id: '',
+      nombre: '',
+      disponibilidad: [],
+      email: '',
+      telefono: '',
+      categoriaServicios: [],
+      foto: '',
+      color: 0xFF0000FF,
+      codVerif: '',
+      rol: [],
+    );
 
     // Inicializar Firebase
     await _iniFirebase();
 
     // Obtener la referencia del documento de empleados
-    final docRef = await _referenciaDocumento(email, 'empleados');
+    CollectionReference docRef = await _referenciaDocumento(email, 'empleados');
 
     // Buscar el documento del empleado por su ID
     await docRef.get().then((QuerySnapshot snapshot) {
@@ -1714,6 +1720,7 @@ class FirebaseProvider extends ChangeNotifier {
               List<dynamic>.from(element['categoriaServicios'] ?? []);
           empleado.color = (element['color'] ?? 0xFFFFFFFF);
           empleado.codVerif = element['cod_verif'];
+          empleado.rol = List<dynamic>.from(element['rol'] ?? []);
         }
       }
     });
@@ -1729,28 +1736,113 @@ class FirebaseProvider extends ChangeNotifier {
     await _iniFirebase();
 
     // Obtener la referencia del documento de empleados
-    final docRef = await _referenciaDocumento(email, 'empleados');
+    CollectionReference docRef = await _referenciaDocumento(email, 'empleados');
 
     // Buscar el documento del empleado por su ID
     await docRef.get().then((QuerySnapshot snapshot) {
       for (var element in snapshot.docs) {
         var empleado = EmpleadoModel(
-            id: element.id,
-            nombre: element['nombre'] ?? '',
-            disponibilidad:
-                List<dynamic>.from(element['disponibilidadSemanal'] ?? []),
-            email: element['email'] ?? '',
-            telefono: element['telefono'] ?? '',
-            categoriaServicios:
-                List<dynamic>.from(element['categoriaServicios'] ?? []),
-            foto: element['foto'] ?? '',
-            color: element['color'] ?? 0xFFFFFFFF,
-            codVerif: element['cod_verif']);
+          id: element.id,
+          nombre: element['nombre'] ?? '',
+          disponibilidad:
+              List<dynamic>.from(element['disponibilidadSemanal'] ?? []),
+          email: element['email'] ?? '',
+          telefono: element['telefono'] ?? '',
+          categoriaServicios:
+              List<dynamic>.from(element['categoriaServicios'] ?? []),
+          foto: element['foto'] ?? '',
+          color: element['color'] ?? 0xFFFFFFFF,
+          codVerif: element['cod_verif'],
+          rol: element['rol'],
+        );
 
         listaEmpleados.add(empleado);
       }
     });
 
     return listaEmpleados;
+  }
+
+  Future<void> editaEmpleado(EmpleadoModel empleado, String email) async {
+    // Inicializar Firebase
+    await _iniFirebase();
+
+    // Obtener la referencia del documento de empleados
+    CollectionReference collectRef =
+        await _referenciaDocumento(email, 'empleados');
+
+    final empleadoEditado = {
+      'nombre': empleado.nombre,
+      'disponibilidadSemanal': empleado.disponibilidad,
+      'email': empleado.email,
+      'telefono': empleado.telefono,
+      'categoriaServicios': empleado.categoriaServicios,
+      'foto': empleado.foto,
+      'color': empleado.color,
+      'cod_verif': empleado.codVerif,
+      'rol': empleado.rol,
+    };
+    await collectRef.doc(empleado.id).update(empleadoEditado);
+  }
+
+  Future<void> agregaEmpleado(EmpleadoModel empleado, String email) async {
+    // Inicializar Firebase
+    await _iniFirebase();
+
+    // Obtener la referencia del documento de empleados
+    CollectionReference collectRef =
+        await _referenciaDocumento(email, 'empleados');
+
+    final empleadoEditado = {
+      'nombre': empleado.nombre,
+      'disponibilidadSemanal': empleado.disponibilidad,
+      'email': empleado.email,
+      'telefono': empleado.telefono,
+      'categoriaServicios': empleado.categoriaServicios,
+      'foto': empleado.foto,
+      'color': empleado.color,
+      'cod_verif': empleado.codVerif,
+      'rol': empleado.rol,
+    };
+    await collectRef.doc().set(empleadoEditado);
+  }
+
+  Future<String> subirImagenStorage(
+      usuarioAPP, image, EmpleadoModel empleado) async {
+    print('------------ESTOY SUBIENDO IMAGEN AL STORE');
+
+    //1º INICIALIZAR
+
+    await _iniFirebase();
+    var storage = FirebaseStorage.instance;
+    //2º FILE LLEVA LA RUTA DE LA FOTO EN EL DISPOSITIVO
+    final file = File(image);
+
+    try {
+      //3º SUBIR FOTO AL STORAGE
+      //TASKSHAPSHOT ES PARA USAR EN POSTERIOR CONSULTA AL STORAGE
+
+      TaskSnapshot taskSnapshot = await storage
+          // GUARDO LAS FOTO DE FICHA CLIENTE EN LA SIGUIENTE DIRECCION DEL STORAGE FIREBASE
+          .ref('agendadecitas/$usuarioAPP/empleados/${empleado.nombre}/foto')
+          .putFile(file);
+      debugPrint(taskSnapshot.toString());
+      // CONSULTA DE LA URL EN STORAGE
+      final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+      debugPrint(downloadUrl.toString());
+
+      return downloadUrl;
+    } on FirebaseException catch (e) {
+      // 'Error Store en la nube ${e.message}'
+
+      debugPrint(e.toString());
+      return 'error en la nube';
+    } catch (e) {
+      //'ERROR AL CARGAR LA FOTO'
+
+      debugPrint(e.toString());
+
+      return 'error al cargar la foto';
+    }
   }
 }

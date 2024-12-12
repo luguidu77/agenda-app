@@ -1,4 +1,3 @@
-import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_cliente.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_confirmar.dart';
@@ -279,8 +278,8 @@ class _HomeScreenState extends State<HomeScreen> {
           'creacionCitaServicio': (context) => const CreacionCitaServicio(),
           'creacionCitaComfirmar': (context) => const CreacionCitaConfirmar(),
           'serviciosCitas': (_) => const ServiciosCreacionCita(),
-          'empleadosScreen': (_) => const EmpleadosScreen(),
-          'empleadosEdicionScreen': (_) => EmpleadoEdicion(),
+          'empleadosScreen': (context) => const EmpleadosScreen(),
+          'empleadosEdicionScreen': (context) => const EmpleadoEdicion(),
         });
   }
 

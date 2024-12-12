@@ -1,6 +1,5 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/empleado_model.dart';
-import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/calendario_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
@@ -26,11 +25,7 @@ class SeccionEmpleados extends StatefulWidget {
 class _SeccionEmpleadosState extends State<SeccionEmpleados> {
   List<EmpleadoModel> empleados = [];
 
-  void getEmpleados() {
-    final empleadosProvider =
-        Provider.of<EmpleadosProvider>(context, listen: false);
-    empleados = empleadosProvider.getEmpleados;
-  }
+  void getEmpleados() {}
 
   @override
   void initState() {
@@ -40,7 +35,30 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
 
   @override
   Widget build(BuildContext context) {
-    return SeccionEmpleados();
+    return Consumer<EmpleadosProvider>(
+      builder: (context, empleadosProvider, child) {
+        if (!empleadosProvider.empleadosCargados) {
+          // Mostrar indicador de carga mientras se cargan los empleados
+          return const Center(
+            child: SkeletonAvatar(
+              style: SkeletonAvatarStyle(
+                shape: BoxShape.circle,
+                width: 50,
+                height: 50,
+              ),
+            ),
+          );
+        }
+
+        if (empleadosProvider.getEmpleados.isEmpty) {
+          // Mostrar mensaje o botón si no hay empleados
+          return _botonNoHayEmpleados(context);
+        }
+
+        // Mostrar contenido si hay empleados
+        return SeccionEmpleados();
+      },
+    );
   }
 
   Visibility SeccionEmpleados() {
@@ -53,6 +71,9 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
     var vistaActual = vistaProvider.vista;
     var citasProvider = Provider.of<CitasProvider>(context, listen: false);
     var todasLasCitas = citasProvider.getCitas;
+    final empleadosProvider =
+        Provider.of<EmpleadosProvider>(context, listen: true);
+    empleados = empleadosProvider.getEmpleados;
 
     return Visibility(
         visible: !leerEstadoBotonIndisponibilidad,
@@ -62,6 +83,7 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
             // cambioVistaCalendario(vistaProvider, vistaActual),
             verTodosLosEmpleados(vistaProvider, vistaActual),
             const SizedBox(width: 10),
+
             ..._empleados(
               context,
               vistaActual,
@@ -124,13 +146,14 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
     final estadoPagoProvider =
         Provider.of<EstadoPagoAppProvider>(context, listen: false);
     String emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    List<Widget> empleadosWidget = [];
 
-    List<dynamic> todos = empleados.map((empleado) {
+    empleadosWidget = empleados.map((empleado) {
       return EmpleadoWidget(
           emailUsuario: emailSesionUsuario, idEmpleado: empleado.id);
     }).toList();
 
-    return vistaActual == CalendarView.day ? todos : [];
+    return vistaActual == CalendarView.day ? empleadosWidget : [];
   }
 
   Future<String> getNumCitas(List<CitaModelFirebase> todasLasCitas) async {
@@ -209,6 +232,32 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
     );
   }
 
+  _botonNoHayEmpleados(context) {
+    return ElevatedButton.icon(
+      onPressed: () => Navigator.pushNamed(context, 'empleadosScreen'),
+      icon: const Icon(
+        Icons.warning_amber_rounded, // Ícono de advertencia
+        color: Colors.white, // Color del ícono
+        size: 20,
+      ),
+      label: const Text(
+        'Agrega un empleado', // Mensaje claro
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(
+            horizontal: 16, vertical: 12), // Tamaño cómodo
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8), // Esquinas redondeadas
+        ),
+        elevation: 4, // Sombra para un efecto moderno
+        backgroundColor: Colors.orange, // Color llamativo como advertencia
+      ),
+    );
+  }
   /*  Padding _skeletonEmpleados(List<dynamic> empleados) {
     return Padding(
       padding: const EdgeInsets.only(top: 10.0),
@@ -251,4 +300,53 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
       ),
     );
   } */
+}
+
+class CargandoDatos extends StatelessWidget {
+  const CargandoDatos({super.key});
+  _botonNoHayEmpleados(context) {
+    return ElevatedButton.icon(
+      onPressed: () => Navigator.pushNamed(context, 'empleadosScreen'),
+      icon: const Icon(
+        Icons.warning_amber_rounded, // Ícono de advertencia
+        color: Colors.white, // Color del ícono
+        size: 20,
+      ),
+      label: const Text(
+        'Agrega un empleado', // Mensaje claro
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(
+            horizontal: 16, vertical: 12), // Tamaño cómodo
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8), // Esquinas redondeadas
+        ),
+        elevation: 4, // Sombra para un efecto moderno
+        backgroundColor: Colors.orange, // Color llamativo como advertencia
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future:
+          Future.delayed(const Duration(seconds: 5)), // Duración de 1 segundo
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          // Retorna un contenedor vacío o reemplaza con el contenido deseado
+          return _botonNoHayEmpleados(
+              context); // Botón u otro widget puede ir aquí
+        }
+        // Mientras se espera, muestra el indicador de carga
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+  }
 }

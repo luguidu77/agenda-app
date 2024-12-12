@@ -186,8 +186,8 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
           return Column(
             children: [
               (notificaciones.isEmpty)
-                  ? Padding(
-                      padding: const EdgeInsets.only(top: 58.0),
+                  ? const Padding(
+                      padding: EdgeInsets.only(top: 58.0),
                       child: SizedBox(
                           height: 200,
                           width: double.infinity,

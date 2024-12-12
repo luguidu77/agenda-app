@@ -1,26 +1,24 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/empleado_model.dart';
-import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/calendario_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
-import 'package:agendacitas/providers/estado_creacion_indisponibilidad.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
 
 class EmpleadoWidget extends StatefulWidget {
   final String emailUsuario;
   final String idEmpleado;
+  final String? procede;
 
-  const EmpleadoWidget({
-    Key? key,
-    required this.emailUsuario,
-    required this.idEmpleado,
-  }) : super(key: key);
+  const EmpleadoWidget(
+      {Key? key,
+      required this.emailUsuario,
+      required this.idEmpleado,
+      this.procede})
+      : super(key: key);
 
   @override
   State<EmpleadoWidget> createState() => _EmpleadoWidgetState();
@@ -37,6 +35,7 @@ class _EmpleadoWidgetState extends State<EmpleadoWidget> {
     foto: '',
     color: 0xFFFFFFFF,
     codVerif: '',
+    rol: [],
   );
 
   getEmpleado(String emailUsuario, String idEmpleado) async {
@@ -44,7 +43,12 @@ class _EmpleadoWidgetState extends State<EmpleadoWidget> {
 
     List<EmpleadoModel> empleados = contextoEmpleado.getEmpleados;
 
-    empleado = empleados.where((empleado) => empleado.id == idEmpleado).first;
+    try {
+      empleado = empleados.where((empleado) => empleado.id == idEmpleado).first;
+    } catch (e) {
+      print('error al buscar empleado');
+      empleado.nombre = '(empleado)';
+    }
   }
 
   Future<int> getNumCitas(String idEmpleado) async {
@@ -80,10 +84,23 @@ class _EmpleadoWidgetState extends State<EmpleadoWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final contextoCreacionCita = context.read<CreacionCitaProvider>();
+    final contextoCreacionCita = context.watch<CreacionCitaProvider>();
     bool empleadoSeleccionado =
         empleado.id == contextoCreacionCita.contextoCita.idEmpleado;
 
+    return widget.procede == 'detalles_cita'
+        ? Text(
+            empleado.nombre,
+            style: TextStyle(
+              color: empleadoSeleccionado ? Colors.black : Colors.grey,
+              fontWeight: FontWeight.bold,
+            ),
+          )
+        : _widgetFotoCitas(contextoCreacionCita, empleadoSeleccionado);
+  }
+
+  Stack _widgetFotoCitas(
+      CreacionCitaProvider contextoCreacionCita, bool empleadoSeleccionado) {
     return Stack(
       alignment: Alignment.topRight,
       children: [

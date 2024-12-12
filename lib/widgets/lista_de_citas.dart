@@ -2,12 +2,9 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:agendacitas/models/empleado_model.dart';
-import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/screens/creacion_no_disponibilidad/tarjeta_indisponibilidad.dart';
 import 'package:agendacitas/screens/detalles_horario_no_disponible_screen.dart';
-import 'package:agendacitas/utils/extraerServicios.dart';
-import 'package:agendacitas/widgets/empleado/empleado.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';

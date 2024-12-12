@@ -7,7 +7,8 @@ class EmpleadoModel {
   List<dynamic> categoriaServicios;
   String foto;
   int color;
-  String codVerif; // Nuevo campo agregado
+  String codVerif;
+  List<dynamic> rol;
 
   // Constructor
   EmpleadoModel({
@@ -19,7 +20,8 @@ class EmpleadoModel {
     required this.categoriaServicios,
     required this.foto,
     required this.color,
-    required this.codVerif, // Nuevo campo en el constructor
+    required this.codVerif,
+    required this.rol,
   });
 
   // Factory constructor para crear una instancia de EmpleadoModel desde un mapa (por ejemplo, datos de Firebase)
@@ -34,7 +36,8 @@ class EmpleadoModel {
       foto: map['foto'] ?? '',
       color: map['color'] ??
           '#FFFFFF', // Valor por defecto para color si no está definido
-      codVerif: map['cod_verif'] ?? '', // Nuevo campo en fromMap
+      codVerif: map['cod_verif'] ?? '',
+      rol: map['rol'] ?? '',
     );
   }
 
@@ -49,7 +52,8 @@ class EmpleadoModel {
       'categoriaServicios': categoriaServicios,
       'foto': foto,
       'color': color, // Agregar color al mapa
-      'cod_verif': codVerif, // Nuevo campo en toMap
+      'cod_verif': codVerif,
+      'rol': rol,
     };
   }
 }

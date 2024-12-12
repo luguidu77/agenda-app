@@ -1,5 +1,11 @@
+import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
+import 'package:agendacitas/providers/empleados_provider.dart';
+import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:agendacitas/models/empleado_model.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 class EmpleadoEdicion extends StatefulWidget {
   final EmpleadoModel? empleado;
@@ -22,6 +28,20 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
   late int color;
   late String codVerif;
 
+  late List<String> rolesEmpleados;
+
+  final ImagePicker _picker = ImagePicker();
+
+  String _emailSesionUsuario = '';
+  bool cargandoFoto = false;
+
+  List<String> servicios = [];
+
+  final List<String> roles = [
+    'Admin',
+    'Gerente',
+    'Staff',
+  ];
   final List<String> diasSemana = [
     'Lunes',
     'Martes',
@@ -32,17 +52,25 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
     'Domingo'
   ];
 
-  final List<String> servicios = [
-    'Servicio 1',
-    'Servicio 2',
-    'Servicio 3',
-    'Servicio 4',
-    'Servicio 5'
-  ];
+  estadoPagoEmailApp() async {
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    //  _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
+
+    final categorias =
+        await FirebaseProvider().cargarCategorias(_emailSesionUsuario);
+    print(categorias.toString());
+    for (var categoria in categorias) {
+      servicios.add(categoria['nombreCategoria']);
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+
+    estadoPagoEmailApp();
+
     if (widget.empleado != null) {
       id = widget.empleado!.id;
       nombre = widget.empleado!.nombre;
@@ -54,6 +82,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
       foto = widget.empleado!.foto;
       color = widget.empleado!.color;
       codVerif = widget.empleado!.codVerif;
+      rolesEmpleados = List<String>.from(widget.empleado!.rol);
     } else {
       id = '';
       nombre = '';
@@ -64,6 +93,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
       foto = '';
       color = 0xFFFFFFFF;
       codVerif = '';
+      rolesEmpleados = [];
     }
   }
 
@@ -130,6 +160,25 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
     if (selectedColor != null) {
       setState(() {
         color = selectedColor;
+      });
+    }
+  }
+
+  void _selectRol() async {
+    List<String>? selectedRoles = await showDialog<List<String>>(
+      context: context,
+      builder: (BuildContext context) {
+        return MultiSelectDialog(
+          title: 'Selecciona sus roles',
+          items: roles,
+          initialSelectedItems: rolesEmpleados,
+        );
+      },
+    );
+
+    if (selectedRoles != null) {
+      setState(() {
+        rolesEmpleados = selectedRoles;
       });
     }
   }
@@ -209,15 +258,25 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   CircleAvatar(
-                    backgroundImage: NetworkImage(foto),
+                    backgroundImage: foto.isEmpty
+                        ? const NetworkImage(
+                            'default_image_url_here') // Foto por defecto si no hay foto aún
+                        : NetworkImage(foto),
                     radius: 50,
                   ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(
-                        Icons.photo_size_select_actual_rounded,
-                        size: 40,
+                      InkWell(
+                        onTap: () {
+                          _subirImagen();
+                        },
+                        child: cargandoFoto
+                            ? const CircularProgressIndicator()
+                            : const Icon(
+                                Icons.photo_library_outlined,
+                                size: 40,
+                              ),
                       ),
                       const SizedBox(height: 16),
                       GestureDetector(
@@ -235,6 +294,10 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                           ),
                         ),
                       ),
+                      Text(
+                        'Asignale un color',
+                        style: TextStyle(color: Colors.grey[600]),
+                      )
                     ],
                   ),
                 ],
@@ -285,6 +348,21 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                 },
               ),
               const SizedBox(height: 16),
+              const Text('Rol:'),
+              GestureDetector(
+                onTap: _selectRol,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(rolesEmpleados.isEmpty
+                      ? 'Selecciona rol'
+                      : rolesEmpleados.join(', ')),
+                ),
+              ),
+              const SizedBox(height: 16),
               const Text('Disponibilidad Semanal:'),
               GestureDetector(
                 onTap: _selectDisponibilidad,
@@ -320,6 +398,13 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
                     // Aquí puedes manejar la lógica para guardar o actualizar el empleado
+                    if (widget.empleado == null) {
+                      // nuevo empleado
+                      _nuevoEmpleado(context);
+                    } else {
+                      // modifica empleado
+                      _modificaEmpleado(context);
+                    }
                     Navigator.pop(context);
                   }
                 },
@@ -334,6 +419,129 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
         ),
       ),
     );
+  }
+
+  void _subirImagen() async {
+    setState(() {
+      cargandoFoto = true;
+    });
+    String pathFireStore = '';
+    final empleadoEditado = EmpleadoModel(
+      id: id,
+      nombre: nombre,
+      disponibilidad: disponibilidad,
+      email: email,
+      telefono: telefono,
+      categoriaServicios: categoriaServicios,
+      foto: pathFireStore,
+      color: color,
+      codVerif: codVerif,
+      rol: roles,
+    );
+
+    try {
+      final image = await _picker.pickImage(
+          source: ImageSource.gallery,
+          imageQuality: 50,
+          maxHeight: 600,
+          maxWidth: 900);
+
+      // SUBE LA FOTO A FIREBASE STORAGE
+
+      pathFireStore = await FirebaseProvider().subirImagenStorage(
+          _emailSesionUsuario, image!.path, empleadoEditado);
+      try {
+        empleadoEditado.foto = pathFireStore;
+        // firebase
+        _editaEmpleadoFirebase(empleadoEditado);
+
+        // contexto
+        _editaContextoEmpleado(empleadoEditado);
+        foto = pathFireStore;
+        setState(() {
+          cargandoFoto = false;
+        });
+      } catch (e) {
+        debugPrint('Error al modificar el empleado: ${e.toString()}');
+      }
+    } catch (e) {
+      debugPrint('Error de imagen ${e.toString()}');
+    }
+  }
+
+  void _editaContextoEmpleado(EmpleadoModel empleadoEditado) {
+    final providerEmpleado = context.read<EmpleadosProvider>();
+    providerEmpleado.modificaEmpleado(empleadoEditado);
+  }
+
+  void _nuevoEmpleado(BuildContext context) {
+    final uuid = const Uuid();
+    // Genera un UUID
+    String uuidString = uuid.v4();
+    // Extraer solo letras de los primeros tres caracteres
+    String codigoVerificacion = uuidString.substring(0, 3).toUpperCase();
+    final empleadoEditado = EmpleadoModel(
+      id: id,
+      nombre: nombre,
+      disponibilidad: disponibilidad,
+      email: email,
+      telefono: telefono,
+      categoriaServicios: categoriaServicios,
+      foto: foto,
+      color: color,
+      codVerif: codigoVerificacion,
+      rol: roles,
+    );
+
+    try {
+      // firebase
+      _agregaEmpleadoFirebase(empleadoEditado);
+
+      // contexto
+      final providerEmpleado = context.read<EmpleadosProvider>();
+      providerEmpleado.agregaEmpleado(empleadoEditado);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al agregar el empleado: $e')),
+      );
+    }
+  }
+
+  void _modificaEmpleado(BuildContext context) {
+    final empleadoEditado = EmpleadoModel(
+      id: id,
+      nombre: nombre,
+      disponibilidad: disponibilidad,
+      email: email,
+      telefono: telefono,
+      categoriaServicios: categoriaServicios,
+      foto: foto,
+      color: color,
+      codVerif: codVerif,
+      rol: roles,
+    );
+
+    try {
+      // firebase
+      _editaEmpleadoFirebase(empleadoEditado);
+
+      // contexto
+      _editaContextoEmpleado(empleadoEditado);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al modificar el empleado: $e')),
+      );
+    }
+  }
+
+  void _agregaEmpleadoFirebase(empleadoEditado) async {
+    await FirebaseProvider()
+        .agregaEmpleado(empleadoEditado, _emailSesionUsuario);
+  }
+
+  void _editaEmpleadoFirebase(empleadoEditado) async {
+    await FirebaseProvider()
+        .editaEmpleado(empleadoEditado, _emailSesionUsuario);
   }
 }
 

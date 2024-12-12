@@ -5,7 +5,6 @@ import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_scree
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rive/math.dart';
 
 import '../providers/providers.dart';
 import '../screens/screens.dart';

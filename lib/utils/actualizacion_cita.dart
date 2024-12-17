@@ -7,6 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ActualizacionCita {
+  static agregar(BuildContext context, citaElegida) {
+    citaElegida.confirmada = true;
+    final contextoCitaProvider = context.read<CitasProvider>();
+
+    Future.microtask(() {
+      contextoCitaProvider.agregaCitaAlContexto(citaElegida);
+    });
+  }
+
   static actualizar(
     BuildContext context,
     Map<String, dynamic> cita,

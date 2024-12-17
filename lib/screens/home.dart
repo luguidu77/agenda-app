@@ -1,8 +1,10 @@
+import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_cliente.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_confirmar.dart';
 import 'package:agendacitas/screens/creacion_citas/empleados_screen.dart';
 import 'package:agendacitas/screens/creacion_citas/nuevo_editar_empleado.dart';
+import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 
 import 'package:agendacitas/screens/detalles_cita_screen.dart';
 import 'package:agendacitas/screens/notificaciones_screen.dart';

@@ -32,6 +32,25 @@ class FirebaseProvider extends ChangeNotifier {
     return role.name; // name es equivalente al String del Enum (ej. 'staff')
   }
 
+  List<RolEmpleado> procesarRoles(dynamic roles) {
+    if (roles is List) {
+      return roles.map<RolEmpleado>((rol) {
+        switch (rol) {
+          case 'personal':
+            return RolEmpleado.personal;
+          case 'gerente':
+            return RolEmpleado.gerente;
+          case 'administrador':
+            return RolEmpleado.administrador;
+          default:
+            throw ArgumentError('Rol desconocido: $rol');
+        }
+      }).toList();
+    } else {
+      throw ArgumentError('El campo roles no es una lista válida: $roles');
+    }
+  }
+
   //?INICIALIZA FIREBASE //////////////////////////////////////////
   _iniFirebase() async {
     await Firebase.initializeApp(
@@ -154,23 +173,35 @@ class FirebaseProvider extends ChangeNotifier {
     await docRef.set(cita);
     // Obtener el ID del documento
 
-    // retorna el id de la cita para utilizarlo en id recordatorio
-    return convertirIdEnEntero(docRef.id);
+    return (docRef.id);
   }
 
   //------------crea el recordatorio ----------------------------------------------
   creaRecordatorio(
     String emailUsuarioAPP,
     String dia,
-    String horaInicio,
+    citaElegida,
     String precio,
-    String comentario,
-    String nombreCliente,
-    String telfonoCliente,
-    String emailCliente,
     List<String> idServicios,
     String idEmpleado,
   ) async {
+/*   _emailSesionUsuario,
+        fecha,
+        citaElegida.horaInicio.toString(),
+        precio,
+        citaElegida.comentario!,
+        citaElegida.nombreCliente!,
+        citaElegida.telefonoCliente!,
+        email,
+        idServicios,
+        citaElegida.idEmpleado!); */
+
+    String horaInicio = citaElegida.horaInicio.toString();
+    String comentario = citaElegida.comentario.toString();
+    String nombreCliente = citaElegida.nombreCliente.toString();
+    String emailCliente = citaElegida.emailCliente.toString();
+    String telefonoCliente = citaElegida.telefonoCliente.toString();
+
     // Crear una lista de futuros a partir de la lista de ids de servicio
     List<String> listaServiciosAux = [];
     for (var element in idServicios) {
@@ -196,7 +227,7 @@ class FirebaseProvider extends ChangeNotifier {
       'cliente': nombreCliente,
       'servicio': listaServiciosAux,
 
-      'telefono': telfonoCliente,
+      'telefono': telefonoCliente,
       'email': emailCliente,
       'timezone': "Europe/Madrid",
       'tokenMessanging': perfilUsuarioApp['tokenMessaging'],
@@ -1725,7 +1756,8 @@ class FirebaseProvider extends ChangeNotifier {
               List<dynamic>.from(element['categoriaServicios'] ?? []);
           empleado.color = (element['color'] ?? 0xFFFFFFFF);
           empleado.codVerif = element['cod_verif'];
-          empleado.roles = List<RolEmpleado>.from(element['rol'] ?? []);
+          empleado.roles =
+              List<RolEmpleado>.from(procesarRoles(element['rol'] ?? []));
         }
       }
     });
@@ -1736,25 +1768,6 @@ class FirebaseProvider extends ChangeNotifier {
   Future<List<EmpleadoModel>> getTodosEmpleados(String email) async {
     List<EmpleadoModel> listaEmpleados = [];
     // Inicializar un empleado vacío
-
-    List<RolEmpleado> procesarRoles(dynamic roles) {
-      if (roles is List) {
-        return roles.map<RolEmpleado>((rol) {
-          switch (rol) {
-            case 'personal':
-              return RolEmpleado.personal;
-            case 'gerente':
-              return RolEmpleado.gerente;
-            case 'administrador':
-              return RolEmpleado.administrador;
-            default:
-              throw ArgumentError('Rol desconocido: $rol');
-          }
-        }).toList();
-      } else {
-        throw ArgumentError('El campo roles no es una lista válida: $roles');
-      }
-    }
 
     // Inicializar Firebase
     await _iniFirebase();

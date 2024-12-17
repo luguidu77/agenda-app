@@ -45,7 +45,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
 
   @override
   void initState() {
-    compruebaEstadoCita();
+    Future.microtask(() => compruebaEstadoCita());
 
     super.initState();
   }
@@ -263,6 +263,7 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
 
   Widget _buildReassignButton() {
     return FloatingActionButton(
+      heroTag: 'reassignButtonTag',
       mini: true,
       backgroundColor: Colors.deepPurpleAccent,
       onPressed: () => showDialog(
@@ -286,8 +287,9 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
     );
   }
 
-  _buildDeleteButton(context, contextoCitaProvider) {
+  Widget _buildDeleteButton(context, contextoCitaProvider) {
     return FloatingActionButton(
+      heroTag: 'deleteButton',
       mini: true,
       backgroundColor: Colors.redAccent,
       onPressed: () async {

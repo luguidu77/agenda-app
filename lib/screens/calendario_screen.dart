@@ -148,8 +148,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
     debugPrint(
         'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX ${diasNoDisponibles.toString()}');
 
-    var calendarioProvider =
-        Provider.of<CalendarioProvider>(context, listen: true);
+    var calendarioProvider = context.watch<CalendarioProvider>();
     fechaElegida = calendarioProvider.fechaSeleccionada;
     visibleCalendario = calendarioProvider.visibleCalendario;
 

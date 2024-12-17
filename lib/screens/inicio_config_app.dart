@@ -51,20 +51,22 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
 
     // Verifica si las citas ya están cargadas
     if (!contextoCitas.citasCargadas) {
-      print('Cargando citas por primera vez...');
+      // Realizar la operación de carga
+      try {
+        List<CitaModelFirebase> citas =
+            await FirebaseProvider().getTodasLasCitas(emailSesionUsuario);
 
-      List<CitaModelFirebase> citas =
-          await FirebaseProvider().getTodasLasCitas(emailSesionUsuario);
+        // Establecer las citas en el contexto
+        contextoCitas.setTodosLasLasCitas(citas);
 
-      // Establece las citas en el contexto
-      contextoCitas.setTodosLasLasCitas(citas);
+        // Restablecer el contexto para la creación de citas
+        CitaModelFirebase edicionContextoCita =
+            CitaModelFirebase(idEmpleado: 'TODOS_EMPLEADOS');
 
-      CitaModelFirebase edicionContextoCita =
-          CitaModelFirebase(idEmpleado: 'TODOS_EMPLEADOS');
+        contextoCreacionCita.setContextoCita(edicionContextoCita);
 
-      contextoCreacionCita.setContextoCita(edicionContextoCita);
-
-      print('Citas cargadas y añadidas al contexto');
+        print('Citas cargadas y añadidas al contexto');
+      } catch (e) {}
     } else {
       print('Las citas ya están cargadas, no se vuelve a cargar.');
     }
@@ -112,6 +114,7 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
                 dDispoSemanal, data.email.toString());
 
             getTodasLasCitas(data.email.toString());
+
             return HomeScreen(
               index: 0,
               myBnB: 0,

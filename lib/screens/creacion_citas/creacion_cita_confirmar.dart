@@ -118,7 +118,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
               children: [
                 Text(
                   DateFormat.Hm('es_ES').format(DateTime.parse(
-                      contextoCreacionCita.contextoCita.dia.toString())),
+                      contextoCreacionCita.contextoCita.horaInicio.toString())),
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
@@ -366,6 +366,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
   }
 
   void contextoCita() {
+    List<String> serviciosNombres = [];
     List<String> tiempos = [];
     totalPrecio = 0.0;
 
@@ -373,6 +374,8 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
       totalPrecio = double.parse(element['PRECIO']) + totalPrecio;
 
       tiempos.add(element['TIEMPO']);
+
+      serviciosNombres.add(element['SERVICIO']);
     }
 
     // SE USA ESTA VARIABLE PARA REPRESENTARLA EN PANTALLA
@@ -388,6 +391,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
       horaInicio: horainicio,
       horaFinal: horafinal,
       precio: totalPrecio.toString(),
+      servicios: serviciosNombres,
     );
     contextoCreacionCita.setContextoCita(edicionCita);
 

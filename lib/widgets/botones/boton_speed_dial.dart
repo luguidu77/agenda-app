@@ -46,19 +46,18 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
     var childrenButtonSize = const Size(56.0, 56.0);
 
     // provider de la fecha elegida
-    final fechaProvider =
-        Provider.of<CalendarioProvider>(context, listen: true);
+    final fechaProvider = context.watch<CalendarioProvider>();
 
     // var selectedfABLocation = FloatingActionButtonLocation.endDocked;
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         SpeedDial(
+          heroTag: 'speed-dial-1', // Asegura que este tag sea único
           visible: fechaProvider.fechaSeleccionada.day != DateTime.now().day,
           backgroundColor: Colors.white,
           onPress: () {
             fechaProvider.setFechaSeleccionada(DateTime.now());
-            setState(() {});
           },
           icon: Icons.today,
           activeIcon: Icons.close,
@@ -72,6 +71,7 @@ class _BotonSpeedDialState extends State<BotonSpeedDial> {
           height: 10,
         ),
         SpeedDial(
+          heroTag: 'speed-dial-2', // Un tag diferente
           icon: Icons.add,
           activeIcon: Icons.close,
           spacing: 3,

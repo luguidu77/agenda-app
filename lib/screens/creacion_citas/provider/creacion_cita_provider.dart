@@ -80,6 +80,12 @@ class CreacionCitaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void limpiarCitaContexto() {
+    // _contextoCita = CitaModelFirebase();
+    _listaServiciosElegidos = [];
+    notifyListeners();
+  }
+
 /*   // CONTEXTO citaElegida ############################
   Map<String, dynamic> _citaElegida = {
     'FECHA': '',

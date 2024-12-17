@@ -8,6 +8,7 @@ import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/personaliza_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
+import 'package:agendacitas/widgets/alertas/alertaAgregarPersonal.dart';
 import 'package:agendacitas/widgets/empleado/empleado.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -24,6 +25,21 @@ class SeccionEmpleados extends StatefulWidget {
 
 class _SeccionEmpleadosState extends State<SeccionEmpleados> {
   List<EmpleadoModel> empleadosStaff = [];
+  @override
+  void initState() {
+    super.initState();
+    // Asegúrate de que el contexto esté disponible antes de actualizarlo
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final empleadosProvider = context.read<EmpleadosProvider>();
+      if (empleadosProvider.getEmpleadosStaff.length == 1) {
+        final contextoCreacionCita = context.read<CreacionCitaProvider>();
+        contextoCreacionCita.setContextoCita(
+          CitaModelFirebase(
+              idEmpleado: empleadosProvider.getEmpleadosStaff[0].id),
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +60,7 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
 
         if (empleadosProvider.getEmpleadosStaff.isEmpty) {
           // Mostrar mensaje o botón si no hay empleados
-          return _botonNoHayEmpleados(context);
+          return Alertas.agregarEmpleadoAlerta(context);
         }
 
         // Mostrar contenido si hay empleados
@@ -86,7 +102,7 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
               todasLasCitas,
             ),
             const SizedBox(width: 56),
-            // gananciaDiaria(todasLasCitas),
+            gananciaDiaria(todasLasCitas),
           ],
         ));
   }
@@ -95,11 +111,13 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
     final contextoCreacionCita = context.watch<CreacionCitaProvider>();
     bool seleccionado = false;
 
-    if (empleadosStaff.length <= 1) {
+    if (empleadosStaff.length == 1) {
       CitaModelFirebase edicionContextoCita =
           CitaModelFirebase(idEmpleado: empleadosStaff[0].id);
-
-      contextoCreacionCita.setContextoCita(edicionContextoCita);
+      if (mounted) {
+        final contextoCreacionCita = context.read<CreacionCitaProvider>();
+        contextoCreacionCita.setContextoCita(edicionContextoCita);
+      }
     } else {
       seleccionado =
           'TODOS_EMPLEADOS' == contextoCreacionCita.contextoCita.idEmpleado;
@@ -238,32 +256,6 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
     );
   }
 
-  _botonNoHayEmpleados(context) {
-    return ElevatedButton.icon(
-      onPressed: () => Navigator.pushNamed(context, 'empleadosScreen'),
-      icon: const Icon(
-        Icons.warning_amber_rounded, // Ícono de advertencia
-        color: Colors.white, // Color del ícono
-        size: 20,
-      ),
-      label: const Text(
-        'Agrega empleado con rol "personal" para asignarle citas', // Mensaje claro
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 16, vertical: 12), // Tamaño cómodo
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8), // Esquinas redondeadas
-        ),
-        elevation: 4, // Sombra para un efecto moderno
-        backgroundColor: Colors.orange, // Color llamativo como advertencia
-      ),
-    );
-  }
   /*  Padding _skeletonEmpleados(List<dynamic> empleados) {
     return Padding(
       padding: const EdgeInsets.only(top: 10.0),

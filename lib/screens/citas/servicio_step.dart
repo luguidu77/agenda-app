@@ -1,3 +1,5 @@
+import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -354,6 +356,7 @@ class _ServicioStepState extends State<ServicioStep> {
       'PRECIO': listaservicios[index].precio.toString(),
       'DETALLE': listaservicios[index].detalle.toString(),
     };
+
     // carga en el cuadro de texto PRECIO el precio del servicio (este no se puede modificar en dicho cuadro de texto)
     myLogic.textControllerPrecio.text = listaservicios[index].precio.toString();
     // carga en el cuadro de texto COMENTARIO  el detalle del servicio, pero cuando se guarde la cita se guardara en comentario de la tabla Cita
@@ -362,8 +365,8 @@ class _ServicioStepState extends State<ServicioStep> {
     setState(() {});
   }
 
-  seleccionaServicioFB(context, usuarioApp, List listNombreServcios,
-      List<ServicioModelFB> listServicios, index) {
+  seleccionaServicioFB(BuildContext context, usuarioApp,
+      List listNombreServcios, List<ServicioModelFB> listServicios, index) {
     print(
         'usuarioapp: $_emailSesionUsuario,lista nombres servicios: $listServicios lista servicios: $listServicios');
     print(listServicios.map((e) => e.servicio));
@@ -377,6 +380,11 @@ class _ServicioStepState extends State<ServicioStep> {
       'PRECIO': listaserviciosFB[index].precio.toString(),
       'DETALLE': listaserviciosFB[index].detalle.toString(),
     };
+/* 
+    CitaModelFirebase edicionCita = CitaModelFirebase(servicios: ['servcio']);
+    final contextoCreacionCita = context.read<CreacionCitaProvider>();
+    contextoCreacionCita.setContextoCita(edicionCita);
+ */
     // carga en el cuadro de texto PRECIO el precio del servicio (este no se puede modificar en dicho cuadro de texto)
     myLogic.textControllerPrecio.text =
         listaserviciosFB[index].precio.toString();

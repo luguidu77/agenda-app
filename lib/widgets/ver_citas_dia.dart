@@ -3,6 +3,7 @@ import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/widgets/lista_de_citas.dart';
+import 'package:agendacitas/widgets/seccion_calendario.dart';
 import 'package:agendacitas/widgets/seccion_empleados.screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -55,10 +56,11 @@ class _ListaCitasState extends State<ListaCitas> {
 
   @override
   Widget build(BuildContext context) {
-    personalizaProvider =
-        Provider.of<PersonalizaProviderFirebase>(context, listen: true);
+    final calendarioProvider = context.watch<CalendarioProvider>();
+
+    personalizaProvider = context.watch<PersonalizaProviderFirebase>();
+
     personaliza = personalizaProvider.getPersonaliza;
-    var fecha = dateFormat.format(widget.fechaElegida);
 
     /* // CITAS SEGUN SELECCION FILTRO (TODAS, SOLO PENDIENTES)
     if (widget.filter == 'TODAS') {
@@ -73,42 +75,17 @@ class _ListaCitasState extends State<ListaCitas> {
       return todasLasCitas(fecha, empleados);
     } */
 
-    return Column(
+    return const Column(
       children: [
         // ########## SECCION EMPLEADOS Y GANANCIAS  ##############################
-        // SeccionEmpleados(leerEstadoBotonIndisponibilidad, vistaProvider, vistaActual, context, todasLasCitasConteoPorEmpleado, citas, numCitas),
-        const SeccionEmpleados(),
+
+        SeccionEmpleados(),
 
         // ########## CALENDARIO DE CITAS             ##############################
-        todasLasCitas(fecha),
+
+        SeccionCalendario(),
       ],
     );
-  }
-
-  vercitas(context, List<CitaModelFirebase> citas, empleados,
-      {List<CitaModelFirebase> todasLasCitasConteoPorEmpleado = const []}) {
-    var vistaProvider = Provider.of<VistaProvider>(context, listen: false);
-
-    var vistaActual = vistaProvider.vista;
-
-    int contadorCitas = 0;
-    final leerEstadoBotonIndisponibilidad =
-        Provider.of<BotonAgregarIndisponibilidadProvider>(context).botonPulsado;
-
-    // ············DESCUENTA DE LAS CITAS LOS INDISPUESTOS ............................... ;
-    for (var cita in citas) {
-      if (cita.idcliente != '999') {
-        contadorCitas++;
-      }
-    }
-    final numCitas = contadorCitas;
-
-    return
-        // ########## TARJETAS DE LAS CITAS CONCERTADAS ##############################
-        //  SYNCFUSION
-        Expanded(
-            child: ListaCitasNuevo(
-                fechaElegida: widget.fechaElegida, citasFiltradas: citas));
   }
 
   cambioVistaCalendario(VistaProvider vistaProvider, CalendarView vistaActual) {
@@ -152,51 +129,6 @@ class _ListaCitasState extends State<ListaCitas> {
           ),
         ),
       ],
-    );
-  }
-
-  List<CitaModelFirebase> filtrarCitas({
-    required String fecha,
-    String? idEmpleado,
-  }) {
-    final citasProvider = context.watch<CitasProvider>();
-    List<CitaModelFirebase> citas = citasProvider.getCitas;
-
-    // Filtrar por fecha
-    List<CitaModelFirebase> citasFiltradas =
-        citas.where((cita) => cita.dia == fecha).toList();
-
-    // Filtrar por empleado si es necesario
-    if (idEmpleado != null) {
-      citasFiltradas = citasFiltradas
-          .where((cita) => cita.idEmpleado == idEmpleado)
-          .toList();
-    }
-
-    return citasFiltradas;
-  }
-
-  Widget todasLasCitas(String fecha) {
-    final citasProvider = context.watch<CitasProvider>();
-    final contextoCreacionCita = context.watch<CreacionCitaProvider>();
-    print("Total citas en el contexto: ${citasProvider.getCitas.length}");
-
-    String idEmpleado =
-        contextoCreacionCita.contextoCita.idEmpleado ?? 'TODOS_EMPLEADOS';
-
-    // Filtrar citas por fecha y empleado
-    List<CitaModelFirebase> citasFiltradas = filtrarCitas(
-      fecha: fecha,
-      idEmpleado: idEmpleado != 'TODOS_EMPLEADOS' ? idEmpleado : null,
-    );
-    print("Total citas filtradas: ${citasFiltradas.length}");
-    final empleados = context.read<EmpleadosProvider>().getEmpleados;
-
-    return vercitas(
-      context,
-      citasFiltradas,
-      empleados,
-      todasLasCitasConteoPorEmpleado: citasProvider.getCitas,
     );
   }
 

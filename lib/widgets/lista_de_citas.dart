@@ -17,9 +17,8 @@ import '../screens/detalles_cita_screen.dart';
 import '../utils/utils.dart';
 
 class ListaCitasNuevo extends StatefulWidget {
-  const ListaCitasNuevo(
-      {super.key, required this.fechaElegida, required this.citasFiltradas});
-  final DateTime fechaElegida;
+  const ListaCitasNuevo({super.key, required this.citasFiltradas});
+
   final List<CitaModelFirebase> citasFiltradas;
   @override
   _ListaCitasNuevoState createState() => _ListaCitasNuevoState();
@@ -47,15 +46,15 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
     emailUsuarioApp();
 
     _employeeCollection = <CalendarResource>[];
-    _addResources();
+    //_addResources();
     //_addSpecialRegions(); // agrega zonas de descansos ejemplo HORA DE COMER
-
+    _calendarController = CalendarController();
     super.initState();
   }
 
   void _addResources() {
-    final empleadosProvider =
-        Provider.of<EmpleadosProvider>(context, listen: false);
+    final empleadosProvider = context.watch<EmpleadosProvider>();
+
     List<EmpleadoModel> empleados = empleadosProvider.getEmpleados;
 
     for (var i = 0; i < empleados.length; i++) {
@@ -99,13 +98,16 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
     }
   }
 
+  late CalendarController _calendarController;
+
   @override
   Widget build(BuildContext context) {
-    _citasFiltradas = widget.citasFiltradas;
+    // _citasFiltradas = widget.citasFiltradas;
     final contextoCreacionCita = context.watch<CreacionCitaProvider>();
+    final calendarioProvider = context.watch<CalendarioProvider>();
 
-    var calendarioProvider =
-        Provider.of<CalendarioProvider>(context, listen: true);
+    _addResources();
+
     var vistaProvider = Provider.of<VistaProvider>(context, listen: true);
 
     final leerEstadoBotonIndisponibilidad =
@@ -113,22 +115,26 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
     print(
         'este es el estado del boton de indisponibilidad $leerEstadoBotonIndisponibilidad  <__________________________');
     int tiempoServicios = 1;
+    _calendarController.selectedDate = calendarioProvider.fechaSeleccionada;
+    _calendarController.displayDate = calendarioProvider.fechaSeleccionada;
 
     return Scaffold(
         body: SfCalendar(
+      controller: _calendarController,
+
       backgroundColor: leerEstadoBotonIndisponibilidad
           ? Colors.red.withOpacity(0.1)
           : Colors.white,
 
-      view: vistaProvider
-          .vista, //············· CAMBIA LA VISTA: VISUALIZA EMPLEADOS :timelineDay ------------------------------------------------
+      /*   view: vistaProvider
+          .vista, */ //············· CAMBIA LA VISTA: VISUALIZA EMPLEADOS :timelineDay ------------------------------------------------
 
       specialRegions:
           _specialTimeRegions, // tramos especiales como descansos entre turnos (comidas, descansos..)
-      allowedViews: const [
+      /*   allowedViews: const [
         CalendarView.day,
         CalendarView.timelineDay,
-      ],
+      ], */
 
       resourceViewSettings: ResourceViewSettings(
           showAvatar: true,
@@ -293,14 +299,14 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         }
       },
 
-      initialDisplayDate: widget.fechaElegida,
+      initialDisplayDate: DateTime.now(),
       dataSource: MeetingDataSource(getAppointments(), _employeeCollection),
     ));
   }
 
   List<Appointment> getAppointments() {
     // **** DONDE CREAMOS LA NOTA QUE TRAE TODOS LOS DATOS NECESARIOS PARA LA GESTION DE CITA ****************
-    meetings = _citasFiltradas.map((cita) {
+    meetings = widget.citasFiltradas.map((cita) {
       final List<String> employeeIds = [];
 
       for (var i = 0; i < _employeeCollection.length; i++) {

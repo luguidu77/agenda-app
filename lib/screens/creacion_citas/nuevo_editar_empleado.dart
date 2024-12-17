@@ -1,6 +1,7 @@
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
+import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:image_picker/image_picker.dart';
@@ -451,7 +452,6 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                       // modifica empleado
                       _modificaEmpleado(context);
                     }
-                    Navigator.pop(context);
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -550,7 +550,6 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
       roles: rolesEmpleados,
     );
 
-    print(id);
     try {
       // firebase
       String idEmpleadoGeneradoEnFirebase =
@@ -558,6 +557,8 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
       EmpleadoModel empleadoConId =
           empleadoEditado.copyWith(id: idEmpleadoGeneradoEnFirebase);
       agregaEnContexto(empleadoConId);
+
+      _mensajeRegresar();
     } catch (e) {
       debugPrint('Error al agregar el empleado: $e');
     }
@@ -584,6 +585,8 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
 
       // contexto
       _editaContextoEmpleado(empleadoEditado);
+
+      _mensajeRegresar();
     } catch (e) {
       debugPrint('Error al agregar el empleado: $e');
     }
@@ -607,6 +610,15 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
     providerEmpleado.agregaEmpleado(empleadoConId);
     // setea el contexto de empleados personal para acutalizar su lista
     providerEmpleado.setEmpleadosStaff();
+  }
+
+  void _mensajeRegresar() {
+    if (mounted) {
+      // Muestra un mensaje de éxito
+      mensajeInfo(context, 'Edición correcta');
+      // Navegar hacia atrás
+      Navigator.pop(context);
+    }
   }
 }
 

@@ -473,48 +473,25 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
                   '${DateTime.parse(textoFechaHora).year.toString()}-${DateTime.parse(textoFechaHora).month.toString().padLeft(2, '0')}-${DateTime.parse(textoFechaHora).day.toString().padLeft(2, '0')}';
               //  var idCitaOld = oldCita['id'];
 
-              if (iniciadaSesionUsuario) {
-                ////XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXFUNCION
-                ////XXxxxx FUNCION actualizar la cita en Firebase  xxxxxXX
-                await ActualizacionCita.actualizar(
-                  context,
-                  oldCita,
-                  null,
-                  fecha,
-                  horaInicioProgramable,
-                  _emailSesionUsuario,
-                );
-
-                await FirebaseProvider().creaRecordatorio(
+              ////XXxxxx FUNCION actualizar la cita en Firebase  xxxxxXX
+              await ActualizacionCita.actualizar(
+                context,
+                oldCita,
+                null,
+                fecha,
+                horaInicioProgramable,
+                _emailSesionUsuario,
+              );
+              // TODO  modificar recordatorio
+              /*   await FirebaseProvider().creaRecordatorio(
                   usuarioAP,
                   fecha,
                   horaInicioProgramable.toString(),
                   'precio',
-                  'comentariocita',
-                  'nombrecliente',
-                  'telefonocliente',
-                  'emailcliente',
                   ['PJg5m6iQQw3btkv1H4EX'],
                   'idempleado',
-                );
-                snackbar();
-              } else {
-                //reprogramacion de fecha y hora de la cita
-                CitaModel newCita = CitaModel();
-                newCita.id = int.parse(oldCita['id']);
-                newCita.dia = fecha;
-                newCita.horaInicio = textoFechaHora;
-                newCita.horaFinal = textoHoraF;
-                newCita.comentario = oldCita['comentario'];
-                newCita.idcliente = oldCita['idCliente'];
-                newCita.idservicio = oldCita['idServicio'];
-
-                debugPrint('$fecha  $textoFechaHora $textoHoraF');
-
-                CitaListProvider().actualizarCita(newCita);
-
-                snackbar();
-              }
+                ); */
+              snackbar();
 
               //todo: incrementar en tabla cliente => citareprogramada (añadir este campo tabla cliente)
             } else {

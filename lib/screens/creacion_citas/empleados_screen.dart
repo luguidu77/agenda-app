@@ -3,6 +3,7 @@ import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/nuevo_editar_empleado.dart';
+import 'package:agendacitas/widgets/alertas/alertaAgregarPersonal.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +15,7 @@ class EmpleadosScreen extends StatefulWidget {
 }
 
 class _EmpleadosScreenState extends State<EmpleadosScreen> {
+  bool foatingVisible = true;
   late List<EmpleadoModel> empleados;
   @override
   void initState() {
@@ -28,217 +30,235 @@ class _EmpleadosScreenState extends State<EmpleadosScreen> {
     final EmpleadosProvider empleadosProvider =
         context.watch<EmpleadosProvider>();
     empleados = empleadosProvider.getEmpleados;
+    List<EmpleadoModel> empleadosStaff = empleadosProvider.getEmpleadosStaff;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gestión de personal'),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.plus_one),
-        onPressed: () {
-          Navigator.pushNamed(context, 'empleadosEdicionScreen');
-        },
-      ),
+      floatingActionButton: empleados.isNotEmpty
+          ? FloatingActionButton(
+              child: const Icon(Icons.plus_one),
+              onPressed: () {
+                Navigator.pushNamed(context, 'empleadosEdicionScreen');
+              },
+            )
+          : null,
       body: (empleados.isEmpty)
           ? _noHayEmpleados()
-          : ListView.builder(
-              itemCount: empleados.length,
-              itemBuilder: (BuildContext context, int index) {
-                return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EmpleadoEdicion(
-                            empleado: empleados[index],
-                          ),
-                        ),
-                      );
-                    },
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        radius: 19,
-                        backgroundImage: NetworkImage(empleados[index].foto),
-                      ),
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            empleados[index].nombre,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16),
-                          ),
-                          Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: Color(empleados[index].color),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.black, width: 1),
-                            ),
-                          ),
-                        ],
-                      ),
-                      subtitle: Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.supervised_user_circle,
-                                    color: Colors.grey, size: 16),
-                                const SizedBox(width: 4),
-                                Expanded(
-                                  child: Text(
-                                    empleados[index]
-                                        .roles
-                                        .map((rol) => rolEmpleadoToString(rol))
-                                        .join(', '),
-                                    style: TextStyle(color: Colors.grey[600]),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+          : Column(
+              children: [
+                Visibility(
+                  visible: empleadosStaff.isEmpty,
+                  child: Alertas.agregarEmpleadoAlerta(context,
+                      enableOnTap: false),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: empleados.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EmpleadoEdicion(
+                                  empleado: empleados[index],
                                 ),
-                              ],
+                              ),
+                            );
+                          },
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              radius: 19,
+                              backgroundImage:
+                                  NetworkImage(empleados[index].foto),
                             ),
-                            const SizedBox(height: 4),
-                            Row(
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Icon(Icons.email,
-                                    color: Colors.grey, size: 16),
-                                const SizedBox(width: 4),
-                                Expanded(
-                                  child: Text(
-                                    empleados[index].email,
-                                    style: TextStyle(color: Colors.grey[600]),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(Icons.phone,
-                                    color: Colors.grey, size: 16),
-                                const SizedBox(width: 4),
                                 Text(
-                                  empleados[index].telefono,
-                                  style: TextStyle(color: Colors.grey[600]),
+                                  empleados[index].nombre,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16),
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Icon(Icons.schedule,
-                                    color: Colors.grey, size: 16),
-                                const SizedBox(width: 4),
-                                Expanded(
-                                  child: Text(
-                                    'Disponibilidad: ${empleados[index].disponibilidad.join(', ')}',
-                                    style: TextStyle(color: Colors.grey[600]),
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    color: Color(empleados[index].color),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: Colors.black, width: 1),
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 4),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Icon(Icons.category,
-                                    color: Colors.grey, size: 16),
-                                const SizedBox(width: 4),
-                                Expanded(
-                                  child: Text(
-                                    'Categoría: ${empleados[index].categoriaServicios.join(', ')}',
-                                    style: TextStyle(color: Colors.grey[600]),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            if (empleados[index].codVerif != 'verificado') ...[
-                              const SizedBox(height: 8),
-                              Row(
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.error,
-                                      color: Colors.red, size: 16),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    'Pendiente Verificación: ${empleados[index].codVerif}',
-                                    style: const TextStyle(color: Colors.red),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.supervised_user_circle,
+                                          color: Colors.grey, size: 16),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Text(
+                                          empleados[index]
+                                              .roles
+                                              .map((rol) =>
+                                                  rolEmpleadoToString(rol))
+                                              .join(', '),
+                                          style: TextStyle(
+                                              color: Colors.grey[600]),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.email,
+                                          color: Colors.grey, size: 16),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Text(
+                                          empleados[index].email,
+                                          style: TextStyle(
+                                              color: Colors.grey[600]),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.phone,
+                                          color: Colors.grey, size: 16),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        empleados[index].telefono,
+                                        style:
+                                            TextStyle(color: Colors.grey[600]),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Icon(Icons.schedule,
+                                          color: Colors.grey, size: 16),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Text(
+                                          'Disponibilidad: ${empleados[index].disponibilidad.join(', ')}',
+                                          style: TextStyle(
+                                              color: Colors.grey[600]),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Icon(Icons.category,
+                                          color: Colors.grey, size: 16),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Text(
+                                          'Categoría: ${empleados[index].categoriaServicios.join(', ')}',
+                                          style: TextStyle(
+                                              color: Colors.grey[600]),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  if (empleados[index].codVerif !=
+                                      'verificado') ...[
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.error,
+                                            color: Colors.red, size: 16),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          'Pendiente Verificación: ${empleados[index].codVerif}',
+                                          style: const TextStyle(
+                                              color: Colors.red),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ],
                               ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      isThreeLine: false,
-                    ));
-              },
+                            ),
+                            isThreeLine: false,
+                          ));
+                    },
+                  ),
+                ),
+              ],
             ),
     );
   }
 
   _noHayEmpleados() {
-    return Card(
-      elevation: 4, // Añade una ligera sombra para un efecto moderno
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12), // Esquinas redondeadas
+    return Padding(
+      padding: const EdgeInsets.all(20.0), // Ampliar el espaciado interno
+      child: Column(
+        spacing: 50,
+        crossAxisAlignment: CrossAxisAlignment.start, // Alinear a la izquierda
+        children: [
+          _agregarPrimerEmpeado(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Alertas.agregarEmpleadoAlerta(context),
+          ),
+        ],
       ),
-      margin: const EdgeInsets.symmetric(
-          horizontal: 16, vertical: 8), // Margen ajustado
-      child: const Padding(
-        padding: EdgeInsets.all(16.0), // Espaciado interno
-        child: Column(
-          children: [
-            Row(
-              spacing: 12,
-              mainAxisSize: MainAxisSize.min, // Ajusta el tamaño al contenido
+    );
+  }
+
+  InkWell _agregarPrimerEmpeado() {
+    return InkWell(
+      onTap: () => Navigator.pushNamed(context, 'empleadosEdicionScreen'),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
               children: [
-                Icon(
-                  Icons.warning_amber_rounded, // Ícono de advertencia
-                  color: Colors.orange, // Color llamativo
-                  size: 28,
+                const Icon(
+                  Icons.edit,
+                  color: Colors.blueAccent, // Diferenciar el color del ícono
+                  size: 30,
                 ),
-                Flexible(
+                const SizedBox(width: 12), // Espaciado entre ícono y texto
+                Expanded(
                   child: Text(
-                    'Debe haber al menos un empleado con el rol personal para asignarle las citas.',
+                    'Agregate como empleado con el mismo email de tu perfil.',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.black87, // Texto en un tono más moderno
-                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[800], // Color uniforme al primer texto
+                      fontWeight: FontWeight.w600,
+                      height: 1.5, // Mejorar legibilidad del texto
                     ),
                     textAlign: TextAlign.start,
                   ),
                 ),
               ],
             ),
-            Row(
-              spacing: 12,
-              mainAxisSize: MainAxisSize.min, // Ajusta el tamaño al contenido
-              children: [
-                Icon(
-                  Icons.edit, // Ícono de advertencia
-                  color: Colors.orange, // Color llamativo
-                  size: 28,
-                ),
-                Flexible(
-                  child: Text(
-                    'Agregate como empleado con el mismo email de tu perfil',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87, // Texto en un tono más moderno
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.start,
-                  ),
-                ),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
     );

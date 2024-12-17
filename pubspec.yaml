@@ -90,7 +90,7 @@ dependencies:
 
   email_validator: ^2.1.17
 
-  flutter_speed_dial: ^6.2.0
+  flutter_speed_dial: ^7.0.0
 
   skeletons: ^0.0.3
 

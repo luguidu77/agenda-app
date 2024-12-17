@@ -2,11 +2,14 @@
 
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
+import 'package:agendacitas/providers/cita_list_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/appBar.dart';
+import 'package:agendacitas/screens/home.dart';
+import 'package:agendacitas/utils/actualizacion_cita.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';
 import 'package:agendacitas/providers/recordatorios_provider.dart';
@@ -69,7 +72,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
   String _emailSesionUsuario = '';
   bool _iniciadaSesionUsuario = false;
 
-  tiempo() async {
+  Future<String> tiempo() async {
     await tiempoEstablecido.cargarTiempo().then((value) async {
       if (value.isNotEmpty) {
         tRecordatorioGuardado.add(value[0].tiempo.toString());
@@ -83,11 +86,10 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
     // si no hay tiempo establecido guarda uno por defecto de 30 minutos
     //  if (tRecordatorioGuardado.isEmpty) await
-    tiempoTextoRecord = tRecordatorioGuardado.first.toString();
-
-    debugPrint('tRecordatorioGuardado : ${tRecordatorioGuardado.first}');
-
-    await guardalacita();
+    // debugPrint('tRecordatorioGuardado : ${tRecordatorioGuardado.first}');
+    tiempoTextoRecord = '00:30'; //TODO: tRecordatorioGuardado.first.toString();
+    return tiempoTextoRecord;
+    // await guardalacita();
   }
 
   double sumarPrecios(listaServicios) {
@@ -103,26 +105,31 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
   }
 
   guardalacita() async {
+    // tiempo recordatorio
+    String tiempoTextoRecord = await tiempo();
+
     // LLEER MICONTEXTO DE CreacionCitaProvider
     contextoCreacionCita = context.read<CreacionCitaProvider>();
     debugPrint('cita elegida ${contextoCreacionCita.contextoCita.toString()}');
 
-    // LEER EL idEmpleado , EMPLEADO SELECCIONADO
+    /*  // LEER EL idEmpleado , EMPLEADO SELECCIONADO
     String idEmpleado = contextoCreacionCita.contextoCita.idEmpleado!;
     EmpleadoModel empleado = await FirebaseProvider()
-        .getEmpleadoporId(_emailSesionUsuario, idEmpleado);
+        .getEmpleadoporId(_emailSesionUsuario, idEmpleado); */
 
     // GENERO UN ID PARA LA CITA(idCitaCliente); // Ejemplo: b7gjR3jNuMRomunRo6SJ
     String idCitaCliente = generarCadenaAleatoria(20);
     // GUARDA EN EL CONTEXTO DE LA CITA
-    CitaModelFirebase edicionCita =
-        CitaModelFirebase(idCitaCliente: idCitaCliente);
-    contextoCreacionCita.setContextoCita(edicionCita);
 
     CitaModelFirebase citaElegida = contextoCreacionCita.contextoCita;
     clientaTexto = citaElegida.nombreCliente!;
     telefono = citaElegida.telefonoCliente!;
     email = citaElegida.emailCliente!;
+
+    CitaModelFirebase edicionCita =
+        CitaModelFirebase(idCitaCliente: idCitaCliente);
+
+    contextoCreacionCita.setContextoCita(edicionCita);
 
     List<Map<String, dynamic>> listaServicios =
         contextoCreacionCita.getServiciosElegidos;
@@ -134,7 +141,6 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     if (tiempoTextoRecord != '') {
       String tiempoAux =
           '${cita.year.toString()}-${cita.month.toString().padLeft(2, '0')}-${cita.day.toString().padLeft(2, '0')} $tiempoTextoRecord';
-      DateTime tiempoRecordatorio = DateTime.parse(tiempoAux);
 
       // si tiempo a restar es '24:00' , resto un día
       if (tiempoTextoRecord[0] == '2') {
@@ -226,7 +232,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     String fechaFormateada = resultado['fechaFormateada'];
     String horaFormateada = resultado['horaFormateada'];
 
-    //* TODOS LOS SERVICIOS
+    //* todos  LOS SERVICIOS
     List<ServicioModel> servicios = [];
     ServicioModel servicio = ServicioModel();
     listaServicios.map((e) => e['SERVICIO']).toList();
@@ -258,25 +264,15 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         idCitaCliente,
         precioTexto,
       );
-
-      //******************************************('AGREGA LA CITA AL PROVIDER')****************
-      List<String> serv = servicios.map((e) => e.servicio.toString()).toList();
-      citaElegida.confirmada = true;
-      citaElegida.idEmpleado = idEmpleado;
-      citaElegida.nombreEmpleado = empleado.nombre;
-      citaElegida.servicios = serv;
-
-      final citaProvider = context.read<CitasProvider>();
-
-      citaProvider.agregaCitaAlContexto(citaElegida);
     } catch (e) {
       // print('ERROR');
     }
 
-    // limpia la lista de servicios
-    listaServicios.clear();
+    //******************************************('AGREGA LA CITA AL PROVIDER')****************
 
-    setState(() {});
+    await ActualizacionCita.agregar(context, citaElegida);
+    // limpia la lista de servicios
+    // listaServicios.clear();
   }
 
   pagoProvider() async {
@@ -293,6 +289,11 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
   void initState() {
     emailUsuario();
     tiempo();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Código que se ejecuta después de que la vista se haya cargado.
+      print("addPostFrameCallback: Vista cargada completamente.");
+      guardalacita();
+    });
     // compruebaPago();
 
     super.initState();
@@ -300,7 +301,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
   @override
   Widget build(BuildContext context) {
-    final contextoCreacionCita = context.read<CreacionCitaProvider>();
+    final contextoCreacionCita = context.watch<CreacionCitaProvider>();
     final citaElegida = contextoCreacionCita.contextoCita;
     return WillPopScope(
       onWillPop: () async => false,
@@ -368,7 +369,18 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
                             const SizedBox(height: 20),
                             ElevatedButton.icon(
                                 onPressed: () {
-                                  Navigator.pushReplacementNamed(context, '/');
+                                  mensajeInfo(
+                                      context, 'Actualizando agenda...');
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (context) => HomeScreen(
+                                              index: 0,
+                                              myBnB: 0,
+                                            )),
+                                    (Route<dynamic> route) =>
+                                        false, // Elimina todo el stack
+                                  );
+
                                   liberarMemoriaEditingController();
                                 },
                                 icon: const Icon(
@@ -402,20 +414,44 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
   }
 
   grabarCita(
-    context,
+    BuildContext context,
     fechaTexto,
     horaIniciotexto,
     CitaModelFirebase citaElegida,
     String fecha,
-    /* String horaInicio,
-      String horaFinal,
-      String comentario,
-      var idCliente, */
     List<String> idServicios,
-    /* String nombreCliente,
-      String telefonoCliente, */
     String nombreServicio,
     String precio,
+  ) async {
+    print(
+        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+    // print('citaelegida ${contextoCitaProvider.getCitas.length.toString()} ');
+
+    //###### CREA CITA Y TRAE ID CITA CREADA EN FIREBASE PARA ID DEL RECORDATORIO
+    _creaCitaEnFirebase(citaElegida);
+
+    //###### CREA RECORDATORIO EN FIREBASE //######//######//######//######
+    _creaRecordatorioEnFirebase(
+      _emailSesionUsuario,
+      fecha,
+      citaElegida,
+      precio,
+      idServicios,
+      horaIniciotexto,
+      nombreServicio,
+    );
+  }
+
+  void _mensajeActivarSegundoPlano() {}
+
+  void _creaRecordatorioEnFirebase(
+    emailSesionUsuario,
+    fecha,
+    citaElegida,
+    precio,
+    idServicios,
+    horaIniciotexto,
+    nombreServicio,
   ) async {
     String title = 'Tienes cita $fechaTexto-$horaIniciotexto h';
     String body =
@@ -424,44 +460,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     debugPrint('hora actual ${DateTime.now().toString()}');
 
     int idCita = 0;
-    if (_iniciadaSesionUsuario) {
-      List<Map<String, dynamic>> servicios =
-          contextoCreacionCita.getServiciosElegidos;
-
-      List<String> idServicios = servicios.map((ser) {
-        return ser['ID'].toString();
-      }).toList();
-
-      //###### CREA CITA Y TRAE ID CITA CREADA EN FIREBASE PARA ID DEL RECORDATORIO
-      idCita = await FirebaseProvider()
-          .nuevaCita(_emailSesionUsuario, citaElegida, idServicios);
-
-      //###### CREA RECORDATORIO EN FIREBASE //######//######//######//######
-      await FirebaseProvider().creaRecordatorio(
-          _emailSesionUsuario,
-          fecha,
-          citaElegida.horaInicio.toString(),
-          precio,
-          citaElegida.comentario!,
-          citaElegida.nombreCliente!,
-          citaElegida.telefonoCliente!,
-          email,
-          idServicios,
-          citaElegida.idEmpleado!);
-    } else {
-      /*   print('id servicio sin sesion ***********************************');
-      print(idServicio); */
-      //###### CREA CITA Y TRAE ID CITA CREADA EN DISPOSITIVO PARA ID DEL RECORDATORIO
-      /*  idCita = await citaElegida.nuevaCita(
-        fecha,
-        horaInicio,
-        horaFinal,
-        comentario,
-        idCliente,
-        idServicio
-            .first, //todo: solo visible el primer servicio de los que se reserve
-      ); */
-    }
+    await FirebaseProvider().creaRecordatorio(emailSesionUsuario, fecha,
+        citaElegida, precio, idServicios, citaElegida.idEmpleado!);
 
     //  RECORDATORIO CON ID PARA EN EL CASO DE QUE SE ELIMINE LA CITA, PODER BORRARLO
     DateTime diaRecord = DateTime.parse(horaRecordatorio);
@@ -495,7 +495,17 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     }
   }
 
-  void _mensajeActivarSegundoPlano() {}
+  void _creaCitaEnFirebase(citaElegida) async {
+    List<Map<String, dynamic>> servicios =
+        contextoCreacionCita.getServiciosElegidos;
+
+    List<String> idServicios = servicios.map((ser) {
+      return ser['ID'].toString();
+    }).toList();
+
+    String idCitaFB = await FirebaseProvider()
+        .nuevaCita(_emailSesionUsuario, citaElegida, idServicios);
+  }
 }
 
 class BackgroundPermissionDialog extends StatelessWidget {

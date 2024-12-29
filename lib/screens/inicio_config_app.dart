@@ -46,7 +46,7 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
   }
 
   void getTodasLasCitas(emailSesionUsuario) async {
-    final contextoCitas = context.read<CitasProvider>();
+    final contextoCitas = context.watch<CitasProvider>();
     final contextoCreacionCita = context.read<CreacionCitaProvider>();
 
     // Verifica si las citas ya están cargadas
@@ -64,6 +64,12 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
             CitaModelFirebase(idEmpleado: 'TODOS_EMPLEADOS');
 
         contextoCreacionCita.setContextoCita(edicionContextoCita);
+
+        // Informar al usuario que las citas deben ser reasignadas (antiguos usuarios app antes de la actualización v10)
+        // comprobarcionReasignaciondeCitas contexto
+        if (citas.any((cita) => cita.idEmpleado == '55')) {
+          context.read<ComprobacionReasignacionCitas>().setReasignado(false);
+        }
 
         print('Citas cargadas y añadidas al contexto');
       } catch (e) {}
@@ -120,6 +126,10 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
               myBnB: 0,
             );
           } else {
+            //quiero limpiar el provider de citas
+            final contextoCitas = context.read<CitasProvider>();
+            contextoCitas.limpiarCitaContexto();
+
             // NO LOGUEADO EN FIREBASE
             debugPrint(
                 'inicio_config_app.dart ----------------> NO LOGUEADO EN FIREBASE');

@@ -193,7 +193,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
                           ),
                           const SizedBox(width: 10),
                           TextButton(
-                              child: const Text('descartar'),
+                              child: const Text('salir'),
                               onPressed: () {
                                 setState(() {});
                                 Provider.of<BotonAgregarIndisponibilidadProvider>(

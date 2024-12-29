@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:agendacitas/models/empleado_model.dart';
+import 'package:agendacitas/providers/Firebase/emailHtml/emails_html.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/screens/creacion_no_disponibilidad/tarjeta_indisponibilidad.dart';
 import 'package:agendacitas/screens/detalles_horario_no_disponible_screen.dart';
@@ -102,9 +103,16 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
   @override
   Widget build(BuildContext context) {
+    List<String> textoALista(String texto) {
+      // Dividir el texto por comas y eliminar espacios adicionales
+      List<String> lista = texto.split(',').map((e) => e.trim()).toList();
+      return lista;
+    }
+
     // _citasFiltradas = widget.citasFiltradas;
     final contextoCreacionCita = context.watch<CreacionCitaProvider>();
     final calendarioProvider = context.watch<CalendarioProvider>();
+    final citaconfirmada = context.watch<EstadoConfirmacionCita>();
 
     _addResources();
 
@@ -210,18 +218,54 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         //###### SI AL HACER CLIC EN EL CALENDARIO, EXISTE UNA CITA NAVEGA A LOS DETALLES DE LA CITA, SI NO HAY CITA NAVEGA A CREACION DE UNA NUEVA CITA-----------
         if (appointments != null) {
           Map<String, dynamic> cita = json.decode(appointments[0].notes);
+
+          List<String> listaServicios = textoALista(cita['servicios']);
+
           print(cita);
           if (cita['nombre'] != '') {
             // print(cita);
             //############# DETALLE DE LA CITA                   ########################
+            final citaElegida = CitaModelFirebase(
+                id: cita['id'],
+                dia: cita['dia'],
+                horaInicio: DateTime.parse(cita['horaInicio']),
+                horaFinal: DateTime.parse(cita['horaFinal']),
+                comentario: cita['comentario'],
+                email: cita['email'],
+                idcliente: cita['idCliente'],
+                //  idservicio: ,
+                servicios: listaServicios,
+                idEmpleado: cita['idEmpleado'],
+                nombreEmpleado: cita['nombreEmpleado'],
+                colorEmpleado: int.parse(cita['colorEmpleado']),
+                precio: cita['precio'],
+                confirmada: cita['confirmada'] == 'true' ? true : false,
+                tokenWebCliente: cita['tokenWebCliente'],
+                idCitaCliente: cita['idCitaCliente'],
+                nombreCliente: cita['nombre'],
+                // fotoCliente: cita['foto'],
+                telefonoCliente: cita['telefono'],
+                emailCliente: cita['email'],
+                notaCliente: cita['nota']);
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DetallesCitaScreen(
-                    emailUsuario: _emailSesionUsuario, reserva: cita),
-              ),
-            );
+            showModalBottomSheet(
+                context: context,
+                isScrollControlled:
+                    true, // Para permitir más contenido si es necesario
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                builder: (BuildContext context) {
+                  return FractionallySizedBox(
+                    heightFactor: 0.7, // 70% de la altura total de la pantalla
+                    child: Container(
+                      padding: const EdgeInsets.all(0),
+                      child: DetallesCitaScreen(
+                          emailUsuario: _emailSesionUsuario,
+                          reserva: citaElegida),
+                    ),
+                  );
+                });
           } else {
             //############# DETALLE HORARIO NO DISPONIBLE      ########################
             Navigator.push(
@@ -233,44 +277,55 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
             );
           }
         } else {
-          //############# CREACION DE HORARIO NO DISPONIBLE --  ########################
-          if (leerEstadoBotonIndisponibilidad) {
-            Navigator.push(
-                context,
-                PageRouteBuilder(
-                  transitionDuration: const Duration(milliseconds: 500),
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      TarjetaIndisponibilidad(argument: details.date),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    const begin = Offset(
-                        1.0, 0.0); // Inicia fuera de la pantalla a la derecha
-                    const end = Offset.zero; // Termina en la posición normal
-                    const curve = Curves.ease;
+          //############# CREACION DE CITA / CREACION HORARIO NO DISPONIBLE ########################
+          //########################################################################################
 
-                    var tween = Tween(begin: begin, end: end)
-                        .chain(CurveTween(curve: curve));
+          // verifica que se ha seleccionado a un empleado antes de iniciar la creacion de cita o indisponibilidad
+          if (contextoCreacionCita.contextoCita.idEmpleado !=
+              'TODOS_EMPLEADOS') {
+            //############# CREACION DE HORARIO NO DISPONIBLE --  ########################
+            if (leerEstadoBotonIndisponibilidad) // si el boton de indisponibilidad esta activado
 
-                    return SlideTransition(
-                      position: animation.drive(tween),
-                      child: child,
-                    );
-                  },
-                ));
+            {
+              Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionDuration: const Duration(milliseconds: 500),
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        TarjetaIndisponibilidad(argument: details.date),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(
+                          1.0, 0.0); // Inicia fuera de la pantalla a la derecha
+                      const end = Offset.zero; // Termina en la posición normal
+                      const curve = Curves.ease;
 
-            /*  Navigator.pushNamed(context, 'creacionNoDisponibilidad',
-                arguments: details.date); */
-          } else {
-            //############# CREACION DE CITA -- ELECCION DE CLIENTE ########################
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
 
-            // verifica que se ha seleccionado a un empleado antes de iniciar la creacion de cita
-            if (contextoCreacionCita.contextoCita.idEmpleado !=
-                'TODOS_EMPLEADOS') {
-              Navigator.pushNamed(context, 'creacionCitaCliente',
-                  arguments: details.date);
-            } else {
-              mensajeError(context, 'Selecciona un empleado');
+                      return SlideTransition(
+                        position: animation.drive(tween),
+                        child: child,
+                      );
+                    },
+                  ));
+            } else // si el boton de indisponibilidad no esta activado
+
+            {
+              //############# CREACION DE CITA -- ELECCION DE CLIENTE ########################
+
+              // verifica que se ha seleccionado a un empleado antes de iniciar la creacion de cita
+              if (contextoCreacionCita.contextoCita.idEmpleado !=
+                  'TODOS_EMPLEADOS') {
+                Navigator.pushNamed(context, 'creacionCitaCliente',
+                    arguments: details.date);
+              } else {
+                mensajeError(context, 'Selecciona un empleado');
+              }
             }
+          } else {
+            // si no se ha seleccionado un empleado, muestra un mensaje de error
+            mensajeError(context, 'Selecciona un empleado');
           }
         }
       },
@@ -377,26 +432,21 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
   }
 
   String textoCita(CitaModelFirebase cita) {
-    bool citaConfirmada = _iniciadaSesionUsuario
-        ? cita.confirmada.toString() == 'true'
-            ? true
-            : false
-        : true;
+    bool confirmada = cita.confirmada.toString() == 'true' ? true : false;
 
     // print('$citaConfirmada ---- $_iniciadaSesionUsuario');
 
-    String textoConfirmada =
-        citaConfirmada ? '✔️ cofirmada' : '❌ sin confirmar';
+    String textoConfirmada = confirmada ? '✔️' : '❌';
+    String hayComentario = cita.comentario!.isNotEmpty ? '🗨️' : '';
+    String horaInicioTexto = formatearHora(cita.horaInicio.toString());
+    String horaFinTexto = formatearHora(cita.horaFinal.toString());
 
     // ###### COMPROBACION SI SE TRATA DE UNA CITA O UNA HORA INDISPONIBLE
     return (cita.nombreCliente != '')
 
         // ------------TARJETA CITA RESERVADA         ---------------------
-        ? '$textoConfirmada con ${cita.nombreEmpleado}'
-            '\n 🧒 ${cita.nombreCliente}'
-            '\n 🤝 $servicios' //.join(', ') => para que no quitar los ()
-            '\n 🗨️ ${cita.comentario}'
-            '\n 💰 ${cita.precio}'
+        ? ' $horaInicioTexto-$horaFinTexto · ${cita.nombreEmpleado} $textoConfirmada '
+            '\n ${cita.nombreCliente} $hayComentario'
 
         // ------------TARJETA HORARIO NO DISPONIBLE ---------------------
         : ' ${cita.comentario}';

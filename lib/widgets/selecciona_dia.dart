@@ -19,7 +19,7 @@ class SeleccionaDia extends StatefulWidget {
       : super(key: key);
   final bool botonReprogramarVisible;
   final dynamic idServicio;
-  final Map<String, dynamic> cita; //? cita original a reprogramar
+  final CitaModelFirebase cita; //? cita original a reprogramar
 
   @override
   State<SeleccionaDia> createState() => _SeleccionaDiaState();
@@ -378,7 +378,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
       //? id de todoas las citas
       List idCitaOld = citas.map((e) => e['id']).toList();
       //? id de la cita que esto reprogramando
-      final idCitaNew = widget.cita['id'];
+      final idCitaNew = widget.cita.id;
 
       for (var i = 0; i < citas.length && disp != false; i++) {
         // ALGORITMO DE COMPROBACION DE HORAS POR CADA CITA YA ESTABLECIDA EN FECHA
@@ -467,7 +467,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
               // ? null : Publicidad().publicidad();
 
               // cita original
-              final Map<String, dynamic> oldCita = widget.cita;
+              final CitaModelFirebase oldCita = widget.cita;
 
               String fecha =
                   '${DateTime.parse(textoFechaHora).year.toString()}-${DateTime.parse(textoFechaHora).month.toString().padLeft(2, '0')}-${DateTime.parse(textoFechaHora).day.toString().padLeft(2, '0')}';

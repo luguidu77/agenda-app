@@ -1,6 +1,7 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/providers/comprobacion_reasignacion_citas.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/nuevo_editar_empleado.dart';
 import 'package:agendacitas/widgets/alertas/alertaAgregarPersonal.dart';
@@ -30,6 +31,10 @@ class _EmpleadosScreenState extends State<EmpleadosScreen> {
     final EmpleadosProvider empleadosProvider =
         context.watch<EmpleadosProvider>();
     empleados = empleadosProvider.getEmpleados;
+
+    final comprobarReasigancionProvider =
+        context.watch<ComprobacionReasignacionCitas>();
+
     List<EmpleadoModel> empleadosStaff = empleadosProvider.getEmpleadosStaff;
 
     return Scaffold(
@@ -48,6 +53,13 @@ class _EmpleadosScreenState extends State<EmpleadosScreen> {
           ? _noHayEmpleados()
           : Column(
               children: [
+                // alerta para reasignar citas en caso de que se haya citas creadas antes de que el usuario se convirtiera en empleado
+                // antiguos usuarios app antes de la actualización 10.0
+                Visibility(
+                  visible: !comprobarReasigancionProvider.estadoReasignado,
+                  child: Alertas.reasignacionCitas(context),
+                ),
+                // alerta para agregar empleado cuando no hay empleados
                 Visibility(
                   visible: empleadosStaff.isEmpty,
                   child: Alertas.agregarEmpleadoAlerta(context,
@@ -71,8 +83,12 @@ class _EmpleadosScreenState extends State<EmpleadosScreen> {
                           child: ListTile(
                             leading: CircleAvatar(
                               radius: 19,
-                              backgroundImage:
-                                  NetworkImage(empleados[index].foto),
+                              backgroundImage: (empleados[index].foto)
+                                      .isNotEmpty
+                                  ? NetworkImage(empleados[index]
+                                      .foto) // Cargar la imagen desde URL
+                                  : const AssetImage("assets/images/nofoto.jpg")
+                                      as ImageProvider, // Imagen local por defecto
                             ),
                             title: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,

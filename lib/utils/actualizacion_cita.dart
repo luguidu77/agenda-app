@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ActualizacionCita {
-  static agregar(BuildContext context, citaElegida) {
+  static agregar(BuildContext context, CitaModelFirebase citaElegida) {
     citaElegida.confirmada = true;
     final contextoCitaProvider = context.read<CitasProvider>();
 
@@ -18,7 +18,7 @@ class ActualizacionCita {
 
   static actualizar(
     BuildContext context,
-    Map<String, dynamic> cita,
+    CitaModelFirebase cita,
     DateTime?
         fechaDroppintTime, // fecha del calendario cuando se arrastra tarjeta
     String?
@@ -44,8 +44,7 @@ class ActualizacionCita {
     }
 
 // OBTENER LA DIFERENCIA ENTRE LA HORA DE INICIO Y LA FINAL PARA CONOCER EL TIEMPO DE LA CITA
-    List<int> tiempoServicios =
-        calculaTiempo(cita['horaInicio'], cita['horaFinal']);
+    List<int> tiempoServicios = calculaTiempo(cita.horaInicio, cita.horaFinal);
 
     // DIFERENCIO SI LOS DATOS LLEGAN DE ARRASTRAR TARJETA DEL CALENDARIO O DEL FORMULARIO DETALLES CITA
     if (fechaDroppintTime != null) {
@@ -68,11 +67,10 @@ class ActualizacionCita {
     debugPrint(cita.toString()); // print cita
 
     //? la funcion extraerServicios, resuelve el problema de que el json no tiene comillas en sus claves: [{idServicio: QF3o14RyJ5KbSSb0d6bB, activo: true, servicio: Semiperman
-    List<String> idServicios =
-        extraerIdServiciosdeCadenaTexto(cita['idServicio']);
+    List<String> idServicios = extraerIdServiciosdeCadenaTexto(cita.idservicio);
 
     print(
-        '------------------------------dfdfd------------------------ ${cita['idServicio'].runtimeType}');
+        '------------------------------dfdfd------------------------ ${cita.idservicio.runtimeType}');
 
     // si la funcion anterior trae una lista vacía, quiere decir que no hay servicios y por lo tanto sera una tarjeta de No DISPONIBLE
     /* if (idServicios.isEmpty) {
@@ -81,28 +79,28 @@ class ActualizacionCita {
 
     CitaModelFirebase newCita = CitaModelFirebase();
 
-    newCita.email = cita['email'];
-    newCita.id = cita['id'];
+    newCita.email = cita.email;
+    newCita.id = cita.id;
     newCita.dia = textoFecha;
     newCita.horaInicio = nuevaHoraDateTime;
     newCita.horaFinal = DateTime.parse(textoFechaHoraFinal);
     newCita.comentario =
-        cita['comentario'] + ' 🔃​'; //todo añadir un nuevo campo REPROGRAMACION
-    newCita.idcliente = cita['idCliente'];
+        cita.comentario!; //todo añadir un nuevo campo REPROGRAMACION
+    newCita.idcliente = cita.idcliente;
     newCita.idservicio = idServicios;
 
-    newCita.idEmpleado = cita['idEmpleado'];
+    newCita.idEmpleado = cita.idEmpleado;
     newCita.confirmada =
-        cita['confirmada'] == 'true'; // Convertir cadena a booleano
+        cita.confirmada == 'true'; // Convertir cadena a booleano
 
-    newCita.idCitaCliente = cita['idCitaCliente'];
-    newCita.tokenWebCliente = cita['tokenWebCliente'];
+    newCita.idCitaCliente = cita.idCitaCliente;
+    newCita.tokenWebCliente = cita.tokenWebCliente;
     debugPrint('$textoFecha  $textoFechaHoraInicio $textoFechaHoraFinal');
 
     // Establece las citas en el contexto, eliminando la antigua y agregandola modificada
     // Asegúrate de que no intente notificar al Provider durante el proceso de construcción. Puedes usar Future.microtask para diferir la notificación:
     Future.microtask(() {
-      contextoCitas.eliminacitaAlContexto(cita['id']);
+      contextoCitas.eliminacitaAlContexto(cita.id);
       contextoCitas.agregaCitaAlContexto(newCita);
     });
 

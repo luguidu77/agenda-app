@@ -1,10 +1,12 @@
+import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/providers.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class BotonConfirmarCitaWeb extends StatefulWidget {
-  final dynamic cita;
+  final CitaModelFirebase cita;
   final String emailUsuario;
 
   const BotonConfirmarCitaWeb({
@@ -18,89 +20,87 @@ class BotonConfirmarCitaWeb extends StatefulWidget {
 }
 
 class _BotonConfirmarCitaWebState extends State<BotonConfirmarCitaWeb> {
-  bool _citaconfirmada = false;
+  late bool _citaconfirmada;
   bool _cargando = false;
 
   @override
   void initState() {
     super.initState();
+    _citaconfirmada = widget.cita.confirmada ?? false;
   }
 
   @override
   Widget build(BuildContext context) {
-    final citaconfirmada =
-        Provider.of<EstadoConfirmacionCita>(context, listen: true);
-    _citaconfirmada = citaconfirmada.estadoCita;
-    bool clienteTieneToken =
-        widget.cita['tokenWebCliente'] != '' ? true : false;
-
     return ListTile(
-        title: _citaconfirmada
-            ? const Text('CITA CONFIRMADA',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12))
-            : const Text(
-                'CITA SIN CONFIRMAR',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12),
-              ),
-        trailing: FloatingActionButton(
-          mini: true,
-          backgroundColor: _citaconfirmada ? Colors.redAccent : Colors.blue,
-          onPressed: _cambiaEstadoConfirmacion,
-          child: _cargando
-              ? const SizedBox(
-                  width: 15, height: 15, child: CircularProgressIndicator())
-              : Icon(_citaconfirmada ? Icons.cancel : Icons.check,
-                  color: Colors.white),
-        ));
-
-    /*   ElevatedButton(
-          // color: _visto ? Colors.blueGrey : Colors.blue,
-          onPressed: _cambiaEstadoConfirmacion,
-          child: _cargando
-              ? const SizedBox(
-                  width: 15, height: 15, child: LinearProgressIndicator())
-              : Text(_visto ? 'Anular' : 'Confirmar'),
-        )); */
+      title: Text(
+        context.watch<EstadoConfirmacionCita>().estadoCita
+            ? 'CITA CONFIRMADA'
+            : 'CITA SIN CONFIRMAR',
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
+      trailing: context.watch<EstadoConfirmacionCita>().estadoCita
+          ? null
+          : _cargando
+              ? const CircularProgressIndicator()
+              : ElevatedButton(
+                  onPressed: _cambiaEstadoConfirmacion,
+                  child: const Text('CONFIRMAR'),
+                ),
+    );
   }
 
-  _cambiaEstadoConfirmacion() async {
+  Future<void> _cambiaEstadoConfirmacion() async {
     setState(() {
-      _cargando = true; // Muestra el indicador de carga
+      _cargando = true;
     });
 
-    //** 1 modifica el estado de confirmada en perfil  del cliente (clienteAgendoWeb)*/
+    try {
+      // Paso 1: Actualizar estado de confirmación en el perfil del cliente
+      await FirebaseProvider().cambiarEstadoConfirmacionCitaCliente(
+        context,
+        widget.cita,
+        widget.emailUsuario,
+      );
 
-    await FirebaseProvider().cambiarEstadoConfirmacionCitaCliente(
-        context, widget.cita, widget.emailUsuario);
-    //
-    //** cambian el estado de confirmada la cita en agendadecitas */
+      // Paso 2: Cambiar estado de confirmación en la colección de citas
+      await FirebaseProvider().cambiarEstadoConfirmacionCita(
+        widget.emailUsuario,
+        widget.cita.id,
+      );
 
-    // Cambiar estado en Firebase
-    await FirebaseProvider()
-        .cambiarEstadoConfirmacionCita(widget.emailUsuario, widget.cita['id']);
+      // Paso 3: Enviar notificación (si el cliente tiene un token web)
+      /*  if (widget.cita.tokenWebCliente?.isNotEmpty ?? false) {
+        // Implementar el envío de notificaciones
+        await FirebaseProvider().enviarNotificacionConfirmacionCita(
+          token: widget.cita.tokenWebCliente!,
+          mensaje: 'Tu cita ha sido confirmada.',
+        );
+      } */
 
-    //todo: enviar notificacion (web o appcliente) al cliente en caso de existir token
+      // Paso 4: Actualizar el estado global
+      context.read<CitasProvider>().actualizaEstadoConfirmacionCitaContexto(
+            widget.cita,
+            true,
+          );
 
-    // Cambiar estado local
-    setState(() {
-      final citaconfirmada =
-          Provider.of<EstadoConfirmacionCita>(context, listen: false);
-      citaconfirmada.setEstadoCita(!_citaconfirmada);
+      context.read<EstadoConfirmacionCita>().setEstadoCita(true);
 
-      _citaconfirmada = citaconfirmada.estadoCita;
-      _cargando = false; // Oculta el indicador de carga
-    });
+      // Actualizar el estado local
+      setState(() {
+        _citaconfirmada = true;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al confirmar cita: $e')),
+      );
+    } finally {
+      setState(() {
+        _cargando = false;
+      });
+    }
   }
 }
-
-/* IconButton(
-                          onPressed: ()=>ConfirmaCita(),
-                          icon: cita['confirmada'] == 'true'
-                              ? Text('ANULAR')
-                              : Text('CONFIRMAR')), */

@@ -2,6 +2,7 @@ import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/calendario_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/providers/comprobacion_reasignacion_citas.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/providers/estado_creacion_indisponibilidad.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
@@ -43,6 +44,9 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
 
   @override
   Widget build(BuildContext context) {
+    final comprobarReasigancionProvider =
+        context.read<ComprobacionReasignacionCitas>();
+
     return Consumer<EmpleadosProvider>(
       builder: (context, empleadosProvider, child) {
         if (!empleadosProvider.empleadosCargados) {
@@ -63,13 +67,19 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
           return Alertas.agregarEmpleadoAlerta(context);
         }
 
-        // Mostrar contenido si hay empleados
-        return seccionEmpleados();
+        return !comprobarReasigancionProvider.estadoReasignado
+            ?
+            // alerta para reasignar citas en caso de que se haya citas creadas antes de que el usuario se convirtiera en empleado
+            // antiguos usuarios app antes de la actualización 10.0
+            Alertas.reasignacionCitas(context)
+            :
+            // si hay empleados, Mostrar SECCION DE EMPLEADOS
+            seccionEmpleados();
       },
     );
   }
 
-  Visibility seccionEmpleados() {
+  Widget seccionEmpleados() {
     //bool leerEstadoBotonIndisponibilidad, VistaProvider vistaProvider, CalendarView vistaActual, context, List<CitaModelFirebase> todasLasCitasConteoPorEmpleado, List<CitaModelFirebase> citas, int numCitas
 
     final leerEstadoBotonIndisponibilidad =
@@ -82,29 +92,26 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
     final empleadosProvider = context.watch<EmpleadosProvider>();
     empleadosStaff = empleadosProvider.getEmpleadosStaff;
 
-    return Visibility(
-        visible: !leerEstadoBotonIndisponibilidad,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            // cambioVistaCalendario(vistaProvider, vistaActual),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        // cambioVistaCalendario(vistaProvider, vistaActual),
 
-            Visibility(
-              visible: empleadosStaff.length != 1,
-              child: verTodosLosEmpleados(vistaProvider, vistaActual),
-            ),
+        Visibility(
+          visible: empleadosStaff.length != 1,
+          child: verTodosLosEmpleados(vistaProvider, vistaActual),
+        ),
 
-            const SizedBox(width: 10),
+        const SizedBox(width: 10),
 
-            ..._empleados(
-              context,
-              vistaActual,
-              todasLasCitas,
-            ),
-            const SizedBox(width: 56),
-            gananciaDiaria(todasLasCitas),
-          ],
-        ));
+        ..._empleados(
+          context,
+          vistaActual,
+          todasLasCitas,
+        ),
+        const SizedBox(width: 30),
+      ],
+    );
   }
 
   verTodosLosEmpleados(VistaProvider vistaProvider, CalendarView vistaActual) {
@@ -179,125 +186,6 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
 
     return vistaActual == CalendarView.day ? empleadosWidget : [];
   }
-
-  Future<String> getNumCitas(List<CitaModelFirebase> todasLasCitas) async {
-    // Obtener la fecha seleccionada y formatearla
-    var calendarioProvider = context.watch<CalendarioProvider>();
-    String fechaElegidaFormateada =
-        DateFormat('yyyy-MM-dd').format(calendarioProvider.fechaSeleccionada);
-
-    // Filtrar citas por fecha seleccionada y calcular la ganancia diaria
-    double gananciaDiaria = todasLasCitas
-        .where((value) => value.dia == fechaElegidaFormateada)
-        .fold(0.0, (sum, cita) {
-      double precio = double.tryParse(cita.precio ?? '0') ?? 0.0;
-      return sum + precio;
-    });
-
-    // Devolver 0 si la ganancia es cero, de lo contrario formatear con dos decimales
-    return gananciaDiaria == 0
-        ? '0.00'
-        : NumberFormat("#.00").format(gananciaDiaria);
-  }
-
-  FutureBuilder<dynamic> gananciaDiaria(List<CitaModelFirebase> citas) {
-    // TRAIGO PERSONALIZA PARA LA MONEDA
-    final contextoPersonaliza = context.read<PersonalizaProviderFirebase>();
-    final personaliza = contextoPersonaliza.getPersonaliza;
-
-    return FutureBuilder<dynamic>(
-      future: getNumCitas(citas),
-      builder: (
-        BuildContext context,
-        AsyncSnapshot<dynamic> snapshot,
-      ) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return SizedBox(
-            width: 70,
-            child: SkeletonParagraph(
-              style: SkeletonParagraphStyle(
-                lines: 1,
-                spacing: 1,
-                lineStyle: SkeletonLineStyle(
-                  height: 35,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              ),
-            ),
-          );
-        } else if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasError) {
-            return const Text('');
-          } else if (snapshot.hasData) {
-            final data = snapshot.data;
-
-            // Fondo rectangular con el borde izquierdo redondeado
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.grey[200], // Color de fondo
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  bottomLeft: Radius.circular(12),
-                ),
-              ),
-              child: Text(
-                ' $data ${personaliza.moneda}',
-                style: textoEstilo,
-              ),
-            );
-          } else {
-            return const Text('Empty data');
-          }
-        } else {
-          return const Text('fdfd');
-        }
-      },
-    );
-  }
-
-  /*  Padding _skeletonEmpleados(List<dynamic> empleados) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10.0),
-      child: Column(
-        children: [
-          Row(children: [
-            const SizedBox(
-              // separacion izquierda de los circulos Todos los empleados y empleados
-              width: 40,
-            ),
-            const SkeletonAvatar(
-              style: SkeletonAvatarStyle(
-                shape: BoxShape.circle,
-                width: 50,
-                height: 50,
-              ),
-            ),
-
-            //// circulos segun numero de empleados
-            ...empleados.map((e) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.0),
-                child: SkeletonAvatar(
-                  style: SkeletonAvatarStyle(
-                    shape: BoxShape.circle,
-                    width: 50,
-                    height: 50,
-                  ),
-                ),
-              );
-            })
-          ]),
-
-          const SizedBox(
-            // separacion entre los circulos empleados y las lineas del calendario
-            height: 40,
-          ),
-         
-        ],
-      ),
-    );
-  } */
 }
 
 class CargandoDatos extends StatelessWidget {

@@ -1,4 +1,5 @@
 import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/models/empleado_model.dart';
 import 'package:flutter/material.dart';
 
 class CitasProvider extends ChangeNotifier {
@@ -23,15 +24,32 @@ class CitasProvider extends ChangeNotifier {
     }
   }
 
-  void eliminacitaAlContexto(id) {
+  void eliminacitaAlContexto(String id) {
     _citas.removeWhere((element) => element.id == id);
 
     _citasCargadas = false;
     notifyListeners();
   }
 
+  void actualizaEstadoConfirmacionCitaContexto(
+      CitaModelFirebase citaEditada, bool estadoConfirmacion) {
+    int index = _citas.indexWhere((cita) => cita.id == citaEditada.id);
+
+    if (index != -1) {
+      _citas[index] = _citas[index].copyWith(confirmada: estadoConfirmacion);
+
+      _citasCargadas = false;
+      notifyListeners();
+    }
+  }
+
   void limpiarCitaContexto() {
     _citas = [];
+    notifyListeners();
+  }
+
+  void reasignacionCita() {
+    _citasCargadas = false;
     notifyListeners();
   }
 }

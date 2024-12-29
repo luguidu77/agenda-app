@@ -316,8 +316,8 @@ class _FechasNoDisponiblesState extends State<FechasNoDisponibles> {
           idEmpleado: 'idEmpleado',
           idCitaCliente: '');
       //SI HAY INICIADA SESION SE GUARDA EN FIREBASE
-      await FirebaseProvider()
-          .nuevaCita(_emailSesionUsuario, citaEdicion, idServicio);
+      await FirebaseProvider().nuevaCita(_emailSesionUsuario, citaEdicion,
+          idServicio, citaEdicion.idCitaCliente!);
     } else {
       //SI NO HAY INICIADA SESION SE GUARDA EN DISPOSITIVO
       var citaElegida = Provider.of<CitaListProvider>(context, listen: false);

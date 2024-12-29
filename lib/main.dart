@@ -161,7 +161,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(
             create: (BuildContext context) => PagoProvider()),
         ChangeNotifierProvider(
-            create: (BuildContext context) => DetectChangeActivateService()),
+            create: (BuildContext context) => ComprobacionReasignacionCitas()),
         ChangeNotifierProvider(
             create: (BuildContext context) => DispoSemanalProvider()),
         ChangeNotifierProvider(

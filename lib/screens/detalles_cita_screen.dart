@@ -16,7 +16,7 @@ import '../widgets/elimina_cita.dart';
 
 class DetallesCitaScreen extends StatefulWidget {
   final String emailUsuario;
-  final Map<String, dynamic> reserva;
+  final CitaModelFirebase? reserva;
   const DetallesCitaScreen(
       {Key? key, required this.reserva, required this.emailUsuario})
       : super(key: key);
@@ -37,7 +37,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
   bool _iniciadaSesionUsuario = false;
 
   compruebaEstadoCita() {
-    bool citaconfirmada = widget.reserva['confirmada'] == 'true' ? true : false;
+    bool citaconfirmada = widget.reserva!.confirmada!;
     final estadoCita =
         Provider.of<EstadoConfirmacionCita>(context, listen: false);
     estadoCita.setEstadoCita(citaconfirmada);
@@ -71,13 +71,13 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
   @override
   Widget build(BuildContext context) {
     final citaconfirmada = Provider.of<EstadoConfirmacionCita>(context);
-    String fechaLarga = DateFormat.MMMMEEEEd('es_ES')
+    String fechaCorta = DateFormat('EEE d MMM', 'es_ES')
         .add_Hm()
-        .format(DateTime.parse(widget.reserva['horaInicio']));
+        .format((widget.reserva!.horaInicio!));
 
     return Scaffold(
         backgroundColor: colorFondo,
-        appBar: AppBar(
+        /*  appBar: AppBar(
           title: Text('Detalle de la cita', style: subTituloEstilo),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new),
@@ -85,7 +85,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
           ),
           backgroundColor: colorFondo,
           elevation: 0,
-        ),
+        ), */
         body: FutureBuilder<void>(
             future:
                 cargarDatos(), // Aquí se espera a que los datos estén listos
@@ -103,8 +103,8 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
                     child: Column(
                   children: [
                     _DetallesCitaWidget(
-                      reserva: widget.reserva,
-                      fechaLarga: fechaLarga,
+                      reserva: widget.reserva!,
+                      fechaCorta: fechaCorta,
                       citaconfirmada: citaconfirmada.estadoCita,
                       personaliza: personaliza,
                       emailUsuario: _emailSesionUsuario,
@@ -118,8 +118,8 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
 }
 
 class _DetallesCitaWidget extends StatefulWidget {
-  final Map<String, dynamic> reserva;
-  final String fechaLarga;
+  final CitaModelFirebase reserva;
+  final String fechaCorta;
   final bool citaconfirmada;
   final PersonalizaModelFirebase personaliza;
   final String emailUsuario;
@@ -127,7 +127,7 @@ class _DetallesCitaWidget extends StatefulWidget {
 
   const _DetallesCitaWidget({
     required this.reserva,
-    required this.fechaLarga,
+    required this.fechaCorta,
     required this.citaconfirmada,
     required this.personaliza,
     required this.emailUsuario,
@@ -160,36 +160,36 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
             padding: const EdgeInsets.all(16.0),
             margin: const EdgeInsets.symmetric(vertical: 8.0),
             child: Column(
+              spacing: 10,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // BOTON CONFIRMAR DE LA CITA---------------------------------------------
                 _buildConfirmationButton(),
                 // CLIENTE DE LA CITA-----------------------------------------------------
                 _ClienteInfoWidget(reserva: widget.reserva),
-                // EMPLEADO ASIGNADO DE LA CITA-------------------------------------------
-                _EmpleadoInfoWidget(reserva: widget.reserva),
 
                 // FECHA DE LA CITA ------------------------------------------------------
-                Text(widget.fechaLarga,
+                Text(widget.fechaCorta,
                     style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white)),
-                const SizedBox(height: 10),
 
+                // EMPLEADO ASIGNADO DE LA CITA-------------------------------------------
+                _EmpleadoInfoWidget(reserva: widget.reserva),
                 // SERVICIOS DE LA CITA----------------------------------------------------
-                Text('servicios: ${widget.reserva['servicios']}',
+                Text(widget.reserva.servicios!.join(', '),
                     style:
                         const TextStyle(fontSize: 14, color: Colors.white54)),
+
                 // PRECIO DE LA CITA------------------------------------------------------
                 Text(
-                  'PRECIO: ${widget.reserva['precio']} ${widget.personaliza.moneda}',
+                  'PRECIO: ${widget.reserva.precio} ${widget.personaliza.moneda}',
                   style: const TextStyle(fontSize: 16, color: Colors.white70),
                 ),
-                const SizedBox(height: 10),
 
                 // NOTAS DE LA CITA---------------------------
-                Text('Notas: ${widget.reserva['comentario']}',
+                Text('Notas: ${widget.reserva.comentario}',
                     style:
                         const TextStyle(fontSize: 14, color: Colors.white54)),
                 const SizedBox(height: 90),
@@ -251,13 +251,13 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
 
   Widget _buildShareButton() {
     return CompartirCitaConCliente(
-      cliente: widget.reserva['nombre'],
-      telefono: widget.reserva['telefono']!,
-      email: widget.reserva['email'],
-      fechaCita: widget.reserva['horaInicio'],
-      servicio: widget.reserva['servicios'].replaceAll(RegExp(r'[\[\]]'),
-          ''), // [servicio1, servicio2] por lo que le quito los corchetes
-      precio: widget.reserva['precio'],
+      cliente: widget.reserva.nombreCliente!,
+      telefono: widget.reserva.telefonoCliente!,
+      email: widget.reserva.email,
+      fechaCita: widget.reserva.horaInicio,
+      servicio: widget.reserva
+          .servicios, // [servicio1, servicio2] por lo que le quito los corchetes
+      precio: widget.reserva.precio,
     );
   }
 
@@ -275,7 +275,7 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
               child: ListView(
                 children: [
                   FormReprogramaReserva(
-                      idServicio: widget.reserva['idServicio'].toString(),
+                      idServicio: widget.reserva.idservicio.toString(),
                       cita: widget.reserva),
                 ],
               ),
@@ -313,39 +313,38 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
 }
 
 class _ClienteInfoWidget extends StatelessWidget {
-  final Map<String, dynamic> reserva;
+  final CitaModelFirebase reserva;
 
   const _ClienteInfoWidget({required this.reserva});
 
   @override
   Widget build(BuildContext context) {
+    final cliente = ClienteModel(
+      id: reserva.idcliente.toString(),
+      nombre: reserva.nombreCliente,
+      telefono: reserva.telefonoCliente,
+      email: reserva.email,
+      foto: reserva.fotoCliente,
+      nota: reserva.notaCliente,
+    );
     return InkWell(
       onTap: () => Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (_, __, ___) => FichaClienteScreen(
-            clienteParametro: ClienteModel(
-              id: reserva['idCliente'].toString(),
-              nombre: reserva['nombre'],
-              telefono: reserva['telefono'],
-              email: reserva['email'],
-              foto: reserva['foto'],
-              nota: reserva['nota'],
-            ),
-          ),
+          pageBuilder: (_, __, ___) =>
+              FichaClienteScreen(clienteParametro: cliente),
           transitionDuration: const Duration(milliseconds: 600),
         ),
       ),
       child: TarjetaCliente(
-        reserva: reserva,
-        cliente: reserva,
+        cliente: cliente,
       ),
     );
   }
 }
 
 class _EmpleadoInfoWidget extends StatelessWidget {
-  final Map<String, dynamic> reserva;
+  final CitaModelFirebase reserva;
 
   const _EmpleadoInfoWidget({required this.reserva});
 
@@ -365,27 +364,12 @@ class _EmpleadoInfoWidget extends StatelessWidget {
         ),
         EmpleadoWidget(
           emailUsuario: emailSesionUsuario,
-          idEmpleado: reserva['idEmpleado'],
+          idEmpleado: reserva.idEmpleado!,
           procede: 'detalles_cita',
         ),
         const SizedBox(
           width: 15,
         ),
-        /*  ElevatedButton(
-          onPressed: () {},
-          style: ButtonStyle(
-            shape: WidgetStateProperty.all(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(0), // Rectangular
-              ),
-            ),
-            side: WidgetStateProperty.all(
-              const BorderSide(
-                  color: Colors.black, width: 2), // Borde negro y ancho de 2
-            ),
-          ),
-          child: const Text('reasignar'),
-        ) */
       ],
     );
   }
@@ -445,9 +429,9 @@ class EmpleadoAvatar extends StatelessWidget {
 }
 
 class TarjetaCliente extends StatelessWidget {
-  final Map<String, dynamic> cliente;
+  final ClienteModel cliente;
 
-  const TarjetaCliente({super.key, required this.cliente, required reserva});
+  const TarjetaCliente({super.key, required this.cliente});
 
   @override
   Widget build(BuildContext context) {
@@ -468,7 +452,7 @@ class TarjetaCliente extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
-          _fotoCliente(cliente['foto']),
+          _fotoCliente(cliente.foto),
           const SizedBox(width: 15),
           _infoCliente(cliente),
         ],
@@ -485,13 +469,13 @@ class TarjetaCliente extends StatelessWidget {
     );
   }
 
-  Widget _infoCliente(Map<String, dynamic> cliente) {
+  Widget _infoCliente(ClienteModel cliente) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            cliente['nombre'] ?? 'Sin nombre',
+            cliente.nombre ?? 'Sin nombre',
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -499,9 +483,9 @@ class TarjetaCliente extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 5),
-          if (cliente['nota'] != null && cliente['nota'].toString().isNotEmpty)
+          if (cliente.nota != null && cliente.nota.toString().isNotEmpty)
             Text(
-              cliente['nota'],
+              cliente.nota!,
               style: const TextStyle(
                 fontSize: 14,
                 color: Colors.blueGrey,

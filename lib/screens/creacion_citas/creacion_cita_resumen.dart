@@ -118,7 +118,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         .getEmpleadoporId(_emailSesionUsuario, idEmpleado); */
 
     // GENERO UN ID PARA LA CITA(idCitaCliente); // Ejemplo: b7gjR3jNuMRomunRo6SJ
-    String idCitaCliente = generarCadenaAleatoria(20);
+    String idCitaCliente = await generarCadenaAleatoria(20);
     // GUARDA EN EL CONTEXTO DE LA CITA
 
     CitaModelFirebase citaElegida = contextoCreacionCita.contextoCita;
@@ -215,7 +215,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         /*  citaElegida.nombreCliente!,
         citaElegida.telefonoCliente!, */
         listaServicios.first['SERVICIO'],
-        precioTexto);
+        precioTexto,
+        idCitaCliente);
 
     //* CLIENTE : comprobar si el cliente tiene cuenta en la web para agregarle la cita
 
@@ -422,13 +423,14 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     List<String> idServicios,
     String nombreServicio,
     String precio,
+    String idCitaCliente,
   ) async {
     print(
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
     // print('citaelegida ${contextoCitaProvider.getCitas.length.toString()} ');
 
     //###### CREA CITA Y TRAE ID CITA CREADA EN FIREBASE PARA ID DEL RECORDATORIO
-    _creaCitaEnFirebase(citaElegida);
+    _creaCitaEnFirebase(citaElegida, idCitaCliente);
 
     //###### CREA RECORDATORIO EN FIREBASE //######//######//######//######
     _creaRecordatorioEnFirebase(
@@ -495,7 +497,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     }
   }
 
-  void _creaCitaEnFirebase(citaElegida) async {
+  void _creaCitaEnFirebase(citaElegida, idCitaCliente) async {
     List<Map<String, dynamic>> servicios =
         contextoCreacionCita.getServiciosElegidos;
 
@@ -503,8 +505,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
       return ser['ID'].toString();
     }).toList();
 
-    String idCitaFB = await FirebaseProvider()
-        .nuevaCita(_emailSesionUsuario, citaElegida, idServicios);
+    String idCitaFB = await FirebaseProvider().nuevaCita(
+        _emailSesionUsuario, citaElegida, idServicios, idCitaCliente);
   }
 }
 

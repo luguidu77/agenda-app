@@ -1,6 +1,6 @@
 import 'dart:math';
 
-String generarCadenaAleatoria(int longitud) {
+Future<String> generarCadenaAleatoria(int longitud) async {
   const String chars =
       'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   Random rnd = Random();

@@ -176,7 +176,10 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
           height: 200.0, // Altura del header
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: NetworkImage(imageUrl), // Ruta de la imagen de fondo
+              image: imageUrl.isNotEmpty
+                  ? NetworkImage(imageUrl) // Cargar la imagen desde URL
+                  : const AssetImage("assets/images/nofoto.jpg")
+                      as ImageProvider, // Imagen local por defectofondo
               fit: BoxFit.cover,
             ),
           ),

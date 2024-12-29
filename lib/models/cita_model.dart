@@ -99,29 +99,77 @@ class CitaModelFirebase {
   String? emailCliente;
   String? notaCliente;
 
-  CitaModelFirebase(
-      {this.id,
-      this.dia,
-      this.horaInicio,
-      this.horaFinal,
-      this.comentario,
-      this.email,
-      this.idcliente,
-      this.idservicio,
-      this.servicios,
-      this.idEmpleado,
-      this.nombreEmpleado,
-      this.colorEmpleado,
-      this.precio,
-      this.confirmada,
-      this.tokenWebCliente,
-      this.idCitaCliente,
-      // Inicialización de los nuevos campos
-      this.nombreCliente,
-      this.fotoCliente,
-      this.telefonoCliente,
-      this.emailCliente,
-      this.notaCliente});
+  CitaModelFirebase({
+    this.id,
+    this.dia,
+    this.horaInicio,
+    this.horaFinal,
+    this.comentario,
+    this.email,
+    this.idcliente,
+    this.idservicio,
+    this.servicios,
+    this.idEmpleado,
+    this.nombreEmpleado,
+    this.colorEmpleado,
+    this.precio,
+    this.confirmada,
+    this.tokenWebCliente,
+    this.idCitaCliente,
+    this.nombreCliente,
+    this.fotoCliente,
+    this.telefonoCliente,
+    this.emailCliente,
+    this.notaCliente,
+  });
+
+  CitaModelFirebase copyWith({
+    var id,
+    String? dia,
+    DateTime? horaInicio,
+    DateTime? horaFinal,
+    String? comentario,
+    String? email,
+    String? idcliente,
+    List<dynamic>? idservicio,
+    List<String>? servicios,
+    String? idEmpleado,
+    String? nombreEmpleado,
+    int? colorEmpleado,
+    String? precio,
+    bool? confirmada,
+    String? tokenWebCliente,
+    String? idCitaCliente,
+    String? nombreCliente,
+    String? fotoCliente,
+    String? telefonoCliente,
+    String? emailCliente,
+    String? notaCliente,
+  }) {
+    return CitaModelFirebase(
+      id: id ?? this.id,
+      dia: dia ?? this.dia,
+      horaInicio: horaInicio ?? this.horaInicio,
+      horaFinal: horaFinal ?? this.horaFinal,
+      comentario: comentario ?? this.comentario,
+      email: email ?? this.email,
+      idcliente: idcliente ?? this.idcliente,
+      idservicio: idservicio ?? this.idservicio,
+      servicios: servicios ?? this.servicios,
+      idEmpleado: idEmpleado ?? this.idEmpleado,
+      nombreEmpleado: nombreEmpleado ?? this.nombreEmpleado,
+      colorEmpleado: colorEmpleado ?? this.colorEmpleado,
+      precio: precio ?? this.precio,
+      confirmada: confirmada ?? this.confirmada,
+      tokenWebCliente: tokenWebCliente ?? this.tokenWebCliente,
+      idCitaCliente: idCitaCliente ?? this.idCitaCliente,
+      nombreCliente: nombreCliente ?? this.nombreCliente,
+      fotoCliente: fotoCliente ?? this.fotoCliente,
+      telefonoCliente: telefonoCliente ?? this.telefonoCliente,
+      emailCliente: emailCliente ?? this.emailCliente,
+      notaCliente: notaCliente ?? this.notaCliente,
+    );
+  }
 
   void actualizarParcialmente(CitaModelFirebase nuevosDatos) {
     id = nuevosDatos.id ?? id;
@@ -149,34 +197,38 @@ class CitaModelFirebase {
 
   factory CitaModelFirebase.fromJson(Map<String, dynamic> json) =>
       CitaModelFirebase(
-          id: json["id"],
-          dia: json["dia"],
-          horaInicio: json["horaInicio"],
-          horaFinal: json["horaFinal"],
-          comentario: json["comentario"],
-          email: json["email"],
-          idcliente: json["idCliente"],
-          idservicio: ["idServicio"], // Adaptación de array
-          servicios: ["servicios"], // Adaptación de array
-          idEmpleado: json["idEmpleado"],
-          nombreEmpleado: json["nombreEmpleado"],
-          colorEmpleado: json["colorEmpleado"],
-          precio: json["precio"],
-          confirmada: json["confirmada"],
-          tokenWebCliente: json["tokenWebCliente"],
-          idCitaCliente: json["idCitaCliente"],
-          // Mapeo de los nuevos campos
-          nombreCliente: json["nombreCliente"],
-          fotoCliente: json["fotoCliente"],
-          telefonoCliente: json["telefonoCliente"],
-          emailCliente: json["emailCliente"],
-          notaCliente: json["notaCliente"]);
+        id: json["id"],
+        dia: json["dia"],
+        horaInicio: json["horaInicio"] != null
+            ? DateTime.parse(json["horaInicio"])
+            : null,
+        horaFinal: json["horaFinal"] != null
+            ? DateTime.parse(json["horaFinal"])
+            : null,
+        comentario: json["comentario"],
+        email: json["email"],
+        idcliente: json["idCliente"],
+        idservicio: json["idServicio"] ?? [],
+        servicios: List<String>.from(json["servicios"] ?? []),
+        idEmpleado: json["idEmpleado"],
+        nombreEmpleado: json["nombreEmpleado"],
+        colorEmpleado: json["colorEmpleado"],
+        precio: json["precio"],
+        confirmada: json["confirmada"],
+        tokenWebCliente: json["tokenWebCliente"],
+        idCitaCliente: json["idCitaCliente"],
+        nombreCliente: json["nombreCliente"],
+        fotoCliente: json["fotoCliente"],
+        telefonoCliente: json["telefonoCliente"],
+        emailCliente: json["emailCliente"],
+        notaCliente: json["notaCliente"],
+      );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "dia": dia,
-        "horaInicio": horaInicio,
-        "horaFinal": horaFinal,
+        "horaInicio": horaInicio?.toIso8601String(),
+        "horaFinal": horaFinal?.toIso8601String(),
         "comentario": comentario,
         "email": email,
         "idCliente": idcliente,
@@ -189,7 +241,6 @@ class CitaModelFirebase {
         "confirmada": confirmada,
         "tokenWebCliente": tokenWebCliente,
         "idCitaCliente": idCitaCliente,
-        // Nuevos campos añadidos al JSON
         "nombreCliente": nombreCliente,
         "fotoCliente": fotoCliente,
         "telefonoCliente": telefonoCliente,

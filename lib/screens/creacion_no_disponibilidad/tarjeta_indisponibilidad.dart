@@ -1,10 +1,14 @@
 import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/mylogic_formularios/my_logic_cita.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/formatea_fecha_hora.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:agendacitas/utils/formatear.dart';
 import 'package:agendacitas/utils/verificaDiferenciaHorario.dart';
+import 'package:agendacitas/widgets/botones/boton_guardar_indisponibilidad.dart';
+import 'package:agendacitas/widgets/empleado/empleado.dart';
+import 'package:agendacitas/widgets/seccion_empleados.screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -101,6 +105,13 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   String textoTitulo = '';
   @override
   Widget build(BuildContext context) {
+    // provider del usuario
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+
+    // provider contexto de la cita para obtener el id del empleado
+    contextoCreacionCita = context.read<CreacionCitaProvider>();
+    final idEmpleado = contextoCreacionCita.contextoCita.idEmpleado;
+
     // provider del boton Guardar
     final personalizadoProvider =
         Provider.of<BotonGuardarAgregarNoDisponible>(context);
@@ -149,66 +160,96 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(
-                ' Agrega horario no disponible',
-                style: estiloHorarios,
-              ),
-              const SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            child: Column(
+                spacing: 20,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Tipo de horarios',
-                    style: subTituloEstilo,
+                    ' Agrega horario no disponible',
+                    style: estiloHorarios,
                   ),
-                  const SizedBox(
-                    width: 90,
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(
+                        'Tipo de horarios',
+                        style: subTituloEstilo,
+                      ),
+                      const SizedBox(
+                        width: 90,
+                      ),
+                      IconButton.outlined(
+                          onPressed: () {
+                            if (_pageController.hasClients) {
+                              _controladorTarjetasAsuntos.paginaAnterior();
+                            }
+                          },
+                          icon: const Icon(Icons.arrow_left)),
+                      IconButton.outlined(
+                          onPressed: () {
+                            if (_pageController.hasClients) {
+                              _controladorTarjetasAsuntos.paginaSiguiente();
+                            }
+                          },
+                          icon: const Icon(Icons.arrow_right)),
+                    ],
                   ),
-                  IconButton.outlined(
-                      onPressed: () {
-                        if (_pageController.hasClients) {
-                          _controladorTarjetasAsuntos.paginaAnterior();
-                        }
-                      },
-                      icon: const Icon(Icons.arrow_left)),
-                  IconButton.outlined(
-                      onPressed: () {
-                        if (_pageController.hasClients) {
-                          _controladorTarjetasAsuntos.paginaSiguiente();
-                        }
-                      },
-                      icon: const Icon(Icons.arrow_right)),
-                ],
-              ),
 
-              // ------------------- ASUNTOS----------------------------
-              //_listaAsuntos(context, fechaElegida, providerHoraFinCarrusel),
-              TarjetasAsuntos(fechaElegida: fechaElegida),
-              const SizedBox(height: 40),
-              // -------------------TEXTO PERSONALIZADO ----------------------------
+                  // ------------------- ASUNTOS----------------------------
+                  //_listaAsuntos(context, fechaElegida, providerHoraFinCarrusel),
+                  TarjetasAsuntos(fechaElegida: fechaElegida),
 
-              Visibility(
-                visible: personalizado,
-                child: const FormularioAsunto(),
-              ),
-              Visibility(
-                  visible: !personalizado, child: _textoAsuntoPredefinido()),
+                  // -------------------EMPLEADO----------------------------
+                  _textoEmpleado(estadoPagoProvider, idEmpleado),
 
-              //Text(providerTextoTitulo.getTitulo)),
-              const SizedBox(height: 20),
-              // ------------------- PRESENTACION DE FECHA Y HORAS---------
-              _presentacionFecha(),
-              const SizedBox(height: 20),
-              _presentacionHoras(),
-              const SizedBox(height: 40),
+                  // -------------------TEXTO PERSONALIZADO ---------------------------
+                  Visibility(
+                    visible: personalizado,
+                    child: const FormularioAsunto(),
+                  ),
+                  Visibility(
+                      visible: !personalizado,
+                      child: _textoAsuntoPredefinido()),
 
-              const BotonGuardar(),
-            ]),
+                  // ------------------- PRESENTACION DE FECHA Y HORAS---------
+                  _presentacionFecha(),
+
+                  _presentacionHoras(),
+
+                  const BotonGuardar(),
+                ]),
           ),
         ),
       ),
+    );
+  }
+
+  Column _textoEmpleado(estadoPagoProvider, idEmpleado) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Empleado:',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Container(
+          width: double.infinity, // Ocupa todo el ancho de la pantalla
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5.0),
+            border: Border.all(
+                color: Colors.black,
+                width: 1), // Borde para asemejar el outline
+          ),
+          child: EmpleadoWidget(
+            procede: 'agrega_horario_indispuesto',
+            emailUsuario: estadoPagoProvider.emailUsuarioApp,
+            idEmpleado: idEmpleado!,
+          ),
+        ),
+      ],
     );
   }
 
@@ -222,7 +263,7 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
         ),
         Container(
           width: double.infinity, // Ocupa todo el ancho de la pantalla
-          padding: const EdgeInsets.all(18.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(5.0),
@@ -1029,157 +1070,6 @@ class _CarruselDeHorariosState extends State<CarruselDeHorarios> {
     } else {
       return estiloHorariosDifuminado;
     }
-  }
-}
-
-class BotonGuardar extends StatefulWidget {
-  const BotonGuardar({super.key});
-
-  @override
-  State<BotonGuardar> createState() => _BotonGuardarState();
-}
-
-class _BotonGuardarState extends State<BotonGuardar> {
-  String _emailSesionUsuario = '';
-  bool botonActivado = false;
-  bool personalizado = true;
-  late TextoTituloIndispuesto providerTextoTitulo;
-  String textoTitulo = '';
-
-  String fechaPantalla = '';
-  String dia = '';
-  String horaInicioPantalla = ''; // se presenta cuadro Hora: de 09:00 a 10:00
-  String horaFinPantalla = ''; // se presenta cuadro Hora: de 09:00 a 10:00
-  String fechaInicio = '';
-  String fechaFin = '';
-  DateTime? horaInicio;
-  DateTime? fechaElegida; // provider fecha elegida
-  DateTime? horaFin; // provider hora fin elegida
-  String horaInicioTexto = ''; //2024-08-09 13:00:00.000Z'
-  String horaFinTexto = ''; //2024-08-09 14:00:00.000Z'
-
-  emailUsuario() async {
-    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
-    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    emailUsuario();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // escucha el provider del titulo del asunto
-    providerTextoTitulo = Provider.of<TextoTituloIndispuesto>(context);
-    textoTitulo = providerTextoTitulo.getTitulo;
-    // provider HORA elegida
-    final providerHoraFinCarrusel =
-        Provider.of<HorarioElegidoCarrusel>(context, listen: false);
-    // Verifica el estado del botón antes de construir la interfaz
-    botonActivado = Verificadiferenciahorario.verificarBotonActivado(
-        providerHoraFinCarrusel);
-
-    // provider del boton Guardar
-    final personalizadoProvider =
-        Provider.of<BotonGuardarAgregarNoDisponible>(context);
-    personalizado =
-        personalizadoProvider.forularioVisible; // formulario es visible o no
-
-    bool condicionBotonActivado() {
-      //  con la variable 'personalizado' verfico si esta la opcion del asunto es personalizado
-      // si es personalizado, compruebo con 'botonAtivado' los tramos horarios, y si el formulario está validado
-      // si no es personalizado y el fomulario no esta visible, pues retorno la condicion verdadera para activar el boton y realizar el guardado.
-      if (personalizado) {
-        if (botonActivado && textoTitulo != ''
-            /*  _formKey.currentState != null &&
-            _formKey.currentState!.validate() &&
-            _errorText == null */
-            ) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-
-      return true;
-    }
-
-    void cerrar() {
-      personalizadoProvider.setBotonGuardar(true); // formulario es visible o no
-
-      Navigator.pop(context);
-      setState(() {});
-    }
-
-    // provider FECHA elegida
-    final providerFechaElegida = Provider.of<FechaElegida>(context);
-    fechaElegida = providerFechaElegida.fechaElegida;
-    dia = formatearFechaDiaCita(fechaElegida!);
-
-    // hora inicio
-    horaInicio = providerHoraFinCarrusel.horaInicio;
-    horaInicioPantalla = DateFormat('HH:mm').format(horaInicio!);
-
-    // hora fin
-    horaFin = providerHoraFinCarrusel.horaFin;
-    horaFinTexto = horaFin.toString();
-    horaFinPantalla = DateFormat('HH:mm').format(horaFin!);
-
-    print('horaFinTexto para grabar cita -----------------------$horaFinTexto');
-
-    //fecha y hora de inicio elegida
-    // dateTimeElegido = widget.argument;
-
-    horaInicioTexto = (fechaElegida).toString();
-    horaInicio = fechaElegida;
-
-    return Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: condicionBotonActivado() ? Colors.black : Colors.grey,
-          border: Border.all(
-            color: Colors.grey,
-            width: 1.0,
-          ),
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-        child: InkWell(
-            onTap: condicionBotonActivado()
-                ? () async {
-                    final citaEdicion = CitaModelFirebase(
-                        dia: dia,
-                        horaInicio: horaInicio,
-                        horaFinal: horaFin,
-                        comentario: textoTitulo,
-                        idcliente: '999',
-                        idEmpleado: 'idEmpleado',
-                        idCitaCliente: '');
-
-                    await FirebaseProvider().nuevaCita(
-                        _emailSesionUsuario, citaEdicion, ['indispuesto']
-                        /*   dia,
-                        horaInicioTexto,
-                        horaFinTexto,
-                        '0', // precio
-                        textoTitulo, // comentario
-                        '999', // idcliente
-                        ['indispuesto'], // idServicio
-                        'idEmpleado',
-                        '' // idCitaCliente */
-                        );
-
-                    cerrar();
-                  }
-                : null,
-            child: const Center(
-              child: Text(
-                'Guardar',
-                style: TextStyle(color: Colors.white),
-              ),
-            )));
   }
 }
 

@@ -1,5 +1,6 @@
 //todo: pendiente hacer este boton para confirmar la cita
 
+import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/widgets/selecciona_dia.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,7 @@ class FormReprogramaReserva extends StatefulWidget {
       {Key? key, required this.idServicio, required this.cita})
       : super(key: key);
   final dynamic idServicio;
-  final Map<String, dynamic> cita;
+  final CitaModelFirebase cita;
   @override
   State<FormReprogramaReserva> createState() => _FormReprogramaReservaState();
 }

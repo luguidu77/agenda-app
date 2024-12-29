@@ -260,7 +260,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
           'ModificacionCitaScreen': (context) => const DetallesCitaScreen(
                 emailUsuario: '',
-                reserva: {},
+                reserva: null,
               ),
           'FichaClienteScreen': (context) => FichaClienteScreen(
                 clienteParametro: ClienteModel(),

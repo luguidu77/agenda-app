@@ -1,4 +1,5 @@
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
+import 'package:agendacitas/providers/comprobacion_reasignacion_citas.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
@@ -19,6 +20,7 @@ class EmpleadoEdicion extends StatefulWidget {
 
 class EmpleadoEdicionState extends State<EmpleadoEdicion> {
   final controllerEmail = TextEditingController(text: '');
+  final controllerRol = TextEditingController(text: '');
   bool _isEmailFieldEnabled = true; // Controla si el campo está habilitado
 
   final _formKey = GlobalKey<FormState>();
@@ -198,6 +200,11 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
     }
   }
 
+  void _rolPorDefecto() {
+    controllerRol.text = 'administrador, gerente, personal';
+    rolesEmpleados = roles;
+  }
+
   void _selectRol() async {
     List<String>? selectedRoles = await showDialog<List<String>>(
       context: context,
@@ -265,6 +272,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
 
     if (empleados.isEmpty) {
       controllerEmail.text = _emailSesionUsuario;
+      _rolPorDefecto();
       setState(() {
         _isEmailFieldEnabled = false;
       });
@@ -305,8 +313,8 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                 children: [
                   CircleAvatar(
                     backgroundImage: foto.isEmpty
-                        ? const NetworkImage(
-                            'default_image_url_here') // Foto por defecto si no hay foto aún
+                        ? const AssetImage("assets/images/nofoto.jpg")
+                            as ImageProvider // Imagen local por defecto// Foto por defecto si no hay foto aún
                         : NetworkImage(foto),
                     radius: 50,
                   ),
@@ -396,19 +404,21 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
               ),
               const SizedBox(height: 16),
               GestureDetector(
-                onTap: _selectRol,
+                onTap: empleados.isEmpty ? null : _selectRol,
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Text(rolesEmpleados.isEmpty
-                      ? 'Selecciona rol'
-                      : rolesEmpleados
-                          .map((rol) => rolEmpleadoToString(rol))
-                          .toList()
-                          .join(', ')),
+                  child: empleados.isEmpty
+                      ? Text(controllerRol.text)
+                      : Text(rolesEmpleados.isEmpty
+                          ? 'Selecciona rol'
+                          : rolesEmpleados
+                              .map((rol) => rolEmpleadoToString(rol))
+                              .toList()
+                              .join(', ')),
                 ),
               ),
               const SizedBox(height: 16),

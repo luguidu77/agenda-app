@@ -98,7 +98,7 @@ class _BotonGuardarState extends State<BotonGuardar> {
 
     // escucha el provider del titulo del asunto
     providerTextoTitulo = Provider.of<TextoTituloIndispuesto>(context);
-    textoTitulo = '${nombreEmpleado}  ${providerTextoTitulo.getTitulo}';
+    textoTitulo = '$nombreEmpleado  ${providerTextoTitulo.getTitulo}';
 
     // provider FECHA elegida
     final providerFechaElegida = Provider.of<FechaElegida>(context);

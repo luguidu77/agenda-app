@@ -73,7 +73,10 @@ class ActualizacionCita {
 
       
     } */
-    List<dynamic> idServicios = cita.idservicio!;
+
+    //quitar espacios en blanco de los servicios
+    List<dynamic> idServicios =
+        cita.idservicio!.map((e) => e.toString().trim()).toList();
 
     // si la funcion anterior trae una lista vacía, quiere decir que no hay servicios y por lo tanto sera una tarjeta de No DISPONIBLE
     /* if (idServicios.isEmpty) {

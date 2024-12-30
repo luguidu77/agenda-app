@@ -228,7 +228,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
               .split(','); // Divide los elementos si hay comas
 
           print(cita);
-          if (cita['nombre'] != '') {
+          if (cita['idCliente'] != '999') {
             // print(cita);
             //############# DETALLE DE LA CITA                   ########################
             final citaElegida = CitaModelFirebase(

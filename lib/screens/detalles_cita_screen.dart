@@ -250,13 +250,18 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
   }
 
   Widget _buildShareButton() {
+    String fechaCorta = DateFormat('EEE d MMM', 'es_ES')
+        .add_Hm()
+        .format((widget.reserva.horaInicio!));
     return CompartirCitaConCliente(
       cliente: widget.reserva.nombreCliente!,
       telefono: widget.reserva.telefonoCliente!,
       email: widget.reserva.email,
-      fechaCita: widget.reserva.horaInicio,
-      servicio: widget.reserva
-          .servicios, // [servicio1, servicio2] por lo que le quito los corchetes
+      fechaCita: widget.reserva.horaInicio!.toString(),
+      servicio: widget.reserva.servicios!
+          .join(', ')
+          .toString(), // [servicio1, servicio2] por lo que le quito los corchetes
+
       precio: widget.reserva.precio,
     );
   }
@@ -274,9 +279,7 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
               height: 400,
               child: ListView(
                 children: [
-                  FormReprogramaReserva(
-                      idServicio: widget.reserva.idservicio.toString(),
-                      cita: widget.reserva),
+                  FormReprogramaReserva(cita: widget.reserva),
                 ],
               ),
             ));
@@ -320,15 +323,17 @@ class _ClienteInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cliente = ClienteModel(
-      id: reserva.idcliente.toString(),
+      id: reserva.idcliente,
       nombre: reserva.nombreCliente,
       telefono: reserva.telefonoCliente,
       email: reserva.email,
-      foto: reserva.fotoCliente,
+      foto: reserva.fotoCliente ?? '', //evita null
       nota: reserva.notaCliente,
     );
     return InkWell(
-      onTap: () => Navigator.push(
+      onTap: () => //print(cliente.foto),
+
+          Navigator.push(
         context,
         PageRouteBuilder(
           pageBuilder: (_, __, ___) =>

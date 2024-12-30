@@ -114,7 +114,8 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
 
     // provider del boton Guardar
     final personalizadoProvider =
-        Provider.of<BotonGuardarAgregarNoDisponible>(context);
+        context.read<BotonGuardarAgregarNoDisponible>();
+
     personalizado =
         personalizadoProvider.forularioVisible; // formulario es visible o no
 

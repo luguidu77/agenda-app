@@ -50,9 +50,6 @@ class _BotonGuardarState extends State<BotonGuardar> {
 
   @override
   Widget build(BuildContext context) {
-    // escucha el provider del titulo del asunto
-    providerTextoTitulo = Provider.of<TextoTituloIndispuesto>(context);
-    textoTitulo = providerTextoTitulo.getTitulo;
     // provider HORA elegida
     final providerHoraFinCarrusel =
         Provider.of<HorarioElegidoCarrusel>(context, listen: false);
@@ -62,7 +59,8 @@ class _BotonGuardarState extends State<BotonGuardar> {
 
     // provider del boton Guardar
     final personalizadoProvider =
-        Provider.of<BotonGuardarAgregarNoDisponible>(context);
+        context.read<BotonGuardarAgregarNoDisponible>();
+
     personalizado =
         personalizadoProvider.forularioVisible; // formulario es visible o no
 
@@ -95,7 +93,12 @@ class _BotonGuardarState extends State<BotonGuardar> {
     // provider contexto de la cita para obtener el id del empleado
     final contextoCreacionCita = context.read<CreacionCitaProvider>();
     final idEmpleado = contextoCreacionCita.contextoCita.idEmpleado;
+    final nombreEmpleado = contextoCreacionCita.contextoCita.nombreEmpleado;
     final contextoCitas = context.read<CitasProvider>();
+
+    // escucha el provider del titulo del asunto
+    providerTextoTitulo = Provider.of<TextoTituloIndispuesto>(context);
+    textoTitulo = '${nombreEmpleado}  ${providerTextoTitulo.getTitulo}';
 
     // provider FECHA elegida
     final providerFechaElegida = Provider.of<FechaElegida>(context);

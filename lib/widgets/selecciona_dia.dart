@@ -12,13 +12,10 @@ import '../utils/utils.dart';
 
 class SeleccionaDia extends StatefulWidget {
   const SeleccionaDia(
-      {Key? key,
-      required this.botonReprogramarVisible,
-      required this.idServicio,
-      required this.cita})
+      {Key? key, required this.botonReprogramarVisible, required this.cita})
       : super(key: key);
   final bool botonReprogramarVisible;
-  final dynamic idServicio;
+
   final CitaModelFirebase cita; //? cita original a reprogramar
 
   @override
@@ -26,6 +23,7 @@ class SeleccionaDia extends StatefulWidget {
 }
 
 class _SeleccionaDiaState extends State<SeleccionaDia> {
+  DateTime selectedTime = DateTime.now();
   late MyLogicCita myLogic;
 
   TextStyle estilotextoErrorValidacion = const TextStyle(color: Colors.red);
@@ -216,8 +214,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
         ),
         title: const Text("Selecciona una hora"),
         onConfirm: (Picker picker, List<int> selectedValues) {
-          DateTime selectedTime =
-              (picker.adapter as DateTimePickerAdapter).value!;
+          selectedTime = (picker.adapter as DateTimePickerAdapter).value!;
           // Aquí puedes hacer algo con la fecha seleccionada
           setState(() {
             myLogic.textControllerHora.text =
@@ -269,7 +266,7 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
     //COMPRUEBO EL TIEMPO DEL SERVICIO A PRESTAR
     ServicioModel resServicio = ServicioModel();
     //TRAE SERVICIO DE FIREBASE O DE DISPOSITIVO
-    if (iniciadaSesionUsuario) {
+    try {
       Map<String, dynamic> resServicioFB = {};
       //idServicio VIENE COMO UN TEXTO [{idServicio: QF3o14RyJ5KbSSb0d6bB, activo: true, servicio: Semipermanente con refuerzo, detalle: , precio: 20, tiempo: 01:00}]
       List<String> idServicios = extraerIdServiciosdeCadenaTexto(idServicio);
@@ -304,49 +301,19 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
       textoHoraF = fechaFinal.toString();
       // COMPROBAR LA FECHA NUEVA ESTÁ DISPONIBLE
 
-      _disponible = await _compruebaDisponibilidad(totalTiempoHoras,
-          totalTiempoMinutos, usuarioAPP, iniciadaSesionUsuario);
-      _disponible = true;
+      /*     _disponible = await _compruebaDisponibilidad(totalTiempoHoras,
+          totalTiempoMinutos, usuarioAPP, iniciadaSesionUsuario); */
+
       print('disponible: $_disponible');
       print('fecha1  $fechaInicio ');
-    } else {
-      resServicio =
-          await CitaListProvider().cargarServicioPorId(int.parse(idServicio));
-
-      print('tiempo del Servicio  = ${resServicio.tiempo}');
-
-      // String tiempoServicio = servicio['TIEMPO'];
-      var tiempoServicio = resServicio.tiempo!;
-      // tiempo servicio en horas
-      int tiempoServicioHoras =
-          int.parse('${tiempoServicio[0]}${tiempoServicio[1]}');
-      // tiempo servicio en minutos
-      int tiempoServicioMinutos =
-          int.parse('${tiempoServicio[3]}${tiempoServicio[4]}');
-      // la hora final se obtiene sumandole a la de inicio el tiempo del servicio
-      DateTime fechaFinal = fechaInicio.add(
-          Duration(hours: tiempoServicioHoras, minutes: tiempoServicioMinutos));
-      // HORA FINAL
-      textoHoraF = fechaFinal.toString();
-
-      print('fecha1  $fechaInicio ');
-
-      /*  micontexto.setCitaElegida = {
-      'FECHA': textoDia,
-      'HORAINICIO': fechaInicio,
-      'HORAFINAL': fechaFinal
-    }; */
-
-      // COMPROBAR LA FECHA NUEVA ESTÁ DISPONIBLE
-      _disponible = await _compruebaDisponibilidad(tiempoServicioHoras,
-          tiempoServicioMinutos, usuarioAPP, iniciadaSesionUsuario);
-      print('disponible: $_disponible');
+    } catch (e) {
+      print('error en seleccionaCita $e');
     }
 
     setState(() {});
 
     // RETORNA SI ESTÁ DISPONIBLE LA FECHA
-    return _disponible;
+    return true; //_disponible;
   }
 
   //? ALGORISMO DE COMPROBACION DE FECHA DISPONIBLE, RETORNA TRUE O FALSE
@@ -442,7 +409,10 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
   }
 
   bool _iconoCircular = false;
+
   botonReprogramar(context, String usuarioAP, bool iniciadaSesionUsuario) {
+    horaInicioProgramable = selectedTime;
+
     return ElevatedButton.icon(
         icon: _iconoCircular
             ? const SizedBox(
@@ -457,11 +427,8 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
             setState(() {
               _iconoCircular = true;
             });
-            _disponible = await seleccionaCita(
-                context,
-                /*  int.parse */ (widget.idServicio),
-                usuarioAP,
-                iniciadaSesionUsuario);
+            _disponible = await seleccionaCita(context, widget.cita.idservicio,
+                usuarioAP, iniciadaSesionUsuario);
             setState(() {});
             if (_disponible) {
               // ? null : Publicidad().publicidad();

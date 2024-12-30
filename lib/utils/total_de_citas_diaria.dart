@@ -17,10 +17,12 @@ Future<int> getNumCitas(BuildContext context, String idEmpleado) async {
   DateTime fechaElegida = calendarioProvider.fechaSeleccionada;
   String fechaElegidaFormateada = DateFormat('yyyy-MM-dd').format(fechaElegida);
 
-  // Filtra las citas que coinciden con la fecha elegida y el idEmpleado
+  // Filtra las citas que coinciden con la fecha elegida y el idEmpleado y que no sean citas de no disponibilidad
   numCitas = todasLasCitas
       .where((value) =>
-          value.dia == fechaElegidaFormateada && value.idEmpleado == idEmpleado)
+          value.dia == fechaElegidaFormateada &&
+          value.idEmpleado == idEmpleado &&
+          value.idcliente != '999')
       .length;
 
   return numCitas;

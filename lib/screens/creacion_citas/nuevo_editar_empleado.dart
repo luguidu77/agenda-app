@@ -127,7 +127,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
       telefono = '';
       categoriaServicios = [];
       foto = '';
-      color = 0xFFFFFFFF;
+      color = 0xFFFFC1C1;
       codVerif = '';
       rolesEmpleados = [];
 
@@ -144,44 +144,49 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
           title: const Text('Selecciona un color'),
           content: SingleChildScrollView(
             child: Column(
-              spacing: 8,
               children: [
                 GestureDetector(
-                  onTap: () => Navigator.pop(context, 0xFFFF0000),
+                  onTap: () => Navigator.pop(context, 0xFFFFC1C1), // Rosa suave
                   child: Container(
-                    color: const Color(0xFFFF0000),
+                    color: const Color(0xFFFFC1C1),
                     height: 50,
                     width: 50,
                   ),
                 ),
+                const SizedBox(height: 8),
                 GestureDetector(
-                  onTap: () => Navigator.pop(context, 0xFF00FF00),
+                  onTap: () =>
+                      Navigator.pop(context, 0xFFB0E57C), // Verde suave
                   child: Container(
-                    color: const Color(0xFF00FF00),
+                    color: const Color(0xFFB0E57C),
                     height: 50,
                     width: 50,
                   ),
                 ),
+                const SizedBox(height: 8),
                 GestureDetector(
-                  onTap: () => Navigator.pop(context, 0xFF0000FF),
+                  onTap: () => Navigator.pop(context, 0xFFADD8E6), // Azul suave
                   child: Container(
-                    color: const Color(0xFF0000FF),
+                    color: const Color(0xFFADD8E6),
                     height: 50,
                     width: 50,
                   ),
                 ),
+                const SizedBox(height: 8),
                 GestureDetector(
-                  onTap: () => Navigator.pop(context, 0xFFFFFF00),
+                  onTap: () =>
+                      Navigator.pop(context, 0xFFFFFFB3), // Amarillo suave
                   child: Container(
-                    color: const Color(0xFFFFFF00),
+                    color: const Color(0xFFFFFFB3),
                     height: 50,
                     width: 50,
                   ),
                 ),
+                const SizedBox(height: 8),
                 GestureDetector(
-                  onTap: () => Navigator.pop(context, 0xFFFF00FF),
+                  onTap: () => Navigator.pop(context, 0xFFD7BDE2), // Lila suave
                   child: Container(
-                    color: const Color(0xFFFF00FF),
+                    color: const Color(0xFFD7BDE2),
                     height: 50,
                     width: 50,
                   ),

@@ -82,8 +82,8 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
 
     //traigo perfil del usuariode la app desde firebase
     await FirebaseProvider().cargarPerfilFB(_emailSesionUsuario).then((value) {
-      //setState(() {});
-      return perfilUsuarioApp = value;
+      setState(() {});
+      perfilUsuarioApp = value;
     });
   }
 

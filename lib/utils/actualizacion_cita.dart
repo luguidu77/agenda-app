@@ -34,8 +34,8 @@ class ActualizacionCita {
     DateTime? nuevaHoraDateTime;
 
     List<int> calculaTiempo(timestamp1, timestamp2) {
-      DateTime dateTime1 = DateTime.parse(timestamp1);
-      DateTime dateTime2 = DateTime.parse(timestamp2);
+      DateTime dateTime1 = (timestamp1);
+      DateTime dateTime2 = (timestamp2);
       Duration difference = dateTime2.difference(dateTime1);
 
       int hours = difference.inHours;
@@ -67,10 +67,13 @@ class ActualizacionCita {
     debugPrint(cita.toString()); // print cita
 
     //? la funcion extraerServicios, resuelve el problema de que el json no tiene comillas en sus claves: [{idServicio: QF3o14RyJ5KbSSb0d6bB, activo: true, servicio: Semiperman
-    List<String> idServicios = extraerIdServiciosdeCadenaTexto(cita.idservicio);
 
-    print(
-        '------------------------------dfdfd------------------------ ${cita.idservicio.runtimeType}');
+    /*    if (cita.idservicio != null) {
+      idServicios = extraerIdServiciosdeCadenaTexto(cita.idservicio);
+
+      
+    } */
+    List<dynamic> idServicios = cita.idservicio!;
 
     // si la funcion anterior trae una lista vacía, quiere decir que no hay servicios y por lo tanto sera una tarjeta de No DISPONIBLE
     /* if (idServicios.isEmpty) {
@@ -90,8 +93,7 @@ class ActualizacionCita {
     newCita.idservicio = idServicios;
 
     newCita.idEmpleado = cita.idEmpleado;
-    newCita.confirmada =
-        cita.confirmada == 'true'; // Convertir cadena a booleano
+    newCita.confirmada = cita.confirmada;
 
     newCita.idCitaCliente = cita.idCitaCliente;
     newCita.tokenWebCliente = cita.tokenWebCliente;

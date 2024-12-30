@@ -129,7 +129,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
     return Scaffold(
         body: SfCalendar(
       controller: _calendarController,
-
+      //color fondo del calendario
       backgroundColor: leerEstadoBotonIndisponibilidad
           ? Colors.red.withOpacity(0.1)
           : Colors.white,
@@ -204,7 +204,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           .snap, // permite pasar fechas arrastrando a los lados
 
       appointmentTextStyle: const TextStyle(
-          color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+          color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
       headerHeight: 0, // oculta fecha
       allowDragAndDrop: true,
       onLongPress: (calendarLongPressDetails) => print('fdfdf'),
@@ -221,6 +221,12 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
           List<String> listaServicios = textoALista(cita['servicios']);
 
+          // el idServicio es un string que contiene una lista de ids de servicios, lo convertimos en una lista de strings
+          String idServicio = cita['idServicio'];
+          List<String> idServicioLista = idServicio
+              .substring(1, idServicio.length - 1) // Elimina los corchetes
+              .split(','); // Divide los elementos si hay comas
+
           print(cita);
           if (cita['nombre'] != '') {
             // print(cita);
@@ -233,7 +239,8 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
                 comentario: cita['comentario'],
                 email: cita['email'],
                 idcliente: cita['idCliente'],
-                //  idservicio: ,
+                idservicio:
+                    idServicioLista, // Divide los elementos si hay comas
                 servicios: listaServicios,
                 idEmpleado: cita['idEmpleado'],
                 nombreEmpleado: cita['nombreEmpleado'],
@@ -376,7 +383,9 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         print(servicios); */
       servicios = cita.servicios.toString().replaceAll(RegExp(r'[\[\]]'), '');
 
-      /* cita.idcliente == '999' // no es un cita, es un indispuesto
+      /* 
+      // color segun el estado de la cita
+      cita.idcliente == '999' // no es un cita, es un indispuesto
                 ? const Color.fromARGB(255, 113, 151, 102)
                 : !citaConfirmada
                     // si la cita esta confirmada, obtiene el color asignado al empleado
@@ -387,7 +396,13 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
                             Color(cita.colorEmpleado!), Colors.white, 0.7)!
                         // si la cita es futura
                         : Color(cita.colorEmpleado!))); */
+
+      // Color del empleado
       int colorEmpleado = cita.colorEmpleado ?? 0xFF000000;
+      // si la cita es un horario no disponible color gris
+      if (cita.idcliente == '999') {
+        colorEmpleado = 0xFFD3D3D3;
+      }
 
       return Appointment(
           // TRAEMOS TODOS LOS DATOS QUE NOS HARA FALTA PARA TRABAJAR CON ELLOS POSTERIORMENTE en Detalles de la cita
@@ -445,7 +460,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
     return (cita.nombreCliente != '')
 
         // ------------TARJETA CITA RESERVADA         ---------------------
-        ? ' $horaInicioTexto-$horaFinTexto · ${cita.nombreEmpleado} $textoConfirmada '
+        ? ' $horaInicioTexto-$horaFinTexto · $textoConfirmada '
             '\n ${cita.nombreCliente} $hayComentario'
 
         // ------------TARJETA HORARIO NO DISPONIBLE ---------------------
@@ -498,8 +513,8 @@ void actualizarFechaSeleccionada(
   }
 }
 
-Future<void> _dialogoEsperayActualizarCita(
-    context, cita, appointmentDragEndDetails, emailSesionUsuario) async {
+Future<void> _dialogoEsperayActualizarCita(context, Map<String, dynamic> cita,
+    appointmentDragEndDetails, emailSesionUsuario) async {
   return showDialog(
     context: context,
     barrierDismissible: false, // No permite cerrar el diálogo al tocar fuera.
@@ -527,9 +542,45 @@ Future<void> _dialogoEsperayActualizarCita(
   );
 }
 
-Future<void> _actualizaciondelacita(BuildContext context, cita,
-    appointmentDragEndDetails, emailSesionUsuario) async {
+Future<void> _actualizaciondelacita(
+    BuildContext context,
+    Map<String, dynamic> cita,
+    appointmentDragEndDetails,
+    emailSesionUsuario) async {
+  CitaModelFirebase nuevaCita = CitaModelFirebase();
+
+  print(cita['idServicio']);
+  print(cita['servicios']);
+  String idServicio = cita['idServicio'];
+  List<String> idservicios = idServicio
+      .substring(1, idServicio.length - 1) // Elimina los corchetes
+      .split(
+          ', '); // Divide los elementos si hay comas y los convierte en una lista
+
+  nuevaCita = CitaModelFirebase(
+    id: cita['id'],
+    dia: cita['dia'],
+    horaInicio: DateTime.parse(cita['horaInicio']),
+    horaFinal: DateTime.parse(cita['horaFinal']),
+    comentario: cita['comentario'],
+    email: cita['email'],
+    idcliente: cita['idCliente'],
+    idservicio: idservicios,
+    servicios: cita['servicios'].split(', '),
+    idEmpleado: cita['idEmpleado'],
+    nombreEmpleado: cita['nombreEmpleado'],
+    colorEmpleado: int.parse(cita['colorEmpleado']),
+    precio: cita['precio'],
+    confirmada: true,
+    tokenWebCliente: cita['tokenWebCliente'],
+    idCitaCliente: cita['idCitaCliente'],
+    nombreCliente: cita['nombre'],
+    telefonoCliente: cita['telefono'],
+    emailCliente: cita['email'],
+    notaCliente: cita['nota'],
+  );
+
   ////XXxxxx FUNCION actualizar la cita en Firebase  xxxxxXX
-  await ActualizacionCita.actualizar(context, cita,
+  await ActualizacionCita.actualizar(context, nuevaCita,
       appointmentDragEndDetails.droppingTime!, null, null, emailSesionUsuario);
 }

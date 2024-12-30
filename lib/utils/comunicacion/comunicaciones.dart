@@ -154,9 +154,6 @@ class Comunicaciones {
         idservicio: textListServicio,
         precio: precio);
 
-    print(
-        '***************************************** ${textListServicio.toString()}');
-
     await emailEstadoCita('Cita confirmada', cita, perfilUsuarioApp.email)
         .then((mailId) {
       Future.delayed(const Duration(seconds: 10), () async {

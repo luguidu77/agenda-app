@@ -25,8 +25,8 @@ String formatearHora(String horaOriginal) {
   return "$hora:${minutos.toString().padLeft(2, '0')}";
 }
 
-String textoHTML(
-    String estadoCita, PerfilModel negocio, CitaModelFirebase cita) {
+String textoHTML(String estadoCita, PerfilAdministradorModel negocio,
+    CitaModelFirebase cita) {
   String negocioNombre = negocio.denominacion!;
   String negocioDireccion = '${negocio.ubicacion} '; /* - ${negocio.ciudad} */
   String fechaCita = formatearFecha(cita.horaInicio.toString());

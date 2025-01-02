@@ -143,7 +143,7 @@ class FirebasePublicacionOnlineAgendoWeb {
   ];
 
   // GUARDA  FOTO, tokenMessaging, imagen,el usuario(email) y publicado == false
-  void creaEstructuraNegocio(PerfilModel negocio) async {
+  void creaEstructuraNegocio(PerfilAdministradorModel negocio) async {
     DocumentReference<Map<String, dynamic>>? docRef;
     FirebaseFirestore db = await inicializaFirebase();
     // docRef = referenciaDocumento(db, negocio.email!);
@@ -214,7 +214,7 @@ class FirebasePublicacionOnlineAgendoWeb {
   }
 
   // SWICHT PUBLICADO / DESPUBLICADO
-  swicthPublicado(PerfilModel negocio, bool value) async {
+  swicthPublicado(PerfilAdministradorModel negocio, bool value) async {
     final idUsuario =
         await buscarIdUsuario("agendoWeb", "usuario", negocio.email);
     FirebaseFirestore db = await inicializaFirebase();

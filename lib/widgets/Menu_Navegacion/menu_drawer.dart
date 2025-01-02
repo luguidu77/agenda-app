@@ -90,7 +90,8 @@ class _MenuDrawerState extends State<MenuDrawer> {
     try {
       return StreamBuilder(
           stream: FirebaseProvider().cargarPerfilFB(usuarioAPP).asStream(),
-          builder: ((context, AsyncSnapshot<PerfilModel> snapshot) {
+          builder:
+              ((context, AsyncSnapshot<PerfilAdministradorModel> snapshot) {
             if (snapshot.hasData) {
               final data = snapshot.data;
               return CircleAvatar(
@@ -143,7 +144,8 @@ class _MenuDrawerState extends State<MenuDrawer> {
                           color: Colors.white,
                           icon: const Icon(Icons.settings),
                           onPressed: () => {
-                                Navigator.pushNamed(context, 'ConfigUsuarioApp')
+                                Navigator.pushNamed(
+                                    context, 'ConfigPerfilAdminstrador')
                               }),
                       Text(usuarioAPP),
                     ],
@@ -223,7 +225,7 @@ class _MenuDrawerState extends State<MenuDrawer> {
                   ));
             },
           ),
-          
+
           ListTile(
             leading: const Icon(Icons.email),
             title: Text(

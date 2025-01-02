@@ -1,3 +1,5 @@
+import 'package:agendacitas/models/empleado_model.dart';
+import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/formatea_fecha_hora.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -150,6 +152,7 @@ class _ListaClientesState extends State<ListaClientes> {
     List<ClienteModel> listaClientes,
     DateTime fechaCita,
   ) {
+    final contextoRoles = context.read<RolUsuarioProvider>();
     const double width = 80;
     const double height = 80;
     return ListView.builder(
@@ -227,51 +230,11 @@ class _ListaClientesState extends State<ListaClientes> {
                           color: Colors.grey[600], // Color de texto más claro
                         ),
                       ),
-                      trailing: IconButton(
-                        icon: const Icon(
-                          FontAwesomeIcons.circleInfo,
-                          color: Colors.blue, // Color del ícono
-                        ),
-                        onPressed: () async {
-                          await showModalBottomSheet(
-                            isScrollControlled: true,
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Container(
-                                height: 300,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(
-                                        20), // Bordes redondeados en la parte superior
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Text(
-                                        listaClientes[index].nombre.toString(),
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black, // Color de texto
-                                        ),
-                                      ),
-                                      const Divider(),
-                                      MenuConfigCliente(
-                                          cliente: listaClientes[index]),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-
-                          setState(() {});
-                        },
-                      ),
+                      trailing: contextoRoles.rol ==
+                                  RolEmpleado.administrador ||
+                              contextoRoles.rol == RolEmpleado.gerente
+                          ? _botonEditarCliente(context, listaClientes, index)
+                          : null,
                     ),
                   ],
                 ),
@@ -289,5 +252,53 @@ class _ListaClientesState extends State<ListaClientes> {
     listaCliente = await FirebaseProvider().cargarClientes(emailSesionUsuario);
 
     return listaCliente;
+  }
+
+  _botonEditarCliente(
+      BuildContext context, List<ClienteModel> listaClientes, int index) {
+    return IconButton(
+      icon: const Icon(
+        FontAwesomeIcons.circleInfo,
+        color: Colors.blue, // Color del ícono
+      ),
+      onPressed: () async {
+        await showModalBottomSheet(
+          isScrollControlled: true,
+          context: context,
+          builder: (BuildContext context) {
+            return Container(
+              height: 300,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(
+                      20), // Bordes redondeados en la parte superior
+                ),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      listaClientes[index].nombre.toString(),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black, // Color de texto
+                      ),
+                    ),
+                    const Divider(),
+                    MenuConfigCliente(cliente: listaClientes[index]),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+
+        setState(() {});
+      },
+    );
   }
 }

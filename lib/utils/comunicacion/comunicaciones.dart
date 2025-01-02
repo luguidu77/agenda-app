@@ -43,8 +43,8 @@ class Comunicaciones {
     await launchUrl(emailLaunchUri);
   }
 
-  String textoCompartir(PerfilModel perfilUsuarioApp, String textoActual,
-      String clienta, String fecha, String servicio) {
+  String textoCompartir(PerfilAdministradorModel perfilUsuarioApp,
+      String textoActual, String clienta, String fecha, String servicio) {
     //EL MENSAJE CAMBIA SI HAY INICIADO UN USUARIO DE APP
     if (perfilUsuarioApp.denominacion != '') {
       RegExp regExp = RegExp(
@@ -100,7 +100,7 @@ class Comunicaciones {
   }
 
   void compartirCitaWhatsapp(
-    PerfilModel perfilUsuarioApp,
+    PerfilAdministradorModel perfilUsuarioApp,
     String textoActual,
     String clienta,
     String telefono,
@@ -134,7 +134,7 @@ class Comunicaciones {
 
   void compartirCitaEmail(
       context,
-      PerfilModel perfilUsuarioApp,
+      PerfilAdministradorModel perfilUsuarioApp,
       String textoActual,
       String clienta,
       String email,
@@ -142,7 +142,7 @@ class Comunicaciones {
       String servicio,
       String precio) async {
     //***           ENVIOS EMAIL AUTOMATICOS SERVICIO FIREBASE ******************************** */
-    PerfilModel negocio = PerfilModel(
+    PerfilAdministradorModel negocio = PerfilAdministradorModel(
         denominacion: perfilUsuarioApp.denominacion,
         telefono: perfilUsuarioApp.telefono);
     // Convertir el texto en una lista de textos
@@ -192,8 +192,13 @@ class Comunicaciones {
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
   }
 
-  void compartirCitaSms(PerfilModel perfilUsuarioApp, String textoActual,
-      String clienta, String telefono, String fecha, String servicio) async {
+  void compartirCitaSms(
+      PerfilAdministradorModel perfilUsuarioApp,
+      String textoActual,
+      String clienta,
+      String telefono,
+      String fecha,
+      String servicio) async {
     String? fechaLarga;
     DateTime resFecha =
         DateTime.parse(fecha); // horaInicio trae 2022-12-05 20:27:00.000Z

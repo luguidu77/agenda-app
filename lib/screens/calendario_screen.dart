@@ -207,7 +207,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
               ),
               //****  activacion de mantenimientos ********* */
               Visibility(
-                visible: true,
+                visible: false,
                 child: Mantenimientos(
                   emailSesionUsuario: _emailSesionUsuario,
                 ),
@@ -223,7 +223,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
                   visible: visibleCalendario,
                   child: Expanded(flex: 10, child: calendario())),
 
-              Visibility(
+              /*      Visibility(
                   visible: !visibleCalendario,
                   child: _iniciadaSesionUsuario
                       ? const SizedBox(
@@ -245,7 +245,7 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
                               style: TextStyle(fontSize: 12),
                             )
                           ],
-                        )),
+                        )), */
 
               Visibility(
                 visible: !visibleCalendario,
@@ -295,7 +295,8 @@ class _CalendarioCitasScreenState extends State<CalendarioCitasScreen>
       return FutureBuilder(
           future: FirebaseProvider().cargarPerfilFB(
               _emailSesionUsuario), //todo: cargar todos los empleados no solo el perfil
-          builder: (BuildContext context, AsyncSnapshot<PerfilModel> snapshot) {
+          builder: (BuildContext context,
+              AsyncSnapshot<PerfilAdministradorModel> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Padding(
                 padding: const EdgeInsets.only(left: 12.0),

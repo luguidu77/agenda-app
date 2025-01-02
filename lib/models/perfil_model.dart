@@ -1,4 +1,4 @@
-class PerfilModel {
+class PerfilAdministradorModel {
   String? id; // Nuevo campo
   String? denominacion;
   String? descripcion;
@@ -21,7 +21,7 @@ class PerfilModel {
   bool? appPagada;
   String? email; // Nuevo campo
 
-  PerfilModel({
+  PerfilAdministradorModel({
     this.id, // Nuevo campo
     this.denominacion,
     this.descripcion,
@@ -45,7 +45,8 @@ class PerfilModel {
     this.email, // Nuevo campo
   });
 
-  factory PerfilModel.fromJson(Map<String, dynamic> json) => PerfilModel(
+  factory PerfilAdministradorModel.fromJson(Map<String, dynamic> json) =>
+      PerfilAdministradorModel(
         id: json["id"], // Nuevo campo
         denominacion: json["denominacion"],
         descripcion: json["descripcion"],
@@ -95,4 +96,63 @@ class PerfilModel {
         "appPagada": appPagada,
         "email": email, // Nuevo campo
       };
+}
+
+class PerfilEmpleadoModel {
+  String? nombre;
+  List<dynamic>? categoriaServicios;
+  String? codVerif;
+  int? color;
+  List<dynamic>? disponibilidadSemanal;
+  String? email;
+  String? emailUsuarioApp;
+  String? foto;
+  List<String>? rol;
+  String? telefono;
+
+  PerfilEmpleadoModel({
+    this.nombre,
+    this.categoriaServicios,
+    this.codVerif,
+    this.color,
+    this.disponibilidadSemanal,
+    this.email,
+    this.emailUsuarioApp,
+    this.foto,
+    this.rol,
+    this.telefono,
+  });
+
+  // Factory constructor para inicializar desde un mapa
+  factory PerfilEmpleadoModel.fromMap(Map<String, dynamic> map) {
+    return PerfilEmpleadoModel(
+      nombre: map['nombre'] ?? '',
+      categoriaServicios: List<dynamic>.from(map['categoriaServicios'] ?? []),
+      codVerif: map['cod_verif'] ?? '',
+      color: map['color'] ?? 0,
+      disponibilidadSemanal:
+          List<dynamic>.from(map['disponibilidadSemanal'] ?? []),
+      email: map['email'] ?? '',
+      emailUsuarioApp: map['emailUsuarioApp'] ?? '',
+      foto: map['foto'] ?? '',
+      rol: List<String>.from(map['rol'] ?? []),
+      telefono: map['telefono'] ?? '',
+    );
+  }
+
+  // Método para convertir el modelo a un mapa
+  Map<String, dynamic> toMap() {
+    return {
+      'nombre': nombre,
+      'categoriaServicios': categoriaServicios,
+      'cod_verif': codVerif,
+      'color': color,
+      'disponibilidadSemanal': disponibilidadSemanal,
+      'email': email,
+      'emailUsuarioApp': emailUsuarioApp,
+      'foto': foto,
+      'rol': rol,
+      'telefono': telefono,
+    };
+  }
 }

@@ -491,7 +491,7 @@ class SincronizarFirebase {
   //------------------------------------------------------------------------------------------------------------
 
   actualizarUsuarioApp(
-      PerfilModel perfilUsuarioApp, String emailUsuario) async {
+      PerfilAdministradorModel perfilUsuarioApp, String emailUsuario) async {
     await _iniFirebase();
     final docRef = await _referenciaDocumento(
         emailUsuario, 'perfil'); //!antigua referencia a exitinguir

@@ -490,6 +490,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
     final empleadoEditado = EmpleadoModel(
       id: id,
       nombre: nombre,
+      emailUsuarioApp: _emailSesionUsuario,
       disponibilidad: disponibilidad,
       email: email,
       telefono: telefono,
@@ -554,6 +555,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
 
     EmpleadoModel empleadoEditado = EmpleadoModel(
       id: id,
+      emailUsuarioApp: _emailSesionUsuario,
       nombre: nombre,
       disponibilidad: disponibilidad,
       email: email,
@@ -583,6 +585,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
     print('id del empleado en el contexto $id');
     final empleadoEditado = EmpleadoModel(
       id: id,
+      emailUsuarioApp: _emailSesionUsuario,
       nombre: nombre,
       disponibilidad: disponibilidad,
       email: email,

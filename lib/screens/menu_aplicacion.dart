@@ -1,10 +1,15 @@
 import 'package:agendacitas/firebase_options.dart';
+import 'package:agendacitas/models/empleado_model.dart';
+import 'package:agendacitas/models/models.dart';
+import 'package:agendacitas/models/perfil_usuarioapp_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_publicacion_online.dart';
+import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/empleados_screen.dart';
 import 'package:agendacitas/screens/servicios_screen.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -26,6 +31,7 @@ class MenuAplicacion extends StatefulWidget {
 
 class _MenuAplicacionState extends State<MenuAplicacion> {
   String _emailSesionUsuario = '';
+  String _emailAdministrador = '';
   String _estadopago = '';
   TextStyle estilo = const TextStyle(color: Colors.blueGrey);
   bool _iniciadaSesionUsuario = false;
@@ -75,18 +81,37 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
   }
 
   emailUsuario() async {
-    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
-    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
-    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
-    _estadopago = estadoPagoProvider.estadoPagoApp;
+    final estadoPagoProvider = context.read<EmailUsuarioAppProvider>();
+    _emailSesionUsuario =
+        estadoPagoProvider.emailUsuarioApp; // emailUsuarioApp;
+
+    final contextoEmailAdmin = context.read<EmailAdministradorAppProvider>();
+    _emailAdministrador =
+        contextoEmailAdmin.emailAdministradorApp; // emailAdministradorApp;
   }
 
   String imageUrl = '';
+
   Future<String> obtenerImagenDesdeFirebase() async {
-    dynamic perfil =
-        await FirebaseProvider().cargarPerfilFB(_emailSesionUsuario);
-    setState(() {});
-    return perfil.foto;
+    final contextoRoles = context.read<RolUsuarioProvider>();
+    if (contextoRoles.rol == RolEmpleado.administrador) {
+      final perfil =
+          await FirebaseProvider().cargarPerfilFB(_emailAdministrador);
+
+      PerfilAdministradorModel perfilModel =
+          PerfilAdministradorModel(foto: perfil.foto);
+
+      setState(() {});
+      return perfilModel.foto.toString();
+    } else {
+      print(_emailSesionUsuario);
+      final perfil = await FirebaseProvider()
+          .cargarPerfilEmpleado(_emailAdministrador, _emailSesionUsuario);
+
+      PerfilEmpleadoModel perfilModel = PerfilEmpleadoModel(foto: perfil.foto);
+      setState(() {});
+      return perfilModel.foto.toString();
+    }
   }
 
   imagenUrl() async {
@@ -105,38 +130,58 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
 
   @override
   Widget build(BuildContext context) {
+    final contextoRoles = context.read<RolUsuarioProvider>();
+
     return Container(
       color: colorFondo,
       child: ListView(
         // Important: Remove any padding from the ListView.
         padding: EdgeInsets.zero,
         children: [
-          _iniciadaSesionUsuario
-              // CABECERA CUAN HAY UNA SESION INICIADA
-              ? _cabeceraConSesion(context)
-
-              // CABECERA CUANDO ES APP GRATUITA
-              : _cabeceraGratuita(),
+          // CABECERA CUAN HAY UNA SESION INICIADA
+          _cabeceraConSesion(context),
 
           // MENSAJE PARA LA PUBLICACION EN AGENDADECITAS.ONLINE
-          _iniciadaSesionUsuario
-              ? _mensajePublicacionOnline(context, _emailSesionUsuario)
-              : Container(),
+          Visibility(
+            visible: contextoRoles.rol == RolEmpleado.administrador,
+            child: _iniciadaSesionUsuario
+                ? _mensajePublicacionOnline(context, _emailSesionUsuario)
+                : Container(),
+          ),
 
           // CONFIGURA LOS SERVICIOS QUE OFRECEN A CLIENTES
-          _serviciosQueOfrece(context),
+          Visibility(
+            visible: contextoRoles.rol == RolEmpleado.administrador ||
+                contextoRoles.rol == RolEmpleado.gerente,
+            child: _serviciosQueOfrece(context),
+          ),
 
           // EMPLEADOS
-          _empleados(context),
+          Visibility(
+            visible: contextoRoles.rol == RolEmpleado.administrador ||
+                contextoRoles.rol == RolEmpleado.gerente,
+            child: _empleados(context),
+          ),
 
           //CONFIGURACION DE LA APP
-          _configuracion(context),
+          Visibility(
+            visible: contextoRoles.rol == RolEmpleado.administrador ||
+                contextoRoles.rol == RolEmpleado.gerente,
+            child: _configuracion(context),
+          ),
 
           // DISPONIBILIDAD SEMANAL
-          _disponiblidadSemanal(context),
+          Visibility(
+            visible: contextoRoles.rol == RolEmpleado.administrador ||
+                contextoRoles.rol == RolEmpleado.gerente,
+            child: _disponiblidadSemanal(context),
+          ),
 
           // INFORMES GANANCIAS
-          _informes(context),
+          Visibility(
+            visible: contextoRoles.rol == RolEmpleado.administrador,
+            child: _informes(context),
+          ),
 
           const Divider(),
 
@@ -169,6 +214,8 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
   }
 
   _cabeceraConSesion(BuildContext context) {
+    final contextoRoles = context.read<RolUsuarioProvider>();
+
     return Stack(
       children: [
         // Imagen de fondo
@@ -214,15 +261,16 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
             IconButton(
               color: Colors.black,
               icon: const Icon(Icons.edit_square),
-              onPressed: () =>
-                  {Navigator.pushNamed(context, 'ConfigUsuarioApp')},
+              onPressed: () => contextoRoles.rol == RolEmpleado.administrador
+                  ? Navigator.pushNamed(context, 'ConfigPerfilAdminstrador')
+                  : Navigator.pushNamed(context, 'ConfigPerfilUsuario'),
             ),
           ],
           accountEmail: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                denominacionNegocio(_emailSesionUsuario),
+                denominacionNegocio(_emailAdministrador),
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: Row(
@@ -294,7 +342,8 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
               subtitle: const Text(
                   style: TextStyle(color: Colors.white),
                   'En tu perfil hemos agreado un enlace que te lleva al formulario de solicitud para publicar tu actividad en la web agendadecitas.online'),
-              onTap: () => {Navigator.pushNamed(context, 'ConfigUsuarioApp')},
+              onTap: () =>
+                  {Navigator.pushNamed(context, 'ConfigPerfilAdminstrador')},
             ),
           );
         });

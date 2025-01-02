@@ -146,11 +146,9 @@ class MyLogicCita {
   }
 }
 
-
-
 class MyLogicUsuarioAPP {
   MyLogicUsuarioAPP(this.perfilUsuarioApp);
-  final PerfilModel? perfilUsuarioApp;
+  final PerfilAdministradorModel? perfilUsuarioApp;
 
   final textControllerDenominacion = TextEditingController();
   final textControllerTelefono = TextEditingController();
@@ -195,7 +193,6 @@ class MyLogicUsuarioAPP {
     }
   }
 }
-
 
 class MyLogicServicioFB {
   MyLogicServicioFB(this.servicioFB);

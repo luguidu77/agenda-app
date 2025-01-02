@@ -1,5 +1,7 @@
 import 'package:agendacitas/config/config.dart';
+import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_publicacion_online.dart';
+import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,19 +15,22 @@ import '../providers/providers.dart';
 import '../screens/screens.dart';
 import '../utils/utils.dart';
 
-class ConfigUsuarioApp extends StatefulWidget {
-  const ConfigUsuarioApp({Key? key}) : super(key: key);
+class ConfigPerfilAdministrador extends StatefulWidget {
+  const ConfigPerfilAdministrador({Key? key}) : super(key: key);
 
   @override
-  State<ConfigUsuarioApp> createState() => _ConfigUsuarioAppState();
+  State<ConfigPerfilAdministrador> createState() =>
+      _ConfigPerfilAdministradorState();
 }
 
-class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> with RouteAware {
+class _ConfigPerfilAdministradorState extends State<ConfigPerfilAdministrador>
+    with RouteAware {
   String foto = '';
   bool visibleIndicator = false;
   bool? _iniciadaSesionUsuario;
   String? _emailSesionUsuario;
-  PerfilModel? perfilUsuarioApp;
+  String? _emailAdministrador;
+  PerfilAdministradorModel? perfilUsuarioApp;
   bool floatExtended = false;
   late bool publicado = false;
 
@@ -34,7 +39,11 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> with RouteAware {
     _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
     _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
 
+    final contextoEmailAdmin = context.read<EmailAdministradorAppProvider>();
+    _emailAdministrador = contextoEmailAdmin.emailAdministradorApp;
+
     debugPrint('USUARIO APP $_emailSesionUsuario');
+
     setState(() {});
   }
 
@@ -73,33 +82,36 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
+    final contextoRoles = context.read<RolUsuarioProvider>();
+
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
-        title: const Text('PERFIL'),
         actions: [
-          ElevatedButton.icon(
-            label: const Text('EDITAR'),
-            style: ButtonStyle(
-                foregroundColor: const WidgetStatePropertyAll(
-                  Colors.white,
-                ),
-                backgroundColor: WidgetStatePropertyAll(
-                  Theme.of(context).primaryColor,
-                )),
-            onPressed: () async {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NuevoAcutalizacionUsuarioApp(
-                    perfilUsuarioApp: perfilUsuarioApp,
-                    usuarioAPP: _emailSesionUsuario,
-                  ),
-                ),
-              );
-            },
-            icon: const Icon(Icons.edit),
-          )
+          contextoRoles.rol == RolEmpleado.administrador
+              ? ElevatedButton.icon(
+                  label: const Text('EDITAR'),
+                  style: ButtonStyle(
+                      foregroundColor: const WidgetStatePropertyAll(
+                        Colors.white,
+                      ),
+                      backgroundColor: WidgetStatePropertyAll(
+                        Theme.of(context).primaryColor,
+                      )),
+                  onPressed: () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NuevoAcutalizacionUsuarioApp(
+                          perfilUsuarioApp: perfilUsuarioApp,
+                          usuarioAPP: _emailSesionUsuario,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.edit),
+                )
+              : Container()
         ],
       ),
 
@@ -140,10 +152,12 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> with RouteAware {
         context, MaterialPageRoute(builder: (_) => const HomeScreen()));
   } */
 
-  StreamBuilder<PerfilModel> _fichaPerfilUsuario() {
+  StreamBuilder<PerfilAdministradorModel> _fichaPerfilUsuario() {
+    final contextoRoles = context.read<RolUsuarioProvider>();
+
     return StreamBuilder(
-      stream: FirebaseProvider().cargarPerfilFB(_emailSesionUsuario).asStream(),
-      builder: (context, AsyncSnapshot<PerfilModel> snapshot) {
+      stream: _perfil(),
+      builder: (context, AsyncSnapshot<PerfilAdministradorModel> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: LinearProgressIndicator(), // Indicador de carga centrado
@@ -160,7 +174,10 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> with RouteAware {
               children: [
                 _fotoEncabezado(data),
                 const SizedBox(height: 20),
-                _etiquetaPublicacionWeb(),
+                contextoRoles.rol == RolEmpleado.administrador
+                    ? _etiquetaPublicacionWeb()
+                    : const SizedBox(),
+
                 const SizedBox(height: 20),
 
                 // Denominación del negocio
@@ -262,29 +279,32 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> with RouteAware {
                 const Divider(),
 
                 // Botón de Cerrar Sesión
-                Card(
-                  color: Colors.red[100],
-                  elevation: 5,
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  child: ListTile(
-                    onTap: () async {
-                      _alertaCerrado();
-                      await PagoProvider().guardaPagado(
-                          _iniciadaSesionUsuario!, _emailSesionUsuario!);
-                      await FirebaseAuth.instance.signOut();
-                      _irHome();
-                    },
-                    iconColor: Colors.blue,
-                    title: const Text(
-                      'CERRAR SESIÓN',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    leading: const Icon(Icons.exit_to_app, color: Colors.red),
-                  ),
-                ),
+                contextoRoles.rol == RolEmpleado.administrador
+                    ? Card(
+                        color: Colors.red[100],
+                        elevation: 5,
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)),
+                        child: ListTile(
+                          onTap: () async {
+                            _alertaCerrado();
+                            await PagoProvider().guardaPagado(
+                                _iniciadaSesionUsuario!, _emailSesionUsuario!);
+                            await FirebaseAuth.instance.signOut();
+                            _irHome();
+                          },
+                          iconColor: Colors.blue,
+                          title: const Text(
+                            'CERRAR SESIÓN',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          leading:
+                              const Icon(Icons.exit_to_app, color: Colors.red),
+                        ),
+                      )
+                    : const SizedBox(),
               ],
             ),
           );
@@ -295,7 +315,7 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> with RouteAware {
   }
 
   // Encabezado de la Foto del Perfil
-  SizedBox _fotoEncabezado(PerfilModel? data) {
+  SizedBox _fotoEncabezado(PerfilAdministradorModel? data) {
     return SizedBox(
       width: double.infinity,
       height: 180,
@@ -321,16 +341,6 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> with RouteAware {
                     height: 180,
                     fit: BoxFit.cover,
                   ),
-            Positioned(
-              top: 10,
-              left: 10,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
           ],
         ),
       ),
@@ -557,5 +567,9 @@ class _ConfigUsuarioAppState extends State<ConfigUsuarioApp> with RouteAware {
 
   void _irHome() {
     Navigator.pushNamed(context, '/');
+  }
+
+  Stream<PerfilAdministradorModel> _perfil() {
+    return FirebaseProvider().cargarPerfilFB(_emailSesionUsuario).asStream();
   }
 }

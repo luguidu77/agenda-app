@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:agendacitas/models/empleado_model.dart';
@@ -71,8 +70,8 @@ class FirebaseProvider extends ChangeNotifier {
     return docRef;
   }
 
-  PerfilModel perfil = PerfilModel();
-  Future<PerfilModel> cargarPerfilFB(usuarioAPP) async {
+  PerfilAdministradorModel perfil = PerfilAdministradorModel();
+  Future<PerfilAdministradorModel> cargarPerfilFB(usuarioAPP) async {
     await _iniFirebase();
     String idNegocio = '';
     try {
@@ -112,6 +111,49 @@ class FirebaseProvider extends ChangeNotifier {
     }
 
     return perfil;
+  }
+
+  PerfilEmpleadoModel perfilEmpleadoModel = PerfilEmpleadoModel();
+
+  Future<PerfilEmpleadoModel> cargarPerfilEmpleado(
+      String usuarioAdministrador, String emailEmpleado) async {
+    await _iniFirebase();
+    PerfilEmpleadoModel perfilEmpleadoModel;
+
+    try {
+      //? TRAIGO LOS DATOS DE FIREBASE
+      var querySnapshot = await db!
+          .collection("agendacitasapp")
+          .doc(usuarioAdministrador)
+          .collection('empleados')
+          .where("email", isEqualTo: emailEmpleado)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        var data = querySnapshot.docs.first.data();
+        perfilEmpleadoModel = PerfilEmpleadoModel(
+          foto: data['foto'] ?? '',
+          categoriaServicios:
+              List<dynamic>.from(data['categoriaServicios'] ?? []),
+          codVerif: data['cod_verif'] ?? '',
+          color: data['color'] ?? 0,
+          disponibilidadSemanal:
+              List<dynamic>.from(data['disponibilidadSemanal'] ?? []),
+          telefono: data['telefono'] ?? '',
+          rol: List<String>.from(data['rol'] ?? []),
+          emailUsuarioApp: data['emailUsuarioApp'] ?? '',
+          nombre: data['nombre'] ?? '',
+          email: data['email'] ?? '',
+        );
+      } else {
+        throw "No se encontró el empleado con el email proporcionado.";
+      }
+    } catch (e) {
+      print('Error al leer de Firebase: $e');
+      throw "Error al cargar el perfil del empleado.";
+    }
+
+    return perfilEmpleadoModel;
   }
 
   nuevoCliente(String emailUsuarioAPP, String nombre, telefono, email, foto,
@@ -409,6 +451,7 @@ class FirebaseProvider extends ChangeNotifier {
         // Cliente indispuesto (datos predeterminados)
         empleado = EmpleadoModel(
           id: '',
+          emailUsuarioApp: '',
           nombre: '',
           disponibilidad: [],
           email: '',
@@ -1315,6 +1358,7 @@ class FirebaseProvider extends ChangeNotifier {
         // es un indisponible
         empleado = EmpleadoModel(
           id: '',
+          emailUsuarioApp: '',
           nombre: '',
           disponibilidad: [],
           email: '',
@@ -1398,6 +1442,62 @@ class FirebaseProvider extends ChangeNotifier {
       pago = false;
     }
     return pago;
+  }
+
+  Future<Map<String, dynamic>> compruebaRolEmpleadoIniciandoSesion(
+      String email) async {
+    await _iniFirebase(); // Inicializa Firebase
+    Map<String, dynamic> resultado = {
+      'emailAdministrador': '',
+      'emailUsuario': '',
+      'rolUsuario': '',
+      'cod_verif': '',
+    };
+
+    try {
+      // Obtén todos los documentos de la colección "agendacitasapp"
+      final querySnapshot = await db!.collection("agendacitasapp").get();
+
+      // Preparamos una lista de futures para realizar las búsquedas en paralelo
+      final futures = querySnapshot.docs.map((doc) async {
+        // Obtén todos los documentos de la subcolección 'empleados'
+        final empleadosSnapshot =
+            await doc.reference.collection("empleados").get();
+
+        // Retornar el primer documento que coincida con el email
+        for (var empleadoDoc in empleadosSnapshot.docs) {
+          if (empleadoDoc.data()['email'] == email) {
+            // Retorna los roles si se encuentran en los documentos de ese empleado
+            resultado['emailAdministrador'] = doc.id;
+            resultado['cod_verif'] = empleadoDoc.data()['cod_verif'];
+            return empleadoDoc
+                .data()['rol']; // Asumiendo que 'rol' está en el empleadoDoc
+          }
+        }
+        // Si no se encuentra el email en este documento, devuelve null
+        return null;
+      }).toList();
+
+      // Ejecuta todas las consultas en paralelo
+      final resultados = await Future.wait(futures);
+
+      // Busca el primer resultado no nulo y lo devuelve
+      for (var result in resultados) {
+        if (result != null) {
+          resultado['rolUsuario'] =
+              result; //{administrador: luguidu@hotmail.com, usuario: hello@gmail.es, rolUsuario: [personal]}
+          resultado['emailUsuario'] = email;
+
+          return resultado; // Devuelve el campo 'rol' de los empleados
+        }
+      }
+
+      // Si no se encuentra el email en ninguna subcolección de los documentos, devuelve una lista vacía
+      return {};
+    } catch (e) {
+      debugPrint("Error buscando el email en la subcolección 'empleados': $e");
+      return {};
+    }
   }
 
   /// esta funcion guarda la notificacion en su tabla correspondiente de firebase
@@ -1738,6 +1838,7 @@ class FirebaseProvider extends ChangeNotifier {
     final empleado = EmpleadoModel(
       id: '',
       nombre: '',
+      emailUsuarioApp: '',
       disponibilidad: [],
       email: '',
       telefono: '',
@@ -1794,6 +1895,7 @@ class FirebaseProvider extends ChangeNotifier {
       for (var element in snapshot.docs) {
         var empleado = EmpleadoModel(
           id: element.id,
+          emailUsuarioApp: element['emailUsuarioApp'] ?? '',
           nombre: element['nombre'] ?? '',
           disponibilidad:
               List<dynamic>.from(element['disponibilidadSemanal'] ?? []),
@@ -1836,6 +1938,37 @@ class FirebaseProvider extends ChangeNotifier {
     };
 
     await collectRef.doc(empleado.id).update(empleadoEditado);
+  }
+
+  Future<bool> editaCodigoVerificacion(String emailAdministrador,
+      String emailEmpleado, String nuevoCodVerif) async {
+    try {
+      // Inicializar Firebase
+      await _iniFirebase();
+
+      // Buscar el documento donde `email` coincida con `emailUsuario`
+      CollectionReference collectRef =
+          await _referenciaDocumento(emailAdministrador, 'empleados');
+      QuerySnapshot querySnapshot =
+          await collectRef.where('email', isEqualTo: emailEmpleado).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Obtener el ID del primer documento encontrado
+        String docId = querySnapshot.docs.first.id;
+
+        print('Documento encontrado: ${docId}, ');
+
+        // Actualizar solo el campo `cod_verif`
+        await collectRef.doc(docId).update({'cod_verif': nuevoCodVerif});
+        return true; // Devuelve true si se realiza con éxito
+      } else {
+        print('No se encontró un empleado con el email especificado.');
+        return false; // Devuelve false si no se encuentra el documento
+      }
+    } catch (e) {
+      print('Error al actualizar el código de verificación: $e');
+      return false; // Devuelve false si ocurre un error
+    }
   }
 
   Future<String> agregaEmpleado(EmpleadoModel empleado, String email) async {

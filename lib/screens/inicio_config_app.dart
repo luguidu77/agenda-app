@@ -1,5 +1,7 @@
 import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,25 +21,6 @@ class InicioConfigApp extends StatefulWidget {
 }
 
 class _InicioConfigAppState extends State<InicioConfigApp> {
-  /* inicializaProviderEstadoPagoEmail() {
-
-    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
-     final emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
-    if (estadoPagoProvider.estadoPagoApp == 'INITIAL' && mounted) {
-      Navigator.pushReplacementNamed(context, 'finalizacionPruebaScreen',
-          arguments: emailSesionUsuario);
-    }
-  } */
-
-/*   getPersonaliza() async {
-    List<PersonalizaModel> data =
-        await PersonalizaProvider().cargarPersonaliza();
-
-    if (data.isEmpty) {
-      await PersonalizaProvider().nuevoPersonaliza(0, 34, '', '', '€');
-    }
-  } */
-
   getDisponibilidadSemanal(emailSesionUsuario) async {
     final disponibilidadSemanalProvider = await SincronizarFirebase()
         .getDisponibilidadSemanal(emailSesionUsuario);
@@ -46,7 +29,7 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
   }
 
   void getTodasLasCitas(emailSesionUsuario) async {
-    final contextoCitas = context.watch<CitasProvider>();
+    final contextoCitas = context.read<CitasProvider>();
     final contextoCreacionCita = context.read<CreacionCitaProvider>();
 
     // Verifica si las citas ya están cargadas
@@ -79,21 +62,15 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
   }
 
   @override
-  void initState() {
-    // inicializaProviderEstadoPagoEmail();
-
-    //? no lo inicializo aqui porque primeramente me trael el usuario de la app vacio
-    //? tengo un poco de cacao aqui en las inicializaciones de la app
-
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
           if (snapshot.hasData) {
             // LOGEADO EN FIREBASE
             debugPrint(
@@ -102,24 +79,9 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
             final User data = snapshot.data;
 
             // ############### SETEA LOS PROVIDER
-            // EMAIL
-            final estadoProvider =
-                Provider.of<EstadoPagoAppProvider>(context, listen: false);
-            estadoProvider.estadoPagoEmailApp(data.email.toString());
-
-            // ###############  PERSONALIZA
-            FirebaseProvider()
-                .cargarPersonaliza(context, data.email.toString());
-
-            // ###############  DISPONIBILIDAD SEMANAL
-            //invocado DispoSemanalProvider
-            //TODO PASAR ESTO AL FIREBASE PROVIDER Y
-            final dDispoSemanal = context.read<DispoSemanalProvider>();
-
-            DisponibilidadSemanal.disponibilidadSemanal(
-                dDispoSemanal, data.email.toString());
-
-            getTodasLasCitas(data.email.toString());
+            // EMAIL DEL USUARIO QUE INICIA SESION
+            final estadoProvider = context.read<EmailUsuarioAppProvider>();
+            estadoProvider.setEmailUsuarioApp(data.email.toString());
 
             return HomeScreen(
               index: 0,
@@ -143,5 +105,26 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
         },
       ),
     );
+  }
+
+  void _configuraApp(data) {
+    // ############### SETEA LOS PROVIDER
+    // EMAIL
+    final estadoProvider =
+        Provider.of<EstadoPagoAppProvider>(context, listen: false);
+    estadoProvider.estadoPagoEmailApp(data.email.toString());
+
+    // ###############  PERSONALIZA
+    FirebaseProvider().cargarPersonaliza(context, data.email.toString());
+
+    // ###############  DISPONIBILIDAD SEMANAL
+    //invocado DispoSemanalProvider
+    //TODO PASAR ESTO AL FIREBASE PROVIDER Y
+    final dDispoSemanal = context.read<DispoSemanalProvider>();
+
+    DisponibilidadSemanal.disponibilidadSemanal(
+        dDispoSemanal, data.email.toString());
+
+    getTodasLasCitas(data.email.toString());
   }
 }

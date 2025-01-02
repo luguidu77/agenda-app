@@ -36,7 +36,7 @@ class MantenimientosFirebase extends ChangeNotifier {
     db = FirebaseFirestore.instance;
 
     //*traigo los datos del perfil de usuario
-    PerfilModel perfil = PerfilModel();
+    PerfilAdministradorModel perfil = PerfilAdministradorModel();
 
     try {
       //? TRAIGO LOS DATOS DE FIREBASE

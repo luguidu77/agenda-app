@@ -6,7 +6,7 @@ export 'package:agendacitas/screens/citas/servicio_step.dart';
 export 'package:agendacitas/config/confg_cliente_screen.dart';
 export 'package:agendacitas/config/config_categoria_servicio_screen.dart';
 export 'package:agendacitas/config/config_personalizar_screen.dart';
-export 'package:agendacitas/config/config_usuario_app.dart';
+export 'package:agendacitas/config/config_perfil_admin_app.dart';
 export 'package:agendacitas/screens/disponibilidad_semanal_screen.dart';
 export 'package:agendacitas/screens/fechas_no_disponibles.dart';
 export 'package:agendacitas/screens/ficha_cliente_screen.dart';

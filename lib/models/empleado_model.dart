@@ -7,6 +7,7 @@ enum RolEmpleado {
 
 class EmpleadoModel {
   String id;
+  String emailUsuarioApp;
   String nombre;
   List<dynamic> disponibilidad;
   String email;
@@ -20,6 +21,7 @@ class EmpleadoModel {
   // Constructor
   EmpleadoModel({
     required this.id,
+    required this.emailUsuarioApp,
     required this.nombre,
     required this.disponibilidad,
     required this.email,
@@ -32,6 +34,7 @@ class EmpleadoModel {
   });
   EmpleadoModel copyWith({
     String? id,
+    String? emailUsuarioApp,
     String? nombre,
     List<dynamic>? disponibilidad,
     String? email,
@@ -44,6 +47,7 @@ class EmpleadoModel {
   }) {
     return EmpleadoModel(
       id: id ?? this.id,
+      emailUsuarioApp: emailUsuarioApp ?? this.emailUsuarioApp,
       nombre: nombre ?? this.nombre,
       disponibilidad: disponibilidad ?? this.disponibilidad,
       email: email ?? this.email,
@@ -60,6 +64,7 @@ class EmpleadoModel {
   factory EmpleadoModel.fromMap(Map<String, dynamic> map) {
     return EmpleadoModel(
       id: map['id'] ?? '',
+      emailUsuarioApp: map['emailUsuarioApp'] ?? '',
       nombre: map['nombre'] ?? '',
       disponibilidad: List<dynamic>.from(map['disponibilidad'] ?? []),
       email: map['email'] ?? '',

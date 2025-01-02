@@ -40,7 +40,6 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   String? email;
   String? password;
 
-  String txtregistroLogin = '';
   bool loginRegistro = false; //true = login,, false = registro
   bool hayEmailUsuario = false;
 
@@ -50,8 +49,8 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   @override
   void initState() {
     super.initState();
-    txtregistroLogin = widget.registroLogin;
-    loginRegistro = (txtregistroLogin == 'Login') ? true : false;
+
+    loginRegistro = (widget.registroLogin == 'Login') ? true : false;
     hayEmailUsuario = (widget.usuarioAPP == '') ? false : true;
     email = widget.usuarioAPP;
   }

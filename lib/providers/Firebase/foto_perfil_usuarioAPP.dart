@@ -8,7 +8,7 @@ fotoPerfil(emailSesionUsuario) {
     return StreamBuilder(
         stream:
             FirebaseProvider().cargarPerfilFB(emailSesionUsuario).asStream(),
-        builder: ((context, AsyncSnapshot<PerfilModel> snapshot) {
+        builder: ((context, AsyncSnapshot<PerfilAdministradorModel> snapshot) {
           if (snapshot.hasData) {
             final data = snapshot.data;
             return CircleAvatar(

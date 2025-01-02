@@ -26,6 +26,7 @@ class EmpleadoWidget extends StatefulWidget {
 class _EmpleadoWidgetState extends State<EmpleadoWidget> {
   EmpleadoModel empleado = EmpleadoModel(
     id: '',
+    emailUsuarioApp: '',
     nombre: '',
     disponibilidad: [],
     email: '',

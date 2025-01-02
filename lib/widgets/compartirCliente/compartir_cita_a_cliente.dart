@@ -31,7 +31,7 @@ class CompartirCitaConCliente extends StatefulWidget {
 class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
   bool animarIcon = false;
   String _emailSesionUsuario = '';
-  late PerfilModel perfilUsuarioApp;
+  late PerfilAdministradorModel perfilUsuarioApp;
   bool pagado =
       true; //deshabilitado, por defecto la variable pagado=true; podria usarlo por ejemplo para hacer una alerta de comprar la app
   String? telefonoCodpais;
@@ -115,7 +115,7 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
             texto: 'Edita tu perfil para que se comparta en las citas',
             accion: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const ConfigUsuarioApp()),
+              MaterialPageRoute(builder: (context) => const ConfigPerfilAdminstrador()),
             ),
           ), */
 

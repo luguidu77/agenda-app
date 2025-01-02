@@ -212,7 +212,8 @@ Future<dynamic> emailEstadoCita(
   cita.horaInicio = fechaLarga; */
 
   // obtengo el perfil del negocio
-  PerfilModel negocio = await FirebaseProvider().cargarPerfilFB(emailnegocio);
+  PerfilAdministradorModel negocio =
+      await FirebaseProvider().cargarPerfilFB(emailnegocio);
   await _iniFirebase();
   final collectionRef = db!.collection("mail");
 

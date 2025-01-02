@@ -12,7 +12,7 @@ import '../providers/providers.dart';
 
 // ignore: must_be_immutable
 class NuevoAcutalizacionUsuarioApp extends StatefulWidget {
-  PerfilModel? perfilUsuarioApp;
+  dynamic perfilUsuarioApp;
   String? usuarioAPP;
   NuevoAcutalizacionUsuarioApp(
       {Key? key, required this.usuarioAPP, required this.perfilUsuarioApp})
@@ -52,7 +52,7 @@ class _NuevoAcutalizacionUsuarioAppState
     TextEditingController textControllerEmail =
         TextEditingController(text: usuarioAPP);
 
-    PerfilModel perfilUsuarioApp = PerfilModel();
+    PerfilAdministradorModel perfilUsuarioApp = PerfilAdministradorModel();
 
     return Scaffold(
       appBar: AppBar(
@@ -315,8 +315,8 @@ class _NuevoAcutalizacionUsuarioAppState
     );
   }
 
-  void _refrescaFicha(
-      PerfilModel perfilUsuarioApp, String emailUsuarioApp, myLogic) async {
+  void _refrescaFicha(PerfilAdministradorModel perfilUsuarioApp,
+      String emailUsuarioApp, myLogic) async {
     // ACTUALIZA CLIENTE DE FIREBASE SI HAY USUARIO
 
     await _actualizarUsuarioAPPFB(perfilUsuarioApp, emailUsuarioApp);
@@ -324,7 +324,8 @@ class _NuevoAcutalizacionUsuarioAppState
     _snackBarRealizado();
   }
 
-  _actualizarUsuarioAPPFB(PerfilModel perfilUsuarioApp, String emailUsuario) {
+  _actualizarUsuarioAPPFB(
+      PerfilAdministradorModel perfilUsuarioApp, String emailUsuario) {
     SincronizarFirebase().actualizarUsuarioApp(perfilUsuarioApp, emailUsuario);
   }
 

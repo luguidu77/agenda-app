@@ -1,6 +1,6 @@
 import 'package:agendacitas/models/models.dart';
 
-adaptacionPerfilNegocio(PerfilModel perfilNegocio) {
+adaptacionPerfilNegocio(PerfilAdministradorModel perfilNegocio) {
   NegocioModel negocio = NegocioModel(
       id: perfilNegocio.id!, // ID DEL NEGOCIO QUE TIENE EN LA WEB
       denominacion: perfilNegocio.denominacion!,

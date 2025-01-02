@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:agendacitas/providers/FormularioBusqueda/formulario_busqueda_provider.dart';
 import 'package:agendacitas/providers/buttom_nav_notificaciones_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 
@@ -201,6 +202,12 @@ class _MyAppState extends State<MyApp> {
             create: (BuildContext context) => VistaProvider()),
         ChangeNotifierProvider(
             create: (BuildContext context) => CitasProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => RolUsuarioProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => EmailUsuarioAppProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => EmailAdministradorAppProvider()),
       ],
       builder: (context, _) {
         return MaterialApp(

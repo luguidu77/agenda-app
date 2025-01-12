@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:math';
 
 import 'package:agendacitas/models/empleado_model.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:timezone/timezone.dart';
 
 import '../models/models.dart';
 import '../providers/providers.dart';
@@ -129,6 +131,8 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
     return Scaffold(
         body: SfCalendar(
+      showCurrentTimeIndicator: true,
+
       controller: _calendarController,
       //color fondo del calendario
       backgroundColor: leerEstadoBotonIndisponibilidad
@@ -193,12 +197,16 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
       // CONFIGURA HORARIO
       timeSlotViewSettings: const TimeSlotViewSettings(
+        dayFormat: '',
+        dateFormat: 'd',
         timeFormat: 'HH:mm', // FORMATO 24H
+
         startHour: 7, // INICIO LABORAL
         endHour: 22, // FINAL LABORAL
         timeInterval: Duration(minutes: 15), //INTERVALOS DE TIEMPO
-        timeIntervalHeight: 20, // tamaño de las casillas
+        timeIntervalHeight: 30, // tamaño de las casillas
       ),
+
       //cellBorderColor: Colors.deepOrange,
 
       viewNavigationMode: ViewNavigationMode
@@ -275,12 +283,35 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
                   );
                 });
           } else {
+            final citaElegida = CitaModelFirebase(
+                id: cita['id'],
+                dia: cita['dia'],
+                horaInicio: DateTime.parse(cita['horaInicio']),
+                horaFinal: DateTime.parse(cita['horaFinal']),
+                comentario: cita['comentario'],
+                email: cita['email'],
+                idcliente: cita['idCliente'],
+                idservicio:
+                    idServicioLista, // Divide los elementos si hay comas
+                servicios: listaServicios,
+                idEmpleado: cita['idEmpleado'],
+                nombreEmpleado: cita['nombreEmpleado'],
+                colorEmpleado: int.parse(cita['colorEmpleado']),
+                precio: cita['precio'],
+                confirmada: cita['confirmada'] == 'true' ? true : false,
+                tokenWebCliente: cita['tokenWebCliente'],
+                idCitaCliente: cita['idCitaCliente'],
+                nombreCliente: cita['nombre'],
+                // fotoCliente: cita['foto'],
+                telefonoCliente: cita['telefono'],
+                emailCliente: cita['email'],
+                notaCliente: cita['nota']);
             //############# DETALLE HORARIO NO DISPONIBLE      ########################
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => DetallesHorarioNoDisponibleScreen(
-                    emailUsuario: _emailSesionUsuario, reserva: cita),
+                    emailUsuario: _emailSesionUsuario, reserva: citaElegida),
               ),
             );
           }
@@ -295,6 +326,13 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
             if (leerEstadoBotonIndisponibilidad) // si el boton de indisponibilidad esta activado
 
             {
+              // Paso al provider fecha elegida Fecha y hora para usarlas en la vista TarjetaIndisponibilidad
+              _seteaProviderFechaElegida(context, details);
+              /*    context
+                  .read<BotonAgregarIndisponibilidadProvider>()
+                  .setBotonPulsadoIndisponibilidad(false); */
+
+              // navega a la vista TarjetaIndisponibilidad
               Navigator.push(
                   context,
                   PageRouteBuilder(
@@ -365,6 +403,20 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
       initialDisplayDate: DateTime.now(),
       dataSource: MeetingDataSource(getAppointments(), _employeeCollection),
     ));
+  }
+
+  void _seteaProviderFechaElegida(
+      BuildContext context, CalendarTapDetails details) {
+    final providerFechaElegida =
+        Provider.of<FechaElegida>(context, listen: false);
+    providerFechaElegida.setFechaElegida(details.date!);
+    final providerHoraFinCarrusel = context.read<HorarioElegidoCarrusel>();
+    // hora inicio
+    providerHoraFinCarrusel.setHoraInicio(details.date!);
+    // hora fin
+    providerHoraFinCarrusel.setHoraFin(details.date!);
+    print(
+        ' setea la fecha elegida en 340-lista_de_citas.dart--------------------');
   }
 
   List<Appointment> getAppointments() {

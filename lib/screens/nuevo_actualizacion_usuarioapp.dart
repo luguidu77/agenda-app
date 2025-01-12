@@ -63,7 +63,10 @@ class _NuevoAcutalizacionUsuarioAppState
                   backgroundColor: WidgetStatePropertyAll(
                 Theme.of(context).primaryColor,
               )),
-              label: const Text('GUARDAR'),
+              label: const Text(
+                'GUARDAR',
+                style: TextStyle(color: Colors.white),
+              ),
               onPressed: () {
                 perfilUsuarioApp.denominacion =
                     myLogic.textControllerDenominacion.text;
@@ -93,7 +96,7 @@ class _NuevoAcutalizacionUsuarioAppState
 
                 _refrescaFicha(perfilUsuarioApp, usuarioAPP, myLogic);
               },
-              icon: const Icon(Icons.save))
+              icon: const Icon(Icons.save, color: Colors.white))
         ],
       ),
       body: Padding(

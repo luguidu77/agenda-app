@@ -110,9 +110,11 @@ class _EmpleadoWidgetState extends State<EmpleadoWidget> {
               // Mostrar la foto del empleado si existe
               InkWell(
                 onTap: () {
-                  // agrego al contexto tanto el id como el nombre del empleado
+                  // agrego al contexto tanto el id como el nombre del empleado y su color
                   CitaModelFirebase edicionCita = CitaModelFirebase(
-                      idEmpleado: empleado.id, nombreEmpleado: empleado.nombre);
+                      idEmpleado: empleado.id,
+                      nombreEmpleado: empleado.nombre,
+                      colorEmpleado: empleado.color);
                   contextoCreacionCita.setContextoCita(edicionCita);
                   debugPrint(
                       'agregado el empleado al contexto de la Creacion de la cita: ${empleado.nombre}');

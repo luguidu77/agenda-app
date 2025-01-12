@@ -21,6 +21,8 @@ class CreacionCitaProvider extends ChangeNotifier {
       idEmpleado: edicionContextoCita.idEmpleado ?? _contextoCita.idEmpleado,
       nombreEmpleado:
           edicionContextoCita.nombreEmpleado ?? _contextoCita.nombreEmpleado,
+      colorEmpleado:
+          edicionContextoCita.colorEmpleado ?? _contextoCita.colorEmpleado,
       precio: edicionContextoCita.precio ?? _contextoCita.precio,
       confirmada: edicionContextoCita.confirmada ?? _contextoCita.confirmada,
       tokenWebCliente:

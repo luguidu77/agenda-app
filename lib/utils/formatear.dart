@@ -109,3 +109,14 @@ String suma(String tiempo1, String valor) {
 
   return resultado;
 }
+
+class Formatear {
+  // formatea el precio para que no aparezcan decimales 0
+  static String formatPrecio(dynamic precio, String moneda) {
+    final numberFormat =
+        NumberFormat('#.##', 'es_ES'); // Formato sin ceros innecesarios
+    final precioFormateado = numberFormat.format(precio);
+
+    return '$precioFormateado $moneda';
+  }
+}

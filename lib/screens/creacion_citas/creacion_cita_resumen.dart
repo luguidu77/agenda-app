@@ -507,6 +507,18 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
     String idCitaFB = await FirebaseProvider().nuevaCita(
         _emailSesionUsuario, citaElegida, idServicios, idCitaCliente);
+
+    final contextCitas = context.read<CitasProvider>();
+    final contextNuevaCita = context.read<CreacionCitaProvider>();
+
+    contextNuevaCita.contextoCita.id = idCitaFB;
+
+    contextNuevaCita.contextoCita.idservicio = idServicios;
+    contextNuevaCita.contextoCita.confirmada = true;
+    contextCitas.agregaCitaAlContexto(contextNuevaCita.contextoCita);
+    print(
+        'contexto de las citas ....................................................................');
+    print(contextCitas);
   }
 }
 

@@ -6,13 +6,13 @@ import 'package:agendacitas/providers/comprobacion_reasignacion_citas.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/providers/estado_creacion_indisponibilidad.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
-import 'package:agendacitas/providers/personaliza_provider.dart';
+
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
-import 'package:agendacitas/screens/style/estilo_pantalla.dart';
+
 import 'package:agendacitas/widgets/alertas/alertaAgregarPersonal.dart';
 import 'package:agendacitas/widgets/empleado/empleado.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
 import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -119,8 +119,9 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
     bool seleccionado = false;
 
     if (empleadosStaff.length == 1) {
-      CitaModelFirebase edicionContextoCita =
-          CitaModelFirebase(idEmpleado: empleadosStaff[0].id);
+      CitaModelFirebase edicionContextoCita = CitaModelFirebase(
+          idEmpleado: empleadosStaff[0].id,
+          colorEmpleado: empleadosStaff[0].color);
       if (mounted) {
         final contextoCreacionCita = context.read<CreacionCitaProvider>();
         contextoCreacionCita.setContextoCita(edicionContextoCita);

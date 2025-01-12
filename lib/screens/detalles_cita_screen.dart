@@ -143,7 +143,7 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
   Widget build(BuildContext context) {
     CitasProvider contextoCitaProvider = context.read<CitasProvider>();
     print('····························reserva·······························');
-    print(widget.reserva);
+    print(widget.reserva.nombreEmpleado);
     final citaconfirmada =
         Provider.of<EstadoConfirmacionCita>(context, listen: true);
     return Padding(
@@ -290,7 +290,7 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
     );
   }
 
-  Widget _buildDeleteButton(context, contextoCitaProvider) {
+  Widget _buildDeleteButton(context, CitasProvider contextoCitaProvider) {
     return FloatingActionButton(
       heroTag: 'deleteButton',
       mini: true,
@@ -300,7 +300,7 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
             context,
             contextoCitaProvider,
             0,
-            widget.reserva,
+            [widget.reserva],
             (widget.emailUsuario == '') ? false : true,
             widget.emailUsuario);
 

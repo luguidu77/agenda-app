@@ -1,3 +1,5 @@
+import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -5,29 +7,31 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../providers/providers.dart';
 import '../utils/utils.dart';
 
-mensajeAlerta(context, contextoCitaProvider, int index, citas,
-    bool iniciadaSesionUsuario, String emailusuario) async {
-  late String textoPregunta;
+mensajeAlerta(
+    context,
+    CitasProvider contextoCitaProvider,
+    int index,
+    List<CitaModelFirebase> citas,
+    bool iniciadaSesionUsuario,
+    String emailusuario) async {
+  String textoPregunta = '';
   bool respuesta = false;
   late String textoNombre;
   late dynamic idCita;
-  print(citas is List);
 
-  if (citas is List) {
-    textoNombre = citas[index]['nombre'].toString();
-    (textoNombre == 'null')
-        ? textoNombre = 'NO DISPONIBLE'
-        : textoNombre = citas[index]['nombre'];
+  textoNombre = citas[index].nombreCliente.toString();
+  if (textoNombre == 'null') {
+    textoNombre = 'NO DISPONIBLE';
 
-    idCita = citas[index]['id'];
+    textoPregunta = '¿ Quieres eliminar esta indisponibilidad ?';
+
+    idCita = citas[index].id;
   } else {
-    textoNombre = citas['nombre'].toString();
-    (textoNombre == 'null')
-        ? textoPregunta = '¿ Quieres eliminar esta indisponibilidad ?'
-        : textoPregunta = '¿ Quieres eliminar la cita de $textoNombre ?';
+    textoNombre = citas[index].nombreCliente!;
 
-    idCita =
-        iniciadaSesionUsuario ? citas['id'].toString() : int.parse(citas['id']);
+    textoPregunta = '¿ Quieres eliminar la cita de $textoNombre ?';
+
+    idCita = citas[index].id.toString();
   }
   print(idCita);
 

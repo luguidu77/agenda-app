@@ -1,13 +1,19 @@
 import 'dart:async';
 
+import 'package:agendacitas/config/config_perfil_usuario.dart';
 import 'package:agendacitas/providers/FormularioBusqueda/formulario_busqueda_provider.dart';
 import 'package:agendacitas/providers/buttom_nav_notificaciones_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
+import 'package:agendacitas/registro_empleados/empleado_revisa_confirma.dart';
+import 'package:agendacitas/registro_empleados/registro_empleados.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
+import 'package:agendacitas/screens/error_page.dart';
+import 'package:agendacitas/screens/not_found_page.dart';
 
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -26,6 +32,7 @@ import 'models/models.dart';
 import 'providers/providers.dart';
 import 'screens/screens.dart';
 import 'widgets/formulariosSessionApp/registro_usuario_screen.dart'; //utilizado para anular la rotación de pantalla
+import 'package:app_links/app_links.dart';
 
 //! DESPLEGAR EN PLAY STORE :
 
@@ -65,6 +72,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+  );
 
   // initializeDateFormatting().then((_) {
 
@@ -84,6 +94,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  late AppLinks _appLinks;
+  StreamSubscription<Uri>? _linkSubscription;
   bool inicioConfigApp = false;
   List hayServicios = [];
   String usuarioAPP = '';
@@ -143,6 +156,8 @@ class _MyAppState extends State<MyApp> {
     //inicializacion();
 
     super.initState();
+
+    initDeepLinks();
   }
 
   @override
@@ -211,6 +226,55 @@ class _MyAppState extends State<MyApp> {
       ],
       builder: (context, _) {
         return MaterialApp(
+            initialRoute: "/",
+            navigatorKey: _navigatorKey,
+            onGenerateRoute: (RouteSettings settings) {
+              Widget routeWidget;
+              // Analiza el nombre de la ruta
+              final routeName = settings.name;
+
+              if (routeName != null) {
+                if (routeName.startsWith('/invitacion')) {
+                  try {
+                    /*   // Convierte el routeName en un URI
+                    final uri = Uri.parse(routeName); */
+
+                    // Redirige a RegistroEmpleados y pasa los datos como argumento
+                    routeWidget = RegistroEmpleados(
+                      dataPorLink: routeName, // Envía la URL completa
+                    );
+
+                    // Opcional: Si prefieres pasar solo los parámetros, puedes adaptarlo así:
+                    // routeWidget = RegistroEmpleados(
+                    //   dataPorLink: uri.queryParameters['id'] ?? '', // Por ejemplo
+                    // );
+                  } catch (e) {
+                    debugPrint('Error procesando la URL: $e');
+                    routeWidget =
+                        ErrorPage(); // Una página de error personalizada
+                  }
+                } else if (routeName == '/empleadoRevisaConfirma') {
+                  routeWidget = const EmpleadoRevisaConfirma();
+                } else if (routeName == '/') {
+                  // Ruta inicial
+                  routeWidget = HomeScreen(
+                    index: 0,
+                    myBnB: 0,
+                  );
+                } else {
+                  // Manejador por defecto para rutas desconocidas
+                  routeWidget = NotFoundPage(); // Página 404
+                }
+              } else {
+                // Por si settings.name es null (improbable pero posible)
+                routeWidget = HomeScreen(
+                  index: 0,
+                  myBnB: 0,
+                );
+              }
+
+              return MaterialPageRoute(builder: (_) => routeWidget);
+            },
             navigatorObservers: [mRouteObserver],
             theme: ThemeData(
               useMaterial3: true,
@@ -278,5 +342,20 @@ class _MyAppState extends State<MyApp> {
             });
       },
     );
+  }
+
+  Future<void> initDeepLinks() async {
+    _appLinks = AppLinks();
+
+    // Handle links
+    _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
+      debugPrint('onAppLink: $uri');
+
+      openAppLink(uri);
+    });
+  }
+
+  void openAppLink(Uri uri) {
+    _navigatorKey.currentState?.pushNamed(uri.fragment);
   }
 }

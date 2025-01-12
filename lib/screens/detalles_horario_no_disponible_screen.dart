@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 
 class DetallesHorarioNoDisponibleScreen extends StatefulWidget {
   final String emailUsuario;
-  final Map<String, dynamic> reserva;
+  final CitaModelFirebase reserva;
   const DetallesHorarioNoDisponibleScreen(
       {super.key, required this.reserva, required this.emailUsuario});
 
@@ -25,7 +25,7 @@ class _DetallesHorarioNoDisponibleScreenState
   bool visibleFormulario = false;
   PersonalizaModelFirebase personaliza = PersonalizaModelFirebase();
   EdgeInsets miPadding = const EdgeInsets.all(18.0);
-  late Map<String, dynamic> reserva;
+  late CitaModelFirebase reserva;
   double altura = 300;
   String _emailSesionUsuario = '';
 
@@ -60,8 +60,8 @@ class _DetallesHorarioNoDisponibleScreenState
     CitasProvider contextoCitaProvider = context.read<CitasProvider>();
     // final cita = widget.reserva; //widget.reserva;
     String? fechaLarga;
-    DateTime resFecha = DateTime.parse(
-        reserva['horaInicio']); // horaInicio trae 2022-12-05 20:27:00.000Z
+    DateTime resFecha = DateTime.parse(reserva.horaInicio
+        .toString()); // horaInicio trae 2022-12-05 20:27:00.000Z
     //? FECHA LARGA EN ESPAÑOL
     fechaLarga = DateFormat.MMMMEEEEd('es_ES')
         .add_Hm()
@@ -90,7 +90,7 @@ class _DetallesHorarioNoDisponibleScreenState
             // Detalle de la cita
 
             _detallesCita(
-              reserva,
+              widget.reserva,
               fechaLarga,
               contextoCitaProvider,
             ),
@@ -115,7 +115,7 @@ class _DetallesHorarioNoDisponibleScreenState
         ));
   }
 
-  _botonesCita(reserva, contextoCitaProvider) {
+  _botonesCita(CitaModelFirebase reserva, contextoCitaProvider) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -129,7 +129,7 @@ class _DetallesHorarioNoDisponibleScreenState
                   context,
                   contextoCitaProvider,
                   0,
-                  widget.reserva,
+                  [reserva],
                   (widget.emailUsuario == '') ? false : true,
                   widget.emailUsuario);
 
@@ -159,7 +159,7 @@ class _DetallesHorarioNoDisponibleScreenState
     );
   }
 
-  _detallesCita(Map<String, dynamic> cita, fechaLarga, contextoCitaProvider) {
+  _detallesCita(CitaModelFirebase cita, fechaLarga, contextoCitaProvider) {
     print(
         'cita actual **************************************************************** $cita');
     return SizedBox(
@@ -195,7 +195,7 @@ class _DetallesHorarioNoDisponibleScreenState
                         height: 10,
                       ),
                       Text(
-                        'Notas: ${cita['comentario'].toString()}',
+                        'Notas: ${cita.comentario.toString()}',
                         style: subTituloEstilo,
                       ),
                       const SizedBox(height: 40),

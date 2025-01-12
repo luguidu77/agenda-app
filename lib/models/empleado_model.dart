@@ -17,6 +17,8 @@ class EmpleadoModel {
   int color;
   String codVerif;
   List<RolEmpleado> roles;
+  String? idNegocio;
+  String? nombreNegocio;
 
   // Constructor
   EmpleadoModel({
@@ -31,6 +33,8 @@ class EmpleadoModel {
     required this.color,
     required this.codVerif,
     required this.roles,
+    this.idNegocio,
+    this.nombreNegocio,
   });
   EmpleadoModel copyWith({
     String? id,
@@ -44,6 +48,8 @@ class EmpleadoModel {
     int? color,
     String? codVerif,
     List<RolEmpleado>? roles,
+    String? idNegocio,
+    String? nombreNegocio,
   }) {
     return EmpleadoModel(
       id: id ?? this.id,
@@ -57,6 +63,8 @@ class EmpleadoModel {
       color: color ?? this.color,
       codVerif: codVerif ?? this.codVerif,
       roles: roles ?? this.roles,
+      idNegocio: idNegocio ?? this.idNegocio,
+      nombreNegocio: nombreNegocio ?? this.nombreNegocio,
     );
   }
 
@@ -77,6 +85,9 @@ class EmpleadoModel {
       roles: (map['rol'] as List<dynamic>? ?? [])
           .map((rol) => _stringToRolEmpleado(rol as String))
           .toList(),
+
+      idNegocio: map['idNegocio'] ?? '',
+      nombreNegocio: map['nombreNegocio'] ?? '',
     );
   }
 

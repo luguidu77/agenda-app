@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 class EmpleadosProvider extends ChangeNotifier {
   final List<EmpleadoModel> _empleados = <EmpleadoModel>[];
   final List<EmpleadoModel> _empleadosStaff = <EmpleadoModel>[];
+  late EmpleadoModel _empleadoRegistro; // al registrarse un empleado
 
-  bool _empleadosCargados = false;
+  bool _empleadosCargados = false; // bandera empleados cargados
 
   List<EmpleadoModel> get getEmpleados => _empleados;
   List<EmpleadoModel> get getEmpleadosStaff => _empleadosStaff;
+  //registrandose un empleado obtengo sus datos
+  EmpleadoModel get getEmpleadoRegistro => _empleadoRegistro;
 
   bool get empleadosCargados => _empleadosCargados;
 
@@ -68,6 +71,25 @@ class EmpleadosProvider extends ChangeNotifier {
 
     _empleadosStaff.addAll(empleadosStaff); // carga los roles personal
 
+    notifyListeners();
+  }
+
+  void setEmpleadoRegistro(EmpleadoModel empleado) {
+    _empleadoRegistro = empleado;
+    notifyListeners();
+  }
+
+  void modificaEmpleadoRegistro(
+      {String? nombre, String? email, String? telefono}) {
+    if (nombre != null) {
+      _empleadoRegistro.nombre = nombre;
+    }
+    if (email != null) {
+      _empleadoRegistro.email = email;
+    }
+    if (telefono != null) {
+      _empleadoRegistro.telefono = telefono;
+    }
     notifyListeners();
   }
 }

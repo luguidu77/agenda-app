@@ -1,3 +1,6 @@
+import 'package:agendacitas/models/empleado_model.dart';
+import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +36,12 @@ class _BNavigatorState extends State<BNavigator> with WidgetsBindingObserver {
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     inicializacion();
-    contadorNotificacionesCitasNoLeidas(context, _emailSesionUsuario);
+    final contextoRoles = context.read<RolUsuarioProvider>();
+    if (contextoRoles.rol == RolEmpleado.administrador ||
+        contextoRoles.rol == RolEmpleado.gerente) {
+      contadorNotificacionesCitasNoLeidas(context, _emailSesionUsuario);
+    }
+
     super.initState();
   }
 
@@ -45,8 +53,13 @@ class _BNavigatorState extends State<BNavigator> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    final contextoRoles = context.read<RolUsuarioProvider>();
+
     if (state == AppLifecycleState.resumed) {
-      contadorNotificacionesCitasNoLeidas(context, _emailSesionUsuario);
+      if (contextoRoles.rol == RolEmpleado.administrador ||
+          contextoRoles.rol == RolEmpleado.gerente) {
+        contadorNotificacionesCitasNoLeidas(context, _emailSesionUsuario);
+      }
       // La aplicación está activa nuevamente
 /* 
       Navigator.push(
@@ -68,9 +81,14 @@ class _BNavigatorState extends State<BNavigator> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final contadorNotificaciones =
-        Provider.of<ButtomNavNotificacionesProvider>(context);
-    hayNorificacionesNoleidas(_emailSesionUsuario, contadorNotificaciones);
+    final contextoRoles = context.watch<RolUsuarioProvider>();
+    if (contextoRoles.rol == RolEmpleado.administrador ||
+        contextoRoles.rol == RolEmpleado.gerente) {
+      final contadorNotificaciones =
+          Provider.of<ButtomNavNotificacionesProvider>(context);
+      hayNorificacionesNoleidas(_emailSesionUsuario, contadorNotificaciones);
+    }
+
     int index = widget.index;
     Color colorTema = Theme.of(context).primaryColor;
     return Container(

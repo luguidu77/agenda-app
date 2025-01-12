@@ -1,8 +1,7 @@
 import 'package:agendacitas/models/cita_model.dart';
-import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
+
 import 'package:agendacitas/providers/citas_provider.dart';
-import 'package:agendacitas/providers/estado_creacion_indisponibilidad.dart';
-import 'package:agendacitas/providers/estado_pago_app_provider.dart';
+
 import 'package:agendacitas/providers/providers.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/formatea_fecha_hora.dart';
@@ -87,7 +86,7 @@ class _BotonGuardarState extends State<BotonGuardar> {
       personalizadoProvider.setBotonGuardar(true); // formulario es visible o no
 
       Navigator.pop(context);
-      setState(() {});
+      // setState(() {});
     }
 
     // provider contexto de la cita para obtener el id del empleado
@@ -145,13 +144,20 @@ class _BotonGuardarState extends State<BotonGuardar> {
                         idEmpleado: idEmpleado,
                         idCitaCliente: '');
                     //guardar la cita en firebase
-                    await FirebaseProvider().nuevaCita(
+                    String idCitaFB = await FirebaseProvider().nuevaCita(
                         _emailSesionUsuario,
                         citaEdicion,
                         ['indispuesto'],
                         citaEdicion.idCitaCliente!);
 
                     //agrear la cita al contexto de las citas
+                    citaEdicion.id = idCitaFB;
+                    citaEdicion.idservicio = ['indispuesto'];
+                    citaEdicion.colorEmpleado = 4278190335;
+                    contextoCreacionCita.contextoCita.confirmada = true;
+                    citaEdicion.comentario = textoTitulo;
+                    citaEdicion.nombreCliente = '';
+
                     contextoCitas.agregaCitaAlContexto(citaEdicion);
 
                     cerrar();

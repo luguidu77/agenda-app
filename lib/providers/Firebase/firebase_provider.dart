@@ -173,8 +173,11 @@ class FirebaseProvider extends ChangeNotifier {
     await docRef.doc().set(newCliente);
   }
 
-  nuevaCita(String emailUsuarioAPP, CitaModelFirebase citaElegida,
-      List<String> idServicios, String idCitaCliente) async {
+  Future<String> nuevaCita(
+      String emailUsuarioAPP,
+      CitaModelFirebase citaElegida,
+      List<String> idServicios,
+      String idCitaCliente) async {
     // Crear una lista de futuros a partir de la lista de ids de servicio
     List<Map<String, dynamic>> listaServiciosAux = [];
     bool esCita = true;
@@ -388,7 +391,7 @@ class FirebaseProvider extends ChangeNotifier {
     return data; //retorna una lista de citas(CitaModelFirebase) cuando el dia sea igual a la fecha
   }
 
-  getTodasLasCitas(emailUsuario) async {
+  Future<List<CitaModelFirebase>> getTodasLasCitas(emailUsuario) async {
     List<CitaModelFirebase> data = [];
     CitaModelFirebase cita = CitaModelFirebase();
     dynamic verifica;
@@ -1992,6 +1995,28 @@ class FirebaseProvider extends ChangeNotifier {
     };
     DocumentReference docRef = await collectRef.add(empleadoEditado);
     return docRef.id;
+  }
+
+  registroEmpleado(EmpleadoModel empleado, String email) async {
+    // Inicializar Firebase
+    await _iniFirebase();
+
+    // Obtener la referencia del documento de empleados
+    CollectionReference collectRef =
+        await _referenciaDocumento(email, 'empleados');
+    final empleadoEditado = {
+      'nombre': empleado.nombre,
+      //'disponibilidadSemanal': empleado.disponibilidad,
+      'email': empleado.email,
+      'telefono': empleado.telefono,
+      //'categoriaServicios': empleado.categoriaServicios,
+      'foto': empleado.foto,
+      // 'color': empleado.color,
+      'cod_verif': 'verificado',
+      //'rol': empleado.roles.map((rol) => rolEmpleadoToString(rol)).toList(),
+    };
+
+    await collectRef.doc(empleado.id).update(empleadoEditado);
   }
 
   Future<String> subirImagenStorage(

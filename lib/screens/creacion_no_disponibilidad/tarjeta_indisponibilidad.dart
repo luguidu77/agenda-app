@@ -86,20 +86,21 @@ class _TarjetaIndisponibilidadState extends State<TarjetaIndisponibilidad> {
   }
 
   seteafechaElegida() {
-    // provider fecha elegida
+    /*   // provider fecha elegida
     final providerFechaElegida =
         Provider.of<FechaElegida>(context, listen: false);
     providerFechaElegida.setFechaElegida(widget.argument);
-
+    print(
+        ' setea la fecha elegida en tarjeta_indisponibilidad.dart--------------------'); */
     // Formatear la fecha  para visualizar en pantalla
   }
 
   reseteaHoraElegida() {
-    final providerHoraFinCarrusel = context.read<HorarioElegidoCarrusel>();
+    /*  final providerHoraFinCarrusel = context.read<HorarioElegidoCarrusel>();
     // hora inicio
     providerHoraFinCarrusel.setHoraInicio(widget.argument);
     // hora fin
-    providerHoraFinCarrusel.setHoraFin(widget.argument);
+    providerHoraFinCarrusel.setHoraFin(widget.argument); */
   }
 
   String textoTitulo = '';

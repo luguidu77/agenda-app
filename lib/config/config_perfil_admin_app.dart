@@ -109,7 +109,10 @@ class _ConfigPerfilAdministradorState extends State<ConfigPerfilAdministrador>
                       ),
                     );
                   },
-                  icon: const Icon(Icons.edit),
+                  icon: const Icon(
+                    Icons.edit,
+                    color: Colors.white,
+                  ),
                 )
               : Container()
         ],

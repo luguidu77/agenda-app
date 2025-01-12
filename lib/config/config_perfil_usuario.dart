@@ -17,7 +17,7 @@ import '../screens/screens.dart';
 import '../utils/utils.dart';
 
 class ConfigPerfilUsuario extends StatefulWidget {
-  const ConfigPerfilUsuario({Key? key}) : super(key: key);
+  ConfigPerfilUsuario({Key? key}) : super(key: key);
 
   @override
   State<ConfigPerfilUsuario> createState() => _ConfigPerfilUsuarioState();
@@ -97,6 +97,7 @@ class _ConfigPerfilUsuarioState extends State<ConfigPerfilUsuario>
                   Theme.of(context).primaryColor,
                 )),
             onPressed: () async {
+              mensajeInfo(context, 'Estamos trabajando, disculpa');
               /*  Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -107,7 +108,10 @@ class _ConfigPerfilUsuarioState extends State<ConfigPerfilUsuario>
                 ),
               ); */
             },
-            icon: const Icon(Icons.edit),
+            icon: const Icon(
+              Icons.edit,
+              color: Colors.white,
+            ),
           )
         ],
       ),
@@ -121,6 +125,7 @@ class _ConfigPerfilUsuarioState extends State<ConfigPerfilUsuario>
               /* const SizedBox(
                 height: 20,
               ), */
+
               _fichaPerfilUsuario(),
               const SizedBox(
                 height: 10,
@@ -355,8 +360,8 @@ class _ConfigPerfilUsuarioState extends State<ConfigPerfilUsuario>
                   child: ListTile(
                     onTap: () async {
                       _alertaCerrado();
-                      await PagoProvider().guardaPagado(
-                          _iniciadaSesionUsuario!, _emailSesionUsuario!);
+                      /*  await PagoProvider().guardaPagado(
+                          _iniciadaSesionUsuario!, _emailSesionUsuario!); */
                       await FirebaseAuth.instance.signOut();
                       _irHome();
                     },
@@ -456,7 +461,13 @@ class _ConfigPerfilUsuarioState extends State<ConfigPerfilUsuario>
   }
 
   void _irHome() {
-    Navigator.pushNamed(context, '/');
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (context) => const Bienvenida(
+              // usuarioAPP: email,
+              )),
+    );
   }
 
   Stream<PerfilEmpleadoModel> _perfil() {

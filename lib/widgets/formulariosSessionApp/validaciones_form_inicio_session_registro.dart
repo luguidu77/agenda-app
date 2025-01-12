@@ -32,7 +32,8 @@ Future<String> validateLoginInput(context, email, password) async {
 }
 
 // ? LOS NUEVOS USUARIOS PAGO 1ª OPCION
-creaCuentaUsuarioApp(context, email, password) async {
+Future<bool> creaCuentaUsuarioApp(
+    BuildContext context, String email, String password) async {
   debugPrint('FORMULARIO REGISTRO VALIDO');
 
   // ? activa el onSave de TextFormField

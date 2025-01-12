@@ -196,7 +196,11 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
           // _estadopago == 'COMPRADA' ? const Text('') : _planAmigo(context),
 
           //NOTIFICACIONES
-          _notificaciones(),
+          Visibility(
+            visible: contextoRoles.rol == RolEmpleado.administrador ||
+                contextoRoles.rol == RolEmpleado.gerente,
+            child: _notificaciones(),
+          ),
 
           //BLOG AGENDADECITAS.CLOUD
           _blog(),

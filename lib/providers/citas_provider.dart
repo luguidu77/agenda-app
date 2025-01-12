@@ -17,9 +17,10 @@ class CitasProvider extends ChangeNotifier {
   }
 
   void agregaCitaAlContexto(CitaModelFirebase nuevaCita) {
-    if (!_citas.any((cita) => cita.id == nuevaCita.id)) {
+    if (!_citas
+        .any((cita) => cita.id == nuevaCita.id || nuevaCita.id == null)) {
       _citas.add(nuevaCita); // Solo agrega si no existe ya
-      _citasCargadas = false;
+      // _citasCargadas = false;
       notifyListeners();
     }
   }

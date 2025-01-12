@@ -1,3 +1,4 @@
+import 'package:agendacitas/config/config_perfil_usuario.dart';
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
@@ -28,16 +29,114 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     return disponibilidadSemanalProvider;
   }
 
-  void getTodasLasCitas(emailSesionUsuario) async {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasData) {
+            final contextoCitas = context.watch<CitasProvider>();
+
+            // LOGEADO EN FIREBASE
+            debugPrint(
+                'inicio_config_app.dart ----------------> LOGEADO EN FIREBASE');
+
+            final User data = snapshot.data;
+
+            // ############### SETEA LOS PROVIDER
+            // EMAIL DEL USUARIO QUE INICIA SESION
+            // TRAE LOS EMPLEADOS Y LOS SETEA EN EL PROVIDER
+
+            _config(data.email!);
+
+            if (!contextoCitas.citasCargadas) {
+              return const Center(child: Text("Cargando..."));
+            }
+            return HomeScreen(
+              emailUsuario: data.email,
+              index: 0,
+              myBnB: 0,
+            );
+          } else {
+            //quiero limpiar el provider de citas
+
+            final contextoCitas = context.read<CitasProvider>();
+
+            if (contextoCitas.getCitas.isNotEmpty) {
+              contextoCitas.limpiarCitaContexto();
+            }
+
+            // NO LOGUEADO EN FIREBASE
+            debugPrint(
+                'inicio_config_app.dart ----------------> NO LOGUEADO EN FIREBASE');
+            return widget.usuarioAPP != ''
+                ? RegistroUsuarioScreen(
+                    registroLogin: 'Login',
+                    usuarioAPP: widget.usuarioAPP,
+                  )
+                : const Bienvenida();
+          }
+        },
+      ),
+    );
+  }
+
+  void _configuraApp(
+    BuildContext context,
+    String emailSesionUsuario,
+    RolEmpleado rolEmpleado,
+    String emailAdministrador,
+  ) async {
+    final contextoCitas = context.read<CitasProvider>();
+    final empleadosProvider = context.read<EmpleadosProvider>();
+
+    // ############### SETEA LOS PROVIDER
+
+    // ESTADO DE PAGO EMAIL USUARIO DE LA APLICACION
+    final emailUsuarioAppProvider = context.read<EmailUsuarioAppProvider>();
+    emailUsuarioAppProvider.setEmailUsuarioApp(emailSesionUsuario);
+
+    // ESTADO DE PAGO EMAIL ADMINISTRADOR
+    final estadoProvider = context.read<EstadoPagoAppProvider>();
+    estadoProvider.estadoPagoEmailApp(emailAdministrador);
+    // setea el email del administrador de la empresa
+    final contextoPago = context.read<EmailAdministradorAppProvider>();
+    contextoPago.setEmailAdministradorApp(emailAdministrador);
+
+    // ############### set roles de usuario
+    context.read<RolUsuarioProvider>().setRol(rolEmpleado);
+
+    // ###############  PERSONALIZA
+    FirebaseProvider().cargarPersonaliza(context, emailAdministrador);
+
+    // ###############  DISPONIBILIDAD SEMANAL APERTURAS DEL NEGOCIO
+    final dDispoSemanal = context.read<DispoSemanalProvider>();
+
+    DisponibilidadSemanal.disponibilidadSemanal(
+        dDispoSemanal, emailAdministrador);
+
+    getTodasLasCitas(emailAdministrador);
+
+    empleados(emailAdministrador);
+  }
+
+  getTodasLasCitas(emailSesionUsuario) async {
     final contextoCitas = context.read<CitasProvider>();
     final contextoCreacionCita = context.read<CreacionCitaProvider>();
+    final estadoProvider = context.read<EmailAdministradorAppProvider>();
+    String emailAdministrador = estadoProvider.emailAdministradorApp;
 
     // Verifica si las citas ya están cargadas
     if (!contextoCitas.citasCargadas) {
       // Realizar la operación de carga
       try {
         List<CitaModelFirebase> citas =
-            await FirebaseProvider().getTodasLasCitas(emailSesionUsuario);
+            await FirebaseProvider().getTodasLasCitas(emailAdministrador);
 
         // Establecer las citas en el contexto
         contextoCitas.setTodosLasLasCitas(citas);
@@ -61,70 +160,133 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+  Future<(RolEmpleado rol, String? emailAdministrador)> _compruebaRolUsuario(
+    String emailSesionUsuario,
+  ) async {
+    final datosUsuario = await FirebaseProvider()
+        .compruebaRolEmpleadoIniciandoSesion(emailSesionUsuario);
+    print(datosUsuario);
+    String emailAdministrador = datosUsuario['emailAdministrador'].toString();
 
-          if (snapshot.hasData) {
-            // LOGEADO EN FIREBASE
-            debugPrint(
-                'inicio_config_app.dart ----------------> LOGEADO EN FIREBASE');
+    // si el usuario es administrador
+    if (datosUsuario['emailUsuario'] == emailAdministrador) {
+      print("El usurio es administrador.");
+      return (RolEmpleado.administrador, emailAdministrador);
 
-            final User data = snapshot.data;
+      // si no es administrador
+    } else {
+      print("usuario encontrado: ${datosUsuario['emailUsuario']}");
 
-            // ############### SETEA LOS PROVIDER
-            // EMAIL DEL USUARIO QUE INICIA SESION
-            final estadoProvider = context.read<EmailUsuarioAppProvider>();
-            estadoProvider.setEmailUsuarioApp(data.email.toString());
+      // pregunta si el usuario  está verificado
+      if (datosUsuario['cod_verif'] != 'verificado') {
+        //mensaje de verificacion, debes de registrar tu cuenta
+        mensajeDialogo();
 
-            return HomeScreen(
-              index: 0,
-              myBnB: 0,
-            );
-          } else {
-            //quiero limpiar el provider de citas
-            final contextoCitas = context.read<CitasProvider>();
-            contextoCitas.limpiarCitaContexto();
+        return (RolEmpleado.personal, emailAdministrador);
+      } else {
+        print("Usuario verificado.");
+        return (RolEmpleado.personal, emailAdministrador);
+      }
+    }
+  }
 
-            // NO LOGUEADO EN FIREBASE
-            debugPrint(
-                'inicio_config_app.dart ----------------> NO LOGUEADO EN FIREBASE');
-            return widget.usuarioAPP != ''
-                ? RegistroUsuarioScreen(
-                    registroLogin: 'Login',
-                    usuarioAPP: widget.usuarioAPP,
-                  )
-                : const Bienvenida();
-          }
-        },
-      ),
+  void mensajeDialogo() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          backgroundColor: Colors.white,
+          title: const Center(
+            child: Text(
+              'Cuenta no verificada',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          content: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Text(
+              'Debes veficar tu cuenta para continuar.',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          actions: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ConfigPerfilUsuario(), // Pantalla de configuración
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue, // color llamativo
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Text(
+                    'Aceptar',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  void _configuraApp(data) {
-    // ############### SETEA LOS PROVIDER
-    // EMAIL
-    final estadoProvider =
-        Provider.of<EstadoPagoAppProvider>(context, listen: false);
-    estadoProvider.estadoPagoEmailApp(data.email.toString());
+  void _config(String email) async {
+    final (rol, emailAdministrador) = await _compruebaRolUsuario(email);
 
-    // ###############  PERSONALIZA
-    FirebaseProvider().cargarPersonaliza(context, data.email.toString());
+    _configuraApp(
+      context,
+      email,
+      rol,
+      emailAdministrador!,
+    );
+  }
 
-    // ###############  DISPONIBILIDAD SEMANAL
-    //invocado DispoSemanalProvider
-    //TODO PASAR ESTO AL FIREBASE PROVIDER Y
-    final dDispoSemanal = context.read<DispoSemanalProvider>();
+  Future empleados(emailAdministrador) async {
+    // TRAE LOS EMPLEADOS Y LOS SETEA EN EL PROVIDER
+    final empleadosProvider = context.read<EmpleadosProvider>();
 
-    DisponibilidadSemanal.disponibilidadSemanal(
-        dDispoSemanal, data.email.toString());
+// Verifica si los empleados ya están cargadas
+    if (!empleadosProvider.empleadosCargados) {
+      print('Cargando empleados por primera vez...');
 
-    getTodasLasCitas(data.email.toString());
+      await FirebaseProvider()
+          .getTodosEmpleados(emailAdministrador)
+          .then((empleados) {
+        // Establece las citas en el contexto
+        empleadosProvider.setTodosLosEmpleados(empleados);
+      });
+
+      debugPrint('empleados cargados y añadidas al contexto');
+    } else {
+      debugPrint('los empleados ya están cargadas, no se vuelve a cargar.');
+    }
   }
 }

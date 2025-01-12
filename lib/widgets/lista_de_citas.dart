@@ -328,9 +328,6 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
             {
               // Paso al provider fecha elegida Fecha y hora para usarlas en la vista TarjetaIndisponibilidad
               _seteaProviderFechaElegida(context, details);
-              /*    context
-                  .read<BotonAgregarIndisponibilidadProvider>()
-                  .setBotonPulsadoIndisponibilidad(false); */
 
               // navega a la vista TarjetaIndisponibilidad
               Navigator.push(

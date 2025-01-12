@@ -1,6 +1,8 @@
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_resumen.dart';
 import 'package:agendacitas/screens/creacion_citas/servicios_creacion_cita.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/formatea_fecha_hora.dart';
 import 'package:agendacitas/utils/utils.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -81,6 +83,9 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
               spacing: 15,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text('${contextoCreacionCita.contextoCita.dia}'),
+                Text('${contextoCreacionCita.contextoCita.horaInicio}'),
+                Text('${contextoCreacionCita.contextoCita.horaFinal}'),
                 // VISUALIZACION DEL CONTEXTO EN PRUEBAS
                 //Text( 'SERVICIOS : ${contextoCreacionCita.getServiciosElegidos}'),
                 _barraProgreso().progreso(context, 0.90, Colors.amber),
@@ -134,7 +139,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
           children: [
             const Icon(Icons.calendar_today),
             InkWell(
-              onTap: () => calendario(),
+              onTap: () => seleccionaDia(),
               child: Text(DateFormat.MMMEd('es_ES').format(DateTime.parse(
                   contextoCreacionCita.contextoCita.dia.toString()))),
             ),
@@ -583,7 +588,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
     );
   }
 
-  calendario() {
+  seleccionaDia() {
     // abre un menu que sale desde abajo de la pantalla con un calendario para seleccionar fecha
     showModalBottomSheet(
       context: context,
@@ -605,7 +610,25 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                   lastDate: DateTime(2100),
                   onDateChanged: (DateTime date) {
                     setState(() {
-                      contextoCreacionCita.contextoCita.dia = date.toString();
+                      String dia = formatearFechaDiaCita(date);
+
+                      // Fecha String : dia ("2025-01-26")
+                      contextoCreacionCita.contextoCita.dia = dia;
+                      DateTime nuevoDia = DateTime.parse(dia);
+                      // hora de inicio "2025-01-26 10:30:00.000"
+                      contextoCreacionCita.contextoCita.horaInicio = DateTime(
+                          nuevoDia.year,
+                          nuevoDia.month,
+                          nuevoDia.day,
+                          contextoCreacionCita.contextoCita.horaInicio!.hour,
+                          contextoCreacionCita.contextoCita.horaInicio!.minute);
+                      // hora de finalizacion "2025-01-26 12:30:00.000"
+                      contextoCreacionCita.contextoCita.horaFinal = DateTime(
+                          nuevoDia.year,
+                          nuevoDia.month,
+                          nuevoDia.day,
+                          contextoCreacionCita.contextoCita.horaFinal!.hour,
+                          contextoCreacionCita.contextoCita.horaFinal!.minute);
                     });
                     Navigator.pop(context);
                   },
@@ -642,7 +665,8 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
               Expanded(
                 child: ListView.builder(
                   controller: ScrollController(
-                      initialScrollOffset: initialIndex * 48.0),
+                    initialScrollOffset: initialIndex * 56.0,
+                  ),
                   itemCount: 24 * 12, // 24 hours * 12 intervals per hour
                   itemBuilder: (context, index) {
                     final hour = index ~/ 12;
@@ -653,15 +677,23 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                     final isSelected =
                         selectedHour == hour && selectedMinute == minute;
                     return ListTile(
-                      title: Text(time),
+                      title: Text(
+                        time,
+                        style: isSelected
+                            ? const TextStyle(fontWeight: FontWeight.bold)
+                            : const TextStyle(color: Colors.grey),
+                      ),
                       trailing: isSelected
                           ? const Icon(Icons.check, color: Colors.green)
                           : null,
                       onTap: () {
                         setState(() {
+                          final dia = contextoCreacionCita.contextoCita.dia;
+                          DateTime fecha = DateTime.parse(dia!);
+
                           contextoCreacionCita.contextoCita.horaInicio =
-                              DateTime(horainicio.year, horainicio.month,
-                                  horainicio.day, hour, minute);
+                              DateTime(fecha.year, fecha.month, fecha.day, hour,
+                                  minute);
 
                           contextoCreacionCita.contextoCita.horaFinal =
                               contextoCreacionCita.contextoCita.horaInicio!
@@ -685,6 +717,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
 
     horainicio = contextoCreacionCita.contextoCita.horaInicio!;
     horafinal = contextoCreacionCita.contextoCita.horaFinal!;
+
     print(
         'hora inicio ..................................................................');
     print(horainicio);

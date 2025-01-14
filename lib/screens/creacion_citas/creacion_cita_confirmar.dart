@@ -83,11 +83,6 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
               spacing: 15,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('${contextoCreacionCita.contextoCita.dia}'),
-                Text('${contextoCreacionCita.contextoCita.horaInicio}'),
-                Text('${contextoCreacionCita.contextoCita.horaFinal}'),
-                // VISUALIZACION DEL CONTEXTO EN PRUEBAS
-                //Text( 'SERVICIOS : ${contextoCreacionCita.getServiciosElegidos}'),
                 _barraProgreso().progreso(context, 0.90, Colors.amber),
                 const SizedBox(height: 10),
                 Container(
@@ -98,12 +93,10 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                     //  height: 80.0, // Altura agradable para la vista
                     decoration: boxDecoration, // Bordes redondeados
                     child: _agregaNotas()),
-
                 Container(
                     height: 80.0, // Altura agradable para la vista
                     decoration: boxDecoration, // Bordes redondeados
                     child: _fechaCita()),
-
                 _servicios(),
                 _botonAgregaServicio(context),
               ],
@@ -417,7 +410,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
               height: 10,
             ),
             InkWell(
-              onTap: totalPrecio != 0.0
+              onTap: totalPrecio != 0.0 && !compuebaDisponible()
                   ? () {
                       Navigator.push(
                           context,
@@ -434,7 +427,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                 width: 150,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
-                    color: Colors.black),
+                    color: compuebaDisponible() ? Colors.grey : Colors.black),
                 child: const Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text(
@@ -737,9 +730,9 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
 
     // Comprobamos si los horarios están dentro del rango laboral
     if (horainicio.isBefore(startHour) || horafinal.isAfter(endHour)) {
-      return false; // No disponible
+      return true; // No disponible
     }
 
-    return true; // Disponible
+    return false; // Disponible
   }
 }

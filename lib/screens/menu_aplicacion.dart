@@ -408,18 +408,16 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
         'Notificaciones',
         style: estilo,
       ),
-      onTap: _iniciadaSesionUsuario
-          ? () async {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HomeScreen(
-                      index: 1,
-                      myBnB: 1,
-                    ),
-                  ));
-            }
-          : () => mensajeError(context, 'Necesita iniciar sesión'),
+      onTap: () async {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(
+                index: 1,
+                myBnB: 1,
+              ),
+            ));
+      },
     );
   }
 

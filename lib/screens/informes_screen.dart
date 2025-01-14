@@ -58,8 +58,8 @@ class _InformesScreenState extends State<InformesScreen> {
     var fecha = dateFormat.format(fechaElegida);
 
     if (_iniciadaSesionUsuario) {
-      citas =
-          await FirebaseProvider().cargarCitasAnual(_emailSesionUsuario, fecha);
+      citas = await FirebaseProvider()
+          .cargarCitasAnual(context, _emailSesionUsuario, fecha);
       debugPrint('TRAE LAS CITAS ANUALES GUARDADAS EN FIREBASE');
     } else {
       citas = await CitaListProvider().cargarCitasAnual(fecha);

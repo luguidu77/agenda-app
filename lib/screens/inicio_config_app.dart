@@ -55,7 +55,13 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
             _config(data.email!);
 
             if (!contextoCitas.citasCargadas) {
-              return const Center(child: Text("Cargando..."));
+              return Center(
+                child: Image.asset(
+                  'assets/images/cargandoAgenda.gif', // Ruta del GIF
+                  width: 100,
+                  height: 100,
+                ),
+              );
             }
             return HomeScreen(
               emailUsuario: data.email,
@@ -120,9 +126,25 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     DisponibilidadSemanal.disponibilidadSemanal(
         dDispoSemanal, emailAdministrador);
 
-    getTodasLasCitas(emailAdministrador);
+    final stopwatch = Stopwatch()..start();
+    await getTodasLasCitas(emailAdministrador);
+    stopwatch.stop();
+    final tiempo = stopwatch.elapsed.inSeconds;
+    print('tiempo de carga de todas las citas...$tiempo');
 
-    empleados(emailAdministrador);
+    final stopwatch2 = Stopwatch()..start();
+    await empleados(emailAdministrador);
+    stopwatch2.stop();
+    final tiempo2 = stopwatch2.elapsed.inSeconds;
+    print('tiempo de carga de todas los empleados...$tiempo2');
+
+    // Marcar las citas como cargadas
+
+    mensajeInfo(context, 'tiempo $tiempo + $tiempo2 : ${tiempo + tiempo2}');
+
+    // getTodasLasCitas(emailAdministrador);
+
+    // empleados(emailAdministrador);
   }
 
   getTodasLasCitas(emailSesionUsuario) async {
@@ -259,8 +281,14 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
   }
 
   void _config(String email) async {
-    final (rol, emailAdministrador) = await _compruebaRolUsuario(email);
+    final stopwatch = Stopwatch()..start();
 
+    final (rol, emailAdministrador) = await _compruebaRolUsuario(email);
+    stopwatch.stop();
+    final tiempo = stopwatch.elapsed.inSeconds;
+
+    print('tiempo de carga comprobacion del rol...$tiempo');
+    mensajeInfo(context, 'tiempo carga rol $tiempo');
     _configuraApp(
       context,
       email,

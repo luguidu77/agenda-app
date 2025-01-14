@@ -304,101 +304,134 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
   Widget build(BuildContext context) {
     final contextoCreacionCita = context.watch<CreacionCitaProvider>();
     final citaElegida = contextoCreacionCita.contextoCita;
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        appBar: appBarCreacionCita(
-          '✔️ Cita confirmada',
-          false,
-        ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            BarraProgreso().progreso(
-              context,
-              1.0,
-              const Color.fromARGB(255, 51, 156, 24),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Flexible(
-              child: ListView.builder(
-                itemCount: 1,
-                itemBuilder: (context, index) {
-                  // para animar el sheck
-                  return servicioTexto == ''
-                      ? const Center(
-                          child: SizedBox(
-                              width: 100,
-                              height: 100,
-                              child: CircularProgressIndicator()))
-                      : Column(
-                          children: [
-                            SizedBox(
-                              width: 100,
-                              child: Image.asset(
-                                './assets/images/cheque.png',
-                                // width: 100,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            /* Text(
-                              'Reservado $servicioTexto con $clientaTexto para el día $fechaTexto h',
-                              style: const TextStyle(
-                                  color: Colors.blueGrey,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ), */
-                            const Divider(),
-                            CompartirCitaConCliente(
-                                cliente: clientaTexto,
-                                telefono: telefono,
-                                email: email,
-                                fechaCita: citaElegida.horaInicio.toString(),
-                                servicio: servicioTexto,
-                                precio: precioTexto),
-                            const SizedBox(height: 20),
-                            ElevatedButton.icon(
-                                onPressed: () {
-                                  mensajeInfo(
-                                      context, 'Actualizando agenda...');
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                        builder: (context) => HomeScreen(
-                                              index: 0,
-                                              myBnB: 0,
-                                            )),
-                                    (Route<dynamic> route) =>
-                                        false, // Elimina todo el stack
-                                  );
 
-                                  liberarMemoriaEditingController();
-                                },
-                                icon: const Icon(
-                                  Icons.check,
-                                  size: 20,
-                                  color: Color.fromARGB(167, 224, 231, 235),
-                                ),
-                                label: const Text('ACEPTAR')),
-                          ],
-                        );
-                },
+    return PopScope(
+      canPop: false, // no permite salir de la pagina al ir atras
+      child: Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              //_buildProgressIndicator(context),
+
+              _buildConfirmationSection(
+                citaElegida: citaElegida,
+                context: context,
+              ),
+              const SizedBox(height: 20),
+              _buildFooterButton(context),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Barra de progreso
+  Widget _buildProgressIndicator(BuildContext context) {
+    return BarraProgreso().progreso(
+      context,
+      1.0,
+      const Color.fromARGB(255, 51, 156, 24),
+    );
+  }
+
+  /// Sección de confirmación de cita
+  Widget _buildConfirmationSection({
+    required dynamic citaElegida,
+    required BuildContext context,
+  }) {
+    return Expanded(
+      child: servicioTexto == ''
+          ? const Center(
+              child: SizedBox(
+                  width: 100, height: 100, child: CircularProgressIndicator()))
+          : Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildConfirmationImage(),
+                    const SizedBox(height: 15),
+                    _buildSharingDetails(citaElegida),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(
-              height: 100,
-            ),
-          ],
+    );
+  }
+
+  /// Imagen de confirmación
+  Column _buildConfirmationImage() {
+    return Column(
+      children: [
+        SizedBox(
+          width: 100,
+          child: Image.asset('./assets/images/cheque.png'),
+        ),
+        const SizedBox(height: 15),
+        const Text(
+          'Reserva confirmada',
+          style: const TextStyle(
+            color: Colors.blueGrey,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  /// Detalles para compartir la cita con el cliente
+  Column _buildSharingDetails(dynamic citaElegida) {
+    return Column(
+      children: [
+        CompartirCitaConCliente(
+          cliente: clientaTexto,
+          telefono: telefono,
+          email: email,
+          fechaCita: citaElegida.horaInicio.toString(),
+          servicio: servicioTexto,
+          precio: precioTexto,
+        ),
+        const Divider(),
+      ],
+    );
+  }
+
+  /// Botón de cierre en el pie de página
+  Widget _buildFooterButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size(double.infinity, 50),
+          backgroundColor: const Color.fromARGB(255, 51, 156, 24),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
+        onPressed: () {
+          mensajeInfo(context, 'Actualizando agenda...');
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+                builder: (context) => HomeScreen(
+                      index: 0,
+                      myBnB: 0,
+                    )),
+            (Route<dynamic> route) => false,
+          );
+          liberarMemoriaEditingController();
+        },
+        icon: const Icon(
+          Icons.check,
+          size: 20,
+          color: Colors.white,
+        ),
+        label: const Text(
+          'Cerrar',
+          style: TextStyle(color: Colors.white),
         ),
       ),
     );
@@ -425,10 +458,6 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     String precio,
     String idCitaCliente,
   ) async {
-    print(
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
-    // print('citaelegida ${contextoCitaProvider.getCitas.length.toString()} ');
-
     //###### CREA CITA Y TRAE ID CITA CREADA EN FIREBASE PARA ID DEL RECORDATORIO
     _creaCitaEnFirebase(citaElegida, idCitaCliente);
 

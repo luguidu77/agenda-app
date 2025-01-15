@@ -5,10 +5,12 @@ import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
+import 'package:agendacitas/registro_empleados/empleado_revisa_confirma.dart';
 
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_cliente.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_confirmar.dart';
 import 'package:agendacitas/screens/creacion_citas/empleados_screen.dart';
+import 'package:agendacitas/screens/creacion_citas/nuevo_editar_empleado.dart';
 
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 
@@ -292,9 +294,9 @@ class _HomeScreenState extends State<HomeScreen> {
           'creacionCitaComfirmar': (context) => const CreacionCitaConfirmar(),
           'serviciosCitas': (_) => const ServiciosCreacionCita(),
           'empleadosScreen': (context) => const EmpleadosScreen(),
-          /* 'empleadosEdicionScreen': (context) => const EmpleadoEdicion(),
+          'empleadosEdicionScreen': (context) => const EmpleadoEdicion(),
           'empleadosRegistroConfirmacion': (context) =>
-              const EmpleadoRevisaConfirma(), */
+              const EmpleadoRevisaConfirma(),
         });
   }
 

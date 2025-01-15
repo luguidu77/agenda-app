@@ -1,10 +1,9 @@
+import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
-import 'package:agendacitas/providers/comprobacion_reasignacion_citas.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';
-import 'package:agendacitas/models/empleado_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -47,6 +46,10 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
     RolEmpleado.administrador,
     RolEmpleado.gerente,
     RolEmpleado.personal,
+  ];
+  final List<RolEmpleado> rolesPersonalInhabilitado = [
+    RolEmpleado.administrador,
+    RolEmpleado.gerente,
   ];
 
   String rolEmpleadoToString(RolEmpleado rol) {
@@ -211,12 +214,13 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
   }
 
   void _selectRol() async {
+    final contextoEmpleados = context.read<EmpleadosProvider>();
     List<String>? selectedRoles = await showDialog<List<String>>(
       context: context,
       builder: (BuildContext context) {
         return MultiSelectDialog(
           title: 'Selecciona sus roles',
-          items: roles.map((rol) => rolEmpleadoToString(rol)).toList(),
+          items: obtenerItems(contextoEmpleados.getEmpleadosStaff.length <= 2),
           initialSelectedItems:
               rolesEmpleados.map((rol) => rolEmpleadoToString(rol)).toList(),
         );
@@ -637,6 +641,12 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
       // Navegar hacia atrás
       Navigator.pop(context);
     }
+  }
+
+  List<String> obtenerItems(bool hayMenosDeTresStaff) {
+    return (hayMenosDeTresStaff ? roles : rolesPersonalInhabilitado)
+        .map((rol) => rolEmpleadoToString(rol))
+        .toList();
   }
 }
 

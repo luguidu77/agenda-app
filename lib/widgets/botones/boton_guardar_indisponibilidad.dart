@@ -58,28 +58,27 @@ class _BotonGuardarState extends State<BotonGuardar> {
 
     // provider del boton Guardar
     final personalizadoProvider =
-        context.read<BotonGuardarAgregarNoDisponible>();
-
+        context.watch<BotonGuardarAgregarNoDisponible>();
     personalizado =
         personalizadoProvider.forularioVisible; // formulario es visible o no
 
+    print(personalizado);
+
+    final providerTextoTitulo = context.watch<TextoTituloIndispuesto>();
+    print({'${providerTextoTitulo.getTitulo}'});
     bool condicionBotonActivado() {
       //  con la variable 'personalizado' verfico si esta la opcion del asunto es personalizado
       // si es personalizado, compruebo con 'botonAtivado' los tramos horarios, y si el formulario está validado
       // si no es personalizado y el fomulario no esta visible, pues retorno la condicion verdadera para activar el boton y realizar el guardado.
-      if (personalizado) {
-        if (botonActivado && textoTitulo != ''
-            /*  _formKey.currentState != null &&
+      if (botonActivado && providerTextoTitulo.getTitulo != ''
+          /*  _formKey.currentState != null &&
             _formKey.currentState!.validate() &&
             _errorText == null */
-            ) {
-          return true;
-        } else {
-          return false;
-        }
+          ) {
+        return true;
+      } else {
+        return false;
       }
-
-      return true;
     }
 
     void cerrar() {
@@ -96,7 +95,7 @@ class _BotonGuardarState extends State<BotonGuardar> {
     final contextoCitas = context.read<CitasProvider>();
 
     // escucha el provider del titulo del asunto
-    providerTextoTitulo = Provider.of<TextoTituloIndispuesto>(context);
+
     textoTitulo = '$nombreEmpleado  ${providerTextoTitulo.getTitulo}';
 
     // provider FECHA elegida

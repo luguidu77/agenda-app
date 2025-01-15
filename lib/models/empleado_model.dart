@@ -5,6 +5,13 @@ enum RolEmpleado {
   administrador,
 }
 
+class RolInfo {
+  final RolEmpleado rol;
+  final bool habilitado;
+
+  RolInfo(this.rol, this.habilitado);
+}
+
 class EmpleadoModel {
   String id;
   String emailUsuarioApp;

@@ -540,10 +540,15 @@ class _TarjetasAsuntosState extends State<TarjetasAsuntos> {
                           _selectedIndex == 0
                               ? personalizadoProvider.setBotonGuardar(true)
                               : personalizadoProvider.setBotonGuardar(false);
-
-                          // texto del asunto elegido para grabar en firebase
-                          providerTextoTitulo.setTitulo(
-                              _asuntos[i]!.keys.first.split('?')[0].toString());
+                          _selectedIndex == 0
+                              ?
+                              // texto del asunto elegido para grabar en firebase
+                              providerTextoTitulo.setTitulo('')
+                              : providerTextoTitulo.setTitulo(_asuntos[i]!
+                                  .keys
+                                  .first
+                                  .split('?')[0]
+                                  .toString());
 
                           DateTime aux =
                               fechaElegida!.add(_asuntos[i]!.values.first);
@@ -729,9 +734,11 @@ class _FormularioAsuntoState extends State<FormularioAsunto> {
                 return null; // Si pasa la validación, devuelve null
               },
               onChanged: (value) {
-                providerTextoTitulo.setTitulo(value);
-
                 _validateField(value); // Llama a la validación manualmente
+
+                final providerTextoTitulo =
+                    context.read<TextoTituloIndispuesto>();
+                providerTextoTitulo.setTitulo(value);
               },
               controller: _asuntoController,
               decoration: InputDecoration(
@@ -901,6 +908,14 @@ class _TarjetaHoraState extends State<TarjetaHora> {
         child: InkWell(
             onTap: () {
               botonActivado ? Navigator.pop(context) : null;
+
+              // provider HORA elegida
+              final contextoTitulo =
+                  Provider.of<TextoTituloIndispuesto>(context, listen: false);
+              // provider del boton Guardar
+              final personalizadoProvider =
+                  context.read<BotonGuardarAgregarNoDisponible>();
+              personalizadoProvider.setBotonGuardar(true);
             },
             child: const Center(
               child: Text(
@@ -1150,7 +1165,8 @@ class _TarjetaCreacionAsuntoState extends State<TarjetaCreacionAsunto> {
   void _onSubmit() {
     // provider del boton Guardar
     final personalizadoProvider =
-        Provider.of<BotonGuardarAgregarNoDisponible>(context, listen: false);
+        context.read<BotonGuardarAgregarNoDisponible>();
+
     /*  // Obtén la instancia del ControladorTarjetasAsuntos
     final controladorTarjetasAsuntos =
         Provider.of<ControladorTarjetasAsuntos>(context, listen: false); */

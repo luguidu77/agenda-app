@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:agendacitas/firebase_options.dart';
+import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/providers/Firebase/emailHtml/emails_html.dart';
 import 'package:agendacitas/providers/providers.dart';
@@ -291,4 +292,29 @@ contadorNotificacionesCitasNoLeidas(
     context.read<ButtomNavNotificacionesProvider>().setContadorNotificaciones(
         cantidadTotal, recordatorios, citaweb, administrador);
   });
+}
+
+//? NOTIFICACIONES EMAILS ***************************************
+// Usando la extensión Trigger Email  de Firebase
+Future<dynamic> emailInvitacion(EmpleadoModel empleado, emailnegocio) async {
+  //? FECHA LARGA EN ESPAÑOL
+  /*  String fechaLarga = formateaFechaLarga(cita.horaInicio);
+  cita.horaInicio = fechaLarga; */
+
+  // obtengo el perfil del negocio
+  PerfilAdministradorModel negocio =
+      await FirebaseProvider().cargarPerfilFB(emailnegocio);
+  await _iniFirebase();
+  final collectionRef = db!.collection("mail");
+
+  var refDoc = await collectionRef.add({
+    'to': empleado.email,
+    'message': {
+      'subject': '${empleado.nombre}, has recibido una invitación',
+      'html': textoHTMLInvitacion(negocio, empleado),
+    },
+  });
+
+  final res = await collectionRef.doc(refDoc.id).get();
+  return res.id; //retorno el id de la coleccion mail
 }

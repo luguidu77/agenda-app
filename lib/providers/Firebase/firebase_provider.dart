@@ -2016,6 +2016,7 @@ class FirebaseProvider extends ChangeNotifier {
         await _referenciaDocumento(email, 'empleados');
 
     final empleadoEditado = {
+      'emailUsuarioApp': empleado.emailUsuarioApp,
       'nombre': empleado.nombre,
       'disponibilidadSemanal': empleado.disponibilidad,
       'email': empleado.email,

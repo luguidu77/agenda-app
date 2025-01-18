@@ -201,15 +201,18 @@ class _EmpleadosScreenState extends State<EmpleadosScreen> {
                                   if (empleados[index].codVerif !=
                                       'verificado') ...[
                                     const SizedBox(height: 8),
-                                    Row(
+                                    Wrap(
                                       children: [
                                         const Icon(Icons.error,
                                             color: Colors.red, size: 16),
                                         const SizedBox(width: 4),
-                                        Text(
-                                          'Pendiente Verificación: ${empleados[index].codVerif}',
-                                          style: const TextStyle(
-                                              color: Colors.red),
+                                        const Text(
+                                          'Pendiente aceptación',
+                                          style: TextStyle(color: Colors.red),
+                                          maxLines:
+                                              2, // Evita que el texto exceda una línea
+                                          overflow: TextOverflow
+                                              .ellipsis, // Agrega "..." si el texto es demasiado largo
                                         ),
                                       ],
                                     ),

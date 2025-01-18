@@ -82,25 +82,25 @@ class _RegistroEmpleadosState extends State<RegistroEmpleados> {
           spacing: 20,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            /*  Text(
               widget.dataPorLink,
               style: TextStyle(color: Colors.grey, fontSize: 12),
               textAlign: TextAlign.center,
-            ),
-            Icon(Icons.store, size: 100, color: Colors.blue),
+            ), */
+            const Icon(Icons.store, size: 100, color: Colors.blue),
             Text(
               'Únete a $nombreNegocio',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            Text(
+            const Text(
               'Crea una cuenta para aceptar la invitación',
               style: TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
             ),
             TextField(
               controller: emailController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
               ),

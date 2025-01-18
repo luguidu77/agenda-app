@@ -1,3 +1,4 @@
+import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/models/models.dart';
 
 String formatearFecha(String fechaOriginal) {
@@ -298,4 +299,96 @@ String textoHTML(String estadoCita, PerfilAdministradorModel negocio,
 </table><!-- End -->
 </body>
 </html> ''';
+}
+
+String textoHTMLInvitacion(
+    //https://agendadecitas.online/invitacion?id=1WosONwUBRqYDSc2JtYk&foto=https://firebasestorage.googleapis.com/v0/b/flutter-varios-576e6.appspot.com/o/agendadecitas%2Fadriananoemi067%40gmail.com%2Fclientes%2F%2B549116434-1681%2Ffoto?alt=media&token=babab7ff-4465-4728-b666-8ef8c82be410&name=Mario&email=hello@gmail.es&idNegocio=luguidu@hotmail.com&nombreNegocio=Agencia%20de%20Servicios
+    PerfilAdministradorModel negocio,
+    EmpleadoModel empleado) {
+  String emailNegocio = negocio.email!;
+  String negocioNombre = negocio.denominacion!;
+  String idEmpleado = empleado.id;
+  String nombreEmpleado = empleado.nombre;
+  String emailEmpleado = empleado.email;
+  String fotoEmpleado = empleado.foto;
+  String telefonoEmpleado = empleado.telefono;
+
+  return '''<!DOCTYPE html>
+<html lang="en" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+  <title>Invitación a unirte</title>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <!--[if mso]>
+  <xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch><o:AllowPNG/></o:OfficeDocumentSettings></xml>
+  <![endif]-->
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600" rel="stylesheet" type="text/css"/>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f7f7f7;
+      color: #333;
+    }
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background-color: #4caf50;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .content {
+      padding: 20px;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    .content p {
+      margin: 0 0 20px;
+    }
+    .footer {
+      background-color: #f1f1f1;
+      text-align: center;
+      padding: 10px;
+      font-size: 12px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h1>¡Te han enviado una invitación!</h1>
+    </div>
+    <div class="content">
+      <p>Hola, <strong>$nombreEmpleado</strong>:</p>
+      <p>Has recibido una invitación para unirte a <strong>$negocioNombre</strong> en <em>Agenda de citas</em>.</p>
+     
+    </div>
+    <div class="button-container">
+  <a href="https://agendadecitas.online/invitacion?id=$idEmpleado&foto=$fotoEmpleado&name=$nombreEmpleado&email=$emailEmpleado&telefono=$telefonoEmpleado&idNegocio=$emailNegocio&nombreNegocio=$nombreEmpleado" target="_blank">Aceptar invitación</a>
+</div>
+<br><br><br>
+    <div class="footer">
+      © {current_year} Agenda de citas. Todos los derechos reservados.
+    </div>
+  </div>
+</body>
+</html>
+ ''';
 }

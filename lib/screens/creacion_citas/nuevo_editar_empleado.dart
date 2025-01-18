@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
+import 'package:agendacitas/providers/Firebase/notificaciones.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
@@ -300,19 +303,22 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
             children: [
               Visibility(
                 visible: codVerif != 'verificado' && codVerif != '',
-                child: Card(
-                  color: Colors.red[200],
-                  child: Column(
-                    children: [
-                      Text(
-                          style: const TextStyle(color: Colors.white),
-                          '$nombre no ha completado su registro,\nfacilítale su código de verificación:'),
-                      Text(
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 19),
-                        ' $codVerif',
-                      ),
-                    ],
+                child: InkWell(
+                  onTap: () => _enviarEmailInvitacion(id),
+                  child: Card(
+                    color: Colors.red[200],
+                    child: Column(
+                      children: [
+                        Text(
+                            style: const TextStyle(color: Colors.white),
+                            '$nombre no ha completado su registro,\nenvíale una invitación'),
+                        /*  Text(
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 19),
+                          ' $codVerif',
+                        ), */
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -647,6 +653,56 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
     return (hayMenosDeTresStaff ? roles : rolesPersonalInhabilitado)
         .map((rol) => rolEmpleadoToString(rol))
         .toList();
+  }
+
+  _enviarEmailInvitacion(idEmpleado) async {
+    final providerEmpleado = context.read<EmpleadosProvider>();
+    List<EmpleadoModel> empleados = providerEmpleado.getEmpleados;
+
+    // Crear un Completer
+    final Completer<void> completer = Completer<void>();
+
+    // Mostrar diálogo de espera con Completer
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Evita que se cierre tocando fuera
+      builder: (BuildContext context) {
+        completer.future.then((_) {
+          // Cerramos el diálogo cuando el Completer complete
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pop();
+          }
+        });
+
+        return const Center(
+          child: CircularProgressIndicator(), // Indicador de carga
+        );
+      },
+    );
+
+    try {
+      // Buscar empleado
+      final empleado =
+          empleados.firstWhere((empleado) => empleado.id == idEmpleado);
+      print('id invitacion');
+      print(empleado.id);
+
+      // Simular envío de email
+      await emailInvitacion(empleado, _emailSesionUsuario);
+
+      // Mostrar mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Invitación enviada correctamente')),
+      );
+    } catch (e) {
+      // Manejo de errores
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al enviar la invitación: $e')),
+      );
+    } finally {
+      // Completar el Completer para cerrar el diálogo
+      completer.complete();
+    }
   }
 }
 

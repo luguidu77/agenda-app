@@ -220,7 +220,7 @@ class _BienvenidaState extends State<Bienvenida> {
           image: _buildImage('compartir.png'),
           decoration: pageDecoration,
         ),
-        PageViewModel(
+        /*   PageViewModel(
           title: "Vamos a configurar lo básico",
           // body:
 
@@ -282,7 +282,7 @@ class _BienvenidaState extends State<Bienvenida> {
             imageFlex: 2,
             safeArea: 0,
           ),
-        ),
+        ), */
         /*  PageViewModel(
           title: "Title of last page - reversed",
           bodyWidget: Row(
@@ -345,7 +345,6 @@ class _BienvenidaState extends State<Bienvenida> {
       dotsDecorator: const DotsDecorator(
         colors: [
           // ? colores para cada punto, debe ser IGUAL en numero que numero de paginas tenga
-          Colors.white,
           Colors.white,
           Colors.white,
           Colors.white,

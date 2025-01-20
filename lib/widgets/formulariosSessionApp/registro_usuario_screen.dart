@@ -1,8 +1,10 @@
+import 'package:agendacitas/providers/creacion_cuenta/cuenta_nueva_provider.dart';
 import 'package:agendacitas/widgets/dialogos/dialogo_linealpregessindicator.dart';
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../providers/providers.dart';
@@ -60,11 +62,9 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              child: loginRegistro ? formInicioSesion() : formCrearCuenta()),
-        ),
+        child: SingleChildScrollView(
+            //  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: loginRegistro ? formInicioSesion() : formCrearCuenta()),
       ),
     );
   }
@@ -204,6 +204,10 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
 
                       if (form.validate()) {
                         debugPrint('FORMULARIO LOGIN VALIDO');
+                        //
+                        context
+                            .read<CuentaNuevaProvider>()
+                            .setCuentaNueva(false);
 
                         dialogoLinealProgressIndicator(
                             context, 'Comprobando credenciales');
@@ -345,177 +349,127 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
 
         const SizedBox(height: 10),
         Form(
-            key: formKeyCrearCuenta,
-            autovalidateMode: AutovalidateMode.always,
-            child: Column(
-              children: [
-                //email----------------------------------------------------
-                hayEmailUsuario
-                    ? Container()
-                    : Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: Colors.white,
-                              )),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TextFormField(
-                              decoration: InputDecoration(
-                                  prefixIcon: IconTheme(
-                                    data: IconThemeData(
-                                        color: Colors.deepPurple[200]),
-                                    child: const Icon(Icons.email),
-                                  ),
-                                  border: InputBorder.none,
-                                  hintText: 'Email'),
-                              onSaved: (input) => email = input,
-                              validator: (value) =>
-                                  EmailValidator.validate(value!)
-                                      ? null
-                                      : "Introduce un email válido",
-                            ),
-                          ),
-                        ),
-                      ),
-
-                const SizedBox(height: 10),
-                //pasword ------------------------------------------------
+          key: formKeyCrearCuenta,
+          autovalidateMode: AutovalidateMode
+              .onUserInteraction, // Valida cuando interactúas con los campos.
+          child: Column(
+            children: [
+              // Email
+              if (!hayEmailUsuario)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white,
-                        )),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
-                        controller: ctlTextPassword1,
-                        decoration: InputDecoration(
-                            prefixIcon: IconTheme(
-                              data:
-                                  IconThemeData(color: Colors.deepPurple[200]),
-                              child: const Icon(Icons.password),
-                            ),
-                            border: InputBorder.none,
-                            hintText: 'Contraseña'),
-                        onSaved: (input) => password = input,
-                        validator: (input) => input!.isEmpty || input.length < 6
-                            ? "6 caracteres como minimo"
-                            : null,
-                      ),
-                    ),
+                  child: _buildTextField(
+                    hintText: 'Email',
+                    icon: Icons.email,
+                    validator: (value) {
+                      return EmailValidator.validate(value!)
+                          ? null
+                          : "Introduce un email válido";
+                    },
+                    onSaved: (value) => email = value,
                   ),
                 ),
-                const SizedBox(height: 10),
-                //repite pasword ------------------------------------------------
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white,
-                        )),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
-                        controller: ctlTextPassword2,
-                        decoration: InputDecoration(
-                            prefixIcon: IconTheme(
-                              data:
-                                  IconThemeData(color: Colors.deepPurple[200]),
-                              child: const Icon(Icons.password),
-                            ),
-                            border: InputBorder.none,
-                            hintText: 'Repite contraseña'),
-                        onSaved: (input) => password = input,
-                        validator: (input) {
-                          return input!.isEmpty ||
-                                  ctlTextPassword1.text != ctlTextPassword2.text
-                              ? "Las contraseñas deben coincidir"
-                              : null;
-                        },
-                      ),
-                    ),
+              const SizedBox(height: 10),
+
+              // Contraseña
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: _buildTextField(
+                  controller: ctlTextPassword1,
+                  hintText: 'Contraseña',
+                  icon: Icons.password,
+                  obscureText: false, // Esconde el texto
+                  validator: (input) => input != null && input.length >= 6
+                      ? null
+                      : "6 caracteres como mínimo",
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // Repetir contraseña
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: _buildTextField(
+                  controller: ctlTextPassword2,
+                  hintText: 'Repite contraseña',
+                  icon: Icons.password,
+                  obscureText: false,
+                  validator: (input) {
+                    return input == ctlTextPassword1.text
+                        ? null
+                        : "Las contraseñas deben coincidir";
+                  },
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // Política de privacidad
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Accediendo das tu consentimiento a la ',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
                   ),
-                ),
-                const SizedBox(height: 10),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Accediendo das tu consentimiento a la ',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        const url =
-                            'https://agendadecitas.cloud/politica-de-privacidad-de-la-agenda-de-citas';
-                        // ignore: deprecated_member_use
-                        if (await launchUrl(Uri.parse(url))) {
-                          await launchUrl(Uri.parse(url));
-                        } else {
-                          throw 'Could not launch $url';
-                        }
-                      },
-                      child: const Text(
-                        'política de privacidad ',
-                        style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10),
-                      ),
-                    )
-                  ],
-                ),
-                //BOTON CREAR CUENTA ------------------------------------------------
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: GestureDetector(
+                  GestureDetector(
                     onTap: () async {
-                      // ? INICIO DE SESION , DESCARGA DATOS DE FIREBASE
-
-                      final form = formKeyCrearCuenta.currentState;
-                      form!.save();
-
-                      if (form.validate()) {
-                        debugPrint('FORMULARIO CREACION CUENTA VALIDO');
-                        // ir a PaginaIconoAnimacion con mensaje ok en la creacion de la cuenta
-                        // y boton ir a inicio de sesion
-                        _irPaginaCreacionCuenta(email, password);
-                      } else {
-                        mensajeError(context, 'FORMULARIO NO VALIDO');
+                      const url =
+                          'https://agendadecitas.cloud/politica-de-privacidad-de-la-agenda-de-citas';
+                      try {
+                        await launchUrl(Uri.parse(url));
+                      } catch (e) {
+                        throw 'No se pudo abrir la URL: $url';
                       }
                     },
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                          color: Colors.deepPurple[300],
-                          borderRadius: BorderRadius.circular(22)),
-                      child: const Center(
-                          child: Text(
+                    child: const Text(
+                      'política de privacidad ',
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Botón CREAR CUENTA
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: GestureDetector(
+                  onTap: () {
+                    final form = formKeyCrearCuenta.currentState;
+                    if (form != null && form.validate()) {
+                      form.save();
+                      debugPrint('FORMULARIO CREACIÓN CUENTA VÁLIDO');
+                      _irPaginaCreacionCuenta(email!, ctlTextPassword1.text);
+                    } else {
+                      mensajeError(context, 'FORMULARIO NO VÁLIDO');
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple[300],
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    child: const Center(
+                      child: Text(
                         'CREAR CUENTA',
                         style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18),
-                      )),
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ],
-            )),
+              ),
+            ],
+          ),
+        ),
 
         const SizedBox(height: 25),
 
@@ -524,7 +478,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
     );
   }
 
-  void _irPaginaCreacionCuenta(email, password) {
+  void _irPaginaCreacionCuenta(String email, String password) {
     FocusScope.of(context).unfocus();
 
     Navigator.pushNamed(context, 'paginaIconoAnimacion', arguments: email);
@@ -555,6 +509,40 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   void _cierraDialogo() {
     Navigator.pop(context);
   }
+
+  Widget _buildTextField({
+    required String hintText,
+    required IconData icon,
+    TextEditingController? controller,
+    bool obscureText = false,
+    String? Function(String?)? validator,
+    void Function(String?)? onSaved,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          decoration: InputDecoration(
+            prefixIcon: IconTheme(
+              data: IconThemeData(color: Colors.deepPurple[200]),
+              child: Icon(icon),
+            ),
+            border: InputBorder.none,
+            hintText: hintText,
+          ),
+          validator: validator,
+          onSaved: onSaved,
+        ),
+      ),
+    );
+  }
 }
 
 class TextoDiasDePrueba extends StatelessWidget {
@@ -569,65 +557,69 @@ class TextoDiasDePrueba extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: Column(
-        children: [
-          RichText(
-            textAlign: TextAlign.justify,
-            text: TextSpan(
-                style: const TextStyle(fontSize: 14, color: Colors.black),
-                children: <TextSpan>[
-                  const TextSpan(
-                    text: 'Prueba durante ',
-                    style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
-                  ),
-                  TextSpan(
-                    text: '$diasDePrueba días',
-                    style: const TextStyle(
-                        color: Color.fromARGB(255, 41, 22, 151),
-                        fontWeight: FontWeight.bold),
-                  ),
-                  const TextSpan(
-                    text:
-                        ', todas las opciones y funcionalidades sin publicidad, sólo necesitas un email y una contraseña, puedes cancelar en cualquier momento. ',
-                    style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
-                  ),
-                  const TextSpan(
-                    text:
-                        'Una vez finalizado el periodo de prueba, tendrás la opción de continuar por ',
-                    style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
-                  ),
-                  const TextSpan(
-                    text: ' un sólo pago sin suscripción ',
-                    style: TextStyle(
-                        color: Color.fromARGB(255, 41, 22, 151),
-                        fontWeight: FontWeight.bold),
-                  ),
-                  /*  const TextSpan(
-                    text: '(precio de lanzamiento)',
-                    style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
-                  ), */
-                ]),
-          ),
-          const SizedBox(height: 10),
-          GestureDetector(
-            onTap: () async {
-              const url =
-                  'https://agendadecitas.cloud/pasos-a-seguir-para-la-eliminacion-de-su-cuenta';
-              if (await launchUrl(Uri.parse(url))) {
-                await launchUrl(Uri.parse(url));
-              } else {
-                throw 'Could not launch $url';
-              }
-            },
-            child: const Text(
-              'CÓMO ELIMINAR SU CUENTA Y/O SUS DATOS',
-              style: TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            RichText(
+              textAlign: TextAlign.justify,
+              text: TextSpan(
+                  style: const TextStyle(fontSize: 14, color: Colors.black),
+                  children: <TextSpan>[
+                    const TextSpan(
+                      text: 'Prueba durante ',
+                      style:
+                          TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
+                    ),
+                    TextSpan(
+                      text: '$diasDePrueba días',
+                      style: const TextStyle(
+                          color: Color.fromARGB(255, 41, 22, 151),
+                          fontWeight: FontWeight.bold),
+                    ),
+                    const TextSpan(
+                      text:
+                          ', todas las opciones y funcionalidades sin publicidad, sólo necesitas un email y una contraseña, puedes cancelar en cualquier momento. ',
+                      style:
+                          TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
+                    ),
+                    const TextSpan(
+                      text:
+                          'Una vez finalizado el periodo de prueba, tendrás la opción de continuar por ',
+                      style:
+                          TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
+                    ),
+                    const TextSpan(
+                      text: ' un sólo pago sin suscripción ',
+                      style: TextStyle(
+                          color: Color.fromARGB(255, 41, 22, 151),
+                          fontWeight: FontWeight.bold),
+                    ),
+                    /*  const TextSpan(
+                      text: '(precio de lanzamiento)',
+                      style: TextStyle(color: Color.fromARGB(255, 106, 105, 109)),
+                    ), */
+                  ]),
             ),
-          )
-        ],
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: () async {
+                const url = 'https://agendadecitas.online/comoeliminarcuenta';
+                if (await launchUrl(Uri.parse(url))) {
+                  await launchUrl(Uri.parse(url));
+                } else {
+                  throw 'Could not launch $url';
+                }
+              },
+              child: const Text(
+                'CÓMO ELIMINAR SU CUENTA Y/O SUS DATOS',
+                style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

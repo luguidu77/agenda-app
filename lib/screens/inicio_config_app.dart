@@ -2,6 +2,7 @@ import 'package:agendacitas/config/config_perfil_usuario.dart';
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/providers/creacion_cuenta/cuenta_nueva_provider.dart';
 import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
@@ -22,6 +23,7 @@ class InicioConfigApp extends StatefulWidget {
 }
 
 class _InicioConfigAppState extends State<InicioConfigApp> {
+  bool? creandoCuenta;
   getDisponibilidadSemanal(emailSesionUsuario) async {
     final disponibilidadSemanalProvider = await SincronizarFirebase()
         .getDisponibilidadSemanal(emailSesionUsuario);
@@ -30,16 +32,32 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    creandoCuenta = context.read<CuentaNuevaProvider>().esCuentaNueva;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
+          /*  if (creandoUsuario) {
+            // Mostrar un estado intermedio mientras se crea el usuario
+            FirebaseAuth.instance.signOut();
+
+            setState(() {
+              creandoUsuario = false;
+            });
+            // Navigator.pushNamed(context, '/');
+          } */
+
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (snapshot.hasData) {
+          if (snapshot.hasData && !creandoCuenta!) {
             final contextoCitas = context.watch<CitasProvider>();
 
             // LOGEADO EN FIREBASE

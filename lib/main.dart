@@ -4,6 +4,7 @@ import 'package:agendacitas/config/config_perfil_usuario.dart';
 import 'package:agendacitas/providers/FormularioBusqueda/formulario_busqueda_provider.dart';
 import 'package:agendacitas/providers/buttom_nav_notificaciones_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/providers/creacion_cuenta/cuenta_nueva_provider.dart';
 import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
 import 'package:agendacitas/registro_empleados/empleado_revisa_confirma.dart';
@@ -223,6 +224,8 @@ class _MyAppState extends State<MyApp> {
             create: (BuildContext context) => EmailUsuarioAppProvider()),
         ChangeNotifierProvider(
             create: (BuildContext context) => EmailAdministradorAppProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => CuentaNuevaProvider()),
       ],
       builder: (context, _) {
         return MaterialApp(

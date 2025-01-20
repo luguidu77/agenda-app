@@ -22,13 +22,13 @@ class SincronizarFirebase {
     debugPrint('sincronizando SUBIENDO datos a firebase');
     await _iniFirebase();
 
-    await _actualizaClientes(usuarioAPP, 'UPLOAD');
+    // await _actualizaClientes(usuarioAPP, 'UPLOAD');
 
-    await _actualizaCitas(usuarioAPP, 'UPLOAD');
+    // await _actualizaCitas(usuarioAPP, 'UPLOAD');
 
-    await _actualizaServicios(usuarioAPP, 'UPLOAD');
+    // await _actualizaServicios(usuarioAPP, 'UPLOAD');
 
-    await _actualizaPago(usuarioAPP, 'UPLOAD');
+    //await _actualizaPago(usuarioAPP, 'UPLOAD');
 
     await _configCamposPerfilUsuarioApp(usuarioAPP, 'UPLOAD');
 
@@ -37,6 +37,8 @@ class SincronizarFirebase {
     await _disponibilidadSemanal(usuarioAPP, 'UPLOAD');
 
     await _personaliza(usuarioAPP, 'UPLOAD');
+
+    await _empleados(usuarioAPP, 'UPLOAD');
 
     debugPrint('FIN sincronizando SUBIENDO datos a firebase');
   }
@@ -80,30 +82,11 @@ class SincronizarFirebase {
 //? CONFIGURA LOS CAMPOS DE FIREBASE - perfilUsuarioApp si no existen ////////////////////////////////////////////
 //? foto, denominacion, descripcion ,... ////////////////////////////////////////////
   _configCamposPerfilUsuarioApp(String usuarioAPP, String updown) async {
-    //referencia al documento
-    // final docRef = await _referenciaDocumento(usuarioAPP, 'perfil');
     try {
-      /*  // si no existen perfilUsuarioApp lo crea con los campos correspondientes
-      await docRef.doc('perfilUsuarioApp').get().then((data) async {
-        if (data.data() == null) {
-          await docRef.doc('perfilUsuarioApp').set({
-            'foto': '',
-            'denominacion': '',
-            'descripcion': '',
-            'telefono': '',
-            'website': '',
-            'facebook': '',
-            'instagram': '',
-            'ubicacion': '',
-            'email': usuarioAPP
-          });
-        }
-      }); */
-
       ///* NUEVA UBICACION DEL PERFIL DE USUARIO
       final docRefNuevo = db!.collection("agendacitasapp").doc(usuarioAPP);
       await docRefNuevo.get().then((data) async {
-        if (data.data() != null) {
+        if (data.data() == null) {
           await docRefNuevo.set({
             'foto': '',
             'denominacion': '',
@@ -114,7 +97,8 @@ class SincronizarFirebase {
             'instagram': '',
             'ubicacion': '',
             'email': usuarioAPP,
-            'registro': DateTime.now()
+            'registro': DateTime.now(),
+            'pago': false,
           });
         }
       });
@@ -158,6 +142,31 @@ class SincronizarFirebase {
         }
       });
     } catch (e) {}
+  }
+
+  // CREA ESTRUCTURA EMPLEADOS AGREGANDO A LA USUARIO COMO PERSONAL
+  _empleados(usuarioAPP, String updown) async {
+    //referencia al documento
+    final collectionRef = await _referenciaDocumento(usuarioAPP, 'empleados');
+    try {
+      // si no existen empleados lo crea con los campos correspondientes
+
+      await collectionRef.add({
+        'categoriaServicios': [],
+        'cod_verif': 'verificado',
+        'color': 4294901760,
+        'disponibilidadSemanal': [],
+        'email': usuarioAPP,
+        'emailUsuarioApp': usuarioAPP,
+        'foto': '',
+        'nombre': '',
+        'rol': ['administrador', 'gerente', 'personal'],
+        'telefono': '',
+      });
+    } catch (e) {
+      print('error estructura empleados $e');
+    }
+    ;
   }
 
   //? SINCRONIZA CLIENTES ////////////////////////////////////////////

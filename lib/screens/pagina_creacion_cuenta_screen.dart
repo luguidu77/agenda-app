@@ -1,5 +1,9 @@
+import 'package:agendacitas/providers/creacion_cuenta/cuenta_nueva_provider.dart';
+import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
 import 'package:agendacitas/widgets/widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:rive/rive.dart';
 
@@ -16,24 +20,20 @@ class PaginaIconoAnimado extends StatefulWidget {
 
 class _PaginaIconoAnimadoState extends State<PaginaIconoAnimado> {
   bool cuentaCreada = false;
+
   void creaCuentaUsuario() async {
+    // EL RESULTADO DE CREACION DE CUENTA ES CORRECTA
+    debugPrint('CREANDO NUEVA CUENTA');
+
+    //await PagoProvider().guardaPagado(false, widget.email.toString());
+    await configuracionInfoPagoRespaldo(widget.email);
+
+    context.read<CuentaNuevaProvider>().setCuentaNueva(true);
     // CREA EN FIREBASE UNA CUENTA NUEVA
+
     final res =
         await creaCuentaUsuarioApp(context, widget.email, widget.password);
-
-    if (res) {
-      // EL RESULTADO DE CREACION DE CUENTA ES CORRECTA
-      debugPrint('CREANDO NUEVA CUENTA');
-
-      await PagoProvider().guardaPagado(false, widget.email.toString());
-      configuracionInfoPagoRespaldo(widget.email);
-
-      /*  final cuentaCreada = context.read<CuentaCreada>();
-      cuentaCreada.setCuentaCreada(
-          true); // esta provider lo está escuchando pagina_icono_animado.dart */
-
-      setState(() => cuentaCreada = true);
-    }
+    setState(() => cuentaCreada = true);
   }
 
   @override
@@ -61,7 +61,7 @@ class _PaginaIconoAnimadoState extends State<PaginaIconoAnimado> {
   configuracionInfoPagoRespaldo(email) async {
     try {
       //GUARDA PAGO EN DISPOSITIVO
-      await PagoProvider().guardaPagado(true, email);
+      //  await PagoProvider().guardaPagado(true, email);
 
       // RESPALDO DATOS EN FIREBASE
       await SincronizarFirebase().sincronizaSubeFB(email);
@@ -88,7 +88,13 @@ class ExitoCreacionCuenta extends StatelessWidget {
         ),
         const Text('Cuenta creada con exito'),
         ElevatedButton(
-            onPressed: () => Navigator.pushReplacementNamed(context, 'home'),
+            onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (_) => RegistroUsuarioScreen(
+                            registroLogin: 'Login',
+                            usuarioAPP: '',
+                          )),
+                ),
             child: const Text('Accede'))
       ]),
     );

@@ -15,6 +15,8 @@
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="default_channel" />
         <activity android:name=".MainActivity">
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="keyboardHidden|orientation|screenSize">
          <intent-filter android:autoVerify="true"> 
               <action android:name="android.intent.action.VIEW" />
               <category android:name="android.intent.category.DEFAULT" />

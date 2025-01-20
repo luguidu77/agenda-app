@@ -46,9 +46,7 @@ Future<bool> creaCuentaUsuarioApp(
     // REGISTRO AUTHENTICATION FIREBASE POR EMAIL Y CONTRASEÑA
     await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: password);
-    //1º INICIO SESION FIREBASE CON EMAIL Y CONTRASEÑA
-    /*  await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password);
+
     //SI EL INICIO DE SESION HA SIDO CORRECTO, EJECUTA LO SIGUIENTE: (retorna true como formulario validado) */
     return true;
   } on FirebaseAuthException catch (e) {

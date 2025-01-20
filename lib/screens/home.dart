@@ -196,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // FirebaseAuth.instance.signOut();
+    //FirebaseAuth.instance.signOut();
 
     themeProvider = context.watch<ThemeProvider>();
 

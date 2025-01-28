@@ -90,9 +90,7 @@ class _ServiciosCreacionCitaState extends State<ServiciosCreacionCita> {
   _body(context) {
     return Expanded(
       child: FutureBuilder(
-        future: _iniciadaSesionUsuario
-            ? cargaServiciosFB(_emailSesionUsuario!)
-            : cargarDatosServiciosDispositivo(),
+        future: cargaServiciosFB(_emailSesionUsuario!),
         builder: (
           BuildContext context,
           AsyncSnapshot<dynamic> snapshot,

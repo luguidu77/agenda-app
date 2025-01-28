@@ -43,16 +43,6 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          /*  if (creandoUsuario) {
-            // Mostrar un estado intermedio mientras se crea el usuario
-            FirebaseAuth.instance.signOut();
-
-            setState(() {
-              creandoUsuario = false;
-            });
-            // Navigator.pushNamed(context, '/');
-          } */
-
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }

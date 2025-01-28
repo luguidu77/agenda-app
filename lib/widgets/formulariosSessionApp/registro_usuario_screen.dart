@@ -2,6 +2,7 @@ import 'package:agendacitas/providers/creacion_cuenta/cuenta_nueva_provider.dart
 import 'package:agendacitas/widgets/dialogos/dialogo_linealpregessindicator.dart';
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -59,6 +60,10 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
 
   @override
   Widget build(BuildContext context) {
+    email = FirebaseAuth.instance.currentUser?.email;
+    if (email != null) {
+      hayEmailUsuario = true;
+    }
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: SafeArea(
@@ -80,7 +85,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
         // hello again!
         Text(
           hayEmailUsuario
-              ? 'Hola ${widget.usuarioAPP.toString().split('@')[0]}!'
+              ? 'Hola ${email.toString().split('@')[0]}!'
               : 'Hola!, ...',
           style: GoogleFonts.bebasNeue(fontSize: 40),
         ),
@@ -204,7 +209,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
 
                       if (form.validate()) {
                         debugPrint('FORMULARIO LOGIN VALIDO');
-                        //
+                        // ACTUALIZA EL PROVIDER DE CUENTA NUEVA para que en inicio_config_app.dart  acceda a la pantalla home
                         context
                             .read<CuentaNuevaProvider>()
                             .setCuentaNueva(false);
@@ -268,10 +273,11 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                           children: [
                             GestureDetector(
                               onTap: () async {
-                                // GUARDA EN EL PROVIDER Y LIMPIA VARIABLES PARA QUE SE PUEDA INICIAR SESION CON OTRO EMAIL
-                                await PagoProvider().guardaPagado(false, '');
+                                /*   // GUARDA EN EL PROVIDER Y LIMPIA VARIABLES PARA QUE SE PUEDA INICIAR SESION CON OTRO EMAIL
+                                await PagoProvider().guardaPagado(false, ''); */
                                 hayEmailUsuario = false;
                                 email = '';
+                                await FirebaseAuth.instance.signOut();
 
                                 setState(() {});
                               },

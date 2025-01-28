@@ -1058,7 +1058,7 @@ class FirebaseProvider extends ChangeNotifier {
     personalizaProvider.setPersonaliza(personaliza);
   }
 
-  Future<void> actualizaPersonaliza(context, String emailUsuario,
+  Future<bool> actualizaPersonaliza(context, String emailUsuario,
       PersonalizaModelFirebase personaliza) async {
     Map<String, Object?> newPersonaliza = {
       'codPais': personaliza.codpais,
@@ -1066,11 +1066,22 @@ class FirebaseProvider extends ChangeNotifier {
       'moneda': personaliza.moneda,
       'tiempoRecordatorio': personaliza.tiempoRecordatorio,
     };
+    try {
+      // Inicialización de Firebase y referencia al documento
+      await _iniFirebase();
+      final docRef = await _referenciaDocumento(emailUsuario, 'personaliza');
+      docRef.doc('configuracion').get().then((doc) {
+        if (doc.exists) {
+          docRef.doc('configuracion').update(newPersonaliza);
+        } else {
+          docRef.doc('configuracion').set(newPersonaliza);
+        }
+      });
 
-    // Inicialización de Firebase y referencia al documento
-    await _iniFirebase();
-    final docRef = await _referenciaDocumento(emailUsuario, 'personaliza');
-    await docRef.doc('configuracion').update(newPersonaliza);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   elimarCita(String emailUsuarioAPP, id) async {

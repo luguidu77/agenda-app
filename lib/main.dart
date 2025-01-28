@@ -226,6 +226,10 @@ class _MyAppState extends State<MyApp> {
             create: (BuildContext context) => EmailAdministradorAppProvider()),
         ChangeNotifierProvider(
             create: (BuildContext context) => CuentaNuevaProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => PaginacionProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => PrimeraConfiguracionProvider()),
       ],
       builder: (context, _) {
         return MaterialApp(

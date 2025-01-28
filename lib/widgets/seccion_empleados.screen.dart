@@ -92,6 +92,18 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
     final empleadosProvider = context.watch<EmpleadosProvider>();
     empleadosStaff = empleadosProvider.getEmpleadosStaff;
 
+    /*   if (empleadosStaff.length == 1) {
+      CitaModelFirebase edicionContextoCita = CitaModelFirebase(
+        idEmpleado: empleadosStaff[0].id,
+        colorEmpleado: empleadosStaff[0].color,
+        nombreEmpleado: empleadosStaff[0].nombre,
+      );
+      if (mounted) {
+        final contextoCreacionCita = context.read<CreacionCitaProvider>();
+        contextoCreacionCita.setContextoCita(edicionContextoCita);
+      }
+    } */
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -120,8 +132,10 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
 
     if (empleadosStaff.length == 1) {
       CitaModelFirebase edicionContextoCita = CitaModelFirebase(
-          idEmpleado: empleadosStaff[0].id,
-          colorEmpleado: empleadosStaff[0].color);
+        idEmpleado: empleadosStaff[0].id,
+        colorEmpleado: empleadosStaff[0].color,
+        nombreEmpleado: empleadosStaff[0].nombre,
+      );
       if (mounted) {
         final contextoCreacionCita = context.read<CreacionCitaProvider>();
         contextoCreacionCita.setContextoCita(edicionContextoCita);

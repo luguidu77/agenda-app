@@ -39,6 +39,7 @@ class PersonalizaModelFirebase {
   String? mensaje;
   String? colorTema;
   String? tiempoRecordatorio;
+  //horario de apertura y cierre de la app . ? deberia ser coordinado con la
 
   PersonalizaModelFirebase({
     this.id,

@@ -119,6 +119,9 @@ dependencies:
   #enlace a la app desde link
   app_links: ^6.3.3
 
+  #para leer archivos svg
+  flutter_svg: ^2.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -140,6 +143,7 @@ flutter:
     - assets/google_pay_payment_profile.json
     - assets/icon/
     - assets/images/
+    - assets/flags/
     - assets/bienvenida_img/
 
   #   - images/a_dot_ham.jpeg

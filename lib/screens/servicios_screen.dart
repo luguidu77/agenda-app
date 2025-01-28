@@ -479,10 +479,7 @@ class _ServiciosScreenState extends State<ServiciosScreen> {
           ),
           IconButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => HomeScreen(index: 3, myBnB: 3)));
+                Navigator.pop(context);
               },
               icon: const Icon(
                 Icons.close,

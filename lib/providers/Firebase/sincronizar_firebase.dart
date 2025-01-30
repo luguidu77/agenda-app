@@ -1,7 +1,10 @@
 import 'package:agendacitas/firebase_options.dart';
+import 'package:agendacitas/models/empleado_model.dart';
+import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 
 import '../../models/models.dart';
 import '../db_provider.dart';
@@ -38,7 +41,7 @@ class SincronizarFirebase {
 
     await _personaliza(usuarioAPP, 'UPLOAD');
 
-    await _empleados(usuarioAPP, 'UPLOAD');
+    // await _empleados(context, usuarioAPP, 'UPLOAD');
 
     debugPrint('FIN sincronizando SUBIENDO datos a firebase');
   }
@@ -145,28 +148,29 @@ class SincronizarFirebase {
   }
 
   // CREA ESTRUCTURA EMPLEADOS AGREGANDO A LA USUARIO COMO PERSONAL
-  _empleados(usuarioAPP, String updown) async {
+  creaUsuariocomoEmpleado(EmpleadoModel empleado) async {
+    await _iniFirebase();
     //referencia al documento
-    final collectionRef = await _referenciaDocumento(usuarioAPP, 'empleados');
+    final collectionRef =
+        await _referenciaDocumento(empleado.email, 'empleados');
     try {
       // si no existen empleados lo crea con los campos correspondientes
 
       await collectionRef.add({
-        'categoriaServicios': [],
-        'cod_verif': 'verificado',
+        'categoriaServicios': empleado.categoriaServicios,
+        'cod_verif': empleado.codVerif,
         'color': 4294901760,
-        'disponibilidadSemanal': [],
-        'email': usuarioAPP,
-        'emailUsuarioApp': usuarioAPP,
-        'foto': '',
-        'nombre': '',
+        'disponibilidadSemanal': empleado.disponibilidad,
+        'email': empleado.email,
+        'emailUsuarioApp': empleado.emailUsuarioApp,
+        'foto': empleado.foto,
+        'nombre': empleado.nombre,
         'rol': ['administrador', 'gerente', 'personal'],
-        'telefono': '',
+        'telefono': empleado.telefono,
       });
     } catch (e) {
       print('error estructura empleados $e');
     }
-    ;
   }
 
   //? SINCRONIZA CLIENTES ////////////////////////////////////////////

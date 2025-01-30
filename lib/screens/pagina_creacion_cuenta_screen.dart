@@ -1,7 +1,10 @@
+import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/providers/creacion_cuenta/cuenta_nueva_provider.dart';
 
 import 'package:agendacitas/widgets/widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'package:flutter/material.dart';
 
@@ -482,6 +485,7 @@ class _HorarioAperturaState extends State<HorarioApertura> {
 
   // Función para mostrar el selector de hora
   Future<void> _seleccionarHora(bool esApertura) async {
+    final contextoConfiguracion = context.read<PrimeraConfiguracionProvider>();
     TimeOfDay horaSeleccionada = esApertura ? apertura : cierre;
     final TimeOfDay? nuevaHora = await showTimePicker(
       context: context,
@@ -492,11 +496,15 @@ class _HorarioAperturaState extends State<HorarioApertura> {
       setState(() {
         if (esApertura) {
           apertura = nuevaHora;
+          final contextoConfiguracion =
+              context.read<PrimeraConfiguracionProvider>();
         } else {
           cierre = nuevaHora;
         }
       });
     }
+    contextoConfiguracion.setHorario(
+        apertura.format(context), cierre.format(context));
   }
 
   @override
@@ -724,6 +732,8 @@ class PrimeraConfiguracionProvider extends ChangeNotifier {
   bool _configuracionCompleta = false;
   bool get configuracionCompleta => _configuracionCompleta;
 
+  String _idEmpleado = '';
+  String get idEmpleado => _idEmpleado;
   String _nombreUsuario = '';
   String get nombreUsuario => _nombreUsuario;
   String _telefonoEmpresa = '';
@@ -742,6 +752,11 @@ class PrimeraConfiguracionProvider extends ChangeNotifier {
   String get apertura => _apertura;
   String _cierre = '';
   String get cierre => _cierre;
+
+  void setIdEmpleado(String id) {
+    _idEmpleado = id;
+    notifyListeners();
+  }
 
   void setNombreyTelefono(String nombre, String telefono) {
     _nombreUsuario = nombre;
@@ -882,8 +897,10 @@ class _BontonProgresoState extends State<BontonProgreso> {
   }
 
   _botonContinuar(pageViewProvider) {
+    final usuarioEmail = FirebaseAuth.instance.currentUser!.email.toString();
+
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         /*  final contextoConfiguracion =
             context.read<PrimeraConfiguracionProvider>();
         contextoConfiguracion.setCodPaisyMoneda(
@@ -894,7 +911,40 @@ class _BontonProgresoState extends State<BontonProgreso> {
           pageViewProvider.actualizarPagina(_paginaActual);
           setState(() {});
         } else {
-          print('ir a la pantalla de inicio');
+          //guardar en contexto de la app
+          final contextoConfiguracion =
+              context.read<PrimeraConfiguracionProvider>();
+
+          ///guardar en firebase la configuracion de la cuenta····················
+          ///documento configuracion
+          final nuevoConfiguracion = PersonalizaModelFirebase(
+              moneda: contextoConfiguracion.moneda['icon'],
+              codpais: contextoConfiguracion.codigoPais,
+              colorTema: '0xFF000000',
+              tiempoRecordatorio: '24:00');
+
+          await FirebaseProvider()
+              .actualizaPersonaliza(context, usuarioEmail, nuevoConfiguracion);
+
+          ///documento empleado
+          final edicionEmpleado = EmpleadoModel(
+              id: contextoConfiguracion.idEmpleado,
+              nombre: contextoConfiguracion.nombreUsuario,
+              telefono: contextoConfiguracion.telefonoEmpresa,
+              emailUsuarioApp: usuarioEmail,
+              disponibilidad: [],
+              email: usuarioEmail,
+              categoriaServicios: [],
+              foto: '',
+              color: 4294901760,
+              codVerif: 'verificado',
+              roles: []);
+
+          await SincronizarFirebase().creaUsuariocomoEmpleado(edicionEmpleado);
+
+          /// navegar a la pantalla de inicio ····································
+          print('ir a la pantalla de inicio sesion');
+
           /*   Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => RegistroUsuarioScreen(
                     registroLogin: 'Login',

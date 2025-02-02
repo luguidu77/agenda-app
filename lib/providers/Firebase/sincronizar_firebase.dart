@@ -148,7 +148,8 @@ class SincronizarFirebase {
   }
 
   // CREA ESTRUCTURA EMPLEADOS AGREGANDO A LA USUARIO COMO PERSONAL
-  creaUsuariocomoEmpleado(EmpleadoModel empleado, String denomininacion) async {
+  creaUsuariocomoEmpleado(EmpleadoModel empleado, String denomininacion,
+      String horaApertura, String horaCierre) async {
     await _iniFirebase();
     //referencia al documento
     final collectionRef =
@@ -181,6 +182,8 @@ class SincronizarFirebase {
       'denominacion': denomininacion,
       'descripcion': '',
       'telefono': empleado.telefono,
+      'horaApertura': horaApertura,
+      'horaCierre': horaCierre,
     });
   }
 

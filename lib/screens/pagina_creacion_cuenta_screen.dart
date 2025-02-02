@@ -208,6 +208,7 @@ class _PersonalizaUsuarioState extends State<PersonalizaUsuario> {
     final contextoConfiguracion = context.read<PrimeraConfiguracionProvider>();
     nombreController.text = contextoConfiguracion.nombreUsuario;
     telefonoController.text = contextoConfiguracion.telefonoEmpresa;
+    denominacionController.text = contextoConfiguracion.denominacionNegocio;
     return Padding(
       padding: const EdgeInsets.all(18.0),
       child: SingleChildScrollView(
@@ -425,21 +426,26 @@ class _PersonalizaPaisState extends State<PersonalizaPais> {
                       ),
                       onChanged: (value) {
                         codigoPaisController.text = value!;
-                        contextoConfiguracion.setCodPaisyMoneda(
-                            value, contextoConfiguracion.moneda);
+                        /*  contextoConfiguracion.setCodPaisyMoneda(
+                            value, contextoConfiguracion.moneda); */
 
-                        Map<String, String>? selectedCurrency =
+                        Map<String, String>? selectedPais =
                             countries.firstWhere(
                           (currency) => currency['code'] == value,
                           orElse: () =>
                               {}, // Opcional: Manejar caso de no encontrar resultado
                         );
 
-                        contextoConfiguracion.setCodPaisyMoneda(
-                            value, selectedCurrency);
+                        Map pais = {
+                          'codigo': selectedPais['code'],
+                          'nombre': selectedPais['name'],
+                          'bandera': selectedPais['flag'],
+                          'moneda': selectedPais['icon'],
+                        };
 
-                        print('País seleccionado: $value');
-                        print(countries.first['flag']);
+                        contextoConfiguracion.setCodPaisyMoneda(pais);
+
+                        print('País seleccionado: ${pais}');
                       },
                       items: countries.map((country) {
                         return DropdownMenuItem<String>(
@@ -603,57 +609,135 @@ class _ResumenPersonalizacionState extends State<ResumenPersonalizacion> {
   Widget build(BuildContext context) {
     final contextoConfiguracion = context.read<PrimeraConfiguracionProvider>();
     return Padding(
-      padding: const EdgeInsets.all(18.0),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
       child: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Column(
-              spacing: 30,
+            Padding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              child: Text(
+                'Resumen de la personalización',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[800],
+                  letterSpacing: 0.5,
+                  height: 1.4,
+                ),
+              ),
+            ),
+            Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Column(
+                  children: [
+                    _buildSummaryItem(
+                      title: 'Nombre de Usuario',
+                      value: contextoConfiguracion.nombreUsuario,
+                      icon: Icons.person_outline,
+                    ),
+                    _buildDivider(),
+                    _buildSummaryItem(
+                      title: 'Teléfono de Empresa',
+                      value: contextoConfiguracion.telefonoEmpresa,
+                      icon: Icons.phone_android_outlined,
+                    ),
+                    _buildDivider(),
+                    _buildSummaryItem(
+                      title: 'País',
+                      value: contextoConfiguracion.nombrePais,
+                      icon: Icons.public_outlined,
+                    ),
+                    _buildDivider(),
+                    _buildSummaryItem(
+                      title: 'Horario Laboral',
+                      value:
+                          'De ${contextoConfiguracion.apertura} a ${contextoConfiguracion.cierre}',
+                      icon: Icons.access_time_outlined,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Puedes agregar aquí un botón de confirmación si es necesario
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return const Divider(
+      height: 1,
+      thickness: 1,
+      indent: 16,
+      endIndent: 16,
+      color: Colors.black12,
+    );
+  }
+
+  Widget _buildSummaryItem(
+      {required String title, required String value, required IconData icon}) {
+    final contextoConfiguracion = context.read<PrimeraConfiguracionProvider>();
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 20, color: Colors.blue.shade700),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Resumen de la personalización de tu cuenta:',
-                  textAlign: TextAlign.center,
+                  title,
                   style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[800],
-                    height: 1.5,
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                // Aquí puedes mostrar un resumen de la personalización de la cuenta
-                // Por ejemplo, el nombre de usuario, el teléfono, el país, la moneda, etc.
-                // Puedes mostrarlo en un ListView, en un Column, etc.
-                // Aquí un ejemplo de cómo mostrarlo en un ListView
-                ListView(
-                  shrinkWrap: true,
+                const SizedBox(height: 4),
+                Row(
                   children: [
-                    ListTile(
-                      title: const Text('Nombre de Usuario'),
-                      subtitle: Text(contextoConfiguracion.nombreUsuario),
+                    Visibility(
+                      visible: icon == Icons.public_outlined,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Image.asset(contextoConfiguracion.banderaPais,
+                            height: 25, width: 25),
+                      ),
                     ),
-                    ListTile(
-                      title: const Text('Teléfono de Empresa'),
-                      subtitle: Text(contextoConfiguracion.telefonoEmpresa),
-                    ),
-                    ListTile(
-                      title: const Text('País'),
-                      subtitle: Text(contextoConfiguracion.codigoPais),
-                    ),
-                    ListTile(
-                      title: const Text('Moneda'),
-                      subtitle: Text(contextoConfiguracion.moneda['icon']),
-                    ),
-                    ListTile(
-                      title: const Text('Horario Laboral'),
-                      subtitle: Text(
-                          'De ${contextoConfiguracion.apertura} a ${contextoConfiguracion.cierre}'),
+                    Text(
+                      value,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[800],
+                        fontWeight: FontWeight.w600,
+                        height: 1.3,
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -734,16 +818,15 @@ class PrimeraConfiguracionProvider extends ChangeNotifier {
   String get nombreUsuario => _nombreUsuario;
   String _telefonoEmpresa = '';
   String get telefonoEmpresa => _telefonoEmpresa;
+
+  String _nombrePais = 'España';
+  String get nombrePais => _nombrePais;
+  String _banderaPais = 'España';
+  String get banderaPais => _banderaPais;
   String _codigoPais = '34';
   String get codigoPais => _codigoPais;
-  Map _moneda = {
-    'code': '34',
-    'flag': 'assets/flags/es.png',
-    'name': 'España',
-    'symbol': 'EUR',
-    'icon': '€'
-  };
-  Map get moneda => _moneda;
+  String _moneda = '€';
+  String get moneda => _moneda;
   String _apertura = '';
   String get apertura => _apertura;
   String _cierre = '';
@@ -761,9 +844,11 @@ class PrimeraConfiguracionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setCodPaisyMoneda(String codPais, Map moneda) {
-    _codigoPais = codPais;
-    _moneda = moneda;
+  void setCodPaisyMoneda(Map pais) {
+    _codigoPais = pais['codigo'];
+    _moneda = pais['moneda'];
+    _nombrePais = pais['nombre'];
+    _banderaPais = pais['bandera'];
     notifyListeners();
   }
 
@@ -915,7 +1000,7 @@ class _BontonProgresoState extends State<BontonProgreso> {
           ///guardar en firebase la configuracion de la cuenta····················
           ///documento configuracion
           final nuevoConfiguracion = PersonalizaModelFirebase(
-              moneda: contextoConfiguracion.moneda['icon'],
+              moneda: contextoConfiguracion.moneda,
               codpais: contextoConfiguracion.codigoPais,
               colorTema: '0xFF000000',
               tiempoRecordatorio: '24:00');
@@ -938,7 +1023,11 @@ class _BontonProgresoState extends State<BontonProgreso> {
               roles: []);
 
           await SincronizarFirebase().creaUsuariocomoEmpleado(
-              edicionEmpleado, contextoConfiguracion.denominacionNegocio);
+            edicionEmpleado,
+            contextoConfiguracion.denominacionNegocio,
+            contextoConfiguracion.apertura,
+            contextoConfiguracion.cierre,
+          );
 
           /// navegar a la pantalla de inicio ····································
           print('ir a la pantalla de inicio sesion');

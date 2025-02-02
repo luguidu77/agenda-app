@@ -148,7 +148,7 @@ class SincronizarFirebase {
   }
 
   // CREA ESTRUCTURA EMPLEADOS AGREGANDO A LA USUARIO COMO PERSONAL
-  creaUsuariocomoEmpleado(EmpleadoModel empleado) async {
+  creaUsuariocomoEmpleado(EmpleadoModel empleado, String denomininacion) async {
     await _iniFirebase();
     //referencia al documento
     final collectionRef =
@@ -171,6 +171,17 @@ class SincronizarFirebase {
     } catch (e) {
       print('error estructura empleados $e');
     }
+
+    await _iniFirebase();
+    final docPerfilRef =
+        await db!.collection("agendacitasapp").doc(empleado.emailUsuarioApp);
+
+    await docPerfilRef.update({
+      'foto': '',
+      'denominacion': denomininacion,
+      'descripcion': '',
+      'telefono': empleado.telefono,
+    });
   }
 
   //? SINCRONIZA CLIENTES ////////////////////////////////////////////
@@ -402,14 +413,33 @@ class SincronizarFirebase {
   //? CREA ESTRUCTURA CATEGORIA DE SERVICIOS ////////////////////////////////////////////
   _configCategoriaServicios(String usuarioAPP) async {
     //referencia al documento
-    final docRef = await _referenciaDocumento(usuarioAPP, 'categoriaServicio');
+    final colecCatRef =
+        await _referenciaDocumento(usuarioAPP, 'categoriaServicio');
     try {
       // si no existen perfilUsuarioApp lo crea con los campos correspondientes
-      await docRef.doc().get().then((data) async {
+      await colecCatRef.doc().get().then((data) async {
         if (data.data() == null) {
-          await docRef.doc('sincategoria').set({
+          await colecCatRef.doc('sincategoria').set({
             'nombreCategoria': 'Sin categoría',
             'detalle': 'sin categoria',
+          });
+        }
+      });
+    } catch (e) {}
+
+    final colecServRef = await _referenciaDocumento(usuarioAPP, 'servicio');
+    try {
+      // si no existen perfilUsuarioApp lo crea con los campos correspondientes
+      await colecServRef.doc().get().then((data) async {
+        if (data.data() == null) {
+          await colecServRef.doc().set({
+            'activo': 'true',
+            'servicio': 'Servicio',
+            'tiempo': "01:00",
+            'precio': 50,
+            'detalle': 'Servicio de prueba',
+            'categoria': 'sincategoria',
+            'index': 1
           });
         }
       });

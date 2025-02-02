@@ -202,6 +202,7 @@ class _PersonalizaUsuarioState extends State<PersonalizaUsuario> {
   bool personalizadoUsuario = false;
   TextEditingController nombreController = TextEditingController();
   TextEditingController telefonoController = TextEditingController();
+  TextEditingController denominacionController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final contextoConfiguracion = context.read<PrimeraConfiguracionProvider>();
@@ -209,100 +210,93 @@ class _PersonalizaUsuarioState extends State<PersonalizaUsuario> {
     telefonoController.text = contextoConfiguracion.telefonoEmpresa;
     return Padding(
       padding: const EdgeInsets.all(18.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Column(
-            spacing: 30,
-            children: [
-              Text(
-                'Designa tu nombre de usuaio y tu teléfono de empresa.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[800],
-                  height: 1.5,
-                ),
+      child: SingleChildScrollView(
+        child: Column(
+          spacing: 8,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              'Designa la denominación y contacto del negocio, y el usuario que aparecerá en las citas.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[800],
+                height: 1.5,
               ),
-              Form(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextFormField(
-                      onChanged: (value) =>
-                          contextoConfiguracion.setNombreyTelefono(
-                              nombreController.text, telefonoController.text),
-                      controller:
-                          nombreController, // Controlador para el nombre de usuario
-                      decoration: const InputDecoration(
-                        hintText: 'nombre de usuario',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Este campo no puede estar vacío';
-                        }
-                        return null;
-                      },
+            ),
+            Form(
+              child: Column(
+                spacing: 8,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextFormField(
+                    onChanged: (value) =>
+                        contextoConfiguracion.setNombreyTelefono(
+                            nombreController.text,
+                            telefonoController.text,
+                            denominacionController.text),
+                    controller:
+                        denominacionController, // Controlador para el nombre de usuario
+                    decoration: const InputDecoration(
+                      hintText: 'Denominación del negocio',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.location_city),
                     ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      onChanged: (value) =>
-                          contextoConfiguracion.setNombreyTelefono(
-                              nombreController.text, telefonoController.text),
-                      controller:
-                          telefonoController, // Controlador para el teléfono de la empresa
-                      keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(
-                        hintText: 'teléfono de empresa',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.phone),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Este campo no puede estar vacío';
-                        } else if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
-                          return 'Introduce un número válido';
-                        }
-                        return null;
-                      },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Este campo no puede estar vacío';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    onChanged: (value) =>
+                        contextoConfiguracion.setNombreyTelefono(
+                            nombreController.text,
+                            telefonoController.text,
+                            denominacionController.text),
+                    controller:
+                        telefonoController, // Controlador para el teléfono de la empresa
+                    keyboardType: TextInputType.phone,
+                    decoration: const InputDecoration(
+                      hintText: 'teléfono de empresa',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.phone),
                     ),
-                  ],
-                ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Este campo no puede estar vacío';
+                      } else if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+                        return 'Introduce un número válido';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    onChanged: (value) =>
+                        contextoConfiguracion.setNombreyTelefono(
+                            nombreController.text,
+                            telefonoController.text,
+                            denominacionController.text),
+                    controller:
+                        nombreController, // Controlador para el nombre de usuario
+                    decoration: const InputDecoration(
+                      hintText: 'nombre de usuario',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.person),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Este campo no puede estar vacío';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
               ),
-
-              /*     nuevoPersonaliza = PersonalizaModelFirebase(
-                      moneda: monedaController.text == ''
-                          ? '€'
-                          : monedaController.text,
-                      codpais: codigoPaisController.text == ''
-                          ? '34'
-                          : codigoPaisController.text,
-                      colorTema: '0xFF000000',
-                      tiempoRecordatorio: '24:00');
-          
-                  // guarda en firebase
-                  String email =
-                      FirebaseAuth.instance.currentUser!.email.toString();
-                  final actualizadoCorrectamente = await FirebaseProvider()
-                      .actualizaPersonaliza(context, email, nuevoPersonaliza); */
-
-              /*   if (actualizadoCorrectamente) {
-                    setState(() {
-                      personalizadoPais = true;
-                    });
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            'Error al guardar la configuración de la cuenta'),
-                      ),
-                    );
-                  } */
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -734,6 +728,8 @@ class PrimeraConfiguracionProvider extends ChangeNotifier {
 
   String _idEmpleado = '';
   String get idEmpleado => _idEmpleado;
+  String _denominacionNegocio = '';
+  String get denominacionNegocio => _denominacionNegocio;
   String _nombreUsuario = '';
   String get nombreUsuario => _nombreUsuario;
   String _telefonoEmpresa = '';
@@ -758,9 +754,10 @@ class PrimeraConfiguracionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setNombreyTelefono(String nombre, String telefono) {
+  void setNombreyTelefono(String nombre, String telefono, String denominacion) {
     _nombreUsuario = nombre;
     _telefonoEmpresa = telefono;
+    _denominacionNegocio = denominacion;
     notifyListeners();
   }
 
@@ -940,7 +937,8 @@ class _BontonProgresoState extends State<BontonProgreso> {
               codVerif: 'verificado',
               roles: []);
 
-          await SincronizarFirebase().creaUsuariocomoEmpleado(edicionEmpleado);
+          await SincronizarFirebase().creaUsuariocomoEmpleado(
+              edicionEmpleado, contextoConfiguracion.denominacionNegocio);
 
           /// navegar a la pantalla de inicio ····································
           print('ir a la pantalla de inicio sesion');

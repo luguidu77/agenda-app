@@ -31,25 +31,16 @@ class _BotonConfirmarCitaWebState extends State<BotonConfirmarCitaWeb> {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(
-        context.watch<EstadoConfirmacionCita>().estadoCita
-            ? 'CITA CONFIRMADA'
-            : 'CITA SIN CONFIRMAR',
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
-        ),
+    return ElevatedButton.icon(
+      style: ButtonStyle(
+          backgroundColor:
+              WidgetStatePropertyAll(const Color.fromARGB(0, 252, 251, 251))),
+      icon: _cargando ? const CircularProgressIndicator() : Container(),
+      onPressed: _cambiaEstadoConfirmacion,
+      label: const Text(
+        'Reservada',
+        style: TextStyle(fontSize: 14, color: Colors.white),
       ),
-      trailing: context.watch<EstadoConfirmacionCita>().estadoCita
-          ? null
-          : _cargando
-              ? const CircularProgressIndicator()
-              : ElevatedButton(
-                  onPressed: _cambiaEstadoConfirmacion,
-                  child: const Text('CONFIRMAR'),
-                ),
     );
   }
 

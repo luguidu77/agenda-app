@@ -106,15 +106,15 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
         appBar: AppBar(
           actions: [
             ElevatedButton.icon(
-                style: ButtonStyle(
-                    foregroundColor: const WidgetStatePropertyAll(
+                style: const ButtonStyle(
+                    foregroundColor: WidgetStatePropertyAll(
                       Colors.white,
                     ),
                     backgroundColor: WidgetStatePropertyAll(
-                      Theme.of(context).primaryColor,
+                      Colors.black,
                     )),
                 label: Text(
-                  nuevoCliente ? 'NUEVO CLIENTE' : 'ACTUALIZAR CLIENTE',
+                  nuevoCliente ? 'GUARDAR' : 'ACTUALIZAR CLIENTE',
                 ),
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
@@ -131,7 +131,10 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
                     }
                   }
                 },
-                icon: const Icon(Icons.save))
+                icon: const Icon(Icons.save, color: Colors.white)),
+            const SizedBox(
+              width: 10,
+            ),
           ],
         ),
         body: Padding(
@@ -139,86 +142,92 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
           child: ListView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  // Carga de imagen o indicador de carga
-                  !cargandoImagen
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(10.0),
-                          child: _iniciadaSesionUsuario &&
-                                  myLogic.textControllerFoto.text.isNotEmpty
-                              ? Image.network(
-                                  myLogic.textControllerFoto.text,
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.asset(
-                                  "./assets/images/nofoto.jpg",
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.cover,
-                                ),
-                        )
-                      : const CircularProgressIndicator(),
-                  const SizedBox(width: 10),
-                  // Botones para seleccionar imagen
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton.icon(
-                          label: const Text('MI IMÁGENES'),
-                          onPressed: () async {
-                            if (_iniciadaSesionUsuario) {
-                              setState(() {
-                                cargandoImagen = true;
-                              });
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // Carga de imagen o indicador de carga
+                      !cargandoImagen
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0),
+                              child: _iniciadaSesionUsuario &&
+                                      myLogic.textControllerFoto.text.isNotEmpty
+                                  ? Image.network(
+                                      myLogic.textControllerFoto.text,
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.asset(
+                                      "./assets/images/nofoto.jpg",
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                            )
+                          : const CircularProgressIndicator(),
+                      const SizedBox(width: 10),
+                      // Botones para seleccionar imagen
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton.icon(
+                              label: const Text('MI IMÁGENES'),
+                              onPressed: () async {
+                                if (_iniciadaSesionUsuario) {
+                                  setState(() {
+                                    cargandoImagen = true;
+                                  });
 
-                              final image = await getImageGaleria(
-                                  _emailSesionUsuario,
-                                  cliente.telefono ?? '',
-                                  cliente);
-                              myLogic.textControllerFoto.text = image;
+                                  final image = await getImageGaleria(
+                                      _emailSesionUsuario,
+                                      cliente.telefono ?? '',
+                                      cliente);
+                                  myLogic.textControllerFoto.text = image;
 
-                              setState(() {
-                                cargandoImagen = false;
-                              });
-                            } else {
-                              mensajeInfo(
-                                  context, 'NO DISPONIBLE SIN INICIAR SESIÓN');
-                            }
-                          },
-                          icon: const Icon(Icons.image),
+                                  setState(() {
+                                    cargandoImagen = false;
+                                  });
+                                } else {
+                                  mensajeInfo(context,
+                                      'NO DISPONIBLE SIN INICIAR SESIÓN');
+                                }
+                              },
+                              icon: const Icon(Icons.image),
+                            ),
+                            const SizedBox(height: 10),
+                            ElevatedButton.icon(
+                              label: const Text('HAZ UNA FOTO'),
+                              onPressed: () async {
+                                if (_iniciadaSesionUsuario) {
+                                  setState(() {
+                                    cargandoImagen = true;
+                                  });
+
+                                  final image = await getImageFoto(
+                                      _emailSesionUsuario,
+                                      cliente.telefono ?? '');
+                                  myLogic.textControllerFoto.text = image;
+
+                                  setState(() {
+                                    cargandoImagen = false;
+                                  });
+                                } else {
+                                  mensajeInfo(context,
+                                      'NO DISPONIBLE SIN INICIAR SESIÓN');
+                                }
+                              },
+                              icon: const Icon(Icons.photo_camera),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 10),
-                        ElevatedButton.icon(
-                          label: const Text('HAZ UNA FOTO'),
-                          onPressed: () async {
-                            if (_iniciadaSesionUsuario) {
-                              setState(() {
-                                cargandoImagen = true;
-                              });
-
-                              final image = await getImageFoto(
-                                  _emailSesionUsuario, cliente.telefono ?? '');
-                              myLogic.textControllerFoto.text = image;
-
-                              setState(() {
-                                cargandoImagen = false;
-                              });
-                            } else {
-                              mensajeInfo(
-                                  context, 'NO DISPONIBLE SIN INICIAR SESIÓN');
-                            }
-                          },
-                          icon: const Icon(Icons.photo_camera),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
               const SizedBox(
                   height: 20), // Espacio entre la fila y el formulario
@@ -498,14 +507,15 @@ class _NuevoActualizacionClienteState extends State<NuevoActualizacionCliente> {
         .nuevoCliente(_emailSesionUsuario, nombre, telefono, email, foto, nota)
         .whenComplete(() {
       debugPrint('cliente nuevo añadido en Firebase!!');
-      Navigator.pop(context);
-      _actualiza();
+      _navegaPaginaClientes();
     });
   }
 
-  _actualiza() {
-    mensajeInfo(
-        context, 'Contacto Agregado, \nArrastra la lista para actualizar');
+  void _navegaPaginaClientes() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => HomeScreen(index: 2, myBnB: 2)));
   }
 
   void _alertaYaExiste(existe) {

@@ -293,8 +293,7 @@ class _ConfigPerfilAdministradorState extends State<ConfigPerfilAdministrador>
                         child: ListTile(
                           onTap: () async {
                             _alertaCerrado();
-                            await PagoProvider().guardaPagado(
-                                _iniciadaSesionUsuario!, _emailSesionUsuario!);
+
                             await FirebaseAuth.instance.signOut();
                             _irHome();
                           },

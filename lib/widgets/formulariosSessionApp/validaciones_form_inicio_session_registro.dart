@@ -1,34 +1,32 @@
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:app_settings/app_settings.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-Future<String> validateLoginInput(context, email, password) async {
-  String data = "";
-  try {
-    //INICIALIZA FIREBASE
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
-
-    //1º INICIO SESION FIREBASE CON EMAIL Y CONTRASEÑA
-    await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password)
-        .then((value) async {
-      //value trae los credenciales del usuario. Se puede utilizar para agregarlo al provider
-      /*  UserCredential(additionalUserInfo: AdditionalUserInfo(isNewUser: false, profile: {}, providerId: null, username: null), credential: null, user: User(displayName: null, email: loli@gmail.com, emailVerified: false, isAnonymous: false, metadata: UserMetadata(creationTime: 2023-05-27 10:13:07.348Z, lastSignInTime: 2023-05-27 10:19:22.222Z), phoneNumber: null, photoURL: null, providerData, [UserInfo(displayName: null, email: loli@gmail.com, phoneNumber: null, photoURL: null, providerId: password, uid: loli@gmail.com)], refreshToken: , tenantId: null, uid: Z3TCba6YfwMCERs6oqpqIghtyWc2)) */
-
-      data = value.toString();
-    });
-  } on FirebaseAuthException catch (e) {
-    // ERRORES DE INICIO DE SESION
-    //'wrong-password'
-    // 'user-not-found'
-    //'too-many-requests'(BLOQUEADO USUARIO TEMPORALMENTE POR MAS DE 10 INTENTOS DESDE UNA MISMA IP)
-    return e.code;
+Future<String> validateLoginInput(
+    BuildContext context, String email, String password) async {
+  if (email.isEmpty || password.isEmpty) {
+    return "Email y contraseña son obligatorios";
   }
 
-  return data;
+  try {
+    // 🚀 INICIO SESIÓN EN FIREBASE
+    UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    return userCredential.user?.uid ?? "Usuario autenticado, pero sin UID";
+  } on FirebaseAuthException catch (e) {
+    return e.code; // Devuelve el código de error de Firebase
+  } catch (e) {
+    return "Error inesperado: $e"; // Maneja cualquier otro error
+  }
 }
 
 // ? LOS NUEVOS USUARIOS PAGO 1ª OPCION

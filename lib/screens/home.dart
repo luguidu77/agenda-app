@@ -271,9 +271,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 perfilUsuarioApp: null,
                 usuarioAPP: '',
               ),
-          'ModificacionCitaScreen': (context) => const DetallesCitaScreen(
+          'ModificacionCitaScreen': (context) => const DetallesCitaWidget(
+                fechaCorta: '',
+                citaconfirmada: false,
+                // personaliza: personaliza,
                 emailUsuario: '',
-                reserva: null,
+                iniciadaSesionUsuario: true,
               ),
           'FichaClienteScreen': (context) => FichaClienteScreen(
                 clienteParametro: ClienteModel(),

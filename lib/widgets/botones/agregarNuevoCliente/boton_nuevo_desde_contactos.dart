@@ -47,11 +47,7 @@ class _BotonNuevoDesdeContactoState extends State<BotonNuevoDesdeContacto> {
 
   GestureDetector botonClienteTelefono(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        _iniciadaSesionUsuario
-            ? _showContactList(context)
-            : mensajeError(context, 'No disponible en versión gratuita');
-      },
+      onTap: () => _showContactList(context),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.green, // Color de fondo

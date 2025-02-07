@@ -95,17 +95,11 @@ class _ListaClientesState extends State<ListaClientes> {
 
                   // SI HAY DATA PERO ESTA VACIA SE VISUALIZA ICONO CAJA VACIA eJ: CUANDO SE HACE BUSQUEDA Y NO HAY COINCIDENCIAS
                   if (data.isEmpty) {
-                    return Center(
-                      child: Column(
-                        children: [
-                          //Text('Sin resultados'),
-                          SizedBox(
-                              width: 150,
-                              child:
-                                  Image.asset('./assets/images/caja-vacia.png'))
-                        ],
-                      ),
-                    );
+                    return ListView(children: [
+                      SizedBox(
+                          height: 125,
+                          child: Image.asset('./assets/images/caja-vacia.png')),
+                    ]);
                   }
                   // ORDENA ALFABETICAMENTE POR NOMBRE CLIENTE
                   data.sort((a, b) => a.nombre!

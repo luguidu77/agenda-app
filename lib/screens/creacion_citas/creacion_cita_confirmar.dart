@@ -719,7 +719,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
     print(horafinal);
 
     final startHour = DateTime(
-        horainicio.year, horainicio.month, horainicio.day, 9); // 9:00 AM
+        horainicio.year, horainicio.month, horainicio.day, 8); // 8:00 AM
 
     print(
         'hora apertura ..................................................................');

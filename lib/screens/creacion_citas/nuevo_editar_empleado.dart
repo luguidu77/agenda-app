@@ -306,12 +306,12 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                 child: InkWell(
                   onTap: () => _enviarEmailInvitacion(id),
                   child: Card(
-                    color: Colors.red[200],
+                    color: const Color.fromARGB(255, 238, 197, 197),
                     child: Column(
                       children: [
                         Text(
                             style: const TextStyle(color: Colors.white),
-                            '$nombre no ha completado su registro,\nenvíale una invitación'),
+                            '$nombre no ha completado su registro,\nenvíale una invitación 📤'),
                         /*  Text(
                           style: const TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 19),
@@ -388,6 +388,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
               ),
               const SizedBox(height: 16),
               TextFormField(
+                keyboardType: TextInputType.emailAddress,
                 initialValue: controllerEmail.text,
                 enabled: _isEmailFieldEnabled,
                 decoration: const InputDecoration(
@@ -404,6 +405,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
               ),
               const SizedBox(height: 16),
               TextFormField(
+                keyboardType: TextInputType.number,
                 initialValue: telefono,
                 decoration: const InputDecoration(
                   labelText: 'Teléfono',

@@ -61,8 +61,10 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   @override
   Widget build(BuildContext context) {
     email = FirebaseAuth.instance.currentUser?.email;
-    if (email != null) {
-      hayEmailUsuario = true;
+    print('hay sesion activa en firebase $email');
+    if (email == null) {
+      hayEmailUsuario = false;
+      email = '';
     }
     return Scaffold(
       backgroundColor: Colors.grey[300],
@@ -222,8 +224,8 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                           Navigator.pop(context);
                         }); */
 
-                        var res =
-                            await validateLoginInput(context, email, password);
+                        var res = await validateLoginInput(
+                            context, email!, password!);
 
                         if (res == 'wrong-password') {
                           _cierraDialogo();

@@ -17,12 +17,28 @@ class CitasProvider extends ChangeNotifier {
   }
 
   void agregaCitaAlContexto(CitaModelFirebase nuevaCita) {
-    if (!_citas
-        .any((cita) => cita.id == nuevaCita.id || nuevaCita.id == null)) {
-      _citas.add(nuevaCita); // Solo agrega si no existe ya
-      // _citasCargadas = false;
-      notifyListeners();
+    // Si el id de la cita es null, no la agregamos.
+    if (nuevaCita.id == null) {
+      print("No se agrega la cita porque su id es null.");
+      return;
     }
+
+    // Busca si ya existe una cita con el mismo id.
+    bool existe = _citas.any((cita) {
+      print(
+          "Comparando cita existente con id: ${cita.id} vs nueva cita id: ${nuevaCita.id}");
+      return cita.id == nuevaCita.id;
+    });
+
+    if (existe) {
+      print("La cita con id ${nuevaCita.id} ya existe en el contexto.");
+      return;
+    }
+
+    // Si no existe, la agregamos
+    _citas.add(nuevaCita);
+    print("Cita agregada, total de citas: ${_citas.length}");
+    notifyListeners();
   }
 
   void eliminacitaAlContexto(String id) {

@@ -697,7 +697,11 @@ class FirebaseProvider extends ChangeNotifier {
       if (fecha.split('-')[0] == anual) {
         //    _servicio = await DBProvider.db.getServicioPorId(item.idservicio! + 1);
 
-        double precio = (cita.precio != '') ? double.parse(cita.precio!) : 0;
+        double precio = (cita.precio != '' &&
+                cita.precio !=
+                    'null') //  '' para antiguas versiones . 'null' para cuando se trata de indispuestos
+            ? double.parse(cita.precio!)
+            : 0;
         if (cita.confirmada == "") {
           // verifico que exita el campo "confirmada" en firebase(antiguas versiones no estaba este dato)
           // sin no existiera, agregare a la lista por defecto

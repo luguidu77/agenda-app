@@ -1,4 +1,5 @@
 import 'package:agendacitas/models/models.dart';
+import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/widgets/line_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -57,14 +58,9 @@ class _InformesScreenState extends State<InformesScreen> {
 
     var fecha = dateFormat.format(fechaElegida);
 
-    if (_iniciadaSesionUsuario) {
-      citas = await FirebaseProvider()
-          .cargarCitasAnual(context, _emailSesionUsuario, fecha);
-      debugPrint('TRAE LAS CITAS ANUALES GUARDADAS EN FIREBASE');
-    } else {
-      citas = await CitaListProvider().cargarCitasAnual(fecha);
-      debugPrint('TRAE LAS CITAS ANUALES GUARDADAS EN DISPOSITIVO');
-    }
+    citas = await FirebaseProvider()
+        .cargarCitasAnual(context, _emailSesionUsuario, fecha);
+    debugPrint('TRAE LAS CITAS ANUALES GUARDADAS EN FIREBASE');
 
     List faux = citas.map((e) => e['fecha']).toList();
     List paux = citas.map((e) => e['precio']).toList();
@@ -156,13 +152,12 @@ class _InformesScreenState extends State<InformesScreen> {
   DateTime fechaElegida = DateTime.now();
   String fechaTexto = '';
   bool? pagado;
-  bool _iniciadaSesionUsuario = false;
+
   String _emailSesionUsuario = '';
 
   emailUsuario() async {
-    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
-    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
-    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
+    final estadoProvider = context.read<EmailAdministradorAppProvider>();
+    _emailSesionUsuario = estadoProvider.emailAdministradorApp;
   }
 
   @override

@@ -27,6 +27,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:provider/provider.dart';
+import 'package:rive_splash_screen/rive_splash_screen.dart';
 
 import 'config/.configuraciones.dart';
 import 'models/models.dart';
@@ -95,9 +96,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  // Agrega estas variables a nivel de clase
+
   final _navigatorKey = GlobalKey<NavigatorState>();
   late AppLinks _appLinks;
   StreamSubscription<Uri>? _linkSubscription;
+
   bool inicioConfigApp = false;
   List hayServicios = [];
   String usuarioAPP = '';
@@ -105,60 +109,19 @@ class _MyAppState extends State<MyApp> {
 
   bool variablePago = false;
 
-  reseteoprueba() async {
-    //todo quitar , es solo pruebas para guadado en dispositivo de pago
-    // await PagoProvider().guardaPagado(false, '');
-    // FirebaseAuth.instance.signOut();
-
-    /* 
-      ?LOGICA DE INICIO:
-      DISPOSITIVO
-
-      PAGO    EMAIL                    CARGAR EN PERFILPROVIDER:
-     
-      FALSE    ''            ---------->  'GRATUITO'                 ----> FORMULARIO 1 (INICIO DE SESION / CREAR CUENTA)
-      FALSE    'EMAIL@EMAIL' ---------->  'PRUEBA_ACTIVA'            ----> INCIA SESION CON EMAIL, FORMULARIO 2 'login'
-      TRUE     'EMAIL@EMAIL' ---------->  'PROPIETARIO'              ----> INCIA SESION CON EMAIL, FORMULARIO 2 'login' O VER LA POSIBILIDAD DE INICIAR SESION AUTOMATICAMENTE 
-                                           
-      AL INICIAR SESION                     COMPROBACION EN FIREBASE            
-       
-       CARGAR EN PERFILPROVIDER:              <15 DIAS DESDE REGISTRO                    'PRUEBA_ACTIVA'        -----> GUARDA EN DISPOSITIVO -> PAGO:FALSE , EMAIL'EMAIL@EMAIL'
-        'PRUEBA_ACTIVA'                       >15 DIAS DESDE REGISTRO                    ' GRATUITA    '        -----> GUARDA EN DISPOSITIVO -> PAGO:FALSE , EMAIL'' , MENSAJE DE ELIMINACION DE CUENTA Y BORRAR REGISTRO AUTENTIFICACION USUARIO EN FIREBASE(DEJAR DATOS EN FIRESTORE)
-    
-        'PROPIETARIO'                 (YA SE HA REALIZADO AL COMPROBAR EN DISPOSITIVO = NO HACER NADA EN PERFILPROVIDER )  --> CALENDARIOSCREEN  
-    
-    
-    
-      AL CREAR  CUENTA PRUEBA 15 DIAS  -----> GUARDAR EN DISPOSITIVO ->  PAGO: FALSE ,'EMAIL@EMAIL'  -> CARGA EN PERFILPROVIDER: 'PRUEBA_ACTIVA'   ----> INCIA SESION CON EMAIL, FORMULARIO 2 'login'
-             
-       
-
-     
-     */
-  }
-
-  inicializacion() async {
-    FlutterNativeSplash.remove();
-    //?comprueba pago en dispositivo
-    final pago = await CompruebaPago.getPagoEmailDispositivo();
-    debugPrint('datos gardados en tabla Pago (main.dart) $pago');
-
-    if (mounted) {
-      setState(() {
-        //? guardo en variables los datos de pago->  email
-        usuarioAPP = pago['email'];
-      });
-    }
-  }
-
   @override
   void initState() {
     // reseteoprueba();
-    //inicializacion();
-
-    super.initState();
 
     initDeepLinks();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _linkSubscription?.cancel();
+
+    super.dispose();
   }
 
   @override
@@ -236,10 +199,16 @@ class _MyAppState extends State<MyApp> {
             initialRoute: "/",
             navigatorKey: _navigatorKey,
             onGenerateRoute: (RouteSettings settings) {
-              Widget routeWidget;
+              // ruta por defecto
+              Widget routeWidget = HomeScreen(
+                index: 0,
+                myBnB: 0,
+              );
               // Analiza el nombre de la ruta
               final routeName = settings.name;
-
+              print('ruta ---------------------------------- $routeName');
+              print(
+                  'ruta ---------------------------------- ${routeName!.startsWith('/invitacion')}');
               if (routeName != null) {
                 if (routeName.startsWith('/invitacion')) {
                   try {
@@ -262,22 +231,10 @@ class _MyAppState extends State<MyApp> {
                   }
                 } else if (routeName == '/empleadoRevisaConfirma') {
                   routeWidget = const EmpleadoRevisaConfirma();
-                } else if (routeName == '/') {
-                  // Ruta inicial
-                  routeWidget = HomeScreen(
-                    index: 0,
-                    myBnB: 0,
-                  );
                 } else {
                   // Manejador por defecto para rutas desconocidas
                   routeWidget = NotFoundPage(); // Página 404
                 }
-              } else {
-                // Por si settings.name es null (improbable pero posible)
-                routeWidget = HomeScreen(
-                  index: 0,
-                  myBnB: 0,
-                );
               }
 
               return MaterialPageRoute(builder: (_) => routeWidget);
@@ -302,17 +259,23 @@ class _MyAppState extends State<MyApp> {
                 : inicioConfigApp
                     ? 'clientesScreen'
                     : 'clientesScreen', */
-            home: /*  SplashScreen.navigate(
-                 width: 200,
-              height: 200,
+            home:
+                /* 
+            // SI QUIERO PONER UN EL ICONO CON ALGUNA ANIMACION
+            SplashScreen.navigate(
+                width: 200,
+                height: 200,
                 fit: BoxFit.fitWidth,
                 until: () => Future.delayed(const Duration(seconds: 2)),
                 startAnimation: 'start',
                 loopAnimation: 'start',
                 backgroundColor: Colors.white,
                 name: 'assets/icon/splash.riv',
-                next: (context) => */
+                next: (context) =>  */
                 InicioConfigApp(usuarioAPP: usuarioAPP),
+
+            /*  */
+
             routes: {
               //home
               'Login': (context) =>
@@ -354,15 +317,18 @@ class _MyAppState extends State<MyApp> {
   Future<void> initDeepLinks() async {
     _appLinks = AppLinks();
 
-    // Handle links
-    _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
-      debugPrint('onAppLink: $uri');
+    // Manejar enlace inicial
+    Uri? initialUri = await _appLinks.getInitialLink();
 
-      openAppLink(uri);
+    if (initialUri != null) {
+      print('link recibido -------------------------');
+      _navigatorKey.currentState?.pushNamed(initialUri.fragment);
+    }
+
+    // Escuchar nuevos enlaces
+    _appLinks.uriLinkStream.listen((uri) {
+      print('escuchando link  ------------------------- ${uri.toString()}');
+      _navigatorKey.currentState?.pushNamed(uri.fragment);
     });
-  }
-
-  void openAppLink(Uri uri) {
-    _navigatorKey.currentState?.pushNamed(uri.fragment);
   }
 }

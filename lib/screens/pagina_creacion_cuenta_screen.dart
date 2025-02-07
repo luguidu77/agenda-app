@@ -1,6 +1,7 @@
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/providers/creacion_cuenta/cuenta_nueva_provider.dart';
+import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
 
 import 'package:agendacitas/widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -480,8 +481,8 @@ class HorarioApertura extends StatefulWidget {
 }
 
 class _HorarioAperturaState extends State<HorarioApertura> {
-  TimeOfDay apertura = TimeOfDay(hour: 9, minute: 0); // Hora de apertura
-  TimeOfDay cierre = TimeOfDay(hour: 18, minute: 0); // Hora de cierre
+  TimeOfDay apertura = TimeOfDay(hour: 8, minute: 0); // Hora de apertura
+  TimeOfDay cierre = TimeOfDay(hour: 22, minute: 0); // Hora de cierre
 
   // Función para mostrar el selector de hora
   Future<void> _seleccionarHora(bool esApertura) async {
@@ -777,18 +778,22 @@ class IconoAnimado extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: Column(
-        children: [
-          SizedBox(
-            width: 180,
-            height: 180,
-            child: rive.RiveAnimation.asset(
-              'assets/icon/iconoapp.riv',
-              fit: BoxFit.contain,
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 180,
+              height: 180,
+              child: rive.RiveAnimation.asset(
+                'assets/icon/iconoapp.riv',
+                fit: BoxFit.contain,
+              ),
             ),
-          ),
-          Text('creando cuenta...'),
-        ],
+            Text('creando cuenta...'),
+          ],
+        ),
       ),
     );
   }
@@ -821,15 +826,15 @@ class PrimeraConfiguracionProvider extends ChangeNotifier {
 
   String _nombrePais = 'España';
   String get nombrePais => _nombrePais;
-  String _banderaPais = 'España';
+  String _banderaPais = 'assets/flags/es.png';
   String get banderaPais => _banderaPais;
   String _codigoPais = '34';
   String get codigoPais => _codigoPais;
   String _moneda = '€';
   String get moneda => _moneda;
-  String _apertura = '';
+  String _apertura = '08:00';
   String get apertura => _apertura;
-  String _cierre = '';
+  String _cierre = '22:00';
   String get cierre => _cierre;
 
   void setIdEmpleado(String id) {
@@ -1032,11 +1037,15 @@ class _BontonProgresoState extends State<BontonProgreso> {
           /// navegar a la pantalla de inicio ····································
           print('ir a la pantalla de inicio sesion');
 
-          /*   Navigator.of(context).push(MaterialPageRoute(
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
               builder: (_) => RegistroUsuarioScreen(
-                    registroLogin: 'Login',
-                    usuarioAPP: '',
-                  ))); */
+                registroLogin: 'Login',
+                usuarioAPP: '',
+              ),
+            ),
+            (Route<dynamic> route) => false,
+          );
         }
         /* _paginaActual = 0;
         pageViewProvider.actualizarPagina(0); */
@@ -1050,7 +1059,7 @@ class _BontonProgresoState extends State<BontonProgreso> {
           borderRadius: BorderRadius.circular(25),
           gradient: LinearGradient(
             colors: _paginaActual == widget.paginas.length - 1
-                ? [
+                ? const [
                     Color.fromARGB(255, 68, 113, 172),
                     Color.fromARGB(255, 128, 139, 231)
                   ]
@@ -1071,7 +1080,7 @@ class _BontonProgresoState extends State<BontonProgreso> {
               ? 'Finalizar'
               : 'Continuar',
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.white,

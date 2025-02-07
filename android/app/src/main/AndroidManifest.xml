@@ -18,7 +18,9 @@
     <application
         android:label="Agenda de citas"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon">
+        android:icon="@mipmap/launcher_icon"
+        android:enableOnBackInvokedCallback="true">
+        
         
         <activity
             android:name=".MainActivity"
@@ -49,8 +51,7 @@
               <category android:name="android.intent.category.DEFAULT" />
               <category android:name="android.intent.category.BROWSABLE" />
               <data 
-                android:scheme="https" 
-                android:host="agendadecitas.online"/>
+                android:scheme="https" android:host="agendadecitas.online" android:pathPrefix="/" />
            </intent-filter>
 
         </activity>
@@ -67,7 +68,7 @@
             android:value="true" />
         <meta-data
             android:name="flutter_deeplinking_enabled"
-            android:value="true" />
+            android:value="false" />
             
   
     </application>

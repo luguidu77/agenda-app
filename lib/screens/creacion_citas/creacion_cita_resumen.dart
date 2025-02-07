@@ -7,10 +7,15 @@ import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
+import 'package:agendacitas/providers/personaliza_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/appBar.dart';
 import 'package:agendacitas/screens/home.dart';
+import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:agendacitas/utils/actualizacion_cita.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:app_settings/app_settings.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:agendacitas/providers/recordatorios_provider.dart';
 import 'package:agendacitas/widgets/compartirCliente/compartir_cita_a_cliente.dart';
@@ -72,24 +77,10 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
   String _emailSesionUsuario = '';
   bool _iniciadaSesionUsuario = false;
 
-  Future<String> tiempo() async {
-    await tiempoEstablecido.cargarTiempo().then((value) async {
-      if (value.isNotEmpty) {
-        tRecordatorioGuardado.add(value[0].tiempo.toString());
-        debugPrint('hay tiempo recordatorio establecido');
-      } else {
-        print('no hay tiempo establecido');
-        /*  await addTiempo();
-        tRecordatorioGuardado.add('00:30'); */
-      }
-    });
-
-    // si no hay tiempo establecido guarda uno por defecto de 30 minutos
-    //  if (tRecordatorioGuardado.isEmpty) await
-    // debugPrint('tRecordatorioGuardado : ${tRecordatorioGuardado.first}');
-    tiempoTextoRecord = '00:30'; //TODO: tRecordatorioGuardado.first.toString();
-    return tiempoTextoRecord;
-    // await guardalacita();
+  String tiempo() {
+    final personalizaProvier = context.read<PersonalizaProviderFirebase>();
+    final personaliza = personalizaProvier.getPersonaliza;
+    return personaliza.tiempoRecordatorio!;
   }
 
   double sumarPrecios(listaServicios) {
@@ -106,7 +97,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
   guardalacita() async {
     // tiempo recordatorio
-    String tiempoTextoRecord = await tiempo();
+    String tiempoTextoRecord = tiempo();
 
     // LLEER MICONTEXTO DE CreacionCitaProvider
     contextoCreacionCita = context.read<CreacionCitaProvider>();
@@ -139,9 +130,6 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     );
 
     if (tiempoTextoRecord != '') {
-      String tiempoAux =
-          '${cita.year.toString()}-${cita.month.toString().padLeft(2, '0')}-${cita.day.toString().padLeft(2, '0')} $tiempoTextoRecord';
-
       // si tiempo a restar es '24:00' , resto un día
       if (tiempoTextoRecord[0] == '2') {
         horaRecordatorio = cita
@@ -385,8 +373,21 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
   /// Detalles para compartir la cita con el cliente
   Column _buildSharingDetails(dynamic citaElegida) {
+    String formattedDate =
+        DateFormat('hh:mm dd-MM-yyyy').format(citaElegida.horaInicio);
+
     return Column(
+      spacing: 10,
       children: [
+        Divider(),
+        Text(
+          'Comparte la cita con ${clientaTexto}\n${formattedDate}',
+          style: const TextStyle(
+            color: Colors.blueGrey,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
         CompartirCitaConCliente(
           cliente: clientaTexto,
           telefono: telefono,
@@ -395,7 +396,6 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
           servicio: servicioTexto,
           precio: precioTexto,
         ),
-        const Divider(),
       ],
     );
   }
@@ -415,13 +415,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         onPressed: () {
           mensajeInfo(context, 'Actualizando agenda...');
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) => HomeScreen(
-                      index: 0,
-                      myBnB: 0,
-                    )),
-            (Route<dynamic> route) => false,
-          );
+              _createRoute(), (Route<dynamic> route) => false);
           liberarMemoriaEditingController();
         },
         icon: const Icon(
@@ -434,6 +428,30 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
           style: TextStyle(color: Colors.white),
         ),
       ),
+    );
+  }
+
+  Route _createRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => HomeScreen(
+        index: 0,
+        myBnB: 0,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0); // Comienza desde la derecha
+        const end = Offset.zero;
+        const curve = Curves.easeInOut;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var offsetAnimation = animation.drive(tween);
+
+        return SlideTransition(
+          position: offsetAnimation,
+          child: child,
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 300),
     );
   }
 
@@ -527,6 +545,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
   }
 
   void _creaCitaEnFirebase(citaElegida, idCitaCliente) async {
+    final contextCitas = context.read<CitasProvider>();
+    final contextNuevaCita = context.read<CreacionCitaProvider>();
     List<Map<String, dynamic>> servicios =
         contextoCreacionCita.getServiciosElegidos;
 
@@ -537,13 +557,10 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     String idCitaFB = await FirebaseProvider().nuevaCita(
         _emailSesionUsuario, citaElegida, idServicios, idCitaCliente);
 
-    final contextCitas = context.read<CitasProvider>();
-    final contextNuevaCita = context.read<CreacionCitaProvider>();
-
     contextNuevaCita.contextoCita.id = idCitaFB;
-
     contextNuevaCita.contextoCita.idservicio = idServicios;
     contextNuevaCita.contextoCita.confirmada = true;
+
     contextCitas.agregaCitaAlContexto(contextNuevaCita.contextoCita);
     print(
         'contexto de las citas ....................................................................');
@@ -563,26 +580,41 @@ class BackgroundPermissionDialog extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Para proporcionar la mejor experiencia de usuario, la aplicación necesita ejecutarse en segundo plano para realizar ciertas tareas, como enviar notificaciones importantes o actualizar datos automáticamente.',
+            '🔋 ¡Permite que la aplicación use batería en segundo plano!\nPara recibir notificaciones y recordatorios a tiempo.\n¡Así la app funcionará sin problemas! 🚀',
           ),
           SizedBox(height: 10),
           Text(
-            'AJUSTE-BATERIA-USO DE BATERIA POR APLICACION-AGENDA DE CITAS-PERMITIR ACTIVIDAD EN SEGUNDO PLANO.',
+            'ℹ️ INFORMACIÓN DE LA APLICACIÓN\n\n'
+            '🔋 Paso 1: Toca "Uso de la batería"\n\n'
+            '✅ Paso 2: Selecciona "Permitir actividad en segundo plano"',
+            textAlign: TextAlign.left,
           ),
           SizedBox(height: 10),
-          Text(
-            'Siempre puedes cambiar esta configuración más tarde en la sección de ajustes de la aplicación.',
-          ),
         ],
       ),
       actions: <Widget>[
         ElevatedButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.pop(context); // Cierra el diálogo antes de abrir ajustes
+            abrirConfiguracionBateria();
           },
-          child: const Text('Aceptar'),
+          child: const Text("Abrir configuración"),
         ),
       ],
     );
+  }
+
+  void abrirConfiguracionBateria() async {
+    const AndroidIntent intent = AndroidIntent(
+      action: 'android.settings.ACTION_POWER_USAGE_SUMMARY', // Acción correcta
+    );
+
+    try {
+      await intent.launch();
+    } catch (e) {
+      print("Error al abrir uso de batería: $e");
+      // Fallback: Abrir ajustes generales de la app
+      AppSettings.openAppSettings();
+    }
   }
 }

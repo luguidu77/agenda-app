@@ -264,24 +264,42 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
                 emailCliente: cita['email'],
                 notaCliente: cita['nota']);
 
-            showModalBottomSheet(
-                context: context,
-                isScrollControlled:
-                    true, // Para permitir más contenido si es necesario
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            // Reemplaza el showModalBottomSheet con esto:
+            Navigator.of(context).push(
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    DetallesCitaWidget(
+                  reserva: citaElegida,
+                  fechaCorta: 'anular',
+                  citaconfirmada: citaconfirmada.estadoCita,
+                  // personaliza: personaliza,
+                  emailUsuario: _emailSesionUsuario,
+                  iniciadaSesionUsuario: _iniciadaSesionUsuario,
                 ),
-                builder: (BuildContext context) {
-                  return FractionallySizedBox(
-                    heightFactor: 0.7, // 70% de la altura total de la pantalla
-                    child: Container(
-                      padding: const EdgeInsets.all(0),
-                      child: DetallesCitaScreen(
-                          emailUsuario: _emailSesionUsuario,
-                          reserva: citaElegida),
-                    ),
+                /*   DetallesCitaScreen(
+                  emailUsuario: _emailSesionUsuario,
+                  reserva: citaElegida,
+                ), */
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0); // Comienza desde la derecha
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
                   );
-                });
+                },
+                transitionDuration: const Duration(milliseconds: 300),
+                fullscreenDialog:
+                    true, // Para comportamiento de diálogo completo
+              ),
+            );
           } else {
             final citaElegida = CitaModelFirebase(
                 id: cita['id'],

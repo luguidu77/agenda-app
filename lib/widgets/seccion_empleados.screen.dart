@@ -127,6 +127,7 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
   }
 
   verTodosLosEmpleados(VistaProvider vistaProvider, CalendarView vistaActual) {
+    // Obtén el provider de creación de cita usando context.watch para reaccionar a sus cambios.
     final contextoCreacionCita = context.watch<CreacionCitaProvider>();
     bool seleccionado = false;
 
@@ -136,9 +137,18 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
         colorEmpleado: empleadosStaff[0].color,
         nombreEmpleado: empleadosStaff[0].nombre,
       );
+
       if (mounted) {
-        final contextoCreacionCita = context.read<CreacionCitaProvider>();
-        contextoCreacionCita.setContextoCita(edicionContextoCita);
+        // Posponer la actualización para después del frame actual
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          // Usamos context.read para no forzar otra reconstrucción
+          final contextCreacion = context.read<CreacionCitaProvider>();
+          // Actualizamos solo si el id no coincide ya (evita actualizaciones innecesarias)
+          if (contextCreacion.contextoCita.idEmpleado !=
+              edicionContextoCita.idEmpleado) {
+            contextCreacion.setContextoCita(edicionContextoCita);
+          }
+        });
       }
     } else {
       seleccionado =

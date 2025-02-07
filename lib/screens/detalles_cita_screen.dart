@@ -1,5 +1,8 @@
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/content_seccion.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/header_seccion.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/widgets_detalle_cita.dart';
 import 'package:agendacitas/screens/screens.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/widgets/botones/boton_confirmar_cita_reserva_web.dart';
@@ -14,7 +17,7 @@ import '../widgets/botones/form_reprogramar_reserva.dart';
 import '../widgets/compartirCliente/compartir_cita_a_cliente.dart';
 import '../widgets/elimina_cita.dart';
 
-class DetallesCitaScreen extends StatefulWidget {
+/* class DetallesCitaScreen extends StatefulWidget {
   final String emailUsuario;
   final CitaModelFirebase? reserva;
   const DetallesCitaScreen(
@@ -46,7 +49,7 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
   @override
   void initState() {
     Future.microtask(() => compruebaEstadoCita());
-
+    cargarDatos();
     super.initState();
   }
 
@@ -75,154 +78,124 @@ class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
         .add_Hm()
         .format((widget.reserva!.horaInicio!));
 
-    return Scaffold(
-        backgroundColor: colorFondo,
-        /*  appBar: AppBar(
-          title: Text('Detalle de la cita', style: subTituloEstilo),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new),
-            onPressed: () => Navigator.pop(context),
-          ),
+    return
+        /*   appBar: AppBar(
+          //title: Text(fechaCorta, style: subTituloEstilo),
+          leading: Container(),
           backgroundColor: colorFondo,
           elevation: 0,
+          actions: [
+            IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close)),
+            const SizedBox(
+              width: 10,
+            )
+          ],
         ), */
-        body: FutureBuilder<void>(
-            future:
-                cargarDatos(), // Aquí se espera a que los datos estén listos
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                    child:
-                        CircularProgressIndicator()); // Mientras se cargan los datos
-              } else if (snapshot.hasError) {
-                return Center(
-                    child: Text('Error: ${snapshot.error}')); // Si hay error
-              } else {
-                // Los datos se cargaron correctamente
-                return SingleChildScrollView(
-                    child: Column(
-                  children: [
-                    _DetallesCitaWidget(
-                      reserva: widget.reserva!,
-                      fechaCorta: fechaCorta,
-                      citaconfirmada: citaconfirmada.estadoCita,
-                      personaliza: personaliza,
-                      emailUsuario: _emailSesionUsuario,
-                      iniciadaSesionUsuario: _iniciadaSesionUsuario,
-                    ),
-                  ],
-                ));
-              }
-            }));
+        // Los datos se cargaron correctamente
+        DetallesCitaWidget(
+      reserva: widget.reserva!,
+      fechaCorta: fechaCorta,
+      citaconfirmada: citaconfirmada.estadoCita,
+      // personaliza: personaliza,
+      emailUsuario: _emailSesionUsuario,
+      iniciadaSesionUsuario: _iniciadaSesionUsuario,
+    );
   }
-}
-
-class _DetallesCitaWidget extends StatefulWidget {
-  final CitaModelFirebase reserva;
+} */
+class DetallesCitaWidget extends StatefulWidget {
+  final CitaModelFirebase? reserva;
   final String fechaCorta;
   final bool citaconfirmada;
-  final PersonalizaModelFirebase personaliza;
   final String emailUsuario;
   final bool iniciadaSesionUsuario;
 
-  const _DetallesCitaWidget({
-    required this.reserva,
+  const DetallesCitaWidget({
+    super.key,
+    this.reserva,
     required this.fechaCorta,
     required this.citaconfirmada,
-    required this.personaliza,
     required this.emailUsuario,
     required this.iniciadaSesionUsuario,
   });
 
   @override
-  State<_DetallesCitaWidget> createState() => _DetallesCitaWidgetState();
+  State<DetallesCitaWidget> createState() => _DetallesCitaWidgetState();
 }
 
-class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
+class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
+  late String _fechaFormateada;
+
+  @override
+  void initState() {
+    super.initState();
+    _fechaFormateada =
+        DateFormat('EEE d MMM', 'es_ES').format(widget.reserva!.horaInicio!);
+  }
+
   @override
   Widget build(BuildContext context) {
-    CitasProvider contextoCitaProvider = context.read<CitasProvider>();
-    print('····························reserva·······························');
-    print(widget.reserva.nombreEmpleado);
+    final personaliza =
+        context.read<PersonalizaProviderFirebase>().getPersonaliza;
     final citaconfirmada =
         Provider.of<EstadoConfirmacionCita>(context, listen: true);
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              gradient: _buildGradient(citaconfirmada.estadoCita),
-              boxShadow: [_buildBoxShadow()],
-            ),
-            padding: const EdgeInsets.all(16.0),
-            margin: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Column(
-              spacing: 10,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // BOTON CONFIRMAR DE LA CITA---------------------------------------------
-                _buildConfirmationButton(),
-                // CLIENTE DE LA CITA-----------------------------------------------------
-                _ClienteInfoWidget(reserva: widget.reserva),
 
-                // FECHA DE LA CITA ------------------------------------------------------
-                Text(widget.fechaCorta,
-                    style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white)),
-
-                // EMPLEADO ASIGNADO DE LA CITA-------------------------------------------
-                _EmpleadoInfoWidget(reserva: widget.reserva),
-                // SERVICIOS DE LA CITA----------------------------------------------------
-                Text(widget.reserva.servicios!.join(', '),
-                    style:
-                        const TextStyle(fontSize: 14, color: Colors.white54)),
-
-                // PRECIO DE LA CITA------------------------------------------------------
-                Text(
-                  'PRECIO: ${widget.reserva.precio} ${widget.personaliza.moneda}',
-                  style: const TextStyle(fontSize: 16, color: Colors.white70),
-                ),
-
-                // NOTAS DE LA CITA---------------------------
-                Text('Notas: ${widget.reserva.comentario}',
-                    style:
-                        const TextStyle(fontSize: 14, color: Colors.white54)),
-                const SizedBox(height: 90),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: -10,
-            right: 20,
-            child: Row(
-              children: [
-                _buildShareButton(),
-                _buildReassignButton(),
-                _buildDeleteButton(context, contextoCitaProvider),
-              ],
-            ),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        //title: Text(fechaCorta, style: subTituloEstilo),
+        leading: Container(),
+        backgroundColor: citaconfirmada.estadoCita ? Colors.blue : Colors.red,
+        elevation: 0,
+        actions: [
+          IconButton(
+              color: Colors.white,
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.close)),
+          const SizedBox(
+            width: 10,
+          )
         ],
+      ),
+      extendBodyBehindAppBar: true,
+      body: Container(
+        color: Colors.white,
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // HEADER DE LA VISTA   ################################
+              HeaderSection(
+                fecha: _fechaFormateada,
+                reserva: widget.reserva!,
+                citaconfirmada: citaconfirmada,
+              ),
+              const SizedBox(height: 20),
+              // CONTENIDO DE LA VISTA ################################
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ContentSection(
+                    reserva: widget.reserva!,
+                    personaliza: personaliza,
+                  ),
+                ),
+              ),
+              // FOOTER DE LA VISTA ################################
+              /*  ActionButtons(
+                reserva: widget.reserva!,
+                emailUsuario: widget.emailUsuario,
+                contextoCitaProvider: context.read<CitasProvider>(),
+              ), */
+            ],
+          ),
+        ),
       ),
     );
   }
+}
 
-  Widget _buildConfirmationButton() {
-    return widget.iniciadaSesionUsuario
-        ? BotonConfirmarCitaWeb(
-            cita: widget.reserva, emailUsuario: widget.emailUsuario)
-        : const Text(
-            'Cita confirmada',
-            style:
-                TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
-          );
-  }
-
+/*
   LinearGradient _buildGradient(bool citaconfirmada) {
     return citaconfirmada
         ? const LinearGradient(
@@ -252,17 +225,17 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
   Widget _buildShareButton() {
     String fechaCorta = DateFormat('EEE d MMM', 'es_ES')
         .add_Hm()
-        .format((widget.reserva.horaInicio!));
+        .format((widget.reserva!.horaInicio!));
     return CompartirCitaConCliente(
-      cliente: widget.reserva.nombreCliente!,
-      telefono: widget.reserva.telefonoCliente!,
-      email: widget.reserva.email,
-      fechaCita: widget.reserva.horaInicio!.toString(),
-      servicio: widget.reserva.servicios!
+      cliente: widget.reserva!.nombreCliente!,
+      telefono: widget.reserva!.telefonoCliente!,
+      email: widget.reserva!.email,
+      fechaCita: widget.reserva!.horaInicio!.toString(),
+      servicio: widget.reserva!.servicios!
           .join(', ')
           .toString(), // [servicio1, servicio2] por lo que le quito los corchetes
 
-      precio: widget.reserva.precio,
+      precio: widget.reserva!.precio,
     );
   }
 
@@ -279,7 +252,7 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
               height: 400,
               child: ListView(
                 children: [
-                  FormReprogramaReserva(cita: widget.reserva),
+                  FormReprogramaReserva(cita: widget.reserva!),
                 ],
               ),
             ));
@@ -300,13 +273,13 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
             context,
             contextoCitaProvider,
             0,
-            [widget.reserva],
+            [widget.reserva!],
             (widget.emailUsuario == '') ? false : true,
             widget.emailUsuario);
 
         if (res == true) {
           await FirebaseProvider()
-              .cancelacionCitaCliente(widget.reserva, widget.emailUsuario);
+              .cancelacionCitaCliente(widget.reserva!, widget.emailUsuario);
           Navigator.pushReplacementNamed(context, '/');
         }
       },
@@ -314,7 +287,7 @@ class _DetallesCitaWidgetState extends State<_DetallesCitaWidget> {
     );
   }
 }
-
+ */
 class _ClienteInfoWidget extends StatelessWidget {
   final CitaModelFirebase reserva;
 

@@ -22,6 +22,9 @@ class ContentSection extends StatelessWidget {
         WidgetsDetalleCita.vercliente(context, reserva),
         // SECCION DE LA CITA
         WidgetsDetalleCita.fechaCita(context, reserva),
+        // SECCION DE SERVICIOS
+        WidgetsDetalleCita.servicios(context, reserva, personaliza),
+
         Container(
           height: 900,
         )

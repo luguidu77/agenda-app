@@ -18,3 +18,4 @@ export '../../providers/personaliza_provider.dart';
 export '../../providers/estado_creacion_indisponibilidad.dart';
 export '../../providers/estado_confirmacion_cita.dart';
 export '../../providers/empleados_provider.dart';
+export '../../providers/servicios_ofrecidos_provider.dart';

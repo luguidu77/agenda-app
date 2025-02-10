@@ -233,9 +233,11 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           // el idServicio es un string que contiene una lista de ids de servicios, lo convertimos en una lista de strings
           String idServicio = cita['idServicio'];
           List<String> idServicioLista = idServicio
-              .substring(1, idServicio.length - 1) // Elimina los corchetes
-              .split(','); // Divide los elementos si hay comas
-
+              .substring(1, idServicio.length - 1)
+              .split(',')
+              .map((item) =>
+                  item.trim()) // Elimina espacios en blanco con trim()
+              .toList();
           print(cita);
           if (cita['idCliente'] != '999') {
             // print(cita);

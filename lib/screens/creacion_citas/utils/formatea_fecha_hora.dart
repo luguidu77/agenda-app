@@ -1,4 +1,4 @@
-import 'package:intl/intl.dart';
+/* import 'package:intl/intl.dart';
 
 Map<String, dynamic> formatearFechaYHora(DateTime fechaHora) {
   String fechaFormateada = DateFormat.yMMMMd('es').format(fechaHora);
@@ -15,11 +15,11 @@ String formatearHora(String hora) {
   int minutos = int.parse(partes[1]);
 
   if (horas > 0 && minutos > 0) {
-    return '$horas h $minutos minutos';
+    return '$horas h $minutos';
   } else if (horas > 0) {
     return '$horas h';
   } else {
-    return '$minutos minutos';
+    return '$minutos min';
   }
 }
 
@@ -27,4 +27,4 @@ String formatearHora(String hora) {
 String formatearFechaDiaCita(DateTime fechaOriginal) {
   // Formatear la fecha en el formato deseado // fecha formateada para FIREBASE
   return DateFormat('yyyy-MM-dd').format(fechaOriginal); // "2020-11-12"
-}
+} */

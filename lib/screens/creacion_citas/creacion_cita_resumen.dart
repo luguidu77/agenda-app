@@ -216,7 +216,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
     // Formatear la fecha al formato deseado
     Map<String, dynamic> resultado =
-        formatearFechaYHora(citaElegida.horaInicio!);
+        FormatearFechaHora.formatearFechaYHora(citaElegida.horaInicio!);
 
     String fechaFormateada = resultado['fechaFormateada'];
     String horaFormateada = resultado['horaFormateada'];
@@ -238,7 +238,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     }
 
     // duracion total de los servicios
-    String duracion = formatearHora(tiempoTotal);
+    String duracion = FormatearFechaHora.formatearHora2(tiempoTotal);
 
     try {
       //******************************************('AGREGA LA CITA AL CLIENTE')****************

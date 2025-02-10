@@ -266,6 +266,24 @@ class ServicioModel {
     this.activo,
   });
 
+  ServicioModel copyWith({
+    var id,
+    String? servicio,
+    String? tiempo,
+    var precio,
+    String? detalle,
+    String? activo,
+  }) {
+    return ServicioModel(
+      id: id ?? this.id,
+      servicio: servicio ?? this.servicio,
+      tiempo: tiempo ?? this.tiempo,
+      precio: precio ?? this.precio,
+      detalle: detalle ?? this.detalle,
+      activo: activo ?? this.activo,
+    );
+  }
+
   factory ServicioModel.fromJson(Map<String, dynamic> json) => ServicioModel(
         id: json["id"],
         servicio: json["servicio"],
@@ -304,6 +322,27 @@ class ServicioModelFB {
       this.activo,
       this.idCategoria,
       this.index});
+  ServicioModelFB copyWith({
+    var id,
+    String? servicio,
+    String? tiempo,
+    var precio,
+    String? detalle,
+    String? activo,
+    String? idCategoria,
+    int? index,
+  }) {
+    return ServicioModelFB(
+      id: id ?? this.id,
+      servicio: servicio ?? this.servicio,
+      tiempo: tiempo ?? this.tiempo,
+      precio: precio ?? this.precio,
+      detalle: detalle ?? this.detalle,
+      activo: activo ?? this.activo,
+      idCategoria: idCategoria ?? this.idCategoria,
+      index: index ?? this.index,
+    );
+  }
 
   factory ServicioModelFB.fromJson(Map<String, dynamic> json) =>
       ServicioModelFB(

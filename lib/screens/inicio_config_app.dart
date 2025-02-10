@@ -157,6 +157,8 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
 
   getTodasLasCitas(emailSesionUsuario) async {
     final contextoCitas = context.read<CitasProvider>();
+    final contextoServiciosOfrecidos =
+        context.read<ServiciosOfrecidosProvider>();
     final contextoCreacionCita = context.read<CreacionCitaProvider>();
     final estadoProvider = context.read<EmailAdministradorAppProvider>();
     String emailAdministrador = estadoProvider.emailAdministradorApp;
@@ -165,11 +167,15 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     if (!contextoCitas.citasCargadas) {
       // Realizar la operación de carga
       try {
+        // CARGA EN EL CONTEXTO LAS CITAS ·········································
         List<CitaModelFirebase> citas =
             await FirebaseProvider().getTodasLasCitas(emailAdministrador);
-
-        // Establecer las citas en el contexto
         contextoCitas.setTodosLasLasCitas(citas);
+        // CARGA EN EL CONTEXTO LOS SERVICIOS OFRECIDOS ··························
+
+        List<ServicioModelFB> todosLosServicios =
+            await FirebaseProvider().cargarServicios(emailAdministrador);
+        contextoServiciosOfrecidos.setTodosLosServicios(todosLosServicios);
 
         // Restablecer el contexto para la creación de citas
         CitaModelFirebase edicionContextoCita =

@@ -1,9 +1,11 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/models.dart';
+import 'package:agendacitas/providers/providers.dart';
 import 'package:agendacitas/utils/formatear.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class WidgetsDetalleCita {
   static vercliente(context, CitaModelFirebase citaElegida) {
@@ -226,88 +228,67 @@ class WidgetsDetalleCita {
         ));
   }
 
-  static servicios(context, CitaModelFirebase citaElegida,
+  static servicios(BuildContext context, CitaModelFirebase citaElegida,
       PersonalizaModelFirebase personaliza) {
-    Widget cardServicios(index) {
-      print(citaElegida.idservicio);
+    final contextoServiciosOfrecidos =
+        context.read<ServiciosOfrecidosProvider>();
+    List<ServicioModelFB> _serviciosOfrecidos =
+        contextoServiciosOfrecidos.getServicios;
 
-      ///TODO traer los tiempos de servicios de firebase o agregarlos a un contexto en el inicio_config_app de con el idservicio
+    ///traer los tiempos de servicios  con el idservicio/////////////////////////////
+    ServicioModelFB? traeServicioPorId(
+        List<ServicioModelFB> todosLosServicios, String idServicio) {
+      try {
+        final servicio = todosLosServicios
+            .firstWhere((servicio) => servicio.id == idServicio);
+        return servicio;
+      } catch (e) {
+        print(
+            'Servicio con ID $idServicio no encontrado en _serviciosOfrecidos'); // Mensaje de debug (opcional)
+        return null; // Devuelve null si no se encuentra el servicio
+      }
+    }
+    /////////////////////////////////////////////////////////////////////////////////
 
-      final precio = citaElegida.precio!;
-      final tiempo = 'tiempo';
+    Widget cardServicios(String idservicio, citaElegida) {
+      final servicio = traeServicioPorId(_serviciosOfrecidos, idservicio);
+
+      print(servicio!.id);
+
+      print('__________________________________________________');
+
+      final precio = servicio.precio!;
+      final tiempo = servicio.tiempo;
+      /* */
+      ; // contextoServiciosOfrecidos.getServicios.first.tiempo;
       final empleado = citaElegida.nombreEmpleado;
       final horaInicio = citaElegida.horaInicio;
       final hora =
           FormatearFechaHora.formatearFechaYHora(horaInicio!)['horaFormateada'];
-      final servicio = citaElegida.servicios!.first.toString();
+
       // contextoCreacionCita.getServiciosElegidos[index]['SERVICIO'];
 
       return Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Container(
-            decoration: const BoxDecoration(
-              border: Border(
-                left: BorderSide(
-                  color: Colors.blue, // Color del borde izquierdo
-                  width: 5, // Ancho del borde izquierdo
-                ),
-              ),
-            ),
-            height: 85,
-            child: ListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              // SERVICIO ...............................................
-              title: Text(
-                '$servicio : $tiempo',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // TIEMPO Y EMPLEADO ...............................................
-                  Text('$hora - $empleado'),
-
-                  /*  Visibility(
-                      visible: compuebaDisponible(),
-                      child: const Card(
-                        color: (const Color.fromARGB(255, 253, 248, 217)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: Text(
-                            '⚠️El miembro no está disponible',
-                            style: TextStyle(fontSize: 10, color: Colors.red),
-                          ),
-                        ),
-                      )) */
-                ],
-              ),
-              // PRECIO ...............................................
-              trailing: Text(
-                precio,
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18), // Destacar el precio
-              ),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Eliminar servicio'),
-                      content: const Text(
-                          '¿Estás seguro de que deseas eliminar este servicio?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop(); // Cerrar el diálogo
-                          },
-                          child: const Text('Cancelar'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            /*   // Eliminar servicio del contexto
+        child: InkWell(
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Eliminar servicio'),
+                  content: const Text(
+                      '¿Estás seguro de que deseas eliminar este servicio?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Cerrar el diálogo
+                      },
+                      child: const Text('Cancelar'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        /*   // Eliminar servicio del contexto
                             contextoCreacionCita
                                 .setEliminaItemListaServiciosElegidos = [
                               contextoCreacionCita.getServiciosElegidos[index]
@@ -318,41 +299,97 @@ class WidgetsDetalleCita {
                             contextoCita();
                             setState(() {});
                             Navigator.of(context).pop(); // Cerrar el diálogo */
-                          },
-                          child: const Text(
-                            'Eliminar',
-                            style: TextStyle(
-                                color: Color.fromARGB(255, 206, 45,
-                                    34)), // Color rojo para enfatizar
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+                      },
+                      child: const Text(
+                        'Eliminar',
+                        style: TextStyle(
+                            color: Color.fromARGB(
+                                255, 206, 45, 34)), // Color rojo para enfatizar
+                      ),
+                    ),
+                  ],
                 );
               },
-            )),
+            );
+          },
+          child: Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                left: BorderSide(
+                  color: Colors.blue,
+                  width: 5,
+                ),
+              ),
+            ),
+            height: 50,
+            child: Row(
+              // Use Row as the main child of Container
+              children: [
+                const SizedBox(
+                    width:
+                        16.0), // Left padding equivalent to ListTile contentPadding
+                Expanded(
+                  // Use Expanded to take available space and center content
+                  child: Column(
+                    mainAxisAlignment:
+                        MainAxisAlignment.center, // Vertically center content
+                    crossAxisAlignment: CrossAxisAlignment
+                        .start, // Align text to the start (left)
+                    children: [
+                      Text(
+                        '${servicio!.servicio} : $tiempo',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis, // Handle long text
+                      ),
+                      Text(
+                        empleado,
+                        overflow: TextOverflow.ellipsis, // Handle long text
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  // Trailing padding equivalent to ListTile contentPadding
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: Text(
+                    precio.toString(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
     }
 
-    final servicios = citaElegida.servicios;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Text(
-            'Servicios',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          ),
-        ),
-        Column(children: [cardServicios('index')]
-            /*  children: servicios!.map((servicio) {
-            final index = servicios.indexOf(servicio);
-            return cardServicios(index);
-          }).toList(), */
+    final idservicios = citaElegida.idservicio;
+    return SizedBox(
+      height: 400,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              'Servicios',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
-      ],
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: idservicios!.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                    child: cardServicios(idservicios[index], citaElegida));
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

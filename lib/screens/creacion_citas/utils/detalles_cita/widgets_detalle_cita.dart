@@ -229,22 +229,18 @@ class WidgetsDetalleCita {
   static servicios(context, CitaModelFirebase citaElegida,
       PersonalizaModelFirebase personaliza) {
     Widget cardServicios(index) {
-      final precio = citaElegida.servicios!.first.toString();
+      print(citaElegida.idservicio);
 
-      /* Formatear.formatPrecio(
-          double.parse(citaElegida.servicios![index]), personaliza.moneda!); */
-      /*  final tiempo = FormatearFechaHora.formatearHora2(
-          citaElegida.servicios!.first.toString()); */
-      //contextoCreacionCita.getServiciosElegidos[index]['TIEMPO'].toString());
+      ///TODO traer los tiempos de servicios de firebase o agregarlos a un contexto en el inicio_config_app de con el idservicio
+
+      final precio = citaElegida.precio!;
+      final tiempo = 'tiempo';
       final empleado = citaElegida.nombreEmpleado;
       final horaInicio = citaElegida.horaInicio;
       final hora =
           FormatearFechaHora.formatearFechaYHora(horaInicio!)['horaFormateada'];
       final servicio = citaElegida.servicios!.first.toString();
       // contextoCreacionCita.getServiciosElegidos[index]['SERVICIO'];
-      print(
-          'tiempoXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
-      /*   print(tiempo); */
 
       return Padding(
         padding: const EdgeInsets.all(8.0),
@@ -263,7 +259,7 @@ class WidgetsDetalleCita {
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               // SERVICIO ...............................................
               title: Text(
-                '$servicio : ',
+                '$servicio : $tiempo',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
 

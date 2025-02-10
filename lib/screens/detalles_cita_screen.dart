@@ -17,93 +17,6 @@ import '../widgets/botones/form_reprogramar_reserva.dart';
 import '../widgets/compartirCliente/compartir_cita_a_cliente.dart';
 import '../widgets/elimina_cita.dart';
 
-/* class DetallesCitaScreen extends StatefulWidget {
-  final String emailUsuario;
-  final CitaModelFirebase? reserva;
-  const DetallesCitaScreen(
-      {Key? key, required this.reserva, required this.emailUsuario})
-      : super(key: key);
-
-  @override
-  State<DetallesCitaScreen> createState() => _DetallesCitaScreenState();
-}
-
-class _DetallesCitaScreenState extends State<DetallesCitaScreen> {
-  PersonalizaModelFirebase personaliza = PersonalizaModelFirebase(
-    id: '',
-    codpais: '',
-    enlace: '',
-    moneda: '',
-    mensaje: '',
-  );
-  late String _emailSesionUsuario;
-  bool _iniciadaSesionUsuario = false;
-
-  compruebaEstadoCita() {
-    bool citaconfirmada = widget.reserva!.confirmada!;
-    final estadoCita =
-        Provider.of<EstadoConfirmacionCita>(context, listen: false);
-    estadoCita.setEstadoCita(citaconfirmada);
-  }
-
-  @override
-  void initState() {
-    Future.microtask(() => compruebaEstadoCita());
-    cargarDatos();
-    super.initState();
-  }
-
-  Future<void> getPersonaliza() async {
-    final personalizaProvider = context.read<PersonalizaProviderFirebase>();
-
-    personaliza = personalizaProvider.getPersonaliza;
-  }
-
-  Future<void> emailUsuario() async {
-    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
-
-    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
-    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
-  }
-
-  Future<void> cargarDatos() async {
-    await emailUsuario();
-    await getPersonaliza();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final citaconfirmada = Provider.of<EstadoConfirmacionCita>(context);
-    String fechaCorta = DateFormat('EEE d MMM', 'es_ES')
-        .add_Hm()
-        .format((widget.reserva!.horaInicio!));
-
-    return
-        /*   appBar: AppBar(
-          //title: Text(fechaCorta, style: subTituloEstilo),
-          leading: Container(),
-          backgroundColor: colorFondo,
-          elevation: 0,
-          actions: [
-            IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.close)),
-            const SizedBox(
-              width: 10,
-            )
-          ],
-        ), */
-        // Los datos se cargaron correctamente
-        DetallesCitaWidget(
-      reserva: widget.reserva!,
-      fechaCorta: fechaCorta,
-      citaconfirmada: citaconfirmada.estadoCita,
-      // personaliza: personaliza,
-      emailUsuario: _emailSesionUsuario,
-      iniciadaSesionUsuario: _iniciadaSesionUsuario,
-    );
-  }
-} */
 class DetallesCitaWidget extends StatefulWidget {
   final CitaModelFirebase? reserva;
   final String fechaCorta;
@@ -138,14 +51,13 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
   Widget build(BuildContext context) {
     final personaliza =
         context.read<PersonalizaProviderFirebase>().getPersonaliza;
-    final citaconfirmada =
-        Provider.of<EstadoConfirmacionCita>(context, listen: true);
+    bool citaConfirmada = widget.reserva!.confirmada!;
 
     return Scaffold(
       appBar: AppBar(
         //title: Text(fechaCorta, style: subTituloEstilo),
         leading: Container(),
-        backgroundColor: citaconfirmada.estadoCita ? Colors.blue : Colors.red,
+        backgroundColor: citaConfirmada ? Colors.blue : Colors.red,
         elevation: 0,
         actions: [
           IconButton(
@@ -168,7 +80,7 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
               HeaderSection(
                 fecha: _fechaFormateada,
                 reserva: widget.reserva!,
-                citaconfirmada: citaconfirmada,
+                citaconfirmada: citaConfirmada,
               ),
               const SizedBox(height: 20),
               // CONTENIDO DE LA VISTA ################################
@@ -182,6 +94,7 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
                 ),
               ),
               // FOOTER DE LA VISTA ################################
+              // COMPARTIR CITA
               /*  ActionButtons(
                 reserva: widget.reserva!,
                 emailUsuario: widget.emailUsuario,

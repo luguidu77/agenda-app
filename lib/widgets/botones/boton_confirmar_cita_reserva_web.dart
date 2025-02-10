@@ -1,6 +1,7 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/providers.dart';
+import 'package:agendacitas/screens/creacion_citas/style/.estilos_creacion_cita.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,14 +33,14 @@ class _BotonConfirmarCitaWebState extends State<BotonConfirmarCitaWeb> {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
-      style: ButtonStyle(
-          backgroundColor:
-              WidgetStatePropertyAll(const Color.fromARGB(0, 252, 251, 251))),
-      icon: _cargando ? const CircularProgressIndicator() : Container(),
+      style: botonHeaderDetalleCita,
+      icon: _cargando
+          ? const CircularProgressIndicator(color: Colors.white)
+          : Container(),
       onPressed: _cambiaEstadoConfirmacion,
-      label: const Text(
-        'Reservada',
-        style: TextStyle(fontSize: 14, color: Colors.white),
+      label: Text(
+        _citaconfirmada ? 'Reservada' : 'Confirmar',
+        style: const TextStyle(fontSize: 14, color: Colors.white),
       ),
     );
   }

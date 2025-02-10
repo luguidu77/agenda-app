@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class HeaderSection extends StatelessWidget {
   final String fecha;
   final CitaModelFirebase reserva;
-  final EstadoConfirmacionCita citaconfirmada;
+  final bool citaconfirmada;
 
   const HeaderSection({
     required this.fecha,
@@ -21,7 +21,7 @@ class HeaderSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          color: citaconfirmada.estadoCita ? Colors.blue : Colors.red,
+          color: citaconfirmada ? Colors.blue : Colors.red,
           height: 100,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,

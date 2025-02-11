@@ -1,10 +1,12 @@
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
-import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/content_seccion.dart';
-import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/header_seccion.dart';
+import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/detalles_cita.dart';
+
 import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/widgets_detalle_cita.dart';
 import 'package:agendacitas/screens/screens.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
+import 'package:agendacitas/utils/utils.dart';
 import 'package:agendacitas/widgets/botones/boton_confirmar_cita_reserva_web.dart';
 import 'package:agendacitas/widgets/empleado/empleado.dart';
 import 'package:flutter/material.dart';
@@ -38,20 +40,24 @@ class DetallesCitaWidget extends StatefulWidget {
 }
 
 class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
-  late String _fechaFormateada;
+  late DateTime
+      _fechaOriginal; // utlizo esta variable para verificar si se modificó la fecha antes de salir de la vista
 
   @override
   void initState() {
     super.initState();
-    _fechaFormateada =
-        DateFormat('EEE d MMM', 'es_ES').format(widget.reserva!.horaInicio!);
+    _fechaOriginal = (widget.reserva!.horaInicio!);
   }
 
   @override
   Widget build(BuildContext context) {
+    String dia = formatearFechaDiaCita(widget.reserva!.horaInicio!);
     final personaliza =
         context.read<PersonalizaProviderFirebase>().getPersonaliza;
     bool citaConfirmada = widget.reserva!.confirmada!;
+    final cita = context.watch<CreacionCitaProvider>();
+    cita.contextoCita.dia = dia;
+    cita.setContextoCita(widget.reserva!);
 
     return Scaffold(
       appBar: AppBar(
@@ -62,7 +68,17 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
         actions: [
           IconButton(
               color: Colors.white,
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                if (_fechaOriginal
+                    .isAtSameMomentAs(cita.contextoCita.horaInicio!)) {
+                  // no se ha modificado la fecha
+                  Navigator.pop(context);
+                } else {
+                  // se ha modificado la fecha
+                  _alertaSinGuardar();
+                }
+                //
+              },
               icon: const Icon(Icons.close)),
           const SizedBox(
             width: 10,
@@ -78,7 +94,7 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
             children: [
               // HEADER DE LA VISTA   ################################
               HeaderSection(
-                fecha: _fechaFormateada,
+                // fecha: _fechaOriginal,
                 reserva: widget.reserva!,
                 citaconfirmada: citaConfirmada,
               ),
@@ -90,21 +106,87 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
                   child: ContentSection(
                     reserva: widget.reserva!,
                     personaliza: personaliza,
+                    emailUsuario: widget.emailUsuario,
                   ),
                 ),
               ),
               // FOOTER DE LA VISTA ################################
               // COMPARTIR CITA
-              /*  ActionButtons(
+              ActionButtons(
                 reserva: widget.reserva!,
                 emailUsuario: widget.emailUsuario,
                 contextoCitaProvider: context.read<CitasProvider>(),
-              ), */
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _alertaSinGuardar() {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: 300,
+              child: Padding(
+                padding: const EdgeInsets.all(28.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  spacing: 20,
+                  children: [
+                    const Text('Tienes cambios sin guardar',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 24)),
+                    const Text(
+                      'Si cierras la cita perderás los cambios, ¿deseas salir?',
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment
+                          .spaceBetween, // Alinea el botón a la derecha
+                      children: [
+                        InkWell(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 30),
+                            decoration: BoxDecoration(
+                              border: Border.all(),
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                            child: const Text(
+                              'Volver',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 30),
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                            child: const Text(
+                              'Sí, salir',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ));
+        });
   }
 }
 

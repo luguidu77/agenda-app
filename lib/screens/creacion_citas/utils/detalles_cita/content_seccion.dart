@@ -6,10 +6,11 @@ import 'package:flutter/material.dart';
 class ContentSection extends StatelessWidget {
   final CitaModelFirebase reserva;
   final PersonalizaModelFirebase personaliza;
-
+  final emailUsuario;
   const ContentSection({
     required this.reserva,
     required this.personaliza,
+    required this.emailUsuario,
   });
 
   @override

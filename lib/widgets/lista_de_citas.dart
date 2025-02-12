@@ -131,6 +131,8 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
     return Scaffold(
         body: SfCalendar(
+      headerHeight: 0, // oculta fecha
+      viewHeaderHeight: 0, // quita el marco superior donde iria la fecha
       showCurrentTimeIndicator: true,
 
       controller: _calendarController,
@@ -200,7 +202,6 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         dayFormat: '',
         dateFormat: 'd',
         timeFormat: 'HH:mm', // FORMATO 24H
-
         startHour: 7, // INICIO LABORAL
         endHour: 22, // FINAL LABORAL
         timeInterval: Duration(minutes: 15), //INTERVALOS DE TIEMPO
@@ -214,7 +215,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
       appointmentTextStyle: const TextStyle(
           color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
-      headerHeight: 0, // oculta fecha
+
       allowDragAndDrop: true,
       onLongPress: (calendarLongPressDetails) => print('fdfdf'),
 

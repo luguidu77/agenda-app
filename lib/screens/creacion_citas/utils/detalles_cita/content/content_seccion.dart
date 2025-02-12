@@ -1,6 +1,6 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/personaliza_model.dart';
-import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/widgets_detalle_cita.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/content/widgets_content.dart';
 import 'package:flutter/material.dart';
 
 class ContentSection extends StatelessWidget {

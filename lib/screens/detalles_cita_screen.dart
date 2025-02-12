@@ -1,9 +1,10 @@
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
-import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/detalles_cita.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/exportaciones_detalles_cita.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/footer/boton_guardar_cambios.dart';
 
-import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/widgets_detalle_cita.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/content/widgets_content.dart';
 import 'package:agendacitas/screens/screens.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/utils/utils.dart';
@@ -55,9 +56,9 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
     final personaliza =
         context.read<PersonalizaProviderFirebase>().getPersonaliza;
     bool citaConfirmada = widget.reserva!.confirmada!;
-    final cita = context.watch<CreacionCitaProvider>();
-    cita.contextoCita.dia = dia;
-    cita.setContextoCita(widget.reserva!);
+    final citaContexto = context.watch<CreacionCitaProvider>();
+    citaContexto.contextoCita.dia = dia;
+    citaContexto.setContextoCita(widget.reserva!);
 
     return Scaffold(
       appBar: AppBar(
@@ -70,14 +71,16 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
               color: Colors.white,
               onPressed: () {
                 if (_fechaOriginal
-                    .isAtSameMomentAs(cita.contextoCita.horaInicio!)) {
+                    .isAtSameMomentAs(citaContexto.contextoCita.horaInicio!)) {
                   // no se ha modificado la fecha
+
                   Navigator.pop(context);
                 } else {
                   // se ha modificado la fecha
                   _alertaSinGuardar();
                 }
-                //
+                // no visualizar el footer_guardar_cambios.dart
+                citaContexto.setVisibleGuardar(false);
               },
               icon: const Icon(Icons.close)),
           const SizedBox(
@@ -93,6 +96,7 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // HEADER DE LA VISTA   ################################
+              // fecha y boton reserva
               HeaderSection(
                 // fecha: _fechaOriginal,
                 reserva: widget.reserva!,
@@ -100,6 +104,7 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
               ),
               const SizedBox(height: 20),
               // CONTENIDO DE LA VISTA ################################
+              // Cliente, fecha y hora, servicios
               Expanded(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
@@ -111,8 +116,8 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
                 ),
               ),
               // FOOTER DE LA VISTA ################################
-              // COMPARTIR CITA
-              ActionButtons(
+
+              FooterSeccion(
                 reserva: widget.reserva!,
                 emailUsuario: widget.emailUsuario,
                 contextoCitaProvider: context.read<CitasProvider>(),

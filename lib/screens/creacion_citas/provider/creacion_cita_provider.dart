@@ -41,23 +41,8 @@ class CreacionCitaProvider extends ChangeNotifier {
 
     notifyListeners();
   }
-  // CONTEXTO servicioElegido ############################
 
-/*   Map<String, dynamic> _servicioElegido = {
-    'ID': 0,
-    'SERVICIO': '',
-    'TIEMPO': '',
-    'PRECIO': '',
-    'DETALLE': '',
-  }; */
   List<Map<String, dynamic>> _listaServiciosElegidos = [];
-
-  // Map<String, dynamic> get getServicioElegido => _servicioElegido;
-
-  /*  set setServicioElegido(Map<String, dynamic> nuevoServicio) {
-    _servicioElegido = nuevoServicio;
-    notifyListeners();
-  } */
 
   List<Map<String, dynamic>> get getServiciosElegidos =>
       _listaServiciosElegidos;
@@ -88,35 +73,14 @@ class CreacionCitaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-/*   // CONTEXTO citaElegida ############################
-  Map<String, dynamic> _citaElegida = {
-    'FECHA': '',
-    'HORAINICIO': '',
-    'HORAFINAL': '',
-    'COMENTARIO': ''
-  };
+// CONTEXTO intercambio footer Detalles de la cita FooterGuardarCambios ############################
+// cuando se hace un cambio en la cita se visualiza el footer para guardar cambios
 
-  Map<String, dynamic> get getCitaElegida => _citaElegida;
+  bool _visibleGuardar = false;
+  bool get visibleGuardar => _visibleGuardar;
 
-  set setCitaElegida(Map<String, dynamic> nuevaCita) {
-    _citaElegida = nuevaCita;
+  setVisibleGuardar(bool visibleGuardar) {
+    _visibleGuardar = visibleGuardar;
     notifyListeners();
   }
-
-  // CONTEXTO clienteElegido ############################
-  Map<String, dynamic> _clienteElegido = {
-    'ID': '',
-    'NOMBRE': '',
-    'TELEFONO': '',
-    'EMAIL': '',
-    'FOTO': '',
-    'NOTA': ''
-  };
-
-  Map<String, dynamic> get getClienteElegido => _clienteElegido;
-
-  set setClienteElegido(Map<String, dynamic> nuevoCliente) {
-    _clienteElegido = nuevoCliente;
-    notifyListeners();
-  } */
 }

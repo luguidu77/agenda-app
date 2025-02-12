@@ -1,18 +1,23 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/providers/personaliza_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/footer/estilo_footer.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/footer/boton_guardar_cambios.dart';
 import 'package:agendacitas/widgets/botones/form_reprogramar_reserva.dart';
 import 'package:agendacitas/widgets/compartirCliente/compartir_cita_a_cliente.dart';
 import 'package:agendacitas/widgets/elimina_cita.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
-class ActionButtons extends StatelessWidget {
+class FooterSeccion extends StatelessWidget {
   final CitaModelFirebase reserva;
   final String emailUsuario;
   final CitasProvider contextoCitaProvider;
 
-  const ActionButtons({
+  const FooterSeccion({
     required this.reserva,
     required this.emailUsuario,
     required this.contextoCitaProvider,
@@ -20,22 +25,49 @@ class ActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          spacing: 10,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            _buildShareButton(),
-            _buildReassignButton(context),
-            _buildDeleteButton(context),
-            Text(reserva.precio!)
-          ],
-        ),
-      ),
-    );
+    final citaProvider = context.watch<CreacionCitaProvider>();
+    final personalizaProvider = context.read<PersonalizaProviderFirebase>();
+    return Container(
+        decoration: estiloBorde,
+        width: MediaQuery.of(context).size.width,
+        height: 150,
+        child: Padding(
+          padding: const EdgeInsets.all(28.0),
+          child: Column(
+            spacing: 10,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment
+                    .spaceBetween, // Ajusta el espacio entre los textos
+                children: [
+                  const Text('Total',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold)), // Texto en negrita
+                  Text(
+                    citaProvider.contextoCita.precio! +
+                        personalizaProvider.getPersonaliza.moneda!,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ), // Texto en negrita
+                ],
+              ),
+              // botones compartir / boton guardar
+              citaProvider.visibleGuardar
+                  ? BotonGuardarCambios()
+                  : Row(
+                      spacing: 10,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        _buildShareButton(),
+                        _buildReassignButton(context),
+                        _buildDeleteButton(context),
+                      ],
+                    ),
+            ],
+          ),
+        ));
   }
 
   Widget _buildShareButton() {

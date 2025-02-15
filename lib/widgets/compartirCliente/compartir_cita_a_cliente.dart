@@ -183,7 +183,7 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
           backgroundColor: Colors.orange,
           child: const FaIcon(FontAwesomeIcons.commentSms),
         ),
-        widget.email != '' && widget.email != ''
+        widget.email != ''
             ? FloatingActionButton(
                 mini: true,
                 onPressed: () {

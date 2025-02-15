@@ -32,25 +32,25 @@ class WidgetsDetalleCita {
           child: Column(
             children: [
               ListTile(
-                leading:
-                    citaElegida.email != '' && citaElegida.fotoCliente != ''
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(150.0),
-                            child: Image.network(
-                              citaElegida.fotoCliente.toString(),
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            ))
-                        : ClipRRect(
-                            borderRadius: BorderRadius.circular(150.0),
-                            child: Image.asset(
-                              "./assets/images/nofoto.jpg",
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                leading: citaElegida.fotoCliente != null &&
+                        citaElegida.fotoCliente != ''
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(150.0),
+                        child: Image.network(
+                          citaElegida.fotoCliente.toString(),
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        ))
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(150.0),
+                        child: Image.asset(
+                          "./assets/images/nofoto.jpg",
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                 title: Text(
                   citaElegida.nombreCliente.toString(),
                   style: const TextStyle(fontWeight: FontWeight.bold),

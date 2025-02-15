@@ -1,7 +1,11 @@
 import 'package:agendacitas/models/models.dart';
+import 'package:agendacitas/models/perfil_usuarioapp_model.dart';
 import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/footer/check.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/footer/widgets_footer.dart';
 import 'package:agendacitas/utils/actualizacion_cita.dart';
+import 'package:agendacitas/utils/comunicacion/comunicaciones.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,64 +15,118 @@ class BotonGuardarCambios extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final citaProvider = context.watch<CreacionCitaProvider>();
+
+    final EmailAdministradorAppProvider emailUsuarioProvider =
+        context.read<EmailAdministradorAppProvider>();
     return Row(
       mainAxisAlignment: MainAxisAlignment.end, // Alinea el botón a la derecha
       children: [
-        InkWell(
-          onTap: () => _alertaActualizar(context, citaProvider.contextoCita),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 18),
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(5.0),
-            ),
-            child: const Text(
-              'Guardar',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        )
+        WidgetsFooter.boton('Guardar', () {
+          if (citaProvider.contextoCita.horaInicio!.isAfter(DateTime.now())) {
+            ///TODO PENDIENTE DE MANEJAR EL CONTEXTO DEL PERFIL DEL ADMINISTRADOR PARA EL ENVIO DE EMAILS
+            ///SI EL CLIENTE NO TIENE EMAIL TAMPOCO SALDRA ESTA OPCION
+            ///SI SE AGREGA EL EMAIL CON LA APP YA INICIADA HABRA QUE AGREGARLO AL CONTEXTO DE CLIENTES
+            /* // Visualiza alerta para compartir al cliente
+            _alertaActualizar(context, citaProvider,
+                emailUsuarioProvider.emailAdministradorApp); */
+            _actualiza(context, citaProvider, emailUsuarioProvider);
+          } else {
+            _actualiza(context, citaProvider, emailUsuarioProvider);
+          }
+        })
       ],
     );
   }
 
-  static void _alertaActualizar(
-      BuildContext context, CitaModelFirebase citaElegida) async {
-    final citaProvider = context.read<CreacionCitaProvider>();
-    final EmailAdministradorAppProvider emailUsuarioProvider =
-        context.read<EmailAdministradorAppProvider>();
+  static void _alertaActualizar(BuildContext context,
+      CreacionCitaProvider citaProvider, String emailAdministrador) async {
+    final perfilAdmin = PerfilAdministradorModel(
+        denominacion: 'denominacion negocio',
+        telefono: 'telefono negocio',
+        email: emailAdministrador);
+
     await showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
-          return Container(
-              width: MediaQuery.of(context).size.width,
-              height: 250,
-              child: Padding(
-                padding: const EdgeInsets.all(28.0),
-                child: Column(spacing: 10, children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Text('check'),
-                      Text('Notificar a ${citaElegida.nombreCliente}')
-                    ],
-                  ),
-                  ElevatedButton(
-                      onPressed: () async {
-                        ////XXxxxx FUNCION actualizar la cita en Firebase  xxxxxXX
-                        await ActualizacionCita.actualizar(
-                          context,
-                          citaElegida,
-                          null,
-                          citaElegida.dia,
-                          citaElegida.horaInicio,
-                          emailUsuarioProvider.emailAdministradorApp,
-                        );
-                        citaProvider.setVisibleGuardar(false);
-                      },
-                      child: Text('Actualizar'))
-                ]),
-              ));
+          return SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: 250,
+            child: Padding(
+              padding: const EdgeInsets.all(28.0),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  spacing: 10,
+                  children: [
+                    const Text(
+                      'Actualizar cita',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const CheckCompartir(),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Notificar a ${citaProvider.contextoCita.nombreCliente} del cambio de la cita',
+                              style: const TextStyle(
+                                  fontSize: 11, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              width: 250,
+                              child: Text(
+                                  softWrap: true,
+                                  'Envía un mensaje para informar a  ${citaProvider.contextoCita.nombreCliente} que se ha reprogramado la cita',
+                                  style: const TextStyle(fontSize: 9)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        WidgetsFooter.boton('Actualizar', () async {
+                          final cita = citaProvider.contextoCita;
+                          if (citaProvider.estadoCheck) {
+                            print(
+                                'enviar notificacion --------------------------');
+                            Comunicaciones().compartirCitaEmail(
+                                context,
+                                perfilAdmin,
+                                'Cita preprogramada',
+                                cita.nombreCliente!,
+                                cita.emailCliente!,
+                                DateTime.now().toString(), // cita.dia!,
+                                cita.servicios!.map((e) => e).toString(),
+                                cita.precio!);
+                          }
+                          /*  _actualiza(
+                              context, citaProvider, emailUsuarioProvider); */
+                        }),
+                      ],
+                    ),
+                  ]),
+            ),
+          );
         });
+  }
+
+  static void _actualiza(
+      BuildContext context, citaProvider, emailUsuarioProvider) async {
+    await ActualizacionCita.actualizar(
+      context,
+      citaProvider.contextoCita,
+      null,
+      citaProvider.contextoCita.dia,
+      citaProvider.contextoCita.horaInicio,
+      emailUsuarioProvider.emailAdministradorApp,
+    );
+    citaProvider.setVisibleGuardar(false);
   }
 }

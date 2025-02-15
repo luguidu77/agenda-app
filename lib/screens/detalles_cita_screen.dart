@@ -79,8 +79,6 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
                   // se ha modificado la fecha
                   _alertaSinGuardar();
                 }
-                // no visualizar el footer_guardar_cambios.dart
-                citaContexto.setVisibleGuardar(false);
               },
               icon: const Icon(Icons.close)),
           const SizedBox(
@@ -130,6 +128,7 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
   }
 
   void _alertaSinGuardar() {
+    final citaContexto = context.read<CreacionCitaProvider>();
     showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
@@ -170,6 +169,8 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
                         ),
                         InkWell(
                           onTap: () {
+                            // no visualizar el footer_guardar_cambios.dart
+                            citaContexto.setVisibleGuardar(false);
                             Navigator.pop(context);
                             Navigator.pop(context);
                           },

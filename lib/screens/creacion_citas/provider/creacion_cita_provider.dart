@@ -83,4 +83,14 @@ class CreacionCitaProvider extends ChangeNotifier {
     _visibleGuardar = visibleGuardar;
     notifyListeners();
   }
+
+  // check envio de notificacion cita reprogramada
+
+  bool _activoNotif = true;
+  bool get estadoCheck => _activoNotif;
+
+  setEstadoCheck(bool estado) {
+    _activoNotif = estado;
+    notifyListeners();
+  }
 }

@@ -1,6 +1,9 @@
+import 'dart:ffi';
+
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/providers/estado_confirmacion_cita.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/style/.estilos_creacion_cita.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/content/widgets_content.dart';
 import 'package:agendacitas/widgets/botones/boton_confirmar_cita_reserva_web.dart';
 import 'package:flutter/material.dart';
@@ -57,12 +60,20 @@ class HeaderSection extends StatelessWidget {
                   ],
                 ),
               ),
-              // BONTON CONFIRMAR CITA
-              Container(
+              //TODO BONTON CONFIRMAR CITA
+              /*  Container(
                   height: 50,
                   width: 120,
                   child: BotonConfirmarCitaWeb(
-                      cita: reserva, emailUsuario: reserva.email!)),
+                      cita: reserva, emailUsuario: reserva.email!)), */
+              ElevatedButton(
+                style: botonHeaderDetalleCita,
+                onPressed: null,
+                child: const Text(
+                  'Reservada',
+                  style: TextStyle(color: Colors.white),
+                ),
+              )
             ],
           ),
         ),

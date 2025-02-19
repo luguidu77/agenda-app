@@ -1,8 +1,5 @@
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
-import 'package:android_intent_plus/android_intent.dart';
-import 'package:app_settings/app_settings.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

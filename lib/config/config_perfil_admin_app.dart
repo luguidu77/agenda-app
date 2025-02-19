@@ -274,7 +274,7 @@ class _ConfigPerfilAdministradorState extends State<ConfigPerfilAdministrador>
                       borderRadius: BorderRadius.circular(15)),
                   child: ListTile(
                     leading:
-                        const Icon(Icons.location_city, color: Colors.orange),
+                        const Icon(Icons.location_on, color: Colors.orange),
                     title: Text(data.ubicacion.toString()),
                   ),
                 ),

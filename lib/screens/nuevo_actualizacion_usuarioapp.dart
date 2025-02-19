@@ -102,7 +102,7 @@ class _NuevoAcutalizacionUsuarioAppState
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          //keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Column(
             children: [
               Row(
@@ -308,7 +308,7 @@ class _NuevoAcutalizacionUsuarioAppState
                       fillColor: Colors.grey[200],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 56),
                 ],
               )
             ],

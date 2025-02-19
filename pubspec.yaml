@@ -65,8 +65,8 @@ dependencies:
   flutter_picker: ^2.1.0
 
   # para abrir los ajustes del telefono
-  app_settings: ^5.2.0
-  device_info_plus: ^11.2.2
+   #pp_settings: ^5.2.0
+   #device_info_plus: ^11.2.2
 
   #restar aplicacion
 
@@ -79,13 +79,13 @@ dependencies:
 
 
   # BASE DE DATOS EN LA NUBE FIREBASE
-  firebase_core: ^2.12.0
-  firebase_auth: ^4.6.0
-  firebase_storage: ^11.2.0
-  cloud_firestore: ^4.7.0
+  firebase_core: ^3.11.0
+  firebase_auth: ^5.4.2
+  firebase_storage: ^12.4.2
+  cloud_firestore: ^5.6.3
  
   # NOTIFICACIONES FIREBASE
-  firebase_messaging: ^14.6.5
+  firebase_messaging: ^15.2.2
   
   # iconos con numeros
   badges: ^3.1.1
@@ -101,7 +101,7 @@ dependencies:
   # Bienvenida.dart introduccion a la app
   introduction_screen: ^3.1.12
   hooks_riverpod: ^2.3.6
-  rive: ^0.11.2
+  rive: ^0.13.20
   rive_splash_screen: ^0.1.1
   flutter_native_splash: ^2.3.1
   font_awesome_flutter: ^10.4.0
@@ -110,7 +110,7 @@ dependencies:
   google_nav_bar: ^5.0.6
   syncfusion_flutter_calendar: ^28.1.38
  
-  flutter_native_timezone: ^2.0.0
+
 
   #riverpod con anotaciones:
   flutter_riverpod: ^2.3.10
@@ -127,7 +127,7 @@ dependencies:
   flutter_svg: ^2.0.1
   
   #para llevar al usuario a la configuracion del dispositivo
-  android_intent_plus: ^5.3.0 
+  # android_intent_plus: ^5.3.0 
 
 dev_dependencies:
   flutter_test:

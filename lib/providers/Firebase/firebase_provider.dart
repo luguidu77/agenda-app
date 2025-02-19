@@ -107,6 +107,17 @@ class FirebaseProvider extends ChangeNotifier {
         perfil.ubicacion = data['ubicacion'];
         perfil.website = data['website'];
       });
+      await db!
+          .collection("agendacitasapp")
+          .doc(usuarioAPP)
+          .collection("personaliza")
+          .doc("configuracion")
+          .get()
+          .then((res) {
+        var data = res.data();
+
+        perfil.moneda = data!['moneda'];
+      });
     } catch (e) {
       print('error lectura en firebase $e');
     }
@@ -2081,12 +2092,17 @@ class FirebaseProvider extends ChangeNotifier {
 
     try {
       //3º SUBIR FOTO AL STORAGE
+      // Sube el archivo con metadatos explícitos
+      SettableMetadata metadata = SettableMetadata(
+        contentType: 'image/jpeg',
+        cacheControl: 'public, max-age=31536000',
+      );
       //TASKSHAPSHOT ES PARA USAR EN POSTERIOR CONSULTA AL STORAGE
 
       TaskSnapshot taskSnapshot = await storage
           // GUARDO LAS FOTO DE FICHA CLIENTE EN LA SIGUIENTE DIRECCION DEL STORAGE FIREBASE
           .ref('agendadecitas/$usuarioAPP/empleados/${empleado.nombre}/foto')
-          .putFile(file);
+          .putFile(file, metadata);
       debugPrint(taskSnapshot.toString());
       // CONSULTA DE LA URL EN STORAGE
       final String downloadUrl = await taskSnapshot.ref.getDownloadURL();

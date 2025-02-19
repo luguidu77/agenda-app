@@ -81,8 +81,9 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
     _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
 
     //traigo perfil del usuariode la app desde firebase
+    //TODO  debo hacer un provider contexto del perfil y traer los datos de firebase en inicio configuracion de la app
     await FirebaseProvider().cargarPerfilFB(_emailSesionUsuario).then((value) {
-      setState(() {});
+      // setState(() {});
       perfilUsuarioApp = value;
     });
   }

@@ -1,27 +1,18 @@
 // ignore_for_file: file_names
 
-import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
-import 'package:agendacitas/providers/cita_list_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:agendacitas/providers/personaliza_provider.dart';
-import 'package:agendacitas/screens/creacion_citas/utils/appBar.dart';
+import 'package:agendacitas/providers/recordatorios_provider.dart';
 import 'package:agendacitas/screens/home.dart';
-import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:agendacitas/utils/actualizacion_cita.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
-import 'package:android_intent_plus/android_intent.dart';
-import 'package:app_settings/app_settings.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/material.dart';
-import 'package:agendacitas/providers/recordatorios_provider.dart';
-import 'package:agendacitas/widgets/compartirCliente/compartir_cita_a_cliente.dart';
-
 import 'package:agendacitas/utils/notificaciones/recordatorio_local/recordatorio_local.dart';
-
+import 'package:agendacitas/widgets/compartirCliente/compartir_cita_a_cliente.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -31,7 +22,6 @@ import '../../utils/formatear.dart';
 import '../../widgets/widgets.dart';
 import 'provider/creacion_cita_provider.dart';
 import 'utils/adaptacion_perfilmodel_negociomodel.dart';
-import 'utils/formatea_fecha_hora.dart';
 import 'utils/id_cita_cliente_random.dart';
 
 //import 'package:url_launcher/url_launcher_string.dart';
@@ -596,7 +586,7 @@ class BackgroundPermissionDialog extends StatelessWidget {
         ElevatedButton(
           onPressed: () {
             Navigator.pop(context); // Cierra el diálogo antes de abrir ajustes
-            abrirConfiguracionBateria();
+            //abrirConfiguracionBateria();
           },
           child: const Text("Abrir configuración"),
         ),
@@ -604,7 +594,7 @@ class BackgroundPermissionDialog extends StatelessWidget {
     );
   }
 
-  void abrirConfiguracionBateria() async {
+  /* void abrirConfiguracionBateria() async {
     const AndroidIntent intent = AndroidIntent(
       action: 'android.settings.ACTION_POWER_USAGE_SUMMARY', // Acción correcta
     );
@@ -616,5 +606,5 @@ class BackgroundPermissionDialog extends StatelessWidget {
       // Fallback: Abrir ajustes generales de la app
       AppSettings.openAppSettings();
     }
-  }
+  } */
 }

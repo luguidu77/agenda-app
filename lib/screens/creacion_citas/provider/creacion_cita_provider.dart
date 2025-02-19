@@ -93,4 +93,15 @@ class CreacionCitaProvider extends ChangeNotifier {
     _activoNotif = estado;
     notifyListeners();
   }
+
+// hora de inicio y fin de la cita
+
+  DateTime _horaVariante = DateTime.now();
+  DateTime get horaVariante => _horaVariante;
+
+  setHoraVariante(DateTime nuevaHora) {
+    _horaVariante = nuevaHora;
+
+    notifyListeners();
+  }
 }

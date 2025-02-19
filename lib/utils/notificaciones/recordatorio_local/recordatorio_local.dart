@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -66,12 +65,12 @@ class NotificationService {
     //initialize timezone package here
     tz.initializeTimeZones();
     final String currentTimeZone =
-        await FlutterNativeTimezone.getLocalTimezone();
-    final location = tz.getLocation(currentTimeZone); //'Europe/Madrid'
+        //  await FlutterNativeTimezone.getLocalTimezone();
+        // final location = tz.getLocation(currentTimeZone); //'Europe/Madrid'
 
-    // VERIFICA LOS ID DE LAS VERIFICACIONES PENDIENTES Y LE SUMA 1
+        // VERIFICA LOS ID DE LAS VERIFICACIONES PENDIENTES Y LE SUMA 1
 
-    await visualizaNotificaciones(pendientes);
+        await visualizaNotificaciones(pendientes);
 
     //!notificaciones con intervalos
     /*  await flutterLocalNotificationsPlugin.periodicallyShow(
@@ -107,7 +106,8 @@ class NotificationService {
     // print(horaInicio);
     //TZDateTime(location, 2022, 8, 14, 21, 30, 0, 0, 0),
 
-    await flutterLocalNotificationsPlugin.zonedSchedule(
+    // TODO DESHABILITADO PORQUE TENGO QUE AGREGAR UNA LIBRERIA PARA OBTENER EL TIMEZONE ALTERNATIVO A flutter native timezone porque no es compatible con la version android
+    /* await flutterLocalNotificationsPlugin.zonedSchedule(
         id,
         title,
         body,
@@ -120,7 +120,7 @@ class NotificationService {
 
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime);
+            UILocalNotificationDateInterpretation.absoluteTime); */
 
     print(pendientes.map((e) {
       return print('''

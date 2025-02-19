@@ -87,7 +87,7 @@ class _EmpleadosScreenState extends State<EmpleadosScreen> {
                                       .isNotEmpty
                                   ? NetworkImage(empleados[index]
                                       .foto) // Cargar la imagen desde URL
-                                  : const AssetImage("assets/images/nofoto.jpg")
+                                  : const AssetImage("assets/images/face.png")
                                       as ImageProvider, // Imagen local por defecto
                             ),
                             title: Row(

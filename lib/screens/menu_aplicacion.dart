@@ -203,7 +203,7 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
           ),
 
           //BLOG AGENDADECITAS.CLOUD
-          _blog(),
+          //_blog(),
 
           // REPORTES Y SUGERENCIAS
           _reportes(),

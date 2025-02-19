@@ -133,8 +133,7 @@ class _EmpleadoWidgetState extends State<EmpleadoWidget> {
                         )
                       : const CircleAvatar(
                           radius: 20,
-                          backgroundImage:
-                              AssetImage('assets/images/nofoto.jpg'),
+                          backgroundImage: AssetImage('assets/images/face.png'),
                         ),
                 ),
               ),

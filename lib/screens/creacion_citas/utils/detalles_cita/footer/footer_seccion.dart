@@ -71,13 +71,12 @@ class FooterSeccion extends StatelessWidget {
   }
 
   Widget _buildShareButton() {
-    String fechaCorta =
-        DateFormat('EEE d MMM', 'es_ES').add_Hm().format((reserva.horaInicio!));
     return CompartirCitaConCliente(
       cliente: reserva.nombreCliente!,
       telefono: reserva.telefonoCliente!,
       email: reserva.email,
       fechaCita: reserva.horaInicio!.toString(),
+
       servicio: reserva.servicios!
           .join(', ')
           .toString(), // [servicio1, servicio2] por lo que le quito los corchetes

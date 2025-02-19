@@ -8,6 +8,7 @@ import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/screens/creacion_no_disponibilidad/tarjeta_indisponibilidad.dart';
 import 'package:agendacitas/screens/detalles_horario_no_disponible_screen.dart';
+import 'package:agendacitas/widgets/guardarCitaModificada/GuardarCitaModificada.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,9 @@ class ListaCitasNuevo extends StatefulWidget {
 }
 
 class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
+  // Variable para almacenar el controlador del mensaje persistente gardar cambios
+  PersistentBottomSheetController? _bottomSheetController;
+
   var servicios;
   List<Appointment> meetings = <Appointment>[];
   String _emailSesionUsuario = '';
@@ -51,7 +55,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
     _employeeCollection = <CalendarResource>[];
     //_addResources();
-    //_addSpecialRegions(); // agrega zonas de descansos ejemplo HORA DE COMER
+    _addSpecialRegions(); // agrega zonas de descansos ejemplo HORA DE COMER
     _calendarController = CalendarController();
     super.initState();
   }
@@ -116,6 +120,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
     final contextoCreacionCita = context.watch<CreacionCitaProvider>();
     final calendarioProvider = context.watch<CalendarioProvider>();
     final citaconfirmada = context.watch<EstadoConfirmacionCita>();
+    final horaInicioCita = contextoCreacionCita.horaVariante;
 
     _addResources();
 
@@ -144,8 +149,13 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
       /*   view: vistaProvider
           .vista, */ //············· CAMBIA LA VISTA: VISUALIZA EMPLEADOS :timelineDay ------------------------------------------------
 
-      specialRegions:
-          _specialTimeRegions, // tramos especiales como descansos entre turnos (comidas, descansos..)
+      specialRegions: [
+        TimeRegion(
+            startTime: DateTime(2025, 1, 1, 6, 0, 0),
+            endTime: DateTime(2025, 1, 1, 7, 0, 0),
+            text: '',
+            recurrenceRule: 'FREQ=DAILY;INTERVAL=1')
+      ], // tramos especiales como descansos entre turnos (comidas, descansos..)
       /*   allowedViews: const [
         CalendarView.day,
         CalendarView.timelineDay,
@@ -202,7 +212,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         dayFormat: '',
         dateFormat: 'd',
         timeFormat: 'HH:mm', // FORMATO 24H
-        startHour: 7, // INICIO LABORAL
+        startHour: 6, // INICIO LABORAL
         endHour: 22, // FINAL LABORAL
         timeInterval: Duration(minutes: 15), //INTERVALOS DE TIEMPO
         timeIntervalHeight: 30, // tamaño de las casillas
@@ -393,33 +403,49 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
           }
         }
       },
-
+      onDragStart: (AppointmentDragStartDetails appointmentDragStartDetails) {
+        // Muestra el mensaje de arrastre
+      },
+      onDragUpdate:
+          (AppointmentDragUpdateDetails appointmentDragUpdateDetails) async {
+        print(appointmentDragUpdateDetails.draggingTime);
+        //? desabilitada porque no se visualiza el mensaje de guardado tengo problemas con el contexto
+        /*   GuardarCitaModificada(
+          funcion: () {
+            // Acción al guardar cambios
+            _bottomSheetController?.close();
+            _bottomSheetController = null;
+          },
+        ); */
+      },
       // ****** reasiganacion de cita**********************************************
       onDragEnd: (AppointmentDragEndDetails appointmentDragEndDetails) async {
         // cita seleccionada
         dynamic appointment = appointmentDragEndDetails.appointment!;
 
-        if (_iniciadaSesionUsuario) {
-          // * LOS DATOS SE TRAJERON DE FIREBASE AL SELECCIONAR EL DIA :
-          //*     lib\widgets\selecciona_dia.dart
-          //*     lib\providers\Firebase\firebase_provider.dart
+        // * LOS DATOS SE TRAJERON DE FIREBASE AL SELECCIONAR EL DIA :
+        //*     lib\widgets\selecciona_dia.dart
+        //*     lib\providers\Firebase\firebase_provider.dart
 
-          // extraemos los datos de (notes) para obtener la cita
-          Map<String, dynamic> cita = json.decode(appointment.notes);
-
-          _dialogoEsperayActualizarCita(
-                  context, cita, appointmentDragEndDetails, _emailSesionUsuario)
-              .whenComplete(() {
-            // Navigator.pushReplacementNamed(context, '/');
-          });
-        } else {
-          setState(() {});
-          mensajeError(context, 'No disponible para esta versión');
-        }
+        // extraemos los datos de (notes) para obtener la cita
+        Map<String, dynamic> cita = json.decode(appointment.notes);
+        print(appointmentDragEndDetails.droppingTime);
+        _mostrarMensajeDrag(
+            context,
+            () => dialogoEsperayActualizarCita(context, cita,
+                        appointmentDragEndDetails, _emailSesionUsuario)
+                    .whenComplete(() {
+                  // Navigator.pushReplacementNamed(context, '/');
+                }));
       },
 
       initialDisplayDate: DateTime.now(),
-      dataSource: MeetingDataSource(getAppointments(), _employeeCollection),
+      dataSource: MeetingDataSource(
+        getAppointments(
+          horaInicioCita,
+        ),
+        _employeeCollection,
+      ),
     ));
   }
 
@@ -437,7 +463,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
         ' setea la fecha elegida en 340-lista_de_citas.dart--------------------');
   }
 
-  List<Appointment> getAppointments() {
+  List<Appointment> getAppointments(horaInicioCita) {
     // **** DONDE CREAMOS LA NOTA QUE TRAE TODOS LOS DATOS NECESARIOS PARA LA GESTION DE CITA ****************
     meetings = widget.citasFiltradas.map((cita) {
       final List<String> employeeIds = [];
@@ -525,6 +551,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
     String textoConfirmada = confirmada ? '✔️' : '❌';
     String hayComentario = cita.comentario!.isNotEmpty ? '🗨️' : '';
     String horaInicioTexto = formatearHora(cita.horaInicio.toString());
+
     String horaFinTexto = formatearHora(cita.horaFinal.toString());
 
     // ###### COMPROBACION SI SE TRATA DE UNA CITA O UNA HORA INDISPONIBLE
@@ -536,6 +563,62 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
 
         // ------------TARJETA HORARIO NO DISPONIBLE ---------------------
         : ' ${cita.comentario}';
+  }
+
+  // Función para mostrar el bottom sheet persistente al iniciar el arrastre
+  void _mostrarMensajeDrag(BuildContext context, Function funcion) {
+    // Evitar mostrar múltiples bottom sheets
+    if (_bottomSheetController != null) return;
+
+    _bottomSheetController = Scaffold.of(context).showBottomSheet(
+      (context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          // Asegúrate de asignar un color de fondo para que se distinga
+          color: Colors.white,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '¿Desea guardar los cambios?',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor:
+                          WidgetStateProperty.all(Colors.redAccent),
+                    ),
+                    onPressed: () {
+                      // Acción al cancelar
+                      setState(() {});
+                      _bottomSheetController?.close();
+                      _bottomSheetController = null;
+                    },
+                    child: const Text('Cancelar'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Acción al guardar cambios
+                      _bottomSheetController?.close();
+                      _bottomSheetController = null;
+                      funcion();
+                    },
+                    child: const Text('Guardar'),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 50,
+              )
+            ],
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -584,33 +667,16 @@ void actualizarFechaSeleccionada(
   }
 }
 
-Future<void> _dialogoEsperayActualizarCita(context, Map<String, dynamic> cita,
+Future<void> dialogoEsperayActualizarCita(context, Map<String, dynamic> cita,
     appointmentDragEndDetails, emailSesionUsuario) async {
-  return showDialog(
-    context: context,
-    barrierDismissible: false, // No permite cerrar el diálogo al tocar fuera.
-    builder: (BuildContext context) {
-      // Llama a la función actualizar la cita y cierra el dialogo.
-      _actualizaciondelacita(
-              context, cita, appointmentDragEndDetails, emailSesionUsuario)
-          .whenComplete(() {
-        // Una vez completada la tarea, cierra el diálogo.
-        Navigator.pop(context);
-        Navigator.pushReplacementNamed(context, '/');
-      });
-
-      return const AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Actualizando, por favor espera...'),
-          ],
-        ),
-      );
-    },
-  );
+  // Llama a la función actualizar la cita y cierra el dialogo.
+  _actualizaciondelacita(
+          context, cita, appointmentDragEndDetails, emailSesionUsuario)
+      .whenComplete(() {
+    // Una vez completada la tarea, cierra el diálogo.
+    // Navigator.pop(context);
+    // Navigator.pushReplacementNamed(context, '/');
+  });
 }
 
 Future<void> _actualizaciondelacita(

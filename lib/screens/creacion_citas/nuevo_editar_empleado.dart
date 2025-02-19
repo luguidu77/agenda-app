@@ -5,6 +5,7 @@ import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/Firebase/notificaciones.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
+import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -92,8 +93,8 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
   ];
 
   estadoPagoEmailApp() async {
-    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
-    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+    final estadoPagoProvider = context.read<EmailAdministradorAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailAdministradorApp;
     //  _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
 
     final categorias =
@@ -328,7 +329,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
                 children: [
                   CircleAvatar(
                     backgroundImage: foto.isEmpty
-                        ? const AssetImage("assets/images/nofoto.jpg")
+                        ? const AssetImage("assets/images/face.png")
                             as ImageProvider // Imagen local por defecto// Foto por defecto si no hay foto aún
                         : NetworkImage(foto),
                     radius: 50,

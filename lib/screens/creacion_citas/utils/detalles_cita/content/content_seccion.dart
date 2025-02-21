@@ -20,7 +20,8 @@ class ContentSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // SECCION DEL CLIENTE
-        WidgetsDetalleCita.vercliente(context, reserva),
+        const VerClienteWidget(),
+
         // SECCION DE LA CITA
         WidgetsDetalleCita.fechaCita(context, reserva),
         // SECCION DE SERVICIOS

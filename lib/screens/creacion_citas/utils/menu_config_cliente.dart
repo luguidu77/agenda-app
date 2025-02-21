@@ -1,3 +1,4 @@
+import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -8,9 +9,11 @@ import '../../../utils/utils.dart';
 import '../../screens.dart';
 
 class MenuConfigCliente extends StatefulWidget {
-  var cliente;
-  MenuConfigCliente({
+  final ClienteModel cliente;
+  final String procedencia;
+  const MenuConfigCliente({
     required this.cliente,
+    required this.procedencia,
     super.key,
   });
 
@@ -44,60 +47,67 @@ class _MenuConfigClienteState extends State<MenuConfigCliente> {
       children: [
         const SizedBox(height: 30),
         InkWell(
-          child: const Text('Edición Rapida'),
+          child: const Text('Edición Rápida'),
           onTap: () {
             setState(() {
+              Navigator.pop(context); //CIERRO EL MENU inferior
               _cardConfigCliente(context, cliente);
             });
           },
         ),
         const SizedBox(height: 30),
-        InkWell(
-          child: const Text('Ficha completa'),
-          onTap: () {
-            //1ºrefresco los datos cliente por si han sido editados
-            //  datosClientes(_emailSesionUsuario);
-            //2ºn navega a Ficha Cliente con sus datos
-            Navigator.push(
-              context,
-              PageRouteBuilder(
-                  pageBuilder: (BuildContext context,
-                          Animation<double> animation,
-                          Animation<double> secondaryAnimation) =>
-                      FichaClienteScreen(
-                        clienteParametro: ClienteModel(
-                            id: cliente.id.toString(),
-                            nombre: cliente.nombre,
-                            telefono: cliente.telefono,
-                            email: cliente.email,
-                            foto: cliente.foto,
-                            nota: cliente.nota),
-                      ),
-                  transitionDuration: // ? TIEMPO PARA QUE SE APRECIE EL HERO DE LA FOTO
-                      const Duration(milliseconds: 600)),
-            );
-          },
+        Visibility(
+          visible: widget.procedencia == 'fichaCliente',
+          child: InkWell(
+            child: const Text('Ficha completa'),
+            onTap: () {
+              Navigator.pop(context);
+              //1ºrefresco los datos cliente por si han sido editados
+              //  datosClientes(_emailSesionUsuario);
+              //2ºn navega a Ficha Cliente con sus datos
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                    pageBuilder: (BuildContext context,
+                            Animation<double> animation,
+                            Animation<double> secondaryAnimation) =>
+                        FichaClienteScreen(
+                          clienteParametro: ClienteModel(
+                              id: cliente.id.toString(),
+                              nombre: cliente.nombre,
+                              telefono: cliente.telefono,
+                              email: cliente.email,
+                              foto: cliente.foto,
+                              nota: cliente.nota),
+                        ),
+                    transitionDuration: // ? TIEMPO PARA QUE SE APRECIE EL HERO DE LA FOTO
+                        const Duration(milliseconds: 600)),
+              );
+            },
+          ),
         ),
         const SizedBox(height: 30),
-        _emailSesionUsuario != ''
-            ? InkWell(
-                onTap: () {
-                  _cardEliminarCliente(context, cliente);
-                },
-                child: const Text(
-                  'Eliminar',
-                  style: TextStyle(color: Colors.red),
-                ),
-              )
-
-            //EN CUENTA GRATUITA ESTA DESHABILITADA ESTA OPCION
-            : const Text('Eliminar', style: TextStyle(color: Colors.grey)),
+        Visibility(
+          visible: widget.procedencia == 'fichaCliente',
+          child: InkWell(
+            onTap: () {
+              _cardEliminarCliente(context, cliente);
+            },
+            child: const Text(
+              'Eliminar',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ),
         const SizedBox(height: 20),
       ],
     );
   }
 
+  // ########### EDICION RAPIDA DE CLIENTE ############################
   _cardConfigCliente(BuildContext context, ClienteModel cliente) {
+    final contextoCita = context.read<CreacionCitaProvider>();
+    final cita = contextoCita.contextoCita;
     MyLogicCliente myLogic = MyLogicCliente(cliente);
     myLogic.init();
 
@@ -132,24 +142,17 @@ class _MenuConfigClienteState extends State<MenuConfigCliente> {
                         decoration:
                             const InputDecoration(labelText: 'Telefono'),
                       ),
+                      TextField(
+                        keyboardType: TextInputType.emailAddress,
+                        controller: myLogic.textControllerEmail,
+                        decoration: const InputDecoration(labelText: 'Email'),
+                      ),
                     ],
                   ),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    //HE DESHABILITADO LA ELIMINACION DE CLIENTES PARA NO TENER QUE ELIMINAR TODOAS SUS CITAS Y POR CONSIGUIENTE CAMBIE LA FACTURACION
-                    /*  TextButton(
-                        onPressed: () async {
-                          await _eliminar(idCliente);
-                          // ELIMINA CLIENTE DE FIREBASE
-                          await _eliminarClienteFB(usuarioAPP, cliente.id);
-                          datosClientes();
-                          Navigator.pop(context);
-                        },
-                        child: const Text(
-                          'ELIMINAR',
-                        )), */
                     TextButton(
                         onPressed: () async {
                           cliente.id = idCliente;
@@ -157,12 +160,21 @@ class _MenuConfigClienteState extends State<MenuConfigCliente> {
                           cliente.nombre = myLogic.textControllerNombre.text;
                           cliente.telefono =
                               myLogic.textControllerTelefono.text;
-                          await _actualizar(cliente);
-                          setState(() {});
+                          cliente.email = myLogic.textControllerEmail.text;
+
+                          final newCliente = CitaModelFirebase(
+                            telefonoCliente: cliente.telefono,
+                            nombreCliente: cliente.nombre,
+                            emailCliente: cliente.email,
+                          );
+                          contextoCita.setContextoCita(newCliente);
+
                           // ACTUALIZA CLIENTE DE FIREBASE
                           await _actualizarClienteFB(
                               _emailSesionUsuario, cliente);
+
                           Navigator.pop(context);
+                          contextoCita.setVisibleGuardar(true);
                         },
                         child: const Text(
                           'ACTUALIZAR',

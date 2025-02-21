@@ -103,7 +103,7 @@ class _CreacionCitaClienteState extends State<CreacionCitaCliente> {
               ],
             ),
             const Divider(),
-
+            const Text('     ⬇️ Actualiza arrastrando hacia abajo ⬇️'),
             // LISTA DE CLIENTES ####################################
             ListaClientes(
                 fecha: fechaTime,

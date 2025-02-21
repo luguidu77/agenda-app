@@ -4,66 +4,145 @@ import 'package:agendacitas/providers/providers.dart';
 import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_confirmar.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/menu_config_cliente.dart';
 import 'package:agendacitas/utils/actualizacion_cita.dart';
 import 'package:agendacitas/utils/formatear.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class WidgetsDetalleCita {
-  static vercliente(context, CitaModelFirebase citaElegida) {
-    final boxDecoration = BoxDecoration(
-      border: Border.all(
-        color: const Color.fromARGB(255, 216, 215, 215), // Color del borde
-        width: 1.0, // Grosor del borde
-      ),
-      borderRadius: BorderRadius.circular(8.0), // Bordes redondeados
-      color: Colors.white, // Fondo opcional
-    );
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10.0),
-      height: 80.0, // Altura agradable para la vista
-      decoration: boxDecoration, // Bordes redondeados
-      child: ClipRect(
-        child: SizedBox(
-          //Banner aqui -----------------------------------------------
-          child: Column(
-            children: [
-              ListTile(
-                leading: citaElegida.fotoCliente != null &&
-                        citaElegida.fotoCliente != ''
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(150.0),
-                        child: Image.network(
-                          citaElegida.fotoCliente.toString(),
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                        ))
-                    : ClipRRect(
-                        borderRadius: BorderRadius.circular(150.0),
-                        child: Image.asset(
-                          "./assets/images/nofoto.jpg",
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                title: Text(
-                  citaElegida.nombreCliente.toString(),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(citaElegida.telefonoCliente.toString()),
-              ),
-            ],
+class VerClienteWidget extends StatelessWidget {
+  const VerClienteWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<CreacionCitaProvider>(
+      builder: (context, contextoCita, child) {
+        final clienteData = contextoCita.contextoCita;
+        final cliente = ClienteModel(
+          id: clienteData.idcliente,
+          nombre: clienteData.nombreCliente,
+          telefono: clienteData.telefonoCliente,
+          foto: clienteData.fotoCliente ?? '',
+          email: clienteData.emailCliente ?? '',
+          nota: clienteData.notaCliente ?? '',
+        );
+        final boxDecoration = BoxDecoration(
+          border: Border.all(
+            color: const Color.fromARGB(255, 216, 215, 215), // Color del borde
+            width: 1.0, // Grosor del borde
           ),
-        ),
-      ),
+          borderRadius: BorderRadius.circular(8.0), // Bordes redondeados
+          color: Colors.white, // Fondo opcional
+        );
+        return InkWell(
+          onTap: () async {
+            await showModalBottomSheet(
+              isScrollControlled: true,
+              context: context,
+              builder: (BuildContext context) {
+                return Container(
+                  height: 300,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(
+                          20), // Bordes redondeados en la parte superior
+                    ),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Text(
+                          clienteData.nombreCliente.toString(),
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black, // Color de texto
+                          ),
+                        ),
+                        Text(
+                          clienteData.telefonoCliente.toString(),
+                          style: const TextStyle(
+                            fontSize: 11,
+
+                            color: Colors.grey, // Color de texto
+                          ),
+                        ),
+                        Text(
+                          clienteData.emailCliente.toString(),
+                          style: const TextStyle(
+                            fontSize: 11,
+
+                            color: Colors.grey, // Color de texto
+                          ),
+                        ),
+                        const Divider(),
+                        MenuConfigCliente(
+                          cliente: cliente,
+                          procedencia: 'detalleCita',
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+
+            //setState(() {});
+          },
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 10.0),
+            height: 80.0, // Altura agradable para la vista
+            decoration: boxDecoration, // Bordes redondeados
+            child: ClipRect(
+              child: SizedBox(
+                //Banner aqui -----------------------------------------------
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: clienteData.fotoCliente != null &&
+                              clienteData.fotoCliente != ''
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(150.0),
+                              child: Image.network(
+                                clienteData.fotoCliente.toString(),
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              ))
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(150.0),
+                              child: Image.asset(
+                                "./assets/images/nofoto.jpg",
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                      title: Text(
+                        clienteData.nombreCliente.toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(clienteData.telefonoCliente.toString()),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
+}
 
+class WidgetsDetalleCita {
   static fechaCita(BuildContext context, CitaModelFirebase citaElegida) {
     final citaProvider = context.watch<CreacionCitaProvider>();
 

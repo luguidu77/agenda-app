@@ -86,6 +86,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
               ),
             ),
             const Divider(),
+            const Text('⬇️ Actualiza arrastrando hacia abajo ⬇️'),
             ListaClientes(
                 fecha: DateTime.now(), // cualquier DateTime
                 iniciadaSesionUsuario: _iniciadaSesionUsuario,

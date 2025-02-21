@@ -284,7 +284,10 @@ class _ListaClientesState extends State<ListaClientes> {
                       ),
                     ),
                     const Divider(),
-                    MenuConfigCliente(cliente: listaClientes[index]),
+                    MenuConfigCliente(
+                      cliente: listaClientes[index],
+                      procedencia: 'fichaCliente',
+                    ),
                   ],
                 ),
               ),

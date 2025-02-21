@@ -56,7 +56,7 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
     final personaliza =
         context.read<PersonalizaProviderFirebase>().getPersonaliza;
     bool citaConfirmada = widget.reserva!.confirmada!;
-    final citaContexto = context.watch<CreacionCitaProvider>();
+    final citaContexto = context.read<CreacionCitaProvider>();
     citaContexto.contextoCita.dia = dia;
     citaContexto.setContextoCita(widget.reserva!);
 
@@ -70,8 +70,7 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
           IconButton(
               color: Colors.white,
               onPressed: () {
-                if (_fechaOriginal
-                    .isAtSameMomentAs(citaContexto.contextoCita.horaInicio!)) {
+                if (citaContexto.visibleGuardar == false) {
                   // no se ha modificado la fecha
 
                   Navigator.pop(context);

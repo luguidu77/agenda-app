@@ -7,6 +7,7 @@ class CreacionCitaProvider extends ChangeNotifier {
   CitaModelFirebase get contextoCita => _contextoCita;
 
   setContextoCita(CitaModelFirebase edicionContextoCita) {
+    print('invocado contextoCita');
     // Actualizar solo los campos que no sean null en edicionContextoCita
     _contextoCita = CitaModelFirebase(
       id: edicionContextoCita.id ?? _contextoCita.id,

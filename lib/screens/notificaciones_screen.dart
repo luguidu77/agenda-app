@@ -293,6 +293,8 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
         print(emailSesionUsuario);
         print(notificacion['id']);
         // final categoria = _obtieneTextoCategoria(notificacion['categoria'], 12);
+        final nombreEmpleado = notificacion['data']['nombreEmpleado'];
+        print(nombreEmpleado);
         await showModalBottomSheet(
           isScrollControlled: true,
           context: context,

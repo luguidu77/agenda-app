@@ -21,10 +21,11 @@ import '../screens/screens.dart';
 import '../utils/utils.dart';
 import '../widgets/widgets.dart';
 
+import 'package:flutter/material.dart';
+
 class MenuAplicacion extends StatefulWidget {
-  const MenuAplicacion({
-    Key? key,
-  }) : super(key: key);
+  const MenuAplicacion({Key? key}) : super(key: key);
+
   @override
   State<MenuAplicacion> createState() => _MenuAplicacionState();
 }
@@ -33,552 +34,323 @@ class _MenuAplicacionState extends State<MenuAplicacion> {
   String _emailSesionUsuario = '';
   String _emailAdministrador = '';
   String _estadopago = '';
-  TextStyle estilo = const TextStyle(color: Colors.blueGrey);
+  TextStyle estilo = const TextStyle(color: Colors.black);
   bool _iniciadaSesionUsuario = false;
   String versionApp = '';
   bool versionPlayS = false;
   String comentarioVersion = '';
   bool enviosugerencia = false;
   bool necesitaActualizar = false;
+  String imageUrl = '';
+
+  @override
+  void initState() {
+    super.initState();
+    emailUsuario();
+    imagenUrl();
+    version();
+  }
 
   version() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-
     versionApp = packageInfo.version;
-
     double verApp = double.parse(versionApp);
-
-//? COMPRUEBA VERSION EN FIREBASE(PLAYSTORE)
 
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
-
     final db = FirebaseFirestore.instance;
-
-// creo una referencia al documento que contiene la version
     final docRefVersion =
         db.collection("versionPlayStore").doc("Izdf1IB8WIfq3s8GbYuK");
-
-    var data = await docRefVersion.get().then(
-          (doc) => doc.data(),
-        );
-
+    var data = await docRefVersion.get().then((doc) => doc.data());
     versionPlayS = data!['version'];
     comentarioVersion = data['comentario'];
-
-    debugPrint(
-        'La version de la app en PlaStore es: ${versionPlayS.toString()}');
-    debugPrint('comentario de version: ${comentarioVersion.toString()}');
-
-    debugPrint('La version de la app instalada es: ${verApp.toString()}');
-
-//? COMPARO VERSION EN FIREBASE(PLAYSTORE) CON LA INSTALADA EN EL MOVIL
     if (versionPlayS) {
       necesitaActualizar = true;
     }
-
     setState(() {});
   }
 
   emailUsuario() async {
     final estadoPagoProvider = context.read<EmailUsuarioAppProvider>();
-    _emailSesionUsuario =
-        estadoPagoProvider.emailUsuarioApp; // emailUsuarioApp;
-
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
     final contextoEmailAdmin = context.read<EmailAdministradorAppProvider>();
-    _emailAdministrador =
-        contextoEmailAdmin.emailAdministradorApp; // emailAdministradorApp;
+    _emailAdministrador = contextoEmailAdmin.emailAdministradorApp;
   }
-
-  String imageUrl = '';
 
   Future<String> obtenerImagenDesdeFirebase() async {
     final contextoRoles = context.read<RolUsuarioProvider>();
     if (contextoRoles.rol == RolEmpleado.administrador) {
       final perfil =
           await FirebaseProvider().cargarPerfilFB(_emailAdministrador);
-
-      PerfilAdministradorModel perfilModel =
-          PerfilAdministradorModel(foto: perfil.foto);
-
-      setState(() {});
-      return perfilModel.foto.toString();
+      return perfil.foto.toString();
     } else {
-      print(_emailSesionUsuario);
       final perfil = await FirebaseProvider()
           .cargarPerfilEmpleado(_emailAdministrador, _emailSesionUsuario);
-
-      PerfilEmpleadoModel perfilModel = PerfilEmpleadoModel(foto: perfil.foto);
-      setState(() {});
-      return perfilModel.foto.toString();
+      return perfil.foto.toString();
     }
-  }
-
-  imagenUrl() async {
-    imageUrl = await obtenerImagenDesdeFirebase();
-  }
-
-  @override
-  void initState() {
-    // leerBasedatos();
-    emailUsuario();
-    imagenUrl();
-    version();
-
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     final contextoRoles = context.read<RolUsuarioProvider>();
+    bool esAdmin = contextoRoles.rol == RolEmpleado.administrador;
+    bool esGerente = contextoRoles.rol == RolEmpleado.gerente;
+    // Lista de opciones del menú
+    final List<MenuOpcion> opciones = [
+      if (esAdmin || esGerente)
+        MenuOpcion(
+          icono: Icons.home_repair_service_outlined,
+          texto: 'Tus servicios',
+          onTap: () {
+            // Navegar a la pantalla de servicios
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ServiciosScreen()),
+            );
+          },
+        ),
+      if (esAdmin || esGerente)
+        MenuOpcion(
+          icono: Icons.person,
+          texto: 'Gestión de personal',
+          onTap: () {
+            // Navegar a la pantalla de gestión de personal
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const EmpleadosScreen()),
+            );
+          },
+        ),
+      if (esAdmin || esGerente)
+        MenuOpcion(
+          icono: Icons.settings,
+          texto: 'Configuración',
+          onTap: () {
+            // Navegar a la pantalla de configuración
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const ConfigPersonalizar()),
+            );
+          },
+        ),
+      if (esAdmin || esGerente)
+        MenuOpcion(
+          icono: Icons.beach_access,
+          texto: 'Disponibilidad Semanal',
+          onTap: () {
+            // Navegar a la pantalla de disponibilidad semanal
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const DisponibilidadSemanalScreen()),
+            );
+          },
+        ),
+      if (esAdmin || esGerente)
+        MenuOpcion(
+          icono: Icons.bar_chart_rounded,
+          texto: 'Informes',
+          onTap: () {
+            // Navegar a la pantalla de informes
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const InformesScreen()),
+            );
+          },
+        ),
+      MenuOpcion(
+        icono: Icons.notification_important_outlined,
+        texto: 'Notificaciones',
+        onTap: () {
+          // Navegar a la pantalla de notificaciones
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => HomeScreen(index: 1, myBnB: 1)),
+          );
+        },
+      ),
+      if (esAdmin || esGerente)
+        MenuOpcion(
+          icono: Icons.email,
+          texto: 'Reportes/sugerencias',
+          onTap: () {
+            // Acción para reportes y sugerencias
+            Comunicaciones.enviaEmailConAsunto(
+                'Reporte y/o sugerencias para Agenda de Citas');
+          },
+        ),
+    ];
 
-    return Container(
-      color: colorFondo,
-      child: ListView(
-        // Important: Remove any padding from the ListView.
-        padding: EdgeInsets.zero,
+    return Scaffold(
+      backgroundColor: Colors.grey[50], // Fondo casi blanco
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              _cabeceraConSesion(context),
+              Expanded(
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, // Dos columnas
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                  ),
+                  itemCount: opciones.length,
+                  itemBuilder: (context, index) {
+                    return _TarjetaOpcion(opcion: opciones[index]);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _cabeceraConSesion(BuildContext context) {
+    return Card(
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 8.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
         children: [
-          // CABECERA CUAN HAY UNA SESION INICIADA
-          _cabeceraConSesion(context),
-
-          // MENSAJE PARA LA PUBLICACION EN AGENDADECITAS.ONLINE
-          Visibility(
-            visible: contextoRoles.rol == RolEmpleado.administrador,
-            child: _iniciadaSesionUsuario
-                ? _mensajePublicacionOnline(context, _emailSesionUsuario)
-                : Container(),
+          // Fondo de color azul
+          Container(
+            height: 180,
+            color: Colors.blue, // Fondo azul
           ),
-
-          // CONFIGURA LOS SERVICIOS QUE OFRECEN A CLIENTES
-          Visibility(
-            visible: contextoRoles.rol == RolEmpleado.administrador ||
-                contextoRoles.rol == RolEmpleado.gerente,
-            child: _serviciosQueOfrece(context),
+          // Contenido del encabezado
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: UserAccountsDrawerHeader(
+              decoration: const BoxDecoration(color: Colors.transparent),
+              accountEmail: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Nombre del negocio en blanco
+                    denominacionNegocio(_emailAdministrador),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Indicador de versión de prueba
+                          _estadopago == 'PRUEBA_ACTIVA'
+                              ? Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 5.0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.3),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Text(
+                                    'versión de prueba',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox(),
+                          // Versión de la aplicación
+                          Text(
+                            'versión $versionApp',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              accountName: const Text(''),
+              // Imagen de perfil
+              currentAccountPicture: CircleAvatar(
+                backgroundImage: imageUrl.isNotEmpty
+                    ? NetworkImage(imageUrl)
+                    : const AssetImage("assets/images/nofoto.jpg")
+                        as ImageProvider,
+              ),
+              // Ícono de edición moderno
+              otherAccountsPictures: [
+                IconButton(
+                  icon: const Icon(
+                      Icons.edit_outlined), // Ícono de edición más elegante
+                  color: Colors.white,
+                  onPressed: () => context.read<RolUsuarioProvider>().rol ==
+                          RolEmpleado.administrador
+                      ? Navigator.pushNamed(context, 'ConfigPerfilAdminstrador')
+                      : Navigator.pushNamed(context, 'ConfigPerfilUsuario'),
+                ),
+              ],
+            ),
           ),
-
-          // EMPLEADOS
-          Visibility(
-            visible: contextoRoles.rol == RolEmpleado.administrador ||
-                contextoRoles.rol == RolEmpleado.gerente,
-            child: _empleados(context),
-          ),
-
-          //CONFIGURACION DE LA APP
-          Visibility(
-            visible: contextoRoles.rol == RolEmpleado.administrador ||
-                contextoRoles.rol == RolEmpleado.gerente,
-            child: _configuracion(context),
-          ),
-
-          // DISPONIBILIDAD SEMANAL
-          Visibility(
-            visible: contextoRoles.rol == RolEmpleado.administrador ||
-                contextoRoles.rol == RolEmpleado.gerente,
-            child: _disponiblidadSemanal(context),
-          ),
-
-          // INFORMES GANANCIAS
-          Visibility(
-            visible: contextoRoles.rol == RolEmpleado.administrador,
-            child: _informes(context),
-          ),
-
-          const Divider(),
-
-          /*  _estadopago == 'INITIAL' || _estadopago == 'GRATUITA'
-              ? _creaCuentaPruebas()
-              : const Text(''), */
-
-          // COMPRAR LA APLICACION
-          // _estadopago == 'COMPRADA' ? const Text('') : _comprarAPP(context),
-
-          // PLAN AMIGO
-          // _estadopago == 'COMPRADA' ? const Text('') : _planAmigo(context),
-
-          //NOTIFICACIONES
-          Visibility(
-            visible: contextoRoles.rol == RolEmpleado.administrador ||
-                contextoRoles.rol == RolEmpleado.gerente,
-            child: _notificaciones(),
-          ),
-
-          //BLOG AGENDADECITAS.CLOUD
-          //_blog(),
-
-          // REPORTES Y SUGERENCIAS
-          _reportes(),
-
-          //_pruebaEnvioEmail(context),
-
-          //VALORAR LA APLICACION Y LA VERSION DISPONIBLE
-          // _valoracionApp(),
         ],
       ),
     );
   }
 
-  _cabeceraConSesion(BuildContext context) {
-    final contextoRoles = context.read<RolUsuarioProvider>();
-
-    return Stack(
-      children: [
-        // Imagen de fondo
-        Container(
-          height: 200.0, // Altura del header
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: imageUrl.isNotEmpty
-                  ? NetworkImage(imageUrl) // Cargar la imagen desde URL
-                  : const AssetImage("assets/images/nofoto.jpg")
-                      as ImageProvider, // Imagen local por defectofondo
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-        // Degradado encima de la imagen
-        Container(
-          height: 200.0, // La misma altura que el Container de la imagen
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight,
-              colors: [
-                Colors.white.withOpacity(0.6), // Negro semi-transparente arriba
-                Colors.white, // Transparente abajo
-              ],
-              stops: const [0.0, 1.0],
-            ),
-          ),
-        ),
-        // UserAccountsDrawerHeader
-        UserAccountsDrawerHeader(
-          decoration: const BoxDecoration(
-            color: Colors.transparent, // Para que el fondo sea transparente
-          ),
-          // currentAccountPicture: fotoPerfil(_emailSesionUsuario),
-          //currentAccountPictureSize: const Size.square(95.0),
-          otherAccountsPictures: [
-            // light/dark
-            //  const ChangeThemeButtonWidget(),
-
-            // editar perfil
-            IconButton(
-              color: Colors.black,
-              icon: const Icon(Icons.edit_square),
-              onPressed: () => contextoRoles.rol == RolEmpleado.administrador
-                  ? Navigator.pushNamed(context, 'ConfigPerfilAdminstrador')
-                  : Navigator.pushNamed(context, 'ConfigPerfilUsuario'),
-            ),
-          ],
-          accountEmail: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                denominacionNegocio(_emailAdministrador),
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _estadopago == 'PRUEBA_ACTIVA'
-                          ? const Card(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 5.0),
-                                child: Text(
-                                  'versión de prueba',
-                                  style: TextStyle(
-                                    color: Color.fromARGB(255, 99, 11, 23),
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            )
-                          : Container(),
-                      Text(
-                        'versión $versionApp',
-                        style: const TextStyle(
-                          color: Color.fromARGB(255, 99, 11, 23),
-                          fontSize: 10,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          accountName: const Text(''),
-        ),
-      ],
-    );
+  imagenUrl() async {
+    imageUrl = await obtenerImagenDesdeFirebase();
+    setState(() {});
   }
+}
 
-  DrawerHeader _cabeceraGratuita() {
-    return DrawerHeader(
-        decoration: const BoxDecoration(
+class _TarjetaOpcion extends StatelessWidget {
+  final MenuOpcion opcion;
+
+  const _TarjetaOpcion({Key? key, required this.opcion}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: opcion.onTap,
+      child: Container(
+        decoration: BoxDecoration(
           color: Colors.white,
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8),
         ),
-        child: Center(
-            child: SingleChildScrollView(
-          child: Column(children: [
-            const Image(
-              image: AssetImage('assets/icon/icon.png'),
-              width: 80,
-            ),
-            Text('Agenda de citas', style: estilo),
-            Text('versión gratuita $versionApp', style: estilo),
-          ]),
-        )));
-  }
-
-  _mensajePublicacionOnline(BuildContext context, String emailUsuario) {
-    return FutureBuilder(
-        future: FirebasePublicacionOnlineAgendoWeb()
-            .verEstadoPublicacion(emailUsuario),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData || snapshot.data != 'NO PUBLICADO') {
-            return Container();
-          }
-          return Container(
-            color: Colors.blue,
-            child: ListTile(
-              leading: const Icon(Icons.edit_square),
-              subtitle: const Text(
-                  style: TextStyle(color: Colors.white),
-                  'En tu perfil hemos agreado un enlace que te lleva al formulario de solicitud para publicar tu actividad en la web agendadecitas.online'),
-              onTap: () =>
-                  {Navigator.pushNamed(context, 'ConfigPerfilAdminstrador')},
-            ),
-          );
-        });
-  }
-
-  ListTile _serviciosQueOfrece(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.home_repair_service_outlined),
-      title: Text('Tus servicios', style: estilo),
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ServiciosScreen(),
-            ));
-      },
-    );
-  }
-
-  ListTile _configuracion(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.settings),
-      title: Text(
-        'Configuración',
-        style: estilo,
-      ),
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ConfigPersonalizar(),
-            ));
-      },
-    );
-  }
-
-  ListTile _disponiblidadSemanal(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.beach_access),
-      title: Text(
-        'Disponibilidad Semanal',
-        style: estilo,
-      ),
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const DisponibilidadSemanalScreen(),
-            ));
-      },
-    );
-  }
-
-  ListTile _notificaciones() {
-    return ListTile(
-      leading: const Icon(Icons.notification_important_outlined),
-      title: Text(
-        'Notificaciones',
-        style: estilo,
-      ),
-      onTap: () async {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => HomeScreen(
-                index: 1,
-                myBnB: 1,
-              ),
-            ));
-      },
-    );
-  }
-
-  ListTile _blog() {
-    return ListTile(
-      leading: const Icon(Icons.wordpress),
-      title: Text(
-        'Blog',
-        style: estilo,
-      ),
-      onTap: () async {
-        const url = 'https://agendadecitas.cloud';
-        if (await canLaunch(url)) {
-          await launch(url);
-        } else {
-          throw 'No se pudo lanzar $url';
-        }
-      },
-    );
-  }
-
-  ListTile _reportes() {
-    return ListTile(
-      leading: const Icon(Icons.email),
-      title: Text(
-        'Reportes y sugerencias',
-        style: estilo,
-      ),
-      onTap: () {
-        Comunicaciones.enviaEmailConAsunto(
-            'Reporte y/o sugerencias para Agenda de Citas');
-      },
-    );
-  }
-
-  /*  ListTile _comprarAPP(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.monetization_on),
-      title: Text(
-        'Quitar anuncios y más',
-        style: estilo,
-      ),
-      onTap: () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const ComprarAplicacion(
-                  // usuarioAPP: email,
-                  )),
-        );
-        //  _quitarPublicidad(context, enviosugerencia);
-      },
-    );
-  } */
-
-  ListTile _informes(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.bar_chart_rounded),
-      title: Text(
-        'Informes',
-        style: estilo,
-      ),
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const InformesScreen(),
-            ));
-        //  _quitarPublicidad(context, enviosugerencia);
-      },
-    );
-  }
-
-/*   ListTile _planAmigo(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.face_retouching_natural),
-      title: Text(
-        ' Plan amigo 🎁',
-        style: estilo,
-      ),
-      onTap: () {
-        Navigator.pushNamed(context, 'PlanAmigo');
-        //  _quitarPublicidad(context, enviosugerencia);
-      },
-    );
-  } */
-
-  ListTile _pruebaEnvioEmail(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.face_retouching_natural),
-      title: Text(
-        ' prueba envio automatico email',
-        style: estilo,
-      ),
-      onTap: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const EnvioSensinblue()));
-      },
-    );
-  }
-
-  ListTile _valoracionApp() {
-    return ListTile(
-        textColor: Colors.red,
-        leading: const Icon(Icons.update),
-        title: Column(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // const Text('Actualización disponible en PlayStore'),
+            Icon(opcion.icono, size: 35, color: Colors.black),
+            const SizedBox(height: 8),
             Text(
-              comentarioVersion.toString(),
-              style: const TextStyle(fontSize: 12),
-            )
+              opcion.texto,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w400,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
-        // link a play store
-        onTap: () async {
-          const url =
-              'https://play.google.com/store/apps/details?id=agendadecitas.app';
-          if (await launchUrl(Uri.parse(url))) {
-            await launchUrl(Uri.parse(url));
-          } else {
-            throw 'Could not launch $url';
-          }
-        });
-  }
-
-  _creaCuentaPruebas() {
-    return Container(
-      color: const Color.fromARGB(255, 101, 176, 238),
-      child: ListTile(
-        leading: const Icon(Icons.face_retouching_natural),
-        title: Text(
-          'Crea cuenta de prueba online',
-          style: textoEstilo,
-        ),
-        subtitle: const Text('Pública tu actividad en la placemarket'),
-        onTap: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => RegistroUsuarioScreen(
-                      registroLogin: 'Registro',
-                      usuarioAPP: '',
-                    )),
-          );
-        },
       ),
     );
   }
+}
 
-  ListTile _empleados(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.person),
-      title: Text('Gestión de personal', style: estilo),
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const EmpleadosScreen(),
-            ));
-      },
-    );
-  }
+class MenuOpcion {
+  final IconData icono;
+  final String texto;
+  final VoidCallback onTap;
+
+  MenuOpcion({
+    required this.icono,
+    required this.texto,
+    required this.onTap,
+  });
 }

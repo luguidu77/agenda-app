@@ -234,7 +234,7 @@ String textoHTML(String estadoCita, PerfilAdministradorModel negocio,
 }
 
 String textoHTMLInvitacion(
-    //https://agendadecitas.online/invitacion?id=1WosONwUBRqYDSc2JtYk&foto=https://firebasestorage.googleapis.com/v0/b/flutter-varios-576e6.appspot.com/o/agendadecitas%2Fadriananoemi067%40gmail.com%2Fclientes%2F%2B549116434-1681%2Ffoto?alt=media&token=babab7ff-4465-4728-b666-8ef8c82be410&name=Mario&email=hello@gmail.es&idNegocio=luguidu@hotmail.com&nombreNegocio=Agencia%20de%20Servicios
+    //https://agendadecitas.online/#/invitacion?id=1WosONwUBRqYDSc2JtYk&foto=https://firebasestorage.googleapis.com/v0/b/flutter-varios-576e6.appspot.com/o/agendadecitas%2Fadriananoemi067%40gmail.com%2Fclientes%2F%2B549116434-1681%2Ffoto?alt=media&token=babab7ff-4465-4728-b666-8ef8c82be410&name=Mario&email=hello@gmail.es&idNegocio=luguidu@hotmail.com&nombreNegocio=Agencia%20de%20Servicios
     PerfilAdministradorModel negocio,
     EmpleadoModel empleado) {
   String emailNegocio = negocio.email!;
@@ -313,7 +313,7 @@ String textoHTMLInvitacion(
      
     </div>
     <div class="button-container">
-  <a href="https://agendadecitas.online/invitacion?id=$idEmpleado&foto=$fotoEmpleado&name=$nombreEmpleado&email=$emailEmpleado&telefono=$telefonoEmpleado&idNegocio=$emailNegocio&nombreNegocio=$nombreEmpleado" target="_blank">Aceptar invitación</a>
+  <a href="https://agendadecitas.online/#/invitacion?id=$idEmpleado&foto=$fotoEmpleado&name=$nombreEmpleado&email=$emailEmpleado&telefono=$telefonoEmpleado&idNegocio=$emailNegocio&nombreNegocio=$nombreEmpleado" target="_blank">Aceptar invitación</a>
 </div>
 <br><br><br>
     <div class="footer">

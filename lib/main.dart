@@ -14,6 +14,7 @@ import 'package:agendacitas/screens/error_page.dart';
 import 'package:agendacitas/screens/not_found_page.dart';
 
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
+import 'package:agendacitas/screens/pantalla_de_carga.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -80,7 +81,7 @@ void main() async {
 
   // initializeDateFormatting().then((_) {
 
-  MobileAds.instance.initialize();
+  // MobileAds.instance.initialize();
 
   //});
   // Registra el background handler
@@ -96,6 +97,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  bool _esperandoDeepLink = true; // Por defecto, esperamos un enlace
+
   // Agrega estas variables a nivel de clase
 
   final _navigatorKey = GlobalKey<NavigatorState>();
@@ -201,42 +204,25 @@ class _MyAppState extends State<MyApp> {
             initialRoute: "/",
             navigatorKey: _navigatorKey,
             onGenerateRoute: (RouteSettings settings) {
-              // ruta por defecto
-              Widget routeWidget = HomeScreen(
-                index: 0,
-                myBnB: 0,
-              );
-              // Analiza el nombre de la ruta
-              final routeName = settings.name;
-              print('ruta ---------------------------------- $routeName');
-              print(
-                  'ruta ---------------------------------- ${routeName!.startsWith('/invitacion')}');
-              if (routeName != null) {
-                if (routeName.startsWith('/invitacion')) {
-                  try {
-                    /*   // Convierte el routeName en un URI
-                    final uri = Uri.parse(routeName); */
+              // Pantalla por defecto mientras esperas el enlace profundo
+              if (_esperandoDeepLink) {
+                return MaterialPageRoute(
+                  builder: (_) => const PantallaDeCarga(),
+                );
+              }
 
-                    // Redirige a RegistroEmpleados y pasa los datos como argumento
-                    routeWidget = RegistroEmpleados(
-                      dataPorLink: routeName, // Envía la URL completa
-                    );
+              // Procesa la ruta recibida
+              final routeName = settings.name ?? '';
+              print('Ruta recibida: $routeName');
 
-                    // Opcional: Si prefieres pasar solo los parámetros, puedes adaptarlo así:
-                    // routeWidget = RegistroEmpleados(
-                    //   dataPorLink: uri.queryParameters['id'] ?? '', // Por ejemplo
-                    // );
-                  } catch (e) {
-                    debugPrint('Error procesando la URL: $e');
-                    routeWidget =
-                        ErrorPage(); // Una página de error personalizada
-                  }
-                } else if (routeName == '/empleadoRevisaConfirma') {
-                  routeWidget = const EmpleadoRevisaConfirma();
-                } else {
-                  // Manejador por defecto para rutas desconocidas
-                  routeWidget = NotFoundPage(); // Página 404
-                }
+              Widget routeWidget;
+
+              if (routeName.startsWith('/invitacion')) {
+                routeWidget = RegistroEmpleados(dataPorLink: routeName);
+              } else if (routeName == '/empleadoRevisaConfirma') {
+                routeWidget = const EmpleadoRevisaConfirma();
+              } else {
+                routeWidget = const NotFoundPage();
               }
 
               return MaterialPageRoute(builder: (_) => routeWidget);
@@ -316,20 +302,21 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Future<void> initDeepLinks() async {
+  void initDeepLinks() async {
     _appLinks = AppLinks();
 
     // Manejar enlace inicial
     Uri? initialUri = await _appLinks.getInitialLink();
-
     if (initialUri != null) {
-      print('link recibido -------------------------');
+      _esperandoDeepLink = false;
       _navigatorKey.currentState?.pushNamed(initialUri.fragment);
+    } else {
+      _esperandoDeepLink = false;
     }
 
     // Escuchar nuevos enlaces
     _appLinks.uriLinkStream.listen((uri) {
-      print('escuchando link  ------------------------- ${uri.toString()}');
+      _esperandoDeepLink = false;
       _navigatorKey.currentState?.pushNamed(uri.fragment);
     });
   }

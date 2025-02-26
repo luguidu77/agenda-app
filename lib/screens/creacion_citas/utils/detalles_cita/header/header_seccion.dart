@@ -23,8 +23,6 @@ class HeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final citaProvider = context.watch<CreacionCitaProvider>();
-
     return Column(
       spacing: 15,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -39,14 +37,16 @@ class HeaderSection extends StatelessWidget {
               InkWell(
                 onTap: () {
                   WidgetsDetalleCita.seleccionaDia(
-                      context, reserva, citaProvider);
+                      context, reserva, context.read<CreacionCitaProvider>());
                 },
                 child: Row(
                   spacing: 5,
                   children: [
                     Text(
-                      DateFormat('EEE d MMM', 'es_ES')
-                          .format(citaProvider.contextoCita.horaInicio!),
+                      DateFormat('EEE d MMM', 'es_ES').format(context
+                          .read<CreacionCitaProvider>()
+                          .contextoCita
+                          .horaInicio!),
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,

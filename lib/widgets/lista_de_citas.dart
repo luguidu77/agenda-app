@@ -277,6 +277,13 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
                 emailCliente: cita['email'],
                 notaCliente: cita['nota']);
 
+            String dia = formatearFechaDiaCita(citaElegida.horaInicio!);
+            // Puedes incluir una verificación para que solo se ejecute una vez si es necesario.
+
+            // Puedes incluir una verificación para que solo se ejecute una vez si es necesario.
+            final citaContexto = context.read<CreacionCitaProvider>();
+            citaContexto.contextoCita.dia = dia;
+            citaContexto.setContextoCita(citaElegida);
             // Reemplaza el showModalBottomSheet con esto:
             Navigator.of(context).push(
               PageRouteBuilder(

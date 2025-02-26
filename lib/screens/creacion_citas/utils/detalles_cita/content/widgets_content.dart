@@ -129,7 +129,7 @@ class VerClienteWidget extends StatelessWidget {
                         clienteData.nombreCliente.toString(),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Text(clienteData.telefonoCliente.toString()),
+                      // subtitle: Text(clienteData.telefonoCliente.toString()),
                     ),
                   ],
                 ),

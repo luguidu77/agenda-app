@@ -2,6 +2,7 @@
 
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/providers/creacion_cuenta/inicio_sesion_forzada.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
@@ -250,6 +251,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     //******************************************('AGREGA LA CITA AL PROVIDER')****************
 
     await ActualizacionCita.agregar(context, citaElegida);
+
     // limpia la lista de servicios
     // listaServicios.clear();
   }
@@ -404,8 +406,14 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         ),
         onPressed: () {
           mensajeInfo(context, 'Actualizando agenda...');
-          Navigator.of(context).pushAndRemoveUntil(
-              _createRoute(), (Route<dynamic> route) => false);
+
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return HomeScreen(
+              index: 0,
+              myBnB: 0,
+            );
+          }));
+
           liberarMemoriaEditingController();
         },
         icon: const Icon(

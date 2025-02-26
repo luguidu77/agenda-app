@@ -3,12 +3,14 @@ import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/creacion_cuenta/cuenta_nueva_provider.dart';
+import 'package:agendacitas/providers/creacion_cuenta/inicio_sesion_forzada.dart';
 import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/providers.dart';
 import '../screens/screens.dart';
@@ -23,6 +25,7 @@ class InicioConfigApp extends StatefulWidget {
 }
 
 class _InicioConfigAppState extends State<InicioConfigApp> {
+  bool haySesionIniciada = true;
   bool? creandoCuenta;
   getDisponibilidadSemanal(emailSesionUsuario) async {
     final disponibilidadSemanalProvider = await SincronizarFirebase()
@@ -35,13 +38,22 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
   void initState() {
     super.initState();
     creandoCuenta = context.read<CuentaNuevaProvider>().esCuentaNueva;
+    bool inicioSesionForzada =
+        context.read<InicioSesionForzada>().esInicioSesionForzada;
+    //  print('estoy forzando el inicio de sesion $inicioSesionForzada');
+    // Actualiza la pantalla si hay un cambio en la sesión: haySesionIniciada fuerzo el inicio de la aplicación
+    if (inicioSesionForzada) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // forceUpdate();
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
+        stream: FirebaseAuth.instance.idTokenChanges(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -71,6 +83,8 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
                 ),
               );
             }
+
+            haySesionIniciada = false;
             return HomeScreen(
               emailUsuario: data.email,
               index: 0,
@@ -326,9 +340,23 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
         empleadosProvider.setTodosLosEmpleados(empleados);
       });
 
+      final EmpleadoModel usuarioapp = empleadosProvider.getEmpleados
+          .firstWhere((element) => element.email == element.emailUsuarioApp);
+      await SharedPreferences.getInstance().then((prefs) {
+        prefs.setString('nombreUsuarioApp', usuarioapp.nombre);
+      });
       debugPrint('empleados cargados y añadidas al contexto');
     } else {
       debugPrint('los empleados ya están cargadas, no se vuelve a cargar.');
     }
+  }
+
+  Future<void> forceUpdate() async {
+    haySesionIniciada = true;
+    setState(() {});
+    print(
+        '###########################forceUpdate  ######################################### forceUpdate #############################################################');
+    // context.read<InicioSesionForzada>().setFuerzaInicio(false);
+    FirebaseAuth.instance.currentUser!.reload();
   }
 }

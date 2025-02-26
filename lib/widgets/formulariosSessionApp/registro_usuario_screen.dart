@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../providers/providers.dart';
@@ -42,12 +43,13 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
 
   String? email;
   String? password;
+  String? nombreUsuario;
 
   bool loginRegistro = false; //true = login,, false = registro
   bool hayEmailUsuario = false;
 
   bool showModal = true;
-  //TextEditingController textControllerEmail = TextEditingController();
+  final ctlTextPassword1 = TextEditingController();
 
   @override
   void initState() {
@@ -55,17 +57,12 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
 
     loginRegistro = (widget.registroLogin == 'Login') ? true : false;
     hayEmailUsuario = (widget.usuarioAPP == '') ? false : true;
-    email = widget.usuarioAPP;
+
+    sesionGardadoSharedPreferences();
   }
 
   @override
   Widget build(BuildContext context) {
-    email = FirebaseAuth.instance.currentUser?.email;
-    print('hay sesion activa en firebase $email');
-    if (email == null) {
-      hayEmailUsuario = false;
-      email = '';
-    }
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: SafeArea(
@@ -86,9 +83,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
         ),
         // hello again!
         Text(
-          hayEmailUsuario
-              ? 'Hola ${email.toString().split('@')[0]}!'
-              : 'Hola!, ...',
+          hayEmailUsuario ? 'Hola ${nombreUsuario}' : 'Hola!, ...',
           style: GoogleFonts.bebasNeue(fontSize: 40),
         ),
         const SizedBox(height: 10),
@@ -156,6 +151,8 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
+                        obscureText: true,
+                        controller: ctlTextPassword1,
                         decoration: InputDecoration(
                             prefixIcon: IconTheme(
                               data:
@@ -242,6 +239,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                           //_irPaginaIconoAnimacion();
                           _cierraDialogo();
                           _irPaginaInicio();
+                          gardarSesion(email, password);
                         }
                       } else {
                         mensajeError(context, 'FORMULARIO NO VALIDO');
@@ -279,6 +277,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                                 await PagoProvider().guardaPagado(false, ''); */
                                 hayEmailUsuario = false;
                                 email = '';
+                                ctlTextPassword1.text = '';
                                 await FirebaseAuth.instance.signOut();
 
                                 setState(() {});
@@ -550,6 +549,26 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
         ),
       ),
     );
+  }
+
+  void gardarSesion(String? email, String? password) async {
+    await SharedPreferences.getInstance().then((prefs) {
+      prefs.setString('email', email!);
+      prefs.setString('password', password!);
+    });
+  }
+
+  sesionGardadoSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    final emailguardado = prefs.getString('email');
+    final password = prefs.getString('password');
+
+    if (emailguardado != null) {
+      email = emailguardado; //no hay sesion
+      ctlTextPassword1.text = password!;
+      nombreUsuario = prefs.getString('nombreUsuarioApp');
+      setState(() {});
+    }
   }
 }
 

@@ -37,18 +37,22 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
   void initState() {
     super.initState();
     _fechaOriginal = (widget.reserva!.horaInicio!);
+    //  seteaContexto(widget.reserva!);
   }
 
   @override
   Widget build(BuildContext context) {
-    String dia = formatearFechaDiaCita(widget.reserva!.horaInicio!);
     final personaliza =
         context.read<PersonalizaProviderFirebase>().getPersonaliza;
     bool citaConfirmada = widget.reserva!.confirmada!;
-    final citaContexto = context.read<CreacionCitaProvider>();
-    citaContexto.contextoCita.dia = dia;
-    citaContexto.setContextoCita(widget.reserva!);
-
+    // Evitar actualizar el provider durante la construcción:
+    /*  WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Puedes incluir una verificación para que solo se ejecute una vez si es necesario.
+      final citaContexto = context.read<CreacionCitaProvider>();
+      citaContexto.contextoCita.dia = dia;
+      citaContexto.setContextoCita(widget.reserva!);
+    });
+ */
     return Scaffold(
       appBar: AppBar(
         //title: Text(fechaCorta, style: subTituloEstilo),
@@ -59,7 +63,7 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
           IconButton(
               color: Colors.white,
               onPressed: () {
-                if (citaContexto.visibleGuardar == false) {
+                if (!context.read<CreacionCitaProvider>().visibleGuardar) {
                   // no se ha modificado la fecha
 
                   Navigator.pop(context);
@@ -181,6 +185,16 @@ class _DetallesCitaWidgetState extends State<DetallesCitaWidget> {
                 ),
               ));
         });
+  }
+
+  void seteaContexto(CitaModelFirebase citaModelFirebase) {
+    String dia = formatearFechaDiaCita(widget.reserva!.horaInicio!);
+    // Puedes incluir una verificación para que solo se ejecute una vez si es necesario.
+
+    // Puedes incluir una verificación para que solo se ejecute una vez si es necesario.
+    final citaContexto = context.read<CreacionCitaProvider>();
+    citaContexto.contextoCita.dia = dia;
+    citaContexto.setContextoCita(widget.reserva!);
   }
 }
 

@@ -127,6 +127,7 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         FloatingActionButton(
+          heroTag: 'comparteWhatsapp',
           mini: true,
           onPressed: () {
             print('comparte whatsapp');
@@ -159,6 +160,7 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
           child: const FaIcon(FontAwesomeIcons.whatsapp),
         ),
         FloatingActionButton(
+          heroTag: 'comparteSms',
           mini: true,
           onPressed: () {
             try {
@@ -186,6 +188,7 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
         ),
         widget.email != ''
             ? FloatingActionButton(
+                heroTag: 'comparteEmail',
                 mini: true,
                 onPressed: () {
                   animarIcon = true;

@@ -126,6 +126,9 @@ dependencies:
   #para leer archivos svg
   flutter_svg: ^2.0.1
   
+  #para mantener la sesion del usuario
+  shared_preferences: ^2.5.2
+  
   #para llevar al usuario a la configuracion del dispositivo
   # android_intent_plus: ^5.3.0 
 

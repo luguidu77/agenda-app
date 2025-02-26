@@ -326,7 +326,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                 citaElegida.nombreCliente.toString(),
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text(citaElegida.telefonoCliente.toString()),
+              // subtitle: Text(citaElegida.telefonoCliente.toString()),
             ),
           ],
         ),
@@ -417,10 +417,6 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                           MaterialPageRoute(
                             builder: (context) => const ConfirmarStep(),
                           ));
-
-                      _iniciadaSesionUsuario
-                          ? null
-                          : Publicidad.publicidad(_iniciadaSesionUsuario);
                     }
                   : null,
               child: Container(

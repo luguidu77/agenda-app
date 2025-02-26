@@ -4,6 +4,7 @@ import 'package:agendacitas/providers/FormularioBusqueda/formulario_busqueda_pro
 import 'package:agendacitas/providers/buttom_nav_notificaciones_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/creacion_cuenta/cuenta_nueva_provider.dart';
+import 'package:agendacitas/providers/creacion_cuenta/inicio_sesion_forzada.dart';
 import 'package:agendacitas/providers/rol_usuario_provider.dart';
 
 import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
@@ -16,6 +17,7 @@ import 'package:agendacitas/screens/not_found_page.dart';
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:agendacitas/screens/pantalla_de_carga.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -29,6 +31,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:provider/provider.dart';
 import 'package:rive_splash_screen/rive_splash_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config/.configuraciones.dart';
 import 'models/models.dart';
@@ -41,11 +44,10 @@ import 'package:app_links/app_links.dart';
 
 //?
 //?   CAMBIAR  Version EN Android/app/build.gradle  ingrementa versionCode y versionName
-//?            version base de datos DB Provider.
-//?            quitar PAGADO DEL home.dart -->> PagoProvider().guardaPagado(true);
+
 //?
 //?   flutter build appbundle
-//?            - C:\PROYECTOS FLUTTER\agenda_app\build\app\outputs\bundle\release
+//?            - C:\PROYECTOS_FLUTTER\agenda_app\build\app\outputs\bundle\release
 
 //      VER SOLUCIONES DE ERRORES README.md
 //! GITHUB :
@@ -86,11 +88,28 @@ void main() async {
   //});
   // Registra el background handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(const MyApp());
+  // verifica si hay un usuario gardado en el dispositivo para iniciar la app
+  // o ir a inicio de sesion con el usuario guardado
+  final usuarioAPP = await sesionGardadoSharedPreferences();
+  runApp(MyApp(usuarioAPP: usuarioAPP));
+}
+
+Future<String> sesionGardadoSharedPreferences() async {
+  String usuarioApp = '';
+  final prefs = await SharedPreferences.getInstance();
+  final email = prefs.getString('email');
+
+  if (email == null) {
+    return ''; //no hay sesion
+  }
+
+  usuarioApp = email;
+  return usuarioApp;
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final String usuarioAPP;
+  const MyApp({Key? key, required this.usuarioAPP}) : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -107,7 +126,7 @@ class _MyAppState extends State<MyApp> {
 
   bool inicioConfigApp = false;
   List hayServicios = [];
-  String usuarioAPP = '';
+
   bool hayEmailPrueba = false;
 
   bool variablePago = false;
@@ -117,7 +136,13 @@ class _MyAppState extends State<MyApp> {
     // reseteoprueba();
 
     initDeepLinks();
+
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override
@@ -198,6 +223,8 @@ class _MyAppState extends State<MyApp> {
             create: (BuildContext context) => PrimeraConfiguracionProvider()),
         ChangeNotifierProvider(
             create: (BuildContext context) => ServiciosOfrecidosProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => InicioSesionForzada()),
       ],
       builder: (context, _) {
         return MaterialApp(
@@ -260,7 +287,7 @@ class _MyAppState extends State<MyApp> {
                 backgroundColor: Colors.white,
                 name: 'assets/icon/splash.riv',
                 next: (context) =>  */
-                InicioConfigApp(usuarioAPP: usuarioAPP),
+                InicioConfigApp(usuarioAPP: widget.usuarioAPP),
 
             /*  */
 

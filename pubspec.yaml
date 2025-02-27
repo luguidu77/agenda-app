@@ -65,8 +65,8 @@ dependencies:
   flutter_picker: ^2.1.0
 
   # para abrir los ajustes del telefono
-   #pp_settings: ^5.2.0
-   #device_info_plus: ^11.2.2
+  app_settings: ^5.2.0
+  device_info_plus: ^11.2.2
 
   #restar aplicacion
 
@@ -130,7 +130,7 @@ dependencies:
   shared_preferences: ^2.5.2
   
   #para llevar al usuario a la configuracion del dispositivo
-  # android_intent_plus: ^5.3.0 
+  android_intent_plus: ^5.3.0 
 
 dev_dependencies:
   flutter_test:

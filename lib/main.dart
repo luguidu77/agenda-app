@@ -53,7 +53,7 @@ import 'package:app_links/app_links.dart';
 //! GITHUB :
 /* 
 git add . 
-git commit -m "modificando splash"  
+git commit -m "version 10.00"  
 git push
 */
 

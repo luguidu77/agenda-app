@@ -24,6 +24,9 @@ import '../../widgets/widgets.dart';
 import 'provider/creacion_cita_provider.dart';
 import 'utils/adaptacion_perfilmodel_negociomodel.dart';
 import 'utils/id_cita_cliente_random.dart';
+import 'package:android_intent_plus/android_intent.dart';
+
+import 'package:app_settings/app_settings.dart';
 
 //import 'package:url_launcher/url_launcher_string.dart';
 
@@ -594,7 +597,7 @@ class BackgroundPermissionDialog extends StatelessWidget {
         ElevatedButton(
           onPressed: () {
             Navigator.pop(context); // Cierra el diálogo antes de abrir ajustes
-            //abrirConfiguracionBateria();
+            abrirConfiguracionBateria();
           },
           child: const Text("Abrir configuración"),
         ),
@@ -602,7 +605,7 @@ class BackgroundPermissionDialog extends StatelessWidget {
     );
   }
 
-  /* void abrirConfiguracionBateria() async {
+  void abrirConfiguracionBateria() async {
     const AndroidIntent intent = AndroidIntent(
       action: 'android.settings.ACTION_POWER_USAGE_SUMMARY', // Acción correcta
     );
@@ -614,5 +617,5 @@ class BackgroundPermissionDialog extends StatelessWidget {
       // Fallback: Abrir ajustes generales de la app
       AppSettings.openAppSettings();
     }
-  } */
+  }
 }

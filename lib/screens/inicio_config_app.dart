@@ -145,6 +145,7 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     contextoPago.setEmailAdministradorApp(emailAdministrador);
 
     // ###############  PERSONALIZA
+
     FirebaseProvider().cargarPersonaliza(context, emailAdministrador);
 
     // ###############  DISPONIBILIDAD SEMANAL APERTURAS DEL NEGOCIO
@@ -153,25 +154,9 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     DisponibilidadSemanal.disponibilidadSemanal(
         dDispoSemanal, emailAdministrador);
 
-    //  final stopwatch = Stopwatch()..start();
     await getTodasLasCitas(emailAdministrador);
-    //  stopwatch.stop();
-    // final tiempo = stopwatch.elapsed.inSeconds;
-    //  print('tiempo de carga de todas las citas...$tiempo');
 
-    //  final stopwatch2 = Stopwatch()..start();
     await empleados(emailAdministrador);
-    //  stopwatch2.stop();
-    //  final tiempo2 = stopwatch2.elapsed.inSeconds;
-    // print('tiempo de carga de todas los empleados...$tiempo2');
-
-    // Marcar las citas como cargadas
-
-    //  mensajeInfo(context, 'tiempo $tiempo + $tiempo2 : ${tiempo + tiempo2}');
-
-    // getTodasLasCitas(emailAdministrador);
-
-    // empleados(emailAdministrador);
   }
 
   Future<void> getTodasLasCitas(String emailSesionUsuario) async {
@@ -187,7 +172,7 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     String emailAdministrador = estadoProvider.emailAdministradorApp;
 
     // Verifica si las citas ya están cargadas
-    if (!contextoCitas.citasCargadas) {
+    if (!contextoCitas.citasCargadas /* && contextoCitas.getCitas.isEmpty */) {
       try {
         // Carga las citas
         List<CitaModelFirebase> citas =
@@ -215,12 +200,15 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
           context.read<ComprobacionReasignacionCitas>().setReasignado(false);
         }
 
-        print('Citas cargadas y añadidas al contexto');
+        print(
+            'Citas cargadas y añadidas al contexto ${contextoCitas.citasCargadas}');
       } catch (e) {
         // Manejo de errores, si es necesario
         print('Error al cargar citas: $e');
       }
     } else {
+      /*     contextoCitas.reasignacionCita();
+      setState(() {}); */
       print('Las citas ya están cargadas, no se vuelve a cargar.');
     }
   }
@@ -380,7 +368,6 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
         prefs.setString('nombreUsuarioApp', usuarioapp.nombre);
       });
       debugPrint('empleados cargados y añadidas al contexto');
-      setState(() {});
     } else {
       debugPrint('los empleados ya están cargadas, no se vuelve a cargar.');
     }

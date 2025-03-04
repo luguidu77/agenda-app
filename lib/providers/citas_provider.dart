@@ -66,7 +66,7 @@ class CitasProvider extends ChangeNotifier {
   }
 
   void reasignacionCita() {
-    _citasCargadas = false;
+    _citasCargadas = true;
     notifyListeners();
   }
 }

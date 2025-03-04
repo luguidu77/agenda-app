@@ -2,7 +2,7 @@ import 'package:agendacitas/models/empleado_model.dart';
 import 'package:flutter/material.dart';
 
 class RolUsuarioProvider with ChangeNotifier {
-  RolEmpleado _rol = RolEmpleado.personal;
+  RolEmpleado _rol = RolEmpleado.desconocido;
 
   RolEmpleado get rol => _rol;
 

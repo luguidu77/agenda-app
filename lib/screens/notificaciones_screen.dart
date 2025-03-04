@@ -293,8 +293,11 @@ class _PaginaNotificacionesScreenState extends State<PaginaNotificacionesScreen>
         print(emailSesionUsuario);
         print(notificacion['id']);
         // final categoria = _obtieneTextoCategoria(notificacion['categoria'], 12);
-        final nombreEmpleado = notificacion['data']['nombreEmpleado'];
-        print(nombreEmpleado);
+        //TODO LA NOTIFICACION DE ADMINISTRADOR NO TIENE EL CAMPO nombreEmpleado
+        // final nombreEmpleado = notificacion['data']['nombreEmpleado'];
+        // print(nombreEmpleado);
+        print(notificacion.toString());
+
         await showModalBottomSheet(
           isScrollControlled: true,
           context: context,

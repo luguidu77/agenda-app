@@ -10,6 +10,7 @@ import 'package:agendacitas/providers/Firebase/emailHtml/emails_html.dart';
 import 'package:agendacitas/providers/Firebase/notificaciones.dart';
 import 'package:agendacitas/providers/db_provider.dart';
 import 'package:agendacitas/utils/extraerServicios.dart';
+import 'package:agendacitas/widgets/alertas/alertaAgregarPersonal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -403,7 +404,7 @@ class FirebaseProvider extends ChangeNotifier {
     return data; //retorna una lista de citas(CitaModelFirebase) cuando el dia sea igual a la fecha
   }
 
-  Future<List<CitaModelFirebase>> getTodasLasCitas(String emailUsuario) async {
+  /* Future<List<CitaModelFirebase>> getTodasLasCitas(String emailUsuario) async {
     List<CitaModelFirebase> citasFirebase = [];
     List<CitaModelFirebase> data = [];
     dynamic verifica;
@@ -414,24 +415,22 @@ class FirebaseProvider extends ChangeNotifier {
     // Obtiene todas las citas de la base de datos
     final snapshot = await docRef.get();
     for (var element in snapshot.docs) {
-      // Agrega las citas de manera eficiente
-      verifica = element.data();
+      final dataMap = element.data() as Map<String, dynamic>;
+
       data.add(CitaModelFirebase(
-          id: element.id,
-          precio: element['precio'],
-          dia: element['dia'],
-          comentario: element['comentario'],
-          horaInicio: DateTime.parse(element['horaInicio']),
-          horaFinal: DateTime.parse(element['horaFinal']),
-          idcliente: element['idcliente'],
-          idservicio: element['idservicio'],
-          idEmpleado: element['idempleado'],
-          confirmada:
-              verifica.containsKey('confirmada') ? element['confirmada'] : '',
-          idCitaCliente: element['idCitaCliente'],
-          tokenWebCliente: verifica.containsKey('tokenWebCliente')
-              ? element['tokenWebCliente']
-              : ''));
+        id: element.id,
+        precio: dataMap['precio'],
+        dia: dataMap['dia'],
+        comentario: dataMap['comentario'],
+        horaInicio: DateTime.parse(dataMap['horaInicio']),
+        horaFinal: DateTime.parse(dataMap['horaFinal']),
+        idcliente: dataMap['idcliente'],
+        idservicio: dataMap['idservicio'],
+        idEmpleado: dataMap['idempleado'],
+        confirmada: dataMap['confirmada'] ?? true,
+        idCitaCliente: dataMap['idCitaCliente']?.toString() ?? '',
+        tokenWebCliente: dataMap['tokenWebCliente']?.toString() ?? '',
+      ));
     }
 
     // Procesa cada cita en paralelo
@@ -542,6 +541,144 @@ class FirebaseProvider extends ChangeNotifier {
     // Ordenar las citas por hora de inicio
     citasFirebase.sort((a, b) => a.horaInicio!.compareTo(b.horaInicio!));
 
+    return citasFirebase;
+  } */
+  Future<List<CitaModelFirebase>> getTodasLasCitas(String emailUsuario) async {
+    await _iniFirebase();
+    final docRef = await _referenciaDocumento(emailUsuario, 'cita');
+    final snapshot = await docRef.get();
+
+    // Caché para evitar consultas duplicadas
+    final Map<String, Future<Map<String, dynamic>>> clienteCache = {};
+    final Map<String, Future<EmpleadoModel>> empleadoCache = {};
+    final Map<String, Future<Map<String, dynamic>>> servicioCache = {};
+
+    // Funciones auxiliares para cachear
+    Future<Map<String, dynamic>> getCliente(String idcliente) {
+      return clienteCache.putIfAbsent(
+          idcliente,
+          () async => await FirebaseProvider()
+              .getClientePorId(emailUsuario, idcliente));
+    }
+
+    Future<EmpleadoModel> getEmpleado(String idEmpleado) {
+      return empleadoCache.putIfAbsent(
+          idEmpleado,
+          () async => await FirebaseProvider()
+              .getEmpleadoporId(emailUsuario, idEmpleado));
+    }
+
+    Future<Map<String, dynamic>> getServicio(String servicioId) {
+      return servicioCache.putIfAbsent(
+          servicioId,
+          () async => await FirebaseProvider()
+              .cargarServicioPorId(emailUsuario, servicioId));
+    }
+
+    // Procesa cada documento de manera concurrente
+    final citasFutures =
+        //Usa .map<Future<CitaModelFirebase>>((doc) async { ... }) para que Dart sepa que cada elemento es un Future que retorna un CitaModelFirebase.
+        snapshot.docs.map<Future<CitaModelFirebase>>((element) async {
+      final dataMap = element.data() as Map<String, dynamic>;
+
+      // Construye la cita básica
+      var cita = CitaModelFirebase(
+        id: element.id,
+        precio: dataMap['precio'],
+        dia: dataMap['dia'],
+        comentario: dataMap['comentario'],
+        horaInicio: DateTime.parse(dataMap['horaInicio']),
+        horaFinal: DateTime.parse(dataMap['horaFinal']),
+        idcliente: dataMap['idcliente'],
+        idservicio: dataMap['idservicio'],
+        idEmpleado: dataMap['idempleado'],
+        confirmada: dataMap['confirmada'] ?? true,
+        idCitaCliente: dataMap['idCitaCliente']?.toString() ?? '',
+        tokenWebCliente: dataMap['tokenWebCliente']?.toString() ?? '',
+        email: dataMap['email'],
+      );
+
+      // Si el cliente no es "indispuesto", realiza las consultas adicionales
+      if (cita.idcliente != "999") {
+        // Ejecuta las consultas en paralelo
+        final clienteFuture = getCliente(cita.idcliente!);
+        final empleadoFuture = getEmpleado(cita.idEmpleado!);
+
+        List<String> serviciosFirebase = [];
+        if (cita.idservicio != null) {
+          // Asume que idservicio es una lista de IDs
+          final serviciosIds = List<String>.from(cita.idservicio!);
+          final serviciosData = await Future.wait(
+            serviciosIds.map((servicioId) => getServicio(servicioId)),
+          );
+          serviciosFirebase = serviciosData
+              .map((servicio) => servicio['servicio'] as String)
+              .toList();
+        }
+
+        // Espera las respuestas de cliente y empleado
+        final clienteData = await clienteFuture;
+        final empleadoData = await empleadoFuture;
+
+        // Actualiza la cita con la información extra
+        cita = CitaModelFirebase(
+          id: cita.id,
+          dia: cita.dia,
+          horaInicio: cita.horaInicio,
+          horaFinal: cita.horaFinal,
+          comentario: cita.comentario,
+          email: cita.email,
+          idcliente: cita.idcliente,
+          idservicio: cita.idservicio,
+          servicios: serviciosFirebase,
+          idEmpleado: cita.idEmpleado,
+          nombreEmpleado: empleadoData.nombre,
+          colorEmpleado: empleadoData.color,
+          precio: cita.precio,
+          confirmada: cita.confirmada,
+          tokenWebCliente: cita.tokenWebCliente,
+          idCitaCliente: cita.idCitaCliente,
+          nombreCliente: clienteData['nombre'],
+          fotoCliente: clienteData['foto'],
+          telefonoCliente: clienteData['telefono'],
+          emailCliente: clienteData['email'],
+          notaCliente: clienteData['nota'],
+        );
+      } else {
+        // Si el cliente es "indispuesto", asigna valores predeterminados
+        cita = CitaModelFirebase(
+          id: cita.id,
+          dia: cita.dia,
+          horaInicio: cita.horaInicio,
+          horaFinal: cita.horaFinal,
+          comentario: cita.comentario,
+          email: cita.email,
+          idcliente: cita.idcliente,
+          idservicio: cita.idservicio,
+          servicios: [],
+          idEmpleado: cita.idEmpleado,
+          nombreEmpleado: '',
+          colorEmpleado: 0xFF0000FF,
+          precio: cita.precio,
+          confirmada: cita.confirmada,
+          tokenWebCliente: cita.tokenWebCliente,
+          idCitaCliente: cita.idCitaCliente,
+          nombreCliente: '',
+          fotoCliente: '',
+          telefonoCliente: '',
+          emailCliente: '',
+          notaCliente: '',
+        );
+      }
+      return cita;
+    }).toList();
+
+    // Espera a que todas las citas se procesen
+    final List<CitaModelFirebase> citasFirebase =
+        await Future.wait(citasFutures);
+
+    // Ordena las citas por hora de inicio
+    citasFirebase.sort((a, b) => a.horaInicio!.compareTo(b.horaInicio!));
     return citasFirebase;
   }
 
@@ -1517,45 +1654,31 @@ class FirebaseProvider extends ChangeNotifier {
     };
 
     try {
-      // Obtén todos los documentos de la colección "agendacitasapp"
-      final querySnapshot = await db!.collection("agendacitasapp").get();
+      // Realiza una consulta collectionGroup en todas las subcolecciones "empleados"
+      final empleadosSnapshot = await db!
+          .collectionGroup("empleados")
+          .where("email", isEqualTo: email)
+          .get();
 
-      // Preparamos una lista de futures para realizar las búsquedas en paralelo
-      final futures = querySnapshot.docs.map((doc) async {
-        // Obtén todos los documentos de la subcolección 'empleados'
-        final empleadosSnapshot =
-            await doc.reference.collection("empleados").get();
-
-        // Retornar el primer documento que coincida con el email
-        for (var empleadoDoc in empleadosSnapshot.docs) {
-          if (empleadoDoc.data()['email'] == email) {
-            // Retorna los roles si se encuentran en los documentos de ese empleado
-            resultado['emailAdministrador'] = doc.id;
-            resultado['cod_verif'] = empleadoDoc.data()['cod_verif'];
-            return empleadoDoc
-                .data()['rol']; // Asumiendo que 'rol' está en el empleadoDoc
-          }
-        }
-        // Si no se encuentra el email en este documento, devuelve null
-        return null;
-      }).toList();
-
-      // Ejecuta todas las consultas en paralelo
-      final resultados = await Future.wait(futures);
-
-      // Busca el primer resultado no nulo y lo devuelve
-      for (var result in resultados) {
-        if (result != null) {
-          resultado['rolUsuario'] =
-              result; //{administrador: luguidu@hotmail.com, usuario: hello@gmail.es, rolUsuario: [personal]}
-          resultado['emailUsuario'] = email;
-
-          return resultado; // Devuelve el campo 'rol' de los empleados
-        }
+      // Si no se encuentra ningún documento, devuelve un mapa vacío
+      if (empleadosSnapshot.docs.isEmpty) {
+        return {};
       }
 
-      // Si no se encuentra el email en ninguna subcolección de los documentos, devuelve una lista vacía
-      return {};
+      // Usa el primer documento que coincide
+      final empleadoDoc = empleadosSnapshot.docs.first;
+      final data = empleadoDoc.data();
+
+      // Para obtener el ID del documento padre de "empleados" (en "agendacitasapp"),
+      // se accede a: empleadoDoc.reference.parent.parent
+      //final emailAdministrador = empleadoDoc.reference.parent.parent!.id;
+
+      resultado['emailAdministrador'] = data['emailUsuarioApp'];
+      resultado['cod_verif'] = data['cod_verif'];
+      resultado['rolUsuario'] = data['rol'];
+      resultado['emailUsuario'] = email;
+
+      return resultado;
     } catch (e) {
       debugPrint("Error buscando el email en la subcolección 'empleados': $e");
       return {};

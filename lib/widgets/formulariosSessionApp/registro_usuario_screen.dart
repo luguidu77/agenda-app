@@ -278,6 +278,8 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                                 hayEmailUsuario = false;
                                 email = '';
                                 ctlTextPassword1.text = '';
+                                limpiaSesionGuardada();
+
                                 await FirebaseAuth.instance.signOut();
 
                                 setState(() {});
@@ -569,6 +571,13 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
       nombreUsuario = prefs.getString('nombreUsuarioApp');
       setState(() {});
     }
+  }
+
+  limpiaSesionGuardada() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove('email');
+    prefs.remove('password');
+    prefs.remove('nombreUsuarioApp');
   }
 }
 

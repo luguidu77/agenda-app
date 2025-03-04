@@ -11,6 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../providers/providers.dart';
 import '../screens/screens.dart';
@@ -38,7 +39,7 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
   void initState() {
     super.initState();
     creandoCuenta = context.read<CuentaNuevaProvider>().esCuentaNueva;
-    bool inicioSesionForzada =
+    /*   bool inicioSesionForzada =
         context.read<InicioSesionForzada>().esInicioSesionForzada;
     //  print('estoy forzando el inicio de sesion $inicioSesionForzada');
     // Actualiza la pantalla si hay un cambio en la sesión: haySesionIniciada fuerzo el inicio de la aplicación
@@ -46,14 +47,14 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         // forceUpdate();
       });
-    }
+    } */
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.idTokenChanges(),
+        stream: FirebaseAuth.instance.authStateChanges(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -61,20 +62,21 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
 
           if (snapshot.hasData && !creandoCuenta!) {
             final contextoCitas = context.watch<CitasProvider>();
-
             // LOGEADO EN FIREBASE
             debugPrint(
                 'inicio_config_app.dart ----------------> LOGEADO EN FIREBASE');
 
             final User data = snapshot.data;
 
-            // ############### SETEA LOS PROVIDER
-            // EMAIL DEL USUARIO QUE INICIA SESION
-            // TRAE LOS EMPLEADOS Y LOS SETEA EN EL PROVIDER
-
-            _config(data.email!);
-
             if (!contextoCitas.citasCargadas) {
+              // Ejecuta _config después del frame actual para evitar llamar a setState durante build
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                // ############### SETEA LOS PROVIDER
+                // EMAIL DEL USUARIO QUE INICIA SESION
+                // TRAE LOS EMPLEADOS Y LOS SETEA EN EL PROVIDER
+                _config(context, data.email!);
+              });
+
               return Center(
                 child: Image.asset(
                   'assets/images/cargandoAgenda.gif', // Ruta del GIF
@@ -120,10 +122,16 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     RolEmpleado rolEmpleado,
     String emailAdministrador,
   ) async {
-    final contextoCitas = context.read<CitasProvider>();
-    final empleadosProvider = context.read<EmpleadosProvider>();
+    /*  final contextoCitas = context.read<CitasProvider>();
+    final empleadosProvider = context.read<EmpleadosProvider>(); */
 
     // ############### SETEA LOS PROVIDER
+// ############### set roles de usuario
+    if (mounted) {
+      final contextoRol = context.read<RolUsuarioProvider>();
+
+      contextoRol.setRol(rolEmpleado);
+    }
 
     // ESTADO DE PAGO EMAIL USUARIO DE LA APLICACION
     final emailUsuarioAppProvider = context.read<EmailUsuarioAppProvider>();
@@ -135,9 +143,6 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     // setea el email del administrador de la empresa
     final contextoPago = context.read<EmailAdministradorAppProvider>();
     contextoPago.setEmailAdministradorApp(emailAdministrador);
-
-    // ############### set roles de usuario
-    context.read<RolUsuarioProvider>().setRol(rolEmpleado);
 
     // ###############  PERSONALIZA
     FirebaseProvider().cargarPersonaliza(context, emailAdministrador);
@@ -169,7 +174,11 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     // empleados(emailAdministrador);
   }
 
-  getTodasLasCitas(emailSesionUsuario) async {
+  Future<void> getTodasLasCitas(String emailSesionUsuario) async {
+    // Comprueba que el widget sigue montado antes de hacer la primera lectura.
+    if (!mounted) return;
+
+    // Se obtienen las referencias de los providers inmediatamente
     final contextoCitas = context.read<CitasProvider>();
     final contextoServiciosOfrecidos =
         context.read<ServiciosOfrecidosProvider>();
@@ -179,32 +188,38 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
 
     // Verifica si las citas ya están cargadas
     if (!contextoCitas.citasCargadas) {
-      // Realizar la operación de carga
       try {
-        // CARGA EN EL CONTEXTO LAS CITAS ·········································
+        // Carga las citas
         List<CitaModelFirebase> citas =
             await FirebaseProvider().getTodasLasCitas(emailAdministrador);
-        contextoCitas.setTodosLasLasCitas(citas);
-        // CARGA EN EL CONTEXTO LOS SERVICIOS OFRECIDOS ··························
 
+        // Antes de usar el context, vuelve a verificar que el widget esté montado
+        if (!mounted) return;
+        contextoCitas.setTodosLasLasCitas(citas);
+
+        // Carga los servicios ofrecidos
         List<ServicioModelFB> todosLosServicios =
             await FirebaseProvider().cargarServicios(emailAdministrador);
+
+        if (!mounted) return;
         contextoServiciosOfrecidos.setTodosLosServicios(todosLosServicios);
 
-        // Restablecer el contexto para la creación de citas
+        // Restablece el contexto para la creación de citas
         CitaModelFirebase edicionContextoCita =
             CitaModelFirebase(idEmpleado: 'TODOS_EMPLEADOS');
-
         contextoCreacionCita.setContextoCita(edicionContextoCita);
 
-        // Informar al usuario que las citas deben ser reasignadas (antiguos usuarios app antes de la actualización v10)
-        // comprobarcionReasignaciondeCitas contexto
+        // Actualiza la reasignación de citas si es necesario
         if (citas.any((cita) => cita.idEmpleado == '55')) {
+          if (!mounted) return;
           context.read<ComprobacionReasignacionCitas>().setReasignado(false);
         }
 
         print('Citas cargadas y añadidas al contexto');
-      } catch (e) {}
+      } catch (e) {
+        // Manejo de errores, si es necesario
+        print('Error al cargar citas: $e');
+      }
     } else {
       print('Las citas ya están cargadas, no se vuelve a cargar.');
     }
@@ -216,6 +231,8 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     final datosUsuario = await FirebaseProvider()
         .compruebaRolEmpleadoIniciandoSesion(emailSesionUsuario);
     print(datosUsuario);
+
+    // si datosUsuario es null
     String emailAdministrador = datosUsuario['emailAdministrador'].toString();
 
     // si el usuario es administrador
@@ -230,7 +247,8 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
       // pregunta si el usuario  está verificado
       if (datosUsuario['cod_verif'] != 'verificado') {
         //mensaje de verificacion, debes de registrar tu cuenta
-        mensajeDialogo();
+        mensajeDialogo('Debes veficar tu cuenta para continuar.');
+        FirebaseAuth.instance.signOut();
 
         return (RolEmpleado.personal, emailAdministrador);
       } else {
@@ -240,7 +258,7 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     }
   }
 
-  void mensajeDialogo() {
+  void mensajeDialogo(texto) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -263,7 +281,7 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
           content: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
-              'Debes veficar tu cuenta para continuar.',
+              texto,
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[600],
@@ -277,13 +295,13 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
               child: TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.pushReplacement(
+                  /*  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
                           ConfigPerfilUsuario(), // Pantalla de configuración
                     ),
-                  );
+                  ); */
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -308,20 +326,36 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     );
   }
 
-  void _config(String email) async {
-    // final stopwatch = Stopwatch()..start();
+  void _config(BuildContext context, String email) async {
+    RolEmpleado rolusuario;
+    final contextoRol = context.read<RolUsuarioProvider>();
+    final contextEmailAdmin = context.read<EmailAdministradorAppProvider>();
+    rolusuario = contextoRol.rol;
+    String emailUsuario = '';
+    String emailAdmin = '';
 
-    final (rol, emailAdministrador) = await _compruebaRolUsuario(email);
-    // stopwatch.stop();
-    // final tiempo = stopwatch.elapsed.inSeconds;
+    emailUsuario = email;
+    emailAdmin = contextEmailAdmin.emailAdministradorApp;
 
-    // print('tiempo de carga comprobacion del rol...$tiempo');
-    // mensajeInfo(context, 'tiempo carga rol $tiempo');
+    if (contextoRol.rol == RolEmpleado.desconocido) {
+      final (rol, emailAdministrador) = await _compruebaRolUsuario(email);
+      rolusuario = rol; // PUEDE ELIMINARSE
+      emailAdmin = emailAdministrador ?? '';
+
+      print(
+          ' SE COMPRUEBA EL ROL DE USUAIO  --------- y SETEO EL CONTEXTO----------------------------------------------------------- ');
+    }
+
+    /*  final rol = RolEmpleado.administrador;
+    final emailAdministrador = 'ritagiove@hotmail.com';
+ */
+    print(
+        ' $rolusuario -------------------------------------------------------------------- ');
     _configuraApp(
       context,
-      email,
-      rol,
-      emailAdministrador!,
+      emailUsuario,
+      rolusuario,
+      emailAdmin,
     );
   }
 
@@ -346,6 +380,7 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
         prefs.setString('nombreUsuarioApp', usuarioapp.nombre);
       });
       debugPrint('empleados cargados y añadidas al contexto');
+      setState(() {});
     } else {
       debugPrint('los empleados ya están cargadas, no se vuelve a cargar.');
     }

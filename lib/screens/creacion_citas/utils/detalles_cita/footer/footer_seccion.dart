@@ -61,7 +61,6 @@ class FooterSeccion extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         _buildShareButton(),
-                        _buildReassignButton(context),
                         _buildDeleteButton(context),
                       ],
                     ),
@@ -82,30 +81,6 @@ class FooterSeccion extends StatelessWidget {
           .toString(), // [servicio1, servicio2] por lo que le quito los corchetes
 
       precio: reserva.precio,
-    );
-  }
-
-  Widget _buildReassignButton(context) {
-    return FloatingActionButton(
-      heroTag: 'reassignButtonTag',
-      mini: true,
-      backgroundColor: Colors.deepPurpleAccent,
-      onPressed: () => showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-                content: SizedBox(
-              height: 400,
-              child: ListView(
-                children: [
-                  FormReprogramaReserva(cita: reserva),
-                ],
-              ),
-            ));
-          }),
-
-      // toggleFormulario,
-      child: const Icon(Icons.change_circle_outlined),
     );
   }
 

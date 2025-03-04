@@ -65,14 +65,21 @@ class _SeccionEmpleadosState extends State<SeccionEmpleados> {
         if (empleadosProvider.getEmpleadosStaff.isEmpty) {
           // Mostrar mensaje o botón si no hay empleados
           return Alertas.agregarEmpleadoAlerta(context);
+        } else if (!comprobarReasigancionProvider.estadoReasignado) {
+          // Mostrar SECCION DE EMPLEADOS
+          return Alertas.reasignacionCitas(context);
+        } else {
+          // Mostrar SECCION DE EMPLEADOS
+          return seccionEmpleados();
         }
 
-        return !comprobarReasigancionProvider.estadoReasignado
+        return /* !comprobarReasigancionProvider.estadoReasignado
             ?
             // alerta para reasignar citas en caso de que se haya citas creadas antes de que el usuario se convirtiera en empleado
             // antiguos usuarios app antes de la actualización 10.0
+
             Alertas.reasignacionCitas(context)
-            :
+            : */
             // si hay empleados, Mostrar SECCION DE EMPLEADOS
             seccionEmpleados();
       },

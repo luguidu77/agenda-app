@@ -1,5 +1,7 @@
 // Enum para los roles de empleados
+// Enum para los roles de
 enum RolEmpleado {
+  desconocido,
   personal,
   gerente,
   administrador,

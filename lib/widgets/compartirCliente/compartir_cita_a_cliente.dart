@@ -67,8 +67,7 @@ class _CompartirCitaConClienteState extends State<CompartirCitaConCliente> {
   }
 
   _estableceCodPais() async {
-    int codPais = 34;
-    await _getCodPais();
+    int codPais = await _getCodPais();
 
     telefonoCodpais = codPais.toString() + widget.telefono;
     print('telefono -------------$telefonoCodpais');

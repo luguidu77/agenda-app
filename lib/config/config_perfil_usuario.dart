@@ -362,7 +362,9 @@ class _ConfigPerfilUsuarioState extends State<ConfigPerfilUsuario>
                       _alertaCerrado();
                       /*  await PagoProvider().guardaPagado(
                           _iniciadaSesionUsuario!, _emailSesionUsuario!); */
+
                       await FirebaseAuth.instance.signOut();
+
                       _irHome();
                     },
                     iconColor: Colors.blue,

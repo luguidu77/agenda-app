@@ -16,7 +16,7 @@ class ActualizacionCita {
     });
   }
 
-  static actualizar(
+  static Future<CitaModelFirebase> actualizar(
     BuildContext context,
     CitaModelFirebase cita,
     DateTime?
@@ -43,7 +43,7 @@ class ActualizacionCita {
       return [hours, minutes];
     }
 
-// OBTENER LA DIFERENCIA ENTRE LA HORA DE INICIO Y LA FINAL PARA CONOCER EL TIEMPO DE LA CITA
+    // OBTENER LA DIFERENCIA ENTRE LA HORA DE INICIO Y LA FINAL PARA CONOCER EL TIEMPO DE LA CITA
     List<int> tiempoServicios = calculaTiempo(cita.horaInicio, cita.horaFinal);
 
     // DIFERENCIO SI LOS DATOS LLEGAN DE ARRASTRAR TARJETA DEL CALENDARIO O DEL FORMULARIO DETALLES CITA
@@ -117,5 +117,7 @@ class ActualizacionCita {
       await FirebaseProvider().actualizaCitareasignada(
           emailSesionUsuario, newCita); // cliente Agendo Web
     } */
+
+    return newCita;
   }
 }

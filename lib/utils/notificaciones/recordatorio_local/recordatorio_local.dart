@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
-  List<dynamic> listId = [];
+  List<int> listId = [];
   // generador de numero unico
 
   // Find the 'current location'
@@ -32,14 +32,6 @@ class NotificationService {
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.areNotificationsEnabled();
-
-    // comprueba las notificaciones pendientes
-    List<PendingNotificationRequest>? pendientes =
-        await flutterLocalNotificationsPlugin
-                .resolvePlatformSpecificImplementation<
-                    AndroidFlutterLocalNotificationsPlugin>()
-                ?.pendingNotificationRequests() ??
-            [];
 
     //Initialization Settings for Android
     //YOUR_APPLICATION_FOLDER_NAME\android\app\src\main\res\drawable\YOUR_APP_ICON.png
@@ -125,7 +117,6 @@ class NotificationService {
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime);
 
-      await visualizaNotificaciones(pendientes);
       // cancelaNotificacion(id);
     } catch (e) {
       print('Error al programar la notificación: $e');
@@ -139,19 +130,28 @@ class NotificationService {
         'mensaje recibido por notificacion local ------------------------------------ Payload: $payload');
   }
 
-  visualizaNotificaciones(List<PendingNotificationRequest> pendientes) async {
+  Future<List<int>> getNotificacionesPendientes() async {
+    // comprueba las notificaciones pendientes
+    List<PendingNotificationRequest>? pendientes =
+        await flutterLocalNotificationsPlugin
+                .resolvePlatformSpecificImplementation<
+                    AndroidFlutterLocalNotificationsPlugin>()
+                ?.pendingNotificationRequests() ??
+            [];
     for (var e in pendientes) {
-      listId.add(('${e.id}  -  ${e.title}    -  ${e.payload}'));
+      listId.add(e.id);
     }
     print(
         '######################  -lista  id pendientes de  notificacion: $listId');
+
+    return listId;
   }
 
   cancelaNotificacion(id) async {
     // await flutterLocalNotificationsPlugin.cancelAll();
 
     // cancel the notification with id value
-    // await flutterLocalNotificationsPlugin.cancel(id);
+    await flutterLocalNotificationsPlugin.cancel(id);
   }
 }
 

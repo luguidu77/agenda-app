@@ -4,8 +4,10 @@ import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/footer/check.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/footer/widgets_footer.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/genera_id_cita_recordatorio.dart';
 import 'package:agendacitas/utils/actualizacion_cita.dart';
 import 'package:agendacitas/utils/comunicacion/comunicaciones.dart';
+import 'package:agendacitas/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -119,7 +121,8 @@ class BotonGuardarCambios extends StatelessWidget {
 
   static void _actualiza(
       BuildContext context, citaProvider, emailUsuarioProvider) async {
-    await ActualizacionCita.actualizar(
+    // actualiza la cita
+    final nuevaCitaCreada = await ActualizacionCita.actualizar(
       context,
       citaProvider.contextoCita,
       null,
@@ -127,6 +130,30 @@ class BotonGuardarCambios extends StatelessWidget {
       citaProvider.contextoCita.horaInicio,
       emailUsuarioProvider.emailAdministradorApp,
     );
+
+    // actualiza recordatorio local
+    final notifPendientes =
+        await NotificationService().getNotificacionesPendientes();
+
+    final idRecordatorio =
+        UtilsRecordatorios.idRecordatorio(citaProvider.contextoCita.horaInicio);
+
+    final idRec = notifPendientes.firstWhere((e) => e == idRecordatorio);
+    // elimina recordatorio local anterior
+    NotificationService().cancelaNotificacion(idRec);
+    // cuerpo texto de la notificacion
+    final dataNotificacion = await Comunicaciones()
+        .textoNotificacionesLocales(context, citaProvider.contextoCita);
+    // crea nuevo recordatorio local
+    //todo: pasar por la clase formater hora y fecha
+    String textoHoraInicio =
+        '${DateTime.parse(nuevaCitaCreada.horaInicio.toString()).hour.toString().padLeft(2, '0')}:${DateTime.parse(nuevaCitaCreada.horaInicio.toString()).minute.toString().padLeft(2, '0')}';
+    NotificationService().notificacion(dataNotificacion.idRecordatorioCita,
+        dataNotificacion.title, dataNotificacion.body, '', textoHoraInicio);
+
+    // actualiza recordatorio firebase (coleccion recordatorios)
+
+    // no visible el boton guardar
     citaProvider.setVisibleGuardar(false);
   }
 }

@@ -14,6 +14,7 @@ import 'package:agendacitas/screens/creacion_citas/utils/genera_id_cita_recordat
 import 'package:agendacitas/screens/home.dart';
 import 'package:agendacitas/utils/actualizacion_cita.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
+import 'package:agendacitas/utils/comunicacion/comunicaciones.dart';
 import 'package:agendacitas/utils/notificaciones/recordatorio_local/recordatorio_local.dart';
 import 'package:agendacitas/widgets/compartirCliente/compartir_cita_a_cliente.dart';
 import 'package:flutter/material.dart';
@@ -506,15 +507,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     horaIniciotexto,
     nombreServicio,
   ) async {
-    // hora recordatorio
-    String time = tiempo();
-    String tiempoTextoRecord = FormatearFechaHora.formatearHora2(time);
-    // id unico del recordatorio (tiene que ser int)
-    int idCita = idRecordatorio(citaElegida.horaInicio!);
-    String title = 'Tienes cita en $tiempoTextoRecord';
-    String body =
-        '${citaElegida.nombreCliente} se va a hacer $nombreServicio con ${citaElegida.nombreEmpleado}';
-
+    final dataNotificacion =
+        await Comunicaciones().textoNotificacionesLocales(context, citaElegida);
     // guarda recordatorio en Firebase coleccion recordatorios
     await FirebaseProvider().creaRecordatorio(emailSesionUsuario, fecha,
         citaElegida, precio, idServicios, citaElegida.idEmpleado!);
@@ -529,12 +523,14 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
       // if (horaRecord >= ahora.hour) {
       debugPrint('---------GUARDA RECORDATORIO-------');
       try {
-        await NotificationService()
-            .notificacion(idCita, title, body, 'citapayload', horaRecordatorio);
+        await NotificationService().notificacion(
+            dataNotificacion.idRecordatorioCita,
+            dataNotificacion.title,
+            dataNotificacion.body,
+            'citapayload',
+            horaRecordatorio);
       } catch (e) {
-        debugPrint('error de notificacion local');
-        print('$idCita - $title - $body - $horaRecordatorio');
-        debugPrint(e.toString());
+        debugPrint('error de notificacion local: ${e.toString()}');
 
         // Mostrar el diálogo al hacer clic en el botón
         showDialog(

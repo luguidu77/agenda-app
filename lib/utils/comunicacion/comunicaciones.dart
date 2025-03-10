@@ -1,9 +1,21 @@
 import 'package:agendacitas/providers/Firebase/notificaciones.dart';
+import 'package:agendacitas/providers/personaliza_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/genera_id_cita_recordatorio.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
+import 'package:agendacitas/utils/formatear.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/models.dart';
+
+// Definición de tipo (opcional pero recomendable)
+typedef NotificacionRecord = ({
+  int idRecordatorioCita,
+  String title,
+  String body
+});
 
 class Comunicaciones {
   static void hacerLlamadaTelefonica(String phoneNumber) async {
@@ -218,5 +230,24 @@ class Comunicaciones {
     );
 
     await launchUrl(smsLaunchUri);
+  }
+
+  Future<NotificacionRecord> textoNotificacionesLocales(
+      BuildContext context, CitaModelFirebase citaElegida) async {
+    final personalizaProvier = context.read<PersonalizaProviderFirebase>();
+    final personaliza = personalizaProvier.getPersonaliza;
+
+    // hora recordatorio
+    String time = personaliza
+        .tiempoRecordatorio!; // tiempo  recordatorio antes de la cita (personaliza)
+    String tiempoTextoRecord = FormatearFechaHora.formatearHora2(time);
+    // id unico del recordatorio (tiene que ser int)
+    int idRecordatorioCita =
+        UtilsRecordatorios.idRecordatorio(citaElegida.horaInicio!);
+    String title = 'Una cita en $tiempoTextoRecord';
+    String body =
+        '${citaElegida.nombreCliente} tiene cita con ${citaElegida.nombreEmpleado}';
+
+    return (idRecordatorioCita: idRecordatorioCita, title: title, body: body);
   }
 }

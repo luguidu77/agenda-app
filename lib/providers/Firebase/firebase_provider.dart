@@ -16,6 +16,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -243,16 +244,7 @@ class FirebaseProvider extends ChangeNotifier {
     List<String> idServicios,
     String idEmpleado,
   ) async {
-/*   _emailSesionUsuario,
-        fecha,
-        citaElegida.horaInicio.toString(),
-        precio,
-        citaElegida.comentario!,
-        citaElegida.nombreCliente!,
-        citaElegida.telefonoCliente!,
-        email,
-        idServicios,
-        citaElegida.idEmpleado!); */
+    final String timeZoneName = await FlutterTimezone.getLocalTimezone();
 
     String horaInicio = citaElegida.horaInicio.toString();
     String comentario = citaElegida.comentario.toString();
@@ -287,7 +279,7 @@ class FirebaseProvider extends ChangeNotifier {
 
       'telefono': telefonoCliente,
       'email': emailCliente,
-      'timezone': "Europe/Madrid",
+      'timezone': timeZoneName,
       'tokenMessanging': perfilUsuarioApp['tokenMessaging'],
     });
 

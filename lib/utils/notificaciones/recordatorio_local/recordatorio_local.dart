@@ -6,12 +6,12 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/intl.dart';
 
-import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
-  List<int> listId = [];
+  List<dynamic> listId = [];
   // generador de numero unico
 
   // Find the 'current location'
@@ -22,6 +22,12 @@ class NotificationService {
 
   notificacion(int id, String? title, String? body, String payload,
       String horaInicio) async {
+    DateTime scheduledDateTime = DateTime.parse(horaInicio);
+
+    // Convierte el DateTime a TZDateTime usando la zona local
+    tz.TZDateTime scheduledTZDateTime =
+        tz.TZDateTime.from(scheduledDateTime, tz.local);
+
     flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
@@ -30,9 +36,10 @@ class NotificationService {
     // comprueba las notificaciones pendientes
     List<PendingNotificationRequest>? pendientes =
         await flutterLocalNotificationsPlugin
-            .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>()
-            ?.pendingNotificationRequests() as List<PendingNotificationRequest>;
+                .resolvePlatformSpecificImplementation<
+                    AndroidFlutterLocalNotificationsPlugin>()
+                ?.pendingNotificationRequests() ??
+            [];
 
     //Initialization Settings for Android
     //YOUR_APPLICATION_FOLDER_NAME\android\app\src\main\res\drawable\YOUR_APP_ICON.png
@@ -40,7 +47,7 @@ class NotificationService {
         AndroidInitializationSettings('@mipmap/launcher_icon');
 
     //Initialization Settings for iOS
-/*     const IOSInitializationSettings initializationSettingsIOS =
+    /*     const IOSInitializationSettings initializationSettingsIOS =
         IOSInitializationSettings(
       requestSoundPermission: true,
       requestBadgePermission: true,
@@ -55,22 +62,19 @@ class NotificationService {
     );
 
     await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onDidReceiveBackgroundNotificationResponse: datapayload);
+        onDidReceiveNotificationResponse: (NotificationResponse response) {
+      onSelectNotification(response.payload);
+    });
 
+    /* Asegúrate de que el canal que usas en AndroidNotificationDetails coincida con el canal que has creado o registrado previamente. 
+          Si el canal no existe o no se ha creado correctamente, la notificación podría no mostrarse.*/
+    const String channelId = 'high_importance_channel';
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
-        'hihg_channel', 'High Importance Notification',
-        description: "this channel is for important notification",
-        importance: Importance.max);
-
-    //initialize timezone package here
-    tz.initializeTimeZones();
-    final String currentTimeZone =
-        //  await FlutterNativeTimezone.getLocalTimezone();
-        // final location = tz.getLocation(currentTimeZone); //'Europe/Madrid'
-
-        // VERIFICA LOS ID DE LAS VERIFICACIONES PENDIENTES Y LE SUMA 1
-
-        await visualizaNotificaciones(pendientes);
+      channelId,
+      'High Importance Notifications',
+      description: "Este canal es para notificaciones importantes",
+      importance: Importance.max,
+    );
 
     //!notificaciones con intervalos
     /*  await flutterLocalNotificationsPlugin.periodicallyShow(
@@ -93,65 +97,61 @@ class NotificationService {
                 channelDescription: channel.description)),
         payload: payload); */
 
-    //!envio hora concreta
-    String fecha = horaInicio.split(' ').first;
-    String hora = horaInicio.split(' ').last;
+    /* La diferencia que ves se debe a que el método toString() de tz.TZDateTime muestra la hora en formato UTC (por eso aparece la "Z" al final), 
+        y en tu zona horaria (España, que es UTC+1 en horario estándar o UTC+2 en horario de verano) la hora local es una hora (o dos) mayor. Es decir,
+         si ves en consola 2025-03-09 15:45:00.000Z, eso representa el mismo instante que 16:45:00 en España (suponiendo que España esté en UTC+1 en ese momento). */
 
-    int year = int.parse(fecha.split('-')[0]);
-    int month = int.parse(fecha.split('-')[1]);
-    int day = int.parse(fecha.split('-')[2]);
-    int hour = int.parse(hora.split(':')[0]);
-    int minute = int.parse(hora.split(':')[1]);
-    // print('$year,  $month , $day,  $hour, $minute');
-    // print(horaInicio);
-    //TZDateTime(location, 2022, 8, 14, 21, 30, 0, 0, 0),
+    final localFormatter = DateFormat('yyyy-MM-dd HH:mm:ss');
+    print(
+        'Hora local recordatorio (UTC )- ${localFormatter.format(scheduledTZDateTime)}');
 
-    // TODO DESHABILITADO PORQUE TENGO QUE AGREGAR UNA LIBRERIA PARA OBTENER EL TIMEZONE ALTERNATIVO A flutter native timezone porque no es compatible con la version android
-    /* await flutterLocalNotificationsPlugin.zonedSchedule(
-        id,
-        title,
-        body,
-        tz.TZDateTime(location, year, month, day, hour, minute, 0, 0, 0)
-            .add(const Duration(minutes: 1)),
-        NotificationDetails(
-            android: AndroidNotificationDetails(channel.id, channel.name,
-                channelDescription: channel.description)),
-        //androidAllowWhileIdle: true,
+    try {
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+          id,
+          title,
+          body,
+          scheduledTZDateTime //scheduledDate
+          ,
+          const NotificationDetails(
+              android: AndroidNotificationDetails(
+            channelId,
+            'High Importance Notifications',
+            channelDescription: 'full screen channel description',
+            priority: Priority.max,
+            importance: Importance.max,
+            // fullScreenIntent: true
+          )),
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime);
 
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime); */
-
-    print(pendientes.map((e) {
-      return print('''
-   id: ${e.id}
-   title:  ${e.title}
-   body: ${e.body}
-   payload:  ${e.payload}
-   
-
- ''');
-    }));
+      await visualizaNotificaciones(pendientes);
+      // cancelaNotificacion(id);
+    } catch (e) {
+      print('Error al programar la notificación: $e');
+    }
   }
 
   void onSelectNotification(String? payload) {
     // Aquí puedes manejar la notificación recibida, por ejemplo, mostrar un diálogo
+
     print(
         'mensaje recibido por notificacion local ------------------------------------ Payload: $payload');
   }
 
   visualizaNotificaciones(List<PendingNotificationRequest> pendientes) async {
     for (var e in pendientes) {
-      listId.add((e.id));
+      listId.add(('${e.id}  -  ${e.title}    -  ${e.payload}'));
     }
-    print('######################  -lista id notificacion: $listId');
+    print(
+        '######################  -lista  id pendientes de  notificacion: $listId');
   }
 
   cancelaNotificacion(id) async {
-    //await flutterLocalNotificationsPlugin.cancelAll();
+    // await flutterLocalNotificationsPlugin.cancelAll();
 
     // cancel the notification with id value
-    await flutterLocalNotificationsPlugin.cancel(id);
+    // await flutterLocalNotificationsPlugin.cancel(id);
   }
 }
 

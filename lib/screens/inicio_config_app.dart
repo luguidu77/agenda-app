@@ -174,9 +174,15 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
     // Verifica si las citas ya están cargadas
     if (!contextoCitas.citasCargadas /* && contextoCitas.getCitas.isEmpty */) {
       try {
-        // Carga las citas
-        List<CitaModelFirebase> citas =
-            await FirebaseProvider().getTodasLasCitas(emailAdministrador);
+        List<CitaModelFirebase> citas = [];
+        citas = await FirebaseProvider().getTodasLasCitas(emailAdministrador);
+        //TODO  por aqui estoy trabajando la carga de las citas ·····································
+        /*  // Carga las citas
+        if (contextoCitas.getCitas.isEmpty) {
+          citas = await FirebaseProvider().getTodasLasCitas(emailAdministrador);
+        } else {
+          citas = contextoCitas.getCitas;
+        } */
 
         // Antes de usar el context, vuelve a verificar que el widget esté montado
         if (!mounted) return;

@@ -51,7 +51,7 @@ dependencies:
   fast_contacts: ^4.0.0
 
   flutter_local_notifications: ^18.0.1
-  timezone: ^0.10.0
+
 
   #admob_flutter: ^3.0.0
   google_mobile_ads: ^3.0.0
@@ -131,6 +131,10 @@ dependencies:
   
   #para llevar al usuario a la configuracion del dispositivo
   android_intent_plus: ^5.3.0 
+  flutter_native_timezone_updated_gradle: ^2.0.3
+
+  flutter_timezone: ^4.1.0
+  timezone: ^0.10.0
 
 dev_dependencies:
   flutter_test:

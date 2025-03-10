@@ -39,6 +39,11 @@ import 'providers/providers.dart';
 import 'screens/screens.dart';
 import 'widgets/formulariosSessionApp/registro_usuario_screen.dart'; //utilizado para anular la rotación de pantalla
 import 'package:app_links/app_links.dart';
+/*  flutter_timezone te dice cuál es la zona horaria del dispositivo, y timezone te permite trabajar con esa información para manipular fechas y horarios 
+latest_all.dart es parte del paquete timezone y contiene la información completa y actualizada de todas las zonas horarias.*/
+import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 //! DESPLEGAR EN PLAY STORE :
 
@@ -76,6 +81,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await _configureLocalTimeZone();
   await Firebase.initializeApp();
   FirebaseFirestore.instance.settings = const Settings(
     persistenceEnabled: true,
@@ -92,6 +98,12 @@ void main() async {
   // o ir a inicio de sesion con el usuario guardado
   final usuarioAPP = await sesionGardadoSharedPreferences();
   runApp(MyApp(usuarioAPP: usuarioAPP));
+}
+
+Future<void> _configureLocalTimeZone() async {
+  tz.initializeTimeZones();
+  final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+  tz.setLocalLocation(tz.getLocation(timeZoneName));
 }
 
 Future<String> sesionGardadoSharedPreferences() async {

@@ -1,5 +1,7 @@
 // ignore_for_file: file_names
 
+import 'dart:math';
+
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/creacion_cuenta/inicio_sesion_forzada.dart';
@@ -8,6 +10,7 @@ import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:agendacitas/providers/personaliza_provider.dart';
 import 'package:agendacitas/providers/recordatorios_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/genera_id_cita_recordatorio.dart';
 import 'package:agendacitas/screens/home.dart';
 import 'package:agendacitas/utils/actualizacion_cita.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
@@ -497,32 +500,31 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
   void _creaRecordatorioEnFirebase(
     emailSesionUsuario,
     fecha,
-    citaElegida,
+    CitaModelFirebase citaElegida,
     precio,
     idServicios,
     horaIniciotexto,
     nombreServicio,
   ) async {
-    String title = 'Tienes cita $fechaTexto-$horaIniciotexto h';
+    // hora recordatorio
+    String time = tiempo();
+    String tiempoTextoRecord = FormatearFechaHora.formatearHora2(time);
+    // id unico del recordatorio (tiene que ser int)
+    int idCita = idRecordatorio(citaElegida.horaInicio!);
+    String title = 'Tienes cita en $tiempoTextoRecord';
     String body =
-        '${citaElegida.nombreCliente} se va a hacer $nombreServicio ¡ganarás $precio ! 🤑';
-    debugPrint('hora recordatorio $horaRecordatorio');
-    debugPrint('hora actual ${DateTime.now().toString()}');
+        '${citaElegida.nombreCliente} se va a hacer $nombreServicio con ${citaElegida.nombreEmpleado}';
 
-    int idCita = 0;
+    // guarda recordatorio en Firebase coleccion recordatorios
     await FirebaseProvider().creaRecordatorio(emailSesionUsuario, fecha,
         citaElegida, precio, idServicios, citaElegida.idEmpleado!);
 
     //  RECORDATORIO CON ID PARA EN EL CASO DE QUE SE ELIMINE LA CITA, PODER BORRARLO
+
+    // GUARDA RECORDATORIO SI LA FECHA ES POSTERIOR A LA ACTUAL//  la fecha notificacion debe ser mayor a la de AHORA
     DateTime diaRecord = DateTime.parse(horaRecordatorio);
-    // int horaRecord = DateTime.parse(horaRecordatorio).hour;
-    // int minutoRecord = DateTime.parse(horaRecordatorio).minute;
+    DateTime ahora = DateTime.now().subtract(const Duration(minutes: 1));
 
-    DateTime ahora = DateTime.now().subtract(const Duration(
-        minutes:
-            1)); // ? incremento 5 minuto porque la fecha notificacion debe ser mayor a la de AHORA
-
-    // GUARDA RECORDATORIO SI LA FECHA ES POSTERIOR A LA ACTUAL
     if (diaRecord.isAfter(ahora)) {
       // if (horaRecord >= ahora.hour) {
       debugPrint('---------GUARDA RECORDATORIO-------');
@@ -530,6 +532,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         await NotificationService()
             .notificacion(idCita, title, body, 'citapayload', horaRecordatorio);
       } catch (e) {
+        debugPrint('error de notificacion local');
+        print('$idCita - $title - $body - $horaRecordatorio');
         debugPrint(e.toString());
 
         // Mostrar el diálogo al hacer clic en el botón

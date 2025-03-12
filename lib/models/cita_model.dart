@@ -99,6 +99,8 @@ class CitaModelFirebase {
   String? emailCliente;
   String? notaCliente;
 
+  int? idRecordatorioLocal; // Nuevo campo
+
   CitaModelFirebase({
     this.id,
     this.dia,
@@ -121,6 +123,7 @@ class CitaModelFirebase {
     this.telefonoCliente,
     this.emailCliente,
     this.notaCliente,
+    this.idRecordatorioLocal, // Nuevo campo en el constructor
   });
 
   CitaModelFirebase copyWith({
@@ -145,6 +148,7 @@ class CitaModelFirebase {
     String? telefonoCliente,
     String? emailCliente,
     String? notaCliente,
+    int? idRecordatorioLocal, // Nuevo campo en copyWith
   }) {
     return CitaModelFirebase(
       id: id ?? this.id,
@@ -168,6 +172,7 @@ class CitaModelFirebase {
       telefonoCliente: telefonoCliente ?? this.telefonoCliente,
       emailCliente: emailCliente ?? this.emailCliente,
       notaCliente: notaCliente ?? this.notaCliente,
+      idRecordatorioLocal: idRecordatorioLocal ?? this.idRecordatorioLocal,
     );
   }
 
@@ -193,6 +198,8 @@ class CitaModelFirebase {
     telefonoCliente = nuevosDatos.telefonoCliente ?? telefonoCliente;
     emailCliente = nuevosDatos.emailCliente ?? emailCliente;
     notaCliente = nuevosDatos.notaCliente ?? notaCliente;
+    idRecordatorioLocal =
+        nuevosDatos.idRecordatorioLocal ?? idRecordatorioLocal;
   }
 
   factory CitaModelFirebase.fromJson(Map<String, dynamic> json) =>
@@ -222,6 +229,7 @@ class CitaModelFirebase {
         telefonoCliente: json["telefonoCliente"],
         emailCliente: json["emailCliente"],
         notaCliente: json["notaCliente"],
+        idRecordatorioLocal: json["idRecordatorioLocal"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -246,6 +254,7 @@ class CitaModelFirebase {
         "telefonoCliente": telefonoCliente,
         "emailCliente": emailCliente,
         "notaCliente": notaCliente,
+        "idRecordatorioLocal": idRecordatorioLocal,
       };
 }
 

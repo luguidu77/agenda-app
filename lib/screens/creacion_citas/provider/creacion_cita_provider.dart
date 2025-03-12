@@ -38,8 +38,9 @@ class CreacionCitaProvider extends ChangeNotifier {
       emailCliente:
           edicionContextoCita.emailCliente ?? _contextoCita.emailCliente,
       notaCliente: edicionContextoCita.notaCliente ?? _contextoCita.notaCliente,
+      idRecordatorioLocal: edicionContextoCita.idRecordatorioLocal ??
+          _contextoCita.idRecordatorioLocal,
     );
-
     notifyListeners();
   }
 

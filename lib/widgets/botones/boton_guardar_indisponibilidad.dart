@@ -145,10 +145,10 @@ class _BotonGuardarState extends State<BotonGuardar> {
                         idCitaCliente: '');
                     //guardar la cita en firebase
                     String idCitaFB = await FirebaseProvider().nuevaCita(
-                        _emailSesionUsuario,
-                        citaEdicion,
-                        ['indispuesto'],
-                        citaEdicion.idCitaCliente!);
+                      _emailSesionUsuario,
+                      citaEdicion,
+                      ['indispuesto'],
+                    );
 
                     //agrear la cita al contexto de las citas
                     citaEdicion.id = idCitaFB;

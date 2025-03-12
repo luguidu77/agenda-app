@@ -1,36 +1,25 @@
 // ignore_for_file: file_names
 
-import 'dart:math';
-
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
-import 'package:agendacitas/providers/creacion_cuenta/inicio_sesion_forzada.dart';
-import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
-import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
 import 'package:agendacitas/providers/personaliza_provider.dart';
-import 'package:agendacitas/providers/recordatorios_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/genera_id_cita_recordatorio.dart';
 import 'package:agendacitas/screens/home.dart';
-import 'package:agendacitas/utils/actualizacion_cita.dart';
 import 'package:agendacitas/utils/alertasSnackBar.dart';
 import 'package:agendacitas/utils/comunicacion/comunicaciones.dart';
 import 'package:agendacitas/utils/notificaciones/recordatorio_local/recordatorio_local.dart';
 import 'package:agendacitas/widgets/compartirCliente/compartir_cita_a_cliente.dart';
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
 import '../../mylogic_formularios/mylogic.dart';
-import '../../utils/formatear.dart';
-import '../../widgets/widgets.dart';
 import 'provider/creacion_cita_provider.dart';
-import 'utils/adaptacion_perfilmodel_negociomodel.dart';
 import 'utils/id_cita_cliente_random.dart';
-import 'package:android_intent_plus/android_intent.dart';
-
-import 'package:app_settings/app_settings.dart';
 
 //import 'package:url_launcher/url_launcher_string.dart';
 
@@ -44,269 +33,298 @@ class ConfirmarStep extends StatefulWidget {
 }
 
 class _ConfirmarStepState extends State<ConfirmarStep> {
-  late CreacionCitaProvider contextoCreacionCita;
-  late EmpleadosProvider contextoEmpleado;
+  // Proveedores
+  late CreacionCitaProvider _citaProvider;
 
-  List<String> tRecordatorioGuardado = [];
-  String tiempoTextoRecord = '';
-  var tiempoEstablecido = RecordatoriosProvider();
-  String horaRecordatorio = '';
-  late DateTime tRestado = DateTime.now();
-  final estiloTextoTitulo =
-      const TextStyle(fontSize: 28, color: Colors.blueGrey);
-  final estiloTexto = const TextStyle(
-      fontSize: 19, color: Colors.blueGrey, fontWeight: FontWeight.bold);
-  //VARIABLES PARA PRESENTARLA EN PANTALLA AL USUARIO
-  String telefono = '';
-  String email = '';
-  String clientaTexto = '';
-  String telefonoTexto = '';
-  String servicioTexto = '';
-  String precioTexto = '';
-  String fechaTexto = '';
-  String fechaMesEspa = '';
-  String citaConfirmadaMes = '';
-  String citaConfirmadaDia = '';
-
-  String horaInicioTexto = '';
-  String horaFinalTexto = '';
-
-  bool? pagado;
+  // Variables de usuario y sesión
   String _emailSesionUsuario = '';
-  bool _iniciadaSesionUsuario = false;
 
-  String tiempo() {
-    final personalizaProvier = context.read<PersonalizaProviderFirebase>();
-    final personaliza = personalizaProvier.getPersonaliza;
-    return personaliza.tiempoRecordatorio!;
-  }
+  // Datos de la cita
+  String _clienteNombre = '';
+  String _telefono = '';
+  String _email = '';
+  String _servicioTexto = '';
+  String _precioTexto = '';
+  String _fechaTexto = '';
+  String _fechaMesEspa = '';
+  String _horaInicioTexto = '';
+  String _horaFinalTexto = '';
+  String _horaRecordatorio = '';
 
-  double sumarPrecios(listaServicios) {
-    double suma = 0.0;
+  // Identificadores
+  String _citaConfirmadaMes = '';
+  String _citaConfirmadaDia = '';
 
-    for (var servicio in listaServicios) {
-      // Obtener el precio en formato de cadena y convertirlo a double
-      double precio = double.parse(servicio['PRECIO']!);
-      suma += precio;
-    }
-
-    return suma;
-  }
-
-  guardalacita() async {
-    // tiempo recordatorio
-    String tiempoTextoRecord = tiempo();
-
-    // LLEER MICONTEXTO DE CreacionCitaProvider
-    contextoCreacionCita = context.read<CreacionCitaProvider>();
-    debugPrint('cita elegida ${contextoCreacionCita.contextoCita.toString()}');
-
-    /*  // LEER EL idEmpleado , EMPLEADO SELECCIONADO
-    String idEmpleado = contextoCreacionCita.contextoCita.idEmpleado!;
-    EmpleadoModel empleado = await FirebaseProvider()
-        .getEmpleadoporId(_emailSesionUsuario, idEmpleado); */
-
-    // GENERO UN ID PARA LA CITA(idCitaCliente); // Ejemplo: b7gjR3jNuMRomunRo6SJ
-    String idCitaCliente = await generarCadenaAleatoria(20);
-    // GUARDA EN EL CONTEXTO DE LA CITA
-
-    CitaModelFirebase citaElegida = contextoCreacionCita.contextoCita;
-    clientaTexto = citaElegida.nombreCliente!;
-    telefono = citaElegida.telefonoCliente!;
-    email = citaElegida.emailCliente!;
-
-    CitaModelFirebase edicionCita =
-        CitaModelFirebase(idCitaCliente: idCitaCliente);
-
-    contextoCreacionCita.setContextoCita(edicionCita);
-
-    List<Map<String, dynamic>> listaServicios =
-        contextoCreacionCita.getServiciosElegidos;
-
-    DateTime cita = DateTime.parse(
-      citaElegida.horaInicio.toString(),
-    );
-
-    if (tiempoTextoRecord != '') {
-      // si tiempo a restar es '24:00' , resto un día
-      if (tiempoTextoRecord[0] == '2') {
-        horaRecordatorio = cita
-            .subtract(const Duration(
-              days: 1,
-            ))
-            .toString();
-      } else {
-        String tiempoAux =
-            '${cita.year.toString()}-${cita.month.toString().padLeft(2, '0')}-${cita.day.toString().padLeft(2, '0')} $tiempoTextoRecord';
-        DateTime tiempoRecordatorio = DateTime.parse(tiempoAux);
-
-        horaRecordatorio = cita
-            .subtract(Duration(
-                hours: tiempoRecordatorio.hour,
-                minutes: tiempoRecordatorio.minute))
-            .toString();
-      }
-    }
-
-    String fecha =
-        '${DateTime.parse(citaElegida.horaInicio.toString()).day.toString().padLeft(2, '0')}/${DateTime.parse(citaElegida.horaInicio.toString()).month.toString().padLeft(2, '0')}';
-
-    //todo: pasar por la clase formater hora y fecha
-    String textoHoraInicio =
-        '${DateTime.parse(citaElegida.horaInicio.toString()).hour.toString().padLeft(2, '0')}:${DateTime.parse(citaElegida.horaInicio.toString()).minute.toString().padLeft(2, '0')}';
-    String textoHoraFinal =
-        '${DateTime.parse(citaElegida.horaFinal.toString()).hour.toString().padLeft(2, '0')}:${DateTime.parse(citaElegida.horaFinal.toString()).minute.toString().padLeft(2, '0')}';
-
-    //VARIABLES PARA PRESENTARLA EN PANTALLA AL USUARIO
-    //todo: SUMAR TODOS LOS SERVICIOS ELEGIDOS -------------------------------------??????
-    double sumaTotal = sumarPrecios(listaServicios);
-    servicioTexto = listaServicios.first['SERVICIO'];
-    precioTexto = sumaTotal.toString();
-    fechaTexto = fecha;
-    horaInicioTexto = textoHoraInicio;
-    horaFinalTexto = textoHoraFinal;
-
-    citaConfirmadaMes =
-        (citaElegida.horaInicio!).month.toString().padLeft(2, '0').toString();
-    citaConfirmadaDia =
-        (citaElegida.horaInicio!).day.toString().padLeft(2, '0').toString();
-
-    //? FECHA LARGA EN ESPAÑOL
-    final String fechaLargaEspa = DateFormat.MMMMEEEEd('es_ES')
-        .add_jm()
-        .format(DateTime.parse(citaElegida.horaInicio.toString()));
-    // print(fechaLargaEspa);
-    fechaTexto = fechaLargaEspa;
-
-    fechaMesEspa = DateFormat.MMM('es_ES')
-        .format(DateTime.parse(citaElegida.horaInicio.toString()));
-    // print(fechaMesEspa); // something ago, sep...
-    fechaTexto = fechaLargaEspa;
-    DateTime dateTime = citaElegida.horaInicio!;
-    String dateOnlyString =
-        '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
-
-    //GRABA LA CITA EN EL NEGOCIO
-    await grabarCita(
-        context,
-        fecha,
-        textoHoraInicio,
-        citaElegida,
-        dateOnlyString,
-        /*  citaElegida.horaInicio.toString(),
-        citaElegida.horaFinal.toString(),
-        citaElegida.comentario.toString(),
-        citaElegida.idcliente!, */
-        listaServicios.map((e) => e['ID'].toString()).toList(),
-        /*  citaElegida.nombreCliente!,
-        citaElegida.telefonoCliente!, */
-        listaServicios.first['SERVICIO'],
-        precioTexto,
-        idCitaCliente);
-
-    //* CLIENTE : comprobar si el cliente tiene cuenta en la web para agregarle la cita
-
-    //? PERFIL DEL NEGOCIO (USUARIOAPP)
-    final perfilNegocio =
-        await FirebaseProvider().cargarPerfilFB(_emailSesionUsuario);
-    //? PASO DE PERFILMODEL A NEGOCIOMODEL
-    NegocioModel negocio = adaptacionPerfilNegocio(perfilNegocio);
-
-    // Formatear la fecha al formato deseado
-    Map<String, dynamic> resultado =
-        FormatearFechaHora.formatearFechaYHora(citaElegida.horaInicio!);
-
-    String fechaFormateada = resultado['fechaFormateada'];
-    String horaFormateada = resultado['horaFormateada'];
-
-    //* todos  LOS SERVICIOS
-    List<ServicioModel> servicios = [];
-    ServicioModel servicio = ServicioModel();
-    listaServicios.map((e) => e['SERVICIO']).toList();
-
-    for (var element in listaServicios) {
-      servicio.servicio = element['SERVICIO'];
-      servicio.tiempo = element['TIEMPO'];
-      servicios.add(servicio);
-    }
-    String tiempoTotal = '00:00';
-    //*SUMA DE LOS TIEMPOS DE LOS SERVICIOS
-    for (var element in servicios) {
-      tiempoTotal = suma(tiempoTotal, element.tiempo.toString());
-    }
-
-    // duracion total de los servicios
-    String duracion = FormatearFechaHora.formatearHora2(tiempoTotal);
-
-    try {
-      //******************************************('AGREGA LA CITA AL CLIENTE')****************
-      await FirebaseProvider().creaNuevacitaAdministracionCliente(
-        negocio,
-        citaElegida.horaInicio,
-        fechaFormateada,
-        horaFormateada,
-        duracion,
-        servicios,
-        citaElegida.emailCliente!,
-        idCitaCliente,
-        precioTexto,
-      );
-    } catch (e) {
-      // print('ERROR');
-    }
-
-    //******************************************('AGREGA LA CITA AL PROVIDER')****************
-
-    await ActualizacionCita.agregar(context, citaElegida);
-
-    // limpia la lista de servicios
-    // listaServicios.clear();
-  }
-
-  pagoProvider() async {
-    return Provider.of<PagoProvider>(context, listen: false);
-  }
-
-  emailUsuario() async {
-    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
-    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
-    _iniciadaSesionUsuario = estadoPagoProvider.iniciadaSesionUsuario;
-  }
+  // Estilos de texto
+  final _estiloTextoTitulo =
+      const TextStyle(fontSize: 28, color: Colors.blueGrey);
+  final _estiloTexto = const TextStyle(
+      fontSize: 19, color: Colors.blueGrey, fontWeight: FontWeight.bold);
 
   @override
   void initState() {
-    emailUsuario();
-    tiempo();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Código que se ejecuta después de que la vista se haya cargado.
-      print("addPostFrameCallback: Vista cargada completamente.");
-      guardalacita();
-    });
-    // compruebaPago();
-
     super.initState();
+    _cargarDatosIniciales();
+  }
+
+  // Método para inicializar datos
+  void _cargarDatosIniciales() async {
+    await _obtenerEmailUsuario();
+
+    // Ejecutar después de que se renderice la vista
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      debugPrint("Vista cargada completamente");
+      _procesarCita();
+    });
+  }
+
+  // Obtener email del usuario
+  Future<void> _obtenerEmailUsuario() async {
+    final estadoPagoProvider = context.read<EstadoPagoAppProvider>();
+    _emailSesionUsuario = estadoPagoProvider.emailUsuarioApp;
+  }
+
+  // Obtener tiempo de recordatorio configurado
+  String _obtenerTiempoRecordatorio() {
+    final personalizaProvider = context.read<PersonalizaProviderFirebase>();
+    final personaliza = personalizaProvider.getPersonaliza;
+    return personaliza.tiempoRecordatorio!;
+  }
+
+  // Calcular suma de precios de servicios
+  double _sumarPrecios(List<Map<String, dynamic>> listaServicios) {
+    double suma = 0.0;
+    for (var servicio in listaServicios) {
+      suma += double.parse(servicio['PRECIO']!);
+    }
+    return suma;
+  }
+
+  // PROCESAMIENTO PRINCIPAL DE LA CITA
+  Future<void> _procesarCita() async {
+    _citaProvider = context.read<CreacionCitaProvider>();
+    debugPrint('Cita elegida: ${_citaProvider.contextoCita.toString()}');
+
+    // 1. Generar ID único para la cita y ID único para el recordatorio
+    String idCitaCliente = await generarCadenaAleatoria(20);
+    int idRecordatorioLocal = UtilsRecordatorios.idRecordatorio(
+        _citaProvider.contextoCita.horaInicio!);
+    CitaModelFirebase citaElegida = _citaProvider.contextoCita;
+
+    // 2. Guardar información del cliente
+    _clienteNombre = citaElegida.nombreCliente!;
+    _telefono = citaElegida.telefonoCliente!;
+    _email = citaElegida.emailCliente!;
+
+    // 3. Actualizar el ID cita e ID recordatorio local en el contexto
+    CitaModelFirebase edicionCita = CitaModelFirebase(
+        idCitaCliente: idCitaCliente, idRecordatorioLocal: idRecordatorioLocal);
+    _citaProvider.setContextoCita(edicionCita);
+
+    // 4. Obtener servicios y calcular precio total
+    List<Map<String, dynamic>> listaServicios =
+        _citaProvider.getServiciosElegidos;
+    double precioTotal = _sumarPrecios(listaServicios);
+
+    // 5. Calcular hora de recordatorio
+    await _calcularHoraRecordatorio(citaElegida);
+
+    // 6. Formatear fechas y horas para mostrar
+    await _formatearDatosFechaHora(citaElegida);
+
+    // 7. Guardar datos para mostrar en UI
+    _servicioTexto = listaServicios.first['SERVICIO'];
+    _precioTexto = precioTotal.toString();
+
+    // 8. Generar fecha formateada para guardar
+    DateTime dateTime = citaElegida.horaInicio!;
+    String fechaYMD =
+        '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
+
+    // 9. Grabar cita en la base de datos
+    await _grabarCitaCompleta(
+      citaElegida: citaElegida,
+      fecha: _fechaTexto,
+      horaInicio: _horaInicioTexto,
+      fechaYMD: fechaYMD,
+      idServicios: listaServicios.map((e) => e['ID'].toString()).toList(),
+      nombreServicio: _servicioTexto,
+      precio: _precioTexto,
+      idCitaCliente: idCitaCliente,
+    );
+
+    // 10. Actualizar la interfaz
+    setState(() {});
+  }
+
+  // Calcular la hora de recordatorio basada en la configuración
+  Future<void> _calcularHoraRecordatorio(CitaModelFirebase citaElegida) async {
+    String tiempoTextoRecord = _obtenerTiempoRecordatorio();
+    DateTime cita = citaElegida.horaInicio!;
+
+    if (tiempoTextoRecord.isEmpty) return;
+
+    // Si tiempo a restar es '24:00', resto un día
+    if (tiempoTextoRecord[0] == '2') {
+      _horaRecordatorio = cita.subtract(const Duration(days: 1)).toString();
+    } else {
+      String tiempoAux =
+          '${cita.year}-${cita.month.toString().padLeft(2, '0')}-${cita.day.toString().padLeft(2, '0')} $tiempoTextoRecord';
+      DateTime tiempoRecordatorio = DateTime.parse(tiempoAux);
+
+      _horaRecordatorio = cita
+          .subtract(Duration(
+              hours: tiempoRecordatorio.hour,
+              minutes: tiempoRecordatorio.minute))
+          .toString();
+    }
+  }
+
+  // Formatear fecha y hora para mostrar
+  Future<void> _formatearDatosFechaHora(CitaModelFirebase citaElegida) async {
+    DateTime horaInicio = citaElegida.horaInicio!;
+    DateTime horaFinal = citaElegida.horaFinal!;
+
+    // Formato corto (DD/MM)
+    String fechaCorta =
+        '${horaInicio.day.toString().padLeft(2, '0')}/${horaInicio.month.toString().padLeft(2, '0')}';
+
+    // Formato hora (HH:MM)
+    _horaInicioTexto =
+        '${horaInicio.hour.toString().padLeft(2, '0')}:${horaInicio.minute.toString().padLeft(2, '0')}';
+    _horaFinalTexto =
+        '${horaFinal.hour.toString().padLeft(2, '0')}:${horaFinal.minute.toString().padLeft(2, '0')}';
+
+    // Formato largo en español
+    final String fechaLargaEspa =
+        DateFormat.MMMMEEEEd('es_ES').add_jm().format(horaInicio);
+    _fechaTexto = fechaLargaEspa;
+
+    // Mes en español abreviado
+    _fechaMesEspa = DateFormat.MMM('es_ES').format(horaInicio);
+
+    // Datos para mostrar día y mes
+    _citaConfirmadaMes = horaInicio.month.toString().padLeft(2, '0');
+    _citaConfirmadaDia = horaInicio.day.toString().padLeft(2, '0');
+  }
+
+  // GUARDAR CITA EN FIREBASE Y CREAR RECORDATORIO
+  Future<void> _grabarCitaCompleta({
+    required CitaModelFirebase citaElegida,
+    required String fecha,
+    required String horaInicio,
+    required String fechaYMD,
+    required List<String> idServicios,
+    required String nombreServicio,
+    required String precio,
+    required String idCitaCliente,
+  }) async {
+    // 1. Crear cita en Firebase
+    await _crearCitaEnFirebase(citaElegida);
+
+    // 2. Crear recordatorio en Firebase
+    //  Obtener texto para notificaciones
+    final dataNotificacion =
+        await Comunicaciones().textoNotificacionesLocales(context, citaElegida);
+    await CrearRecordatorio.crearRecordatorioLocalyEnFirebase(
+      citaElegida: citaElegida,
+      fecha: fechaYMD,
+      precio: precio,
+      idServicios: idServicios,
+      nombreServicio: nombreServicio,
+      dataNotificacion: dataNotificacion,
+      horaRecordatorio: _horaRecordatorio,
+    );
+  }
+
+  // Crear cita en Firebase
+  Future<void> _crearCitaEnFirebase(CitaModelFirebase citaElegida) async {
+    final contextCitas = context.read<CitasProvider>();
+    final contextNuevaCita = context.read<CreacionCitaProvider>();
+
+    // Obtener servicios del contexto
+    List<Map<String, dynamic>> servicios = _citaProvider.getServiciosElegidos;
+    List<String> idServicios =
+        servicios.map((ser) => ser['ID'].toString()).toList();
+
+    // Guardar cita en Firebase
+    String idCitaFB = await FirebaseProvider()
+        .nuevaCita(_emailSesionUsuario, citaElegida, idServicios);
+
+    // Actualizar contexto con ID de Firebase
+    contextNuevaCita.contextoCita.id = idCitaFB;
+    contextNuevaCita.contextoCita.idservicio = idServicios;
+    contextNuevaCita.contextoCita.confirmada = true;
+
+    // Agregar cita al contexto general
+    contextCitas.agregaCitaAlContexto(contextNuevaCita.contextoCita);
+    debugPrint('Cita agregada al contexto');
+  }
+
+  // Crear recordatorio en Firebase y notificación local
+  /*  Future<void> _crearRecordatorioLocalyEnFirebase({
+    required CitaModelFirebase citaElegida,
+    required String fecha,
+    required String precio,
+    required List<String> idServicios,
+    required String horaInicio,
+    required String nombreServicio,
+  }) async {
+    // 1. Obtener texto para notificaciones
+    final dataNotificacion =
+        await Comunicaciones().textoNotificacionesLocales(context, citaElegida);
+
+    // 2. Guardar recordatorio en Firebase
+    await FirebaseProvider().creaRecordatorio(
+        _emailSesionUsuario, fecha, citaElegida, precio, idServicios);
+
+    // 3. Verificar si la fecha es posterior a la actual
+    DateTime diaRecord = DateTime.parse(_horaRecordatorio);
+    DateTime ahora = DateTime.now().subtract(const Duration(minutes: 1));
+
+    if (diaRecord.isAfter(ahora)) {
+      debugPrint('---------GUARDA RECORDATORIO-------');
+      try {
+        // 4. Crear notificación local
+        await NotificationService().notificacion(
+            dataNotificacion.idRecordatorioCita,
+            dataNotificacion.title,
+            dataNotificacion.body,
+            'citapayload',
+            _horaRecordatorio);
+      } catch (e) {
+        debugPrint('Error de notificación local: $e');
+        // 5. Mostrar diálogo para permisos de segundo plano
+        _mostrarDialogoPermisosSegundoPlano();
+      }
+    }
+  } */
+
+  // Liberar recursos de controladores
+  void _liberarMemoriaEditingController() {
+    final cliente = ClienteModel();
+    final servicio = ServicioModel();
+    final cita = CitaModel();
+
+    MyLogicCliente(cliente).dispose();
+    MyLogicServicio(servicio).dispose();
+    MyLogicCita(cita).dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final contextoCreacionCita = context.watch<CreacionCitaProvider>();
-    final citaElegida = contextoCreacionCita.contextoCita;
+    final citaElegida = context.watch<CreacionCitaProvider>().contextoCita;
 
     return PopScope(
-      canPop: false, // no permite salir de la pagina al ir atras
+      canPop: false, // No permite salir de la página al ir atrás
       child: Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              //_buildProgressIndicator(context),
-
-              _buildConfirmationSection(
-                citaElegida: citaElegida,
-                context: context,
-              ),
+              _buildConfirmationSection(citaElegida: citaElegida),
               const SizedBox(height: 20),
-              _buildFooterButton(context),
+              _buildFooterButton(),
             ],
           ),
         ),
@@ -314,22 +332,12 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     );
   }
 
-  /// Barra de progreso
-  Widget _buildProgressIndicator(BuildContext context) {
-    return BarraProgreso().progreso(
-      context,
-      1.0,
-      const Color.fromARGB(255, 51, 156, 24),
-    );
-  }
+  // WIDGETS DE LA INTERFAZ
 
-  /// Sección de confirmación de cita
-  Widget _buildConfirmationSection({
-    required dynamic citaElegida,
-    required BuildContext context,
-  }) {
+  // Sección de confirmación de cita
+  Widget _buildConfirmationSection({required CitaModelFirebase citaElegida}) {
     return Expanded(
-      child: servicioTexto == ''
+      child: _servicioTexto.isEmpty
           ? const Center(
               child: SizedBox(
                   width: 100, height: 100, child: CircularProgressIndicator()))
@@ -348,8 +356,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     );
   }
 
-  /// Imagen de confirmación
-  Column _buildConfirmationImage() {
+  // Imagen de confirmación
+  Widget _buildConfirmationImage() {
     return Column(
       children: [
         SizedBox(
@@ -359,7 +367,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         const SizedBox(height: 15),
         const Text(
           'Reserva confirmada',
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.blueGrey,
             fontWeight: FontWeight.bold,
             fontSize: 18,
@@ -370,17 +378,17 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     );
   }
 
-  /// Detalles para compartir la cita con el cliente
-  Column _buildSharingDetails(dynamic citaElegida) {
+  // Detalles para compartir la cita
+  Widget _buildSharingDetails(CitaModelFirebase citaElegida) {
     String formattedDate =
-        DateFormat('hh:mm dd-MM-yyyy').format(citaElegida.horaInicio);
+        DateFormat('dd-MM-yyyy HH:mm').format(citaElegida.horaInicio!);
 
     return Column(
-      spacing: 10,
+      spacing: 25,
       children: [
-        Divider(),
+        const Divider(),
         Text(
-          'Comparte la cita con ${clientaTexto}\n${formattedDate}',
+          'Comparte la cita con $_clienteNombre\n\nCita: $formattedDate', //El formato 'HH' representa las horas en un ciclo de 24 horas
           style: const TextStyle(
             color: Colors.blueGrey,
             fontWeight: FontWeight.bold,
@@ -388,19 +396,19 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
           ),
         ),
         CompartirCitaConCliente(
-          cliente: clientaTexto,
-          telefono: telefono,
-          email: email,
+          cliente: _clienteNombre,
+          telefono: _telefono,
+          email: _email,
           fechaCita: citaElegida.horaInicio.toString(),
-          servicio: servicioTexto,
-          precio: precioTexto,
+          servicio: _servicioTexto,
+          precio: _precioTexto,
         ),
       ],
     );
   }
 
-  /// Botón de cierre en el pie de página
-  Widget _buildFooterButton(BuildContext context) {
+  // Botón de cierre en el pie de página
+  Widget _buildFooterButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: ElevatedButton.icon(
@@ -413,15 +421,8 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         ),
         onPressed: () {
           mensajeInfo(context, 'Actualizando agenda...');
-
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return HomeScreen(
-              index: 0,
-              myBnB: 0,
-            );
-          }));
-
-          liberarMemoriaEditingController();
+          Navigator.push(context, _createRoute());
+          _liberarMemoriaEditingController();
         },
         icon: const Icon(
           Icons.check,
@@ -436,6 +437,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     );
   }
 
+  // Transición de página personalizada
   Route _createRoute() {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => HomeScreen(
@@ -459,116 +461,9 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
       transitionDuration: const Duration(milliseconds: 300),
     );
   }
-
-  void liberarMemoriaEditingController() {
-    final cliente = ClienteModel();
-    final servicio = ServicioModel();
-    final cita = CitaModel();
-
-    MyLogicCliente(cliente).dispose();
-    MyLogicServicio(servicio).dispose();
-    MyLogicCita(cita).dispose();
-  }
-
-  grabarCita(
-    BuildContext context,
-    fechaTexto,
-    horaIniciotexto,
-    CitaModelFirebase citaElegida,
-    String fecha,
-    List<String> idServicios,
-    String nombreServicio,
-    String precio,
-    String idCitaCliente,
-  ) async {
-    //###### CREA CITA Y TRAE ID CITA CREADA EN FIREBASE PARA ID DEL RECORDATORIO
-    _creaCitaEnFirebase(citaElegida, idCitaCliente);
-
-    //###### CREA RECORDATORIO EN FIREBASE //######//######//######//######
-    _creaRecordatorioEnFirebase(
-      _emailSesionUsuario,
-      fecha,
-      citaElegida,
-      precio,
-      idServicios,
-      horaIniciotexto,
-      nombreServicio,
-    );
-  }
-
-  void _mensajeActivarSegundoPlano() {}
-
-  void _creaRecordatorioEnFirebase(
-    emailSesionUsuario,
-    fecha,
-    CitaModelFirebase citaElegida,
-    precio,
-    idServicios,
-    horaIniciotexto,
-    nombreServicio,
-  ) async {
-    final dataNotificacion =
-        await Comunicaciones().textoNotificacionesLocales(context, citaElegida);
-    // guarda recordatorio en Firebase coleccion recordatorios
-    await FirebaseProvider().creaRecordatorio(emailSesionUsuario, fecha,
-        citaElegida, precio, idServicios, citaElegida.idEmpleado!);
-
-    //  RECORDATORIO CON ID PARA EN EL CASO DE QUE SE ELIMINE LA CITA, PODER BORRARLO
-
-    // GUARDA RECORDATORIO SI LA FECHA ES POSTERIOR A LA ACTUAL//  la fecha notificacion debe ser mayor a la de AHORA
-    DateTime diaRecord = DateTime.parse(horaRecordatorio);
-    DateTime ahora = DateTime.now().subtract(const Duration(minutes: 1));
-
-    if (diaRecord.isAfter(ahora)) {
-      // if (horaRecord >= ahora.hour) {
-      debugPrint('---------GUARDA RECORDATORIO-------');
-      try {
-        await NotificationService().notificacion(
-            dataNotificacion.idRecordatorioCita,
-            dataNotificacion.title,
-            dataNotificacion.body,
-            'citapayload',
-            horaRecordatorio);
-      } catch (e) {
-        debugPrint('error de notificacion local: ${e.toString()}');
-
-        // Mostrar el diálogo al hacer clic en el botón
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return const BackgroundPermissionDialog();
-          },
-        );
-        mensajeInfo(context, 'No recordaremos esta cita');
-      }
-      // }
-    }
-  }
-
-  void _creaCitaEnFirebase(citaElegida, idCitaCliente) async {
-    final contextCitas = context.read<CitasProvider>();
-    final contextNuevaCita = context.read<CreacionCitaProvider>();
-    List<Map<String, dynamic>> servicios =
-        contextoCreacionCita.getServiciosElegidos;
-
-    List<String> idServicios = servicios.map((ser) {
-      return ser['ID'].toString();
-    }).toList();
-
-    String idCitaFB = await FirebaseProvider().nuevaCita(
-        _emailSesionUsuario, citaElegida, idServicios, idCitaCliente);
-
-    contextNuevaCita.contextoCita.id = idCitaFB;
-    contextNuevaCita.contextoCita.idservicio = idServicios;
-    contextNuevaCita.contextoCita.confirmada = true;
-
-    contextCitas.agregaCitaAlContexto(contextNuevaCita.contextoCita);
-    print(
-        'contexto de las citas ....................................................................');
-    print(contextCitas);
-  }
 }
 
+// Diálogo para permisos de segundo plano
 class BackgroundPermissionDialog extends StatelessWidget {
   const BackgroundPermissionDialog({super.key});
 
@@ -607,7 +502,7 @@ class BackgroundPermissionDialog extends StatelessWidget {
 
   void abrirConfiguracionBateria() async {
     const AndroidIntent intent = AndroidIntent(
-      action: 'android.settings.ACTION_POWER_USAGE_SUMMARY', // Acción correcta
+      action: 'android.settings.ACTION_POWER_USAGE_SUMMARY',
     );
 
     try {

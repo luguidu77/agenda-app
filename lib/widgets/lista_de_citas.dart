@@ -254,28 +254,31 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
             // print(cita);
             //############# DETALLE DE LA CITA                   ########################
             final citaElegida = CitaModelFirebase(
-                id: cita['id'],
-                dia: cita['dia'],
-                horaInicio: DateTime.parse(cita['horaInicio']),
-                horaFinal: DateTime.parse(cita['horaFinal']),
-                comentario: cita['comentario'],
-                email: cita['email'],
-                idcliente: cita['idCliente'],
-                idservicio:
-                    idServicioLista, // Divide los elementos si hay comas
-                servicios: listaServicios,
-                idEmpleado: cita['idEmpleado'],
-                nombreEmpleado: cita['nombreEmpleado'],
-                colorEmpleado: int.parse(cita['colorEmpleado']),
-                precio: cita['precio'],
-                confirmada: cita['confirmada'] == 'true' ? true : false,
-                tokenWebCliente: cita['tokenWebCliente'],
-                idCitaCliente: cita['idCitaCliente'],
-                nombreCliente: cita['nombre'],
-                // fotoCliente: cita['foto'],
-                telefonoCliente: cita['telefono'],
-                emailCliente: cita['email'],
-                notaCliente: cita['nota']);
+              id: cita['id'],
+              dia: cita['dia'],
+              horaInicio: DateTime.parse(cita['horaInicio']),
+              horaFinal: DateTime.parse(cita['horaFinal']),
+              comentario: cita['comentario'],
+              email: cita['email'],
+              idcliente: cita['idCliente'],
+              idservicio: idServicioLista, // Divide los elementos si hay comas
+              servicios: listaServicios,
+              idEmpleado: cita['idEmpleado'],
+              nombreEmpleado: cita['nombreEmpleado'],
+              colorEmpleado: int.parse(cita['colorEmpleado']),
+              precio: cita['precio'],
+              confirmada: cita['confirmada'] == 'true' ? true : false,
+              tokenWebCliente: cita['tokenWebCliente'],
+              idCitaCliente: cita['idCitaCliente'],
+              nombreCliente: cita['nombre'],
+              // fotoCliente: cita['foto'],
+              telefonoCliente: cita['telefono'],
+              emailCliente: cita['email'],
+              notaCliente: cita['nota'],
+              idRecordatorioLocal: cita['idRecordatorioLocal'] != null
+                  ? (int.parse(cita['idRecordatorioLocal']))
+                  : 0,
+            );
 
             String dia = formatearFechaDiaCita(citaElegida.horaInicio!);
             // Puedes incluir una verificación para que solo se ejecute una vez si es necesario.
@@ -531,7 +534,9 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
                          "comentario": "${cita.comentario}",
                          "confirmada": "${cita.confirmada.toString()}",
                          "idCitaCliente": "${cita.idCitaCliente.toString()}",
-                         "tokenWebCliente": "${cita.tokenWebCliente.toString()}"
+                         "tokenWebCliente": "${cita.tokenWebCliente.toString()}",
+                         "idRecordatorioLocal": "${cita.idRecordatorioLocal.toString()}"
+                         
                     }
                     ''',
           resourceIds: employeeIds,
@@ -722,9 +727,16 @@ Future<void> _actualizaciondelacita(
     telefonoCliente: cita['telefono'],
     emailCliente: cita['email'],
     notaCliente: cita['nota'],
+    idRecordatorioLocal: cita['idRecordatorioLocal'],
   );
 
   ////XXxxxx FUNCION actualizar la cita en Firebase  xxxxxXX
-  await ActualizacionCita.actualizar(context, nuevaCita,
-      appointmentDragEndDetails.droppingTime!, null, null, emailSesionUsuario);
+  await ActualizacionCita.actualizar(
+      context,
+      nuevaCita,
+      appointmentDragEndDetails.droppingTime!,
+      null,
+      null,
+      emailSesionUsuario,
+      'dataNotificacion');
 }

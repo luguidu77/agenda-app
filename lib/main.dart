@@ -11,13 +11,12 @@ import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
 import 'package:agendacitas/registro_empleados/empleado_revisa_confirma.dart';
 import 'package:agendacitas/registro_empleados/registro_empleados.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
-import 'package:agendacitas/screens/error_page.dart';
+
 import 'package:agendacitas/screens/not_found_page.dart';
 
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:agendacitas/screens/pantalla_de_carga.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -41,7 +40,7 @@ import 'widgets/formulariosSessionApp/registro_usuario_screen.dart'; //utilizado
 import 'package:app_links/app_links.dart';
 /*  flutter_timezone te dice cuál es la zona horaria del dispositivo, y timezone te permite trabajar con esa información para manipular fechas y horarios 
 latest_all.dart es parte del paquete timezone y contiene la información completa y actualizada de todas las zonas horarias.*/
-import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -102,7 +101,7 @@ void main() async {
 
 Future<void> _configureLocalTimeZone() async {
   tz.initializeTimeZones();
-  final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+  final String timeZoneName = await FlutterNativeTimezone.getLocalTimezone();
   tz.setLocalLocation(tz.getLocation(timeZoneName));
 }
 

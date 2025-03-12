@@ -1,8 +1,11 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
+import 'package:agendacitas/providers/personaliza_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/utils/genera_id_cita_recordatorio.dart';
 
 import 'package:agendacitas/utils/extraerServicios.dart';
+import 'package:agendacitas/utils/notificaciones/recordatorio_local/recordatorio_local.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,17 +20,21 @@ class ActualizacionCita {
   }
 
   static Future<CitaModelFirebase> actualizar(
-    BuildContext context,
-    CitaModelFirebase cita,
-    DateTime?
-        fechaDroppintTime, // fecha del calendario cuando se arrastra tarjeta
-    String?
-        fechaFormulario, // fecha del formulario reasignar de la pantalla detalles cita
-    DateTime? horaInicioProgramable, // formulario reasignar
+      BuildContext context,
+      CitaModelFirebase cita,
+      DateTime?
+          fechaDroppintTime, // fecha del calendario cuando se arrastra tarjeta
+      String?
+          fechaFormulario, // fecha del formulario reasignar de la pantalla detalles cita
+      DateTime? horaInicioProgramable, // formulario reasignar
 
-    emailSesionUsuario,
-  ) async {
+      emailSesionUsuario,
+      dataNotificacion) async {
     final contextoCitas = context.read<CitasProvider>();
+    int idRecordatorioLocal =
+        UtilsRecordatorios.idRecordatorio(cita.horaInicio!);
+    final personalizaProvider = context.read<PersonalizaProviderFirebase>();
+    final personaliza = personalizaProvider.getPersonaliza;
     String? textoFecha;
     String? textoFechaHoraInicio;
     String? textoFechaHoraFinal;
@@ -100,6 +107,7 @@ class ActualizacionCita {
 
     newCita.idCitaCliente = cita.idCitaCliente;
     newCita.tokenWebCliente = cita.tokenWebCliente;
+    newCita.idRecordatorioLocal = idRecordatorioLocal;
     debugPrint('$textoFecha  $textoFechaHoraInicio $textoFechaHoraFinal');
 
     // Establece las citas en el contexto, eliminando la antigua y agregandola modificada
@@ -111,6 +119,29 @@ class ActualizacionCita {
 
     //* ACUTALIZA LAS BASE DE DATOS DE agandadecitaspp y clienteAgendoWeb
     await FirebaseProvider().actualizarCita(emailSesionUsuario, newCita);
+
+    // CREA NUEVO RECORDATORIO LOCAL
+    //  Generar fecha formateada para guardar
+    DateTime dateTime = newCita.horaInicio!;
+    String fechaYMD =
+        '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
+
+    // Obtener tiempo de recordatorio configurado
+
+    final horaRecordatorio = await CrearRecordatorio().calcularHoraRecordatorio(
+      newCita,
+      personaliza.tiempoRecordatorio!,
+    );
+
+    await CrearRecordatorio.crearRecordatorioLocalyEnFirebase(
+      citaElegida: newCita,
+      fecha: fechaYMD,
+      precio: cita.precio!,
+      idServicios: newCita.idservicio! as List<String>,
+      nombreServicio: cita.servicios!.first,
+      dataNotificacion: dataNotificacion,
+      horaRecordatorio: horaRecordatorio,
+    );
 
     // si es una tarjeta indisponibilidad, no actualiza clienteAgendoWeb
     /*  if (idServicios != ['indispuesto']) {

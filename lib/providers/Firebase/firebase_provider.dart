@@ -16,7 +16,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -188,10 +189,10 @@ class FirebaseProvider extends ChangeNotifier {
   }
 
   Future<String> nuevaCita(
-      String emailUsuarioAPP,
-      CitaModelFirebase citaElegida,
-      List<String> idServicios,
-      String idCitaCliente) async {
+    String emailUsuarioAPP,
+    CitaModelFirebase citaElegida,
+    List<String> idServicios,
+  ) async {
     // Crear una lista de futuros a partir de la lista de ids de servicio
     List<Map<String, dynamic>> listaServiciosAux = [];
     bool esCita = true;
@@ -217,8 +218,9 @@ class FirebaseProvider extends ChangeNotifier {
           : ['indispuesto'],
       'idempleado': citaElegida.idEmpleado!,
       'confirmada': true,
-      'idCitaCliente': idCitaCliente,
+      'idCitaCliente': citaElegida.idCitaCliente,
       'tokenWebCliente': '',
+      'idRecordatorioLocal': citaElegida.idRecordatorioLocal,
     });
     //rinicializa Firebase
     await _iniFirebase();
@@ -239,18 +241,19 @@ class FirebaseProvider extends ChangeNotifier {
   creaRecordatorio(
     String emailUsuarioAPP,
     String dia,
-    citaElegida,
+    CitaModelFirebase citaElegida,
     String precio,
     List<String> idServicios,
-    String idEmpleado,
   ) async {
-    final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+    final String timeZoneName = await FlutterNativeTimezone.getLocalTimezone();
 
     String horaInicio = citaElegida.horaInicio.toString();
     String comentario = citaElegida.comentario.toString();
     String nombreCliente = citaElegida.nombreCliente.toString();
     String emailCliente = citaElegida.emailCliente.toString();
     String telefonoCliente = citaElegida.telefonoCliente.toString();
+    String nombreEmpleado = citaElegida.nombreEmpleado.toString();
+    int idRecordatorioLocal = citaElegida.idRecordatorioLocal!;
 
     // Crear una lista de futuros a partir de la lista de ids de servicio
     List<String> listaServiciosAux = [];
@@ -273,14 +276,16 @@ class FirebaseProvider extends ChangeNotifier {
       'horaFormateada': formatearHora(horaInicio),
       //'horaFinal': horaFinal,
       //'precio': precio,
-      //'comentario': comentario,
+
       'cliente': nombreCliente,
       'servicio': listaServiciosAux,
-
       'telefono': telefonoCliente,
       'email': emailCliente,
       'timezone': timeZoneName,
       'tokenMessanging': perfilUsuarioApp['tokenMessaging'],
+      'idRecordatorio': idRecordatorioLocal,
+      'nombreEmpleado': nombreEmpleado,
+      'comentario': comentario,
     });
 
     //referencia a la coleccion
@@ -588,6 +593,9 @@ class FirebaseProvider extends ChangeNotifier {
         idCitaCliente: dataMap['idCitaCliente']?.toString() ?? '',
         tokenWebCliente: dataMap['tokenWebCliente']?.toString() ?? '',
         email: dataMap['email'],
+        idRecordatorioLocal: dataMap['idRecordatorioLocal'] != null
+            ? (dataMap['idRecordatorioLocal'])
+            : 0,
       );
 
       // Si el cliente no es "indispuesto", realiza las consultas adicionales
@@ -635,6 +643,7 @@ class FirebaseProvider extends ChangeNotifier {
           telefonoCliente: clienteData['telefono'],
           emailCliente: clienteData['email'],
           notaCliente: clienteData['nota'],
+          idRecordatorioLocal: cita.idRecordatorioLocal,
         );
       } else {
         // Si el cliente es "indispuesto", asigna valores predeterminados
@@ -1317,7 +1326,8 @@ class FirebaseProvider extends ChangeNotifier {
       'idempleado': cita.idEmpleado,
       'confirmada': cita.confirmada,
       'idCitaCliente': cita.idCitaCliente,
-      'tokenWebCliente': cita.tokenWebCliente
+      'tokenWebCliente': cita.tokenWebCliente,
+      'idRecordatorioLocal': cita.idRecordatorioLocal,
     };
 
     await _iniFirebase();
@@ -1595,6 +1605,7 @@ class FirebaseProvider extends ChangeNotifier {
         telefonoCliente: cliente['telefono'],
         emailCliente: cliente['email'],
         notaCliente: cliente['nota'],
+        idRecordatorioLocal: cita['idRecordatorioLocal'],
       );
 
       citasFirebase.add(citaFirebase);

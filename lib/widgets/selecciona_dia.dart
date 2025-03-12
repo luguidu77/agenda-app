@@ -442,13 +442,13 @@ class _SeleccionaDiaState extends State<SeleccionaDia> {
 
               ////XXxxxx FUNCION actualizar la cita en Firebase  xxxxxXX
               await ActualizacionCita.actualizar(
-                context,
-                oldCita,
-                null,
-                fecha,
-                horaInicioProgramable,
-                _emailSesionUsuario,
-              );
+                  context,
+                  oldCita,
+                  null,
+                  fecha,
+                  horaInicioProgramable,
+                  _emailSesionUsuario,
+                  'dataNotificacion');
               // TODO  modificar recordatorio
               /*   await FirebaseProvider().creaRecordatorio(
                   usuarioAP,

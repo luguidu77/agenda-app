@@ -3,12 +3,91 @@
 
 import 'dart:io';
 
+import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/models/notificacion_model.dart';
+import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
+import 'package:agendacitas/screens/creacion_citas/creacion_cita_resumen.dart';
+import 'package:agendacitas/utils/alertasSnackBar.dart';
+import 'package:agendacitas/utils/comunicacion/comunicaciones.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 
 import 'package:timezone/timezone.dart' as tz;
+
+class CrearRecordatorio {
+  String horaRecordatorio = '';
+  // Calcular la hora de recordatorio basada en la configuración
+  Future<String> calcularHoraRecordatorio(
+      CitaModelFirebase citaElegida, tiempoTextoRecord) async {
+    DateTime cita = citaElegida.horaInicio!;
+
+    // Si tiempo a restar es '24:00', resto un día
+    if (tiempoTextoRecord[0] == '2') {
+      horaRecordatorio = cita.subtract(const Duration(days: 1)).toString();
+    } else {
+      String tiempoAux =
+          '${cita.year}-${cita.month.toString().padLeft(2, '0')}-${cita.day.toString().padLeft(2, '0')} $tiempoTextoRecord';
+      DateTime tiempoRecordatorio = DateTime.parse(tiempoAux);
+
+      horaRecordatorio = cita
+          .subtract(Duration(
+              hours: tiempoRecordatorio.hour,
+              minutes: tiempoRecordatorio.minute))
+          .toString();
+    }
+
+    return horaRecordatorio;
+  }
+
+  static Future<void> crearRecordatorioLocalyEnFirebase({
+    required CitaModelFirebase citaElegida,
+    required String fecha,
+    required String precio,
+    required List<String> idServicios,
+    required String nombreServicio,
+    required String horaRecordatorio,
+    required NotificacionRecord dataNotificacion,
+  }) async {
+    // 2. Guardar recordatorio en Firebase
+    await FirebaseProvider().creaRecordatorio(
+        citaElegida.email!, fecha, citaElegida, precio, idServicios);
+
+    // 3. Verificar si la fecha es posterior a la actual
+    DateTime diaRecord = DateTime.parse(horaRecordatorio);
+    DateTime ahora = DateTime.now().subtract(const Duration(minutes: 1));
+
+    if (diaRecord.isAfter(ahora)) {
+      debugPrint('---------GUARDA RECORDATORIO-------');
+      try {
+        // 4. Crear notificación local
+        await NotificationService().notificacion(
+            dataNotificacion.idRecordatorioCita,
+            dataNotificacion.title,
+            dataNotificacion.body,
+            'citapayload',
+            horaRecordatorio);
+      } catch (e) {
+        debugPrint('Error de notificación local: $e');
+        // 5. Mostrar diálogo para permisos de segundo plano
+        // _mostrarDialogoPermisosSegundoPlano(context);
+      }
+    }
+  }
+
+  static // Mostrar diálogo para permisos de segundo plano
+      void _mostrarDialogoPermisosSegundoPlano(context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return const BackgroundPermissionDialog();
+      },
+    );
+    mensajeInfo(context, 'No recordaremos esta cita');
+  }
+}
 
 class NotificationService {
   List<int> listId = [];

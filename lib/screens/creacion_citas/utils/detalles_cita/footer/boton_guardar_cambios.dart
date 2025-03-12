@@ -119,29 +119,55 @@ class BotonGuardarCambios extends StatelessWidget {
         });
   }
 
-  static void _actualiza(
-      BuildContext context, citaProvider, emailUsuarioProvider) async {
+  static void _actualiza(context, citaProvider, emailUsuarioProvider) async {
+    debugPrint(
+        '--------- contexto cita ${citaProvider.contextoCita.idRecordatorioLocal.toString()}-------');
+    // actualiza recordatorio local
+    _eliminaRecordatorioLocalAnterior(
+        citaProvider.contextoCita.idRecordatorioLocal);
+    //  Obtener texto para notificaciones
+    final dataNotificacion = await Comunicaciones()
+        .textoNotificacionesLocales(context, citaProvider.contextoCita);
     // actualiza la cita
     final nuevaCitaCreada = await ActualizacionCita.actualizar(
-      context,
-      citaProvider.contextoCita,
-      null,
-      citaProvider.contextoCita.dia,
-      citaProvider.contextoCita.horaInicio,
-      emailUsuarioProvider.emailAdministradorApp,
-    );
+        context,
+        citaProvider.contextoCita,
+        null,
+        citaProvider.contextoCita.dia,
+        citaProvider.contextoCita.horaInicio,
+        emailUsuarioProvider.emailAdministradorApp,
+        dataNotificacion);
 
-    // actualiza recordatorio local
+    // actualiza recordatorio firebase (coleccion recordatorios)
+
+    // no visible el boton guardar
+    citaProvider.setVisibleGuardar(false);
+  }
+
+  static void _eliminaRecordatorioLocalAnterior(idRecordatorioLocal) async {
+    // traigo las notificaciones locales pendientes
     final notifPendientes =
         await NotificationService().getNotificacionesPendientes();
 
-    final idRecordatorio =
-        UtilsRecordatorios.idRecordatorio(citaProvider.contextoCita.horaInicio);
+    debugPrint(
+        '--------- RECORDATORIOS PENDIENTES ${notifPendientes.toString()}-------');
 
-    final idRec = notifPendientes.firstWhere((e) => e == idRecordatorio);
-    // elimina recordatorio local anterior
-    NotificationService().cancelaNotificacion(idRec);
-    // cuerpo texto de la notificacion
+    // traigo el id del recordatorio local de la cita
+
+    debugPrint(
+        '---------idRecordatorio a eliminar de RECORDATORIOS PENDIENTES ${idRecordatorioLocal.toString()}-------');
+
+    // si la cita tiene guardado un id de recordatorio local, comprueba que se encuentra en pendientes y lo cancela
+    if (idRecordatorioLocal != null) {
+      final idRec = notifPendientes.firstWhere((e) => e == idRecordatorioLocal);
+      // elimina recordatorio local anterior
+      NotificationService().cancelaNotificacion(idRec);
+    } else {
+      debugPrint('no tiene idRecordatorioLocal');
+    }
+
+    // UtilsRecordatorios.idRecordatorio(citaProvider.contextoCita.horaInicio);
+    /*    // cuerpo texto de la notificacion
     final dataNotificacion = await Comunicaciones()
         .textoNotificacionesLocales(context, citaProvider.contextoCita);
     // crea nuevo recordatorio local
@@ -149,11 +175,6 @@ class BotonGuardarCambios extends StatelessWidget {
     String textoHoraInicio =
         '${DateTime.parse(nuevaCitaCreada.horaInicio.toString()).hour.toString().padLeft(2, '0')}:${DateTime.parse(nuevaCitaCreada.horaInicio.toString()).minute.toString().padLeft(2, '0')}';
     NotificationService().notificacion(dataNotificacion.idRecordatorioCita,
-        dataNotificacion.title, dataNotificacion.body, '', textoHoraInicio);
-
-    // actualiza recordatorio firebase (coleccion recordatorios)
-
-    // no visible el boton guardar
-    citaProvider.setVisibleGuardar(false);
+        dataNotificacion.title, dataNotificacion.body, '', textoHoraInicio); */
   }
 }

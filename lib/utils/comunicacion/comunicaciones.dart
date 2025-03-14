@@ -242,7 +242,7 @@ class Comunicaciones {
         .tiempoRecordatorio!; // tiempo  recordatorio antes de la cita (personaliza)
     String tiempoTextoRecord = FormatearFechaHora.formatearHora2(time);
     // id unico del recordatorio (tiene que ser int)
-    int idRecordatorioCita = citaElegida.idRecordatorioLocal!;
+    int idRecordatorioCita = 0;
     String title = 'Una cita en $tiempoTextoRecord';
     String body =
         '${citaElegida.nombreCliente} tiene cita con ${citaElegida.nombreEmpleado}';

@@ -245,7 +245,7 @@ class FirebaseProvider extends ChangeNotifier {
     String precio,
     List<String> idServicios,
   ) async {
-    final String timeZoneName = await FlutterNativeTimezone.getLocalTimezone();
+    // final String timeZoneName = await FlutterNativeTimezone.getLocalTimezone();
 
     String horaInicio = citaElegida.horaInicio.toString();
     String comentario = citaElegida.comentario.toString();
@@ -253,7 +253,7 @@ class FirebaseProvider extends ChangeNotifier {
     String emailCliente = citaElegida.emailCliente.toString();
     String telefonoCliente = citaElegida.telefonoCliente.toString();
     String nombreEmpleado = citaElegida.nombreEmpleado.toString();
-    int idRecordatorioLocal = citaElegida.idRecordatorioLocal!;
+    int idRecordatorioLocal = citaElegida.idRecordatorioLocal ?? 0;
 
     // Crear una lista de futuros a partir de la lista de ids de servicio
     List<String> listaServiciosAux = [];
@@ -281,7 +281,7 @@ class FirebaseProvider extends ChangeNotifier {
       'servicio': listaServiciosAux,
       'telefono': telefonoCliente,
       'email': emailCliente,
-      'timezone': timeZoneName,
+      'timezone': "Europe/Madrid", //timeZoneName
       'tokenMessanging': perfilUsuarioApp['tokenMessaging'],
       'idRecordatorio': idRecordatorioLocal,
       'nombreEmpleado': nombreEmpleado,

@@ -25,6 +25,9 @@ class BotonGuardarCambios extends StatelessWidget {
       children: [
         WidgetsFooter.boton('Guardar', () {
           if (citaProvider.contextoCita.horaInicio!.isAfter(DateTime.now())) {
+            // quita el boton Guardar
+            context.read<CreacionCitaProvider>().setVisibleGuardar(false);
+
             ///TODO PENDIENTE DE MANEJAR EL CONTEXTO DEL PERFIL DEL ADMINISTRADOR PARA EL ENVIO DE EMAILS
             ///SI EL CLIENTE NO TIENE EMAIL TAMPOCO SALDRA ESTA OPCION
             ///SI SE AGREGA EL EMAIL CON LA APP YA INICIADA HABRA QUE AGREGARLO AL CONTEXTO DE CLIENTES

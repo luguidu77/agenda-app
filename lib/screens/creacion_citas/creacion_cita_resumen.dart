@@ -111,10 +111,11 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         _citaProvider.contextoCita.horaInicio!);
     CitaModelFirebase citaElegida = _citaProvider.contextoCita;
 
-    // 2. Guardar información del cliente
+    // 2. Guardar información del cliente y email del usuario de la app
     _clienteNombre = citaElegida.nombreCliente!;
     _telefono = citaElegida.telefonoCliente!;
     _email = citaElegida.emailCliente!;
+    citaElegida.email = _emailSesionUsuario;
 
     // 3. Actualizar el ID cita e ID recordatorio local en el contexto
     CitaModelFirebase edicionCita = CitaModelFirebase(
@@ -313,7 +314,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
   @override
   Widget build(BuildContext context) {
-    final citaElegida = context.watch<CreacionCitaProvider>().contextoCita;
+    final citaElegida = context.read<CreacionCitaProvider>().contextoCita;
 
     return PopScope(
       canPop: false, // No permite salir de la página al ir atrás

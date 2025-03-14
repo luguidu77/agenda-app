@@ -218,9 +218,9 @@ class FirebaseProvider extends ChangeNotifier {
           : ['indispuesto'],
       'idempleado': citaElegida.idEmpleado!,
       'confirmada': true,
-      'idCitaCliente': citaElegida.idCitaCliente,
+      'idCitaCliente': citaElegida.idCitaCliente!,
       'tokenWebCliente': '',
-      'idRecordatorioLocal': citaElegida.idRecordatorioLocal,
+      'idRecordatorioLocal': citaElegida.idRecordatorioLocal!,
     });
     //rinicializa Firebase
     await _iniFirebase();

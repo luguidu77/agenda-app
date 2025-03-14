@@ -107,7 +107,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
 
     // 1. Generar ID único para la cita y ID único para el recordatorio
     String idCitaCliente = await generarCadenaAleatoria(20);
-    int idRecordatorioLocal = UtilsRecordatorios.idRecordatorio(
+    int idRecordatorioLocal = await UtilsRecordatorios.idRecordatorio(
         _citaProvider.contextoCita.horaInicio!);
     CitaModelFirebase citaElegida = _citaProvider.contextoCita;
 
@@ -116,6 +116,9 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     _telefono = citaElegida.telefonoCliente!;
     _email = citaElegida.emailCliente!;
     citaElegida.email = _emailSesionUsuario;
+    // actualiza cita con idCitaCliente y idRecordatorioLocal
+    citaElegida.idCitaCliente = idCitaCliente;
+    citaElegida.idRecordatorioLocal = idRecordatorioLocal;
 
     // 3. Actualizar el ID cita e ID recordatorio local en el contexto
     CitaModelFirebase edicionCita = CitaModelFirebase(
@@ -220,13 +223,17 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     required String precio,
     required String idCitaCliente,
   }) async {
-    // 1. Crear cita en Firebase
-    await _crearCitaEnFirebase(citaElegida);
-
-    // 2. Crear recordatorio en Firebase
     //  Obtener texto para notificaciones
     final dataNotificacion =
         await Comunicaciones().textoNotificacionesLocales(context, citaElegida);
+
+    // 1. Crear cita en Firebase
+    await _crearCitaEnFirebase(
+      citaElegida,
+    );
+
+    // 2. Crear recordatorio en Firebase
+
     await CrearRecordatorio.crearRecordatorioLocalyEnFirebase(
       citaElegida: citaElegida,
       fecha: fechaYMD,

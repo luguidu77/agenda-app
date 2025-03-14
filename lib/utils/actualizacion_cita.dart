@@ -32,7 +32,7 @@ class ActualizacionCita {
       dataNotificacion) async {
     final contextoCitas = context.read<CitasProvider>();
     int idRecordatorioLocal =
-        UtilsRecordatorios.idRecordatorio(cita.horaInicio!);
+        await UtilsRecordatorios.idRecordatorio(cita.horaInicio!);
     final personalizaProvider = context.read<PersonalizaProviderFirebase>();
     final personaliza = personalizaProvider.getPersonaliza;
     String? textoFecha;

@@ -63,8 +63,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool temaDefecto = true;
 
-  bool _iniciadaSesionUsuario = false;
-  String _emailSesionUsuario = '';
+  final bool _iniciadaSesionUsuario = false;
+  final String _emailSesionUsuario = '';
 
   ThemeProvider themeProvider = ThemeProvider();
 

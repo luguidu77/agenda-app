@@ -10,7 +10,6 @@ import 'package:agendacitas/providers/Firebase/emailHtml/emails_html.dart';
 import 'package:agendacitas/providers/Firebase/notificaciones.dart';
 import 'package:agendacitas/providers/db_provider.dart';
 import 'package:agendacitas/utils/extraerServicios.dart';
-import 'package:agendacitas/widgets/alertas/alertaAgregarPersonal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -1527,7 +1526,7 @@ class FirebaseProvider extends ChangeNotifier {
 
       var cliente;
       EmpleadoModel empleado;
-      var serv;
+      Map<String, dynamic> serv;
 
       if (cita['idCliente'] != "999") {
         // si no es indispuesto
@@ -2133,7 +2132,7 @@ class FirebaseProvider extends ChangeNotifier {
         // Obtener el ID del primer documento encontrado
         String docId = querySnapshot.docs.first.id;
 
-        print('Documento encontrado: ${docId}, ');
+        print('Documento encontrado: $docId, ');
 
         // Actualizar solo el campo `cod_verif`
         await collectRef.doc(docId).update({'cod_verif': nuevoCodVerif});

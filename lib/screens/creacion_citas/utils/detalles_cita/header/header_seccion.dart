@@ -1,11 +1,8 @@
-import 'dart:ffi';
 
 import 'package:agendacitas/models/cita_model.dart';
-import 'package:agendacitas/providers/estado_confirmacion_cita.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/style/.estilos_creacion_cita.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/content/widgets_content.dart';
-import 'package:agendacitas/widgets/botones/boton_confirmar_cita_reserva_web.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +12,7 @@ class HeaderSection extends StatelessWidget {
   final CitaModelFirebase reserva;
   final bool citaconfirmada;
 
-  const HeaderSection({
+  const HeaderSection({super.key, 
     //required this.fecha,
     required this.reserva,
     required this.citaconfirmada,

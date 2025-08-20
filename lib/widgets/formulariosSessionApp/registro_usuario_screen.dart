@@ -83,7 +83,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
         ),
         // hello again!
         Text(
-          hayEmailUsuario ? 'Hola ${nombreUsuario}' : 'Hola!, ...',
+          hayEmailUsuario ? 'Hola $nombreUsuario' : 'Hola!, ...',
           style: GoogleFonts.bebasNeue(fontSize: 40),
         ),
         const SizedBox(height: 10),

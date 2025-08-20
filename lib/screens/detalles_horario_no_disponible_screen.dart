@@ -1,5 +1,4 @@
 import 'package:agendacitas/models/models.dart';
-import 'package:agendacitas/models/personaliza_model.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/personaliza_provider.dart';

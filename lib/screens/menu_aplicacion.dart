@@ -24,9 +24,9 @@ class MenuAplicacion extends StatefulWidget {
 class _MenuAplicacionState extends State<MenuAplicacion> {
   String _emailSesionUsuario = '';
   String _emailAdministrador = '';
-  String _estadopago = '';
+  final String _estadopago = '';
   TextStyle estilo = const TextStyle(color: Colors.black);
-  bool _iniciadaSesionUsuario = false;
+  final bool _iniciadaSesionUsuario = false;
   String versionApp = '';
   bool versionPlayS = false;
   String comentarioVersion = '';

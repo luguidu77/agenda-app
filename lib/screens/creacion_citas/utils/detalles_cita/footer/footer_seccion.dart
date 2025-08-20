@@ -5,11 +5,9 @@ import 'package:agendacitas/providers/personaliza_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/footer/estilo_footer.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/footer/boton_guardar_cambios.dart';
-import 'package:agendacitas/widgets/botones/form_reprogramar_reserva.dart';
 import 'package:agendacitas/widgets/compartirCliente/compartir_cita_a_cliente.dart';
 import 'package:agendacitas/widgets/elimina_cita.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class FooterSeccion extends StatelessWidget {
@@ -17,7 +15,7 @@ class FooterSeccion extends StatelessWidget {
   final String emailUsuario;
   final CitasProvider contextoCitaProvider;
 
-  const FooterSeccion({
+  const FooterSeccion({super.key, 
     required this.reserva,
     required this.emailUsuario,
     required this.contextoCitaProvider,
@@ -55,7 +53,7 @@ class FooterSeccion extends StatelessWidget {
               ),
               // botones compartir / boton guardar
               citaProvider.visibleGuardar
-                  ? BotonGuardarCambios()
+                  ? const BotonGuardarCambios()
                   : Row(
                       spacing: 10,
                       mainAxisAlignment: MainAxisAlignment.end,

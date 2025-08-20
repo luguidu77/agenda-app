@@ -130,7 +130,7 @@ class _RegistroEmpleadosState extends State<RegistroEmpleados> {
 
                 Navigator.pushNamed(context, '/empleadoRevisaConfirma');
               },
-              child: Text('Continuar'),
+              child: const Text('Continuar'),
             ),
           ],
         ),

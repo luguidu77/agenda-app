@@ -1,19 +1,18 @@
 import 'dart:convert';
-import 'dart:developer';
+
 import 'dart:math';
 
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/providers/Firebase/emailHtml/emails_html.dart';
-import 'package:agendacitas/providers/citas_provider.dart';
+
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/screens/creacion_no_disponibilidad/tarjeta_indisponibilidad.dart';
 import 'package:agendacitas/screens/detalles_horario_no_disponible_screen.dart';
-import 'package:agendacitas/widgets/guardarCitaModificada/GuardarCitaModificada.dart';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-import 'package:timezone/timezone.dart';
 
 import '../models/models.dart';
 import '../providers/providers.dart';
@@ -47,7 +46,7 @@ class _ListaCitasNuevoState extends State<ListaCitasNuevo> {
   List<CalendarResource> _employeeCollection = [];
   final List<TimeRegion> _specialTimeRegions = [];
 
-  List<CitaModelFirebase> _citasFiltradas = [];
+  final List<CitaModelFirebase> _citasFiltradas = [];
 
   @override
   void initState() {

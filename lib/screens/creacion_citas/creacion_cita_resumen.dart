@@ -1,10 +1,8 @@
 // ignore_for_file: file_names
 
-import 'dart:math';
 
 import 'package:agendacitas/providers/Firebase/firebase_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
-import 'package:agendacitas/providers/creacion_cuenta/inicio_sesion_forzada.dart';
 import 'package:agendacitas/providers/empleados_provider.dart';
 import 'package:agendacitas/providers/estado_pago_app_provider.dart';
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
@@ -358,7 +356,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
         const SizedBox(height: 15),
         const Text(
           'Reserva confirmada',
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.blueGrey,
             fontWeight: FontWeight.bold,
             fontSize: 18,
@@ -377,9 +375,9 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     return Column(
       spacing: 10,
       children: [
-        Divider(),
+        const Divider(),
         Text(
-          'Comparte la cita con ${clientaTexto}\n${formattedDate}',
+          'Comparte la cita con $clientaTexto\n$formattedDate',
           style: const TextStyle(
             color: Colors.blueGrey,
             fontWeight: FontWeight.bold,

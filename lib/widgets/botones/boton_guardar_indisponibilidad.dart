@@ -66,7 +66,7 @@ class _BotonGuardarState extends State<BotonGuardar> {
     print(personalizado);
 
     final providerTextoTitulo = context.watch<TextoTituloIndispuesto>();
-    print({'${providerTextoTitulo.getTitulo}'});
+    print({(providerTextoTitulo.getTitulo)});
     bool condicionBotonActivado() {
       //  con la variable 'personalizado' verfico si esta la opcion del asunto es personalizado
       // si es personalizado, compruebo con 'botonAtivado' los tramos horarios, y si el formulario está validado

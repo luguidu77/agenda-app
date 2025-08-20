@@ -7,7 +7,7 @@ class ContentSection extends StatelessWidget {
   final CitaModelFirebase reserva;
   final PersonalizaModelFirebase personaliza;
   final emailUsuario;
-  const ContentSection({
+  const ContentSection({super.key, 
     required this.reserva,
     required this.personaliza,
     required this.emailUsuario,

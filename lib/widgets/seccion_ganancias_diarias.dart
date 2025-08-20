@@ -3,7 +3,6 @@ import 'package:agendacitas/providers/calendario_provider.dart';
 import 'package:agendacitas/providers/citas_provider.dart';
 import 'package:agendacitas/providers/personaliza_provider.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
-import 'package:agendacitas/utils/total_de_citas_diaria.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';

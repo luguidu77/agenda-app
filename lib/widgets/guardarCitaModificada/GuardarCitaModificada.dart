@@ -67,7 +67,7 @@ class _GuardarCitaModificadaState extends State<GuardarCitaModificada> {
                     ElevatedButton(
                       style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.all(Colors.redAccent),
+                            WidgetStateProperty.all(Colors.redAccent),
                       ),
                       onPressed: _cerrarBottomSheet,
                       child: const Text('Cancelar'),

@@ -695,7 +695,7 @@ class EmpleadoEdicionState extends State<EmpleadoEdicion> {
 
       // Mostrar mensaje de éxito
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Invitación enviada correctamente')),
+        const SnackBar(content: Text('Invitación enviada correctamente')),
       );
     } catch (e) {
       // Manejo de errores

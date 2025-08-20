@@ -1,16 +1,9 @@
-import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/providers/providers.dart';
-import 'package:agendacitas/providers/rol_usuario_provider.dart';
-import 'package:agendacitas/screens/creacion_citas/creacion_cita_confirmar.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/menu_config_cliente.dart';
-import 'package:agendacitas/utils/actualizacion_cita.dart';
 import 'package:agendacitas/utils/formatear.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -196,7 +189,7 @@ class WidgetsDetalleCita {
       PersonalizaModelFirebase personaliza) {
     final contextoServiciosOfrecidos =
         context.read<ServiciosOfrecidosProvider>();
-    List<ServicioModelFB> _serviciosOfrecidos =
+    List<ServicioModelFB> serviciosOfrecidos =
         contextoServiciosOfrecidos.getServicios;
 
     ///traer los tiempos de servicios  con el idservicio/////////////////////////////
@@ -216,7 +209,7 @@ class WidgetsDetalleCita {
 
     Widget cardServicios(BuildContext context, String idservicio, citaElegida) {
       final personalizaProvider = context.read<PersonalizaProviderFirebase>();
-      final servicio = traeServicioPorId(_serviciosOfrecidos, idservicio);
+      final servicio = traeServicioPorId(serviciosOfrecidos, idservicio);
 
       print(servicio!.id);
 
@@ -225,7 +218,7 @@ class WidgetsDetalleCita {
       final precio = servicio.precio!;
       final tiempo = servicio.tiempo;
       /* */
-      ; // contextoServiciosOfrecidos.getServicios.first.tiempo;
+// contextoServiciosOfrecidos.getServicios.first.tiempo;
       final empleado = citaElegida.nombreEmpleado;
       final horaInicio = citaElegida.horaInicio;
       final hora =
@@ -367,7 +360,7 @@ class WidgetsDetalleCita {
     await showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Container(
+        return SizedBox(
           height: MediaQuery.of(context).size.height / 2,
           child: Column(
             children: [
@@ -432,7 +425,7 @@ class WidgetsDetalleCita {
         final selectedMinute = citaProvider.contextoCita.horaInicio!.minute;
         final initialIndex = selectedHour * 12 + (selectedMinute ~/ 5);
 
-        return Container(
+        return SizedBox(
           height: MediaQuery.of(context).size.height / 2,
           child: Column(
             children: [

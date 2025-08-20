@@ -47,14 +47,14 @@ dependencies:
   url_launcher: ^6.1.5
   whatsapp_unilink: ^2.0.2
 
-  permission_handler: ^10.2.0
+  permission_handler: ^12.0.1
   fast_contacts: ^4.0.0
 
   flutter_local_notifications: ^18.0.1
 
 
   #admob_flutter: ^3.0.0
-  google_mobile_ads: ^3.0.0
+  google_mobile_ads: ^6.0.0
   #sms_advanced: ^1.0.1
   google_fonts:
   material_dialogs: ^1.1.3
@@ -131,7 +131,7 @@ dependencies:
   
   #para llevar al usuario a la configuracion del dispositivo
   android_intent_plus: ^5.3.0 
-  flutter_native_timezone_updated_gradle: ^2.0.3
+  
 
   flutter_timezone: ^4.1.0
   timezone: ^0.10.0

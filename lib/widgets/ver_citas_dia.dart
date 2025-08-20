@@ -1,9 +1,5 @@
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/models/models.dart';
-import 'package:agendacitas/providers/citas_provider.dart';
-import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
-import 'package:agendacitas/screens/style/estilo_pantalla.dart';
-import 'package:agendacitas/widgets/lista_de_citas.dart';
 import 'package:agendacitas/widgets/seccion_calendario.dart';
 import 'package:agendacitas/widgets/seccion_empleados.screen.dart';
 import 'package:agendacitas/widgets/seccion_ganancias_diarias.dart';

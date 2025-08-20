@@ -1,8 +1,6 @@
 import 'package:agendacitas/screens/creacion_citas/creacion_cita_resumen.dart';
 import 'package:agendacitas/screens/creacion_citas/servicios_creacion_cita.dart';
-import 'package:agendacitas/screens/creacion_citas/utils/formatea_fecha_hora.dart';
 import 'package:agendacitas/utils/utils.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -233,9 +231,9 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
                 Visibility(
                     visible: compuebaDisponible(),
                     child: const Card(
-                      color: (const Color.fromARGB(255, 253, 248, 217)),
+                      color: (Color.fromARGB(255, 253, 248, 217)),
                       child: Padding(
-                        padding: const EdgeInsets.all(5.0),
+                        padding: EdgeInsets.all(5.0),
                         child: Text(
                           '⚠️El miembro no está disponible',
                           style: TextStyle(fontSize: 10, color: Colors.red),
@@ -582,7 +580,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Container(
+        return SizedBox(
           height: MediaQuery.of(context).size.height / 2,
           child: Column(
             children: [
@@ -641,7 +639,7 @@ class _CreacionCitaConfirmarState extends State<CreacionCitaConfirmar> {
             contextoCreacionCita.contextoCita.horaInicio!.minute;
         final initialIndex = selectedHour * 12 + (selectedMinute ~/ 5);
 
-        return Container(
+        return SizedBox(
           height: MediaQuery.of(context).size.height / 2,
           child: Column(
             children: [

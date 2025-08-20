@@ -1,5 +1,4 @@
 import 'package:agendacitas/providers/pago_dispositivo_provider.dart';
-import 'package:agendacitas/config/config_personalizar_screen.dart';
 import 'package:agendacitas/screens/home.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:agendacitas/widgets/formulariosSessionApp/registro_usuario_screen.dart';

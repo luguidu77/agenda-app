@@ -1,5 +1,4 @@
 import 'package:agendacitas/models/models.dart';
-import 'package:agendacitas/models/perfil_usuarioapp_model.dart';
 import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
 import 'package:agendacitas/screens/creacion_citas/utils/detalles_cita/footer/check.dart';

@@ -1,7 +1,6 @@
 import 'package:agendacitas/models/empleado_model.dart';
 import 'package:agendacitas/models/models.dart';
 import 'package:agendacitas/utils/formatear.dart';
-import 'package:flutter/material.dart';
 
 String formatearFecha(String fechaOriginal) {
   return formateaFechaLarga(fechaOriginal);
@@ -31,7 +30,7 @@ String textoHTML(String estadoCita, PerfilAdministradorModel negocio,
   // Crear una cadena de texto HTML con los elementos de la lista en columna
   String htmlServicios = "<div>";
   for (String item in cita.idservicio!) {
-    htmlServicios += "<p>${item}</p>";
+    htmlServicios += "<p>$item</p>";
   }
   htmlServicios += "</div>";
 

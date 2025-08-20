@@ -52,7 +52,7 @@ class _PaginaIconoAnimadoState extends State<PaginaIconoAnimado> {
 
   @override
   Widget build(BuildContext context) {
-    return !cuentaCreada ? const IconoAnimado() : ConfiguracionPersonalizada();
+    return !cuentaCreada ? const IconoAnimado() : const ConfiguracionPersonalizada();
   }
 
 //METODO PARA GUARDADO DE PAGO Y RESPALDO EN FIREBASE Y PRESENTAR INFORMACION AL USUARIO EN PANTALLA
@@ -420,7 +420,7 @@ class _PersonalizaPaisState extends State<PersonalizaPais> {
                   spacing: 20,
                   children: [
                     DropdownButtonFormField<String>(
-                      value: contextoConfiguracion.codigoPais,
+                      initialValue: contextoConfiguracion.codigoPais,
                       decoration: const InputDecoration(
                         labelText: 'País',
                         border: OutlineInputBorder(),
@@ -446,7 +446,7 @@ class _PersonalizaPaisState extends State<PersonalizaPais> {
 
                         contextoConfiguracion.setCodPaisyMoneda(pais);
 
-                        print('País seleccionado: ${pais}');
+                        print('País seleccionado: $pais');
                       },
                       items: countries.map((country) {
                         return DropdownMenuItem<String>(
@@ -455,7 +455,7 @@ class _PersonalizaPaisState extends State<PersonalizaPais> {
                             children: [
                               Image.asset(
                                   height: 25, '${country['flag']}', width: 25),
-                              SizedBox(width: 10),
+                              const SizedBox(width: 10),
                               Text('${country['name']} '),
                             ],
                           ),
@@ -481,8 +481,8 @@ class HorarioApertura extends StatefulWidget {
 }
 
 class _HorarioAperturaState extends State<HorarioApertura> {
-  TimeOfDay apertura = TimeOfDay(hour: 8, minute: 0); // Hora de apertura
-  TimeOfDay cierre = TimeOfDay(hour: 22, minute: 0); // Hora de cierre
+  TimeOfDay apertura = const TimeOfDay(hour: 8, minute: 0); // Hora de apertura
+  TimeOfDay cierre = const TimeOfDay(hour: 22, minute: 0); // Hora de cierre
 
   // Función para mostrar el selector de hora
   Future<void> _seleccionarHora(bool esApertura) async {
@@ -554,7 +554,7 @@ class _HorarioAperturaState extends State<HorarioApertura> {
                 children: [
                   Text(
                     'Cierre: ${cierre.format(context)}',
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
                   TextButton(
                     onPressed: () => _seleccionarHora(false),
@@ -812,7 +812,7 @@ class PaginacionProvider extends ChangeNotifier {
 }
 
 class PrimeraConfiguracionProvider extends ChangeNotifier {
-  bool _configuracionCompleta = false;
+  final bool _configuracionCompleta = false;
   bool get configuracionCompleta => _configuracionCompleta;
 
   String _idEmpleado = '';
@@ -879,13 +879,13 @@ class _BontonProgresoState extends State<BontonProgreso> {
     final pageViewProvider =
         Provider.of<PaginacionProvider>(context, listen: true);
     _paginaActual = pageViewProvider.paginaActual;
-    return Container(
+    return SizedBox(
       height: 100,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Container(width: 120, child: _botonAtras(pageViewProvider)),
-          Container(
+          SizedBox(width: 120, child: _botonAtras(pageViewProvider)),
+          SizedBox(
             width: 150,
             child: _botonContinuar(pageViewProvider),
           ),
@@ -954,7 +954,7 @@ class _BontonProgresoState extends State<BontonProgreso> {
         padding: const EdgeInsets.symmetric(vertical: 15),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(25),
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             colors: [
               Color.fromARGB(255, 44, 43, 92),
               Colors.black
@@ -970,7 +970,7 @@ class _BontonProgresoState extends State<BontonProgreso> {
             ),
           ],
         ),
-        child: Text(
+        child: const Text(
           'Atrás',
           textAlign: TextAlign.center,
           style: TextStyle(
@@ -1063,7 +1063,7 @@ class _BontonProgresoState extends State<BontonProgreso> {
                     Color.fromARGB(255, 68, 113, 172),
                     Color.fromARGB(255, 128, 139, 231)
                   ]
-                : [Color(0xFF4CAF50), Color(0xFF8BC34A)], // Gradiente verde
+                : [const Color(0xFF4CAF50), const Color(0xFF8BC34A)], // Gradiente verde
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

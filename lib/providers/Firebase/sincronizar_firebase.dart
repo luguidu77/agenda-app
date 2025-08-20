@@ -1,10 +1,8 @@
 import 'package:agendacitas/firebase_options.dart';
 import 'package:agendacitas/models/empleado_model.dart';
-import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 
 import '../../models/models.dart';
 import '../db_provider.dart';
@@ -175,7 +173,7 @@ class SincronizarFirebase {
 
     await _iniFirebase();
     final docPerfilRef =
-        await db!.collection("agendacitasapp").doc(empleado.emailUsuarioApp);
+        db!.collection("agendacitasapp").doc(empleado.emailUsuarioApp);
 
     await docPerfilRef.update({
       'foto': '',

@@ -298,12 +298,12 @@ class _InicioConfigAppState extends State<InicioConfigApp> {
                   ); */
                 },
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   decoration: BoxDecoration(
                     color: Colors.blue, // color llamativo
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Aceptar',
                     style: TextStyle(
                       fontSize: 16,

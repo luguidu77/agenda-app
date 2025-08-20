@@ -11,13 +11,11 @@ import 'package:agendacitas/providers/tab_notificaciones_screen_provider.dart';
 import 'package:agendacitas/registro_empleados/empleado_revisa_confirma.dart';
 import 'package:agendacitas/registro_empleados/registro_empleados.dart';
 import 'package:agendacitas/screens/creacion_citas/provider/creacion_cita_provider.dart';
-import 'package:agendacitas/screens/error_page.dart';
 import 'package:agendacitas/screens/not_found_page.dart';
 
 import 'package:agendacitas/screens/pagina_creacion_cuenta_screen.dart';
 import 'package:agendacitas/screens/pantalla_de_carga.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -25,12 +23,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:provider/provider.dart';
-import 'package:rive_splash_screen/rive_splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config/.configuraciones.dart';

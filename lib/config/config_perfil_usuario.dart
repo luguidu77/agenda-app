@@ -1,15 +1,11 @@
 import 'package:agendacitas/config/config.dart';
-import 'package:agendacitas/models/empleado_model.dart';
-import 'package:agendacitas/providers/Firebase/firebase_publicacion_online.dart';
 import 'package:agendacitas/providers/rol_usuario_provider.dart';
 import 'package:agendacitas/screens/style/estilo_pantalla.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../models/models.dart';
 import '../providers/providers.dart';
@@ -17,7 +13,7 @@ import '../screens/screens.dart';
 import '../utils/utils.dart';
 
 class ConfigPerfilUsuario extends StatefulWidget {
-  ConfigPerfilUsuario({Key? key}) : super(key: key);
+  const ConfigPerfilUsuario({Key? key}) : super(key: key);
 
   @override
   State<ConfigPerfilUsuario> createState() => _ConfigPerfilUsuarioState();
@@ -34,7 +30,7 @@ class _ConfigPerfilUsuarioState extends State<ConfigPerfilUsuario>
   bool floatExtended = false;
   late bool publicado = false;
 
-  bool _comprobando = false;
+  final bool _comprobando = false;
 
   emailUsuarioApp() async {
     final estadoPagoProvider = context.read<EmailUsuarioAppProvider>();
@@ -260,7 +256,7 @@ class _ConfigPerfilUsuarioState extends State<ConfigPerfilUsuario>
                       borderRadius: BorderRadius.circular(15)),
                   child: ListTile(
                     title: Text(
-                      data!.nombre.toString(),
+                      data.nombre.toString(),
                       style: tituloEstilo,
                     ),
                     leading: const Icon(Icons.person, color: Colors.blue),
